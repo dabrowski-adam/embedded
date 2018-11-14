@@ -1,0 +1,1249 @@
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 1
+
+
+   1              		.code	16
+   2              		.file	"port.c"
+   3              		.section	.debug_abbrev,"",%progbits
+   4              	.Ldebug_abbrev0:
+   5              		.section	.debug_info,"",%progbits
+   6              	.Ldebug_info0:
+   7              		.section	.debug_line,"",%progbits
+   8              	.Ldebug_line0:
+   9 0000 A8000000 		.text
+   9      02004700 
+   9      00000201 
+   9      FB0E0D00 
+   9      01010101 
+  10              	.Ltext0:
+  11              		.align	2
+  12              		.global	pxPortInitialiseStack
+  13              		.code 16
+  14              		.thumb_func
+  15              		.type	pxPortInitialiseStack, %function
+  16              	pxPortInitialiseStack:
+  17              	.LFB2:
+  18              		.file 1 "portable/port.c"
+   1:portable/port.c **** /*
+   2:portable/port.c **** 	FreeRTOS.org V5.1.1 - Copyright (C) 2003-2008 Richard Barry.
+   3:portable/port.c **** 
+   4:portable/port.c **** 	This file is part of the FreeRTOS.org distribution.
+   5:portable/port.c **** 
+   6:portable/port.c **** 	FreeRTOS.org is free software; you can redistribute it and/or modify
+   7:portable/port.c **** 	it under the terms of the GNU General Public License as published by
+   8:portable/port.c **** 	the Free Software Foundation; either version 2 of the License, or
+   9:portable/port.c **** 	(at your option) any later version.
+  10:portable/port.c **** 
+  11:portable/port.c **** 	FreeRTOS.org is distributed in the hope that it will be useful,
+  12:portable/port.c **** 	but WITHOUT ANY WARRANTY; without even the implied warranty of
+  13:portable/port.c **** 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  14:portable/port.c **** 	GNU General Public License for more details.
+  15:portable/port.c **** 
+  16:portable/port.c **** 	You should have received a copy of the GNU General Public License
+  17:portable/port.c **** 	along with FreeRTOS.org; if not, write to the Free Software
+  18:portable/port.c **** 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  19:portable/port.c **** 
+  20:portable/port.c **** 	A special exception to the GPL can be applied should you wish to distribute
+  21:portable/port.c **** 	a combined work that includes FreeRTOS.org, without being obliged to provide
+  22:portable/port.c **** 	the source code for any proprietary components.  See the licensing section 
+  23:portable/port.c **** 	of http://www.FreeRTOS.org for full details of how and when the exception
+  24:portable/port.c **** 	can be applied.
+  25:portable/port.c **** 
+  26:portable/port.c ****     ***************************************************************************
+  27:portable/port.c ****     ***************************************************************************
+  28:portable/port.c ****     *                                                                         *
+  29:portable/port.c ****     * SAVE TIME AND MONEY!  We can port FreeRTOS.org to your own hardware,    *
+  30:portable/port.c ****     * and even write all or part of your application on your behalf.          *
+  31:portable/port.c ****     * See http://www.OpenRTOS.com for details of the services we provide to   *
+  32:portable/port.c ****     * expedite your project.                                                  *
+  33:portable/port.c ****     *                                                                         *
+  34:portable/port.c ****     ***************************************************************************
+  35:portable/port.c ****     ***************************************************************************
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 2
+
+
+  36:portable/port.c **** 
+  37:portable/port.c **** 	Please ensure to read the configuration and relevant port sections of the
+  38:portable/port.c **** 	online documentation.
+  39:portable/port.c **** 
+  40:portable/port.c **** 	http://www.FreeRTOS.org - Documentation, latest information, license and 
+  41:portable/port.c **** 	contact details.
+  42:portable/port.c **** 
+  43:portable/port.c **** 	http://www.SafeRTOS.com - A version that is certified for use in safety 
+  44:portable/port.c **** 	critical systems.
+  45:portable/port.c **** 
+  46:portable/port.c **** 	http://www.OpenRTOS.com - Commercial support, development, porting, 
+  47:portable/port.c **** 	licensing and training services.
+  48:portable/port.c **** */
+  49:portable/port.c **** 
+  50:portable/port.c **** 
+  51:portable/port.c **** /*-----------------------------------------------------------
+  52:portable/port.c ****  * Implementation of functions defined in portable.h for the ARM7 port.
+  53:portable/port.c ****  *
+  54:portable/port.c ****  * Components that can be compiled to either ARM or THUMB mode are
+  55:portable/port.c ****  * contained in this file.  The ISR routines, which can only be compiled
+  56:portable/port.c ****  * to ARM mode are contained in portISR.c.
+  57:portable/port.c ****  *----------------------------------------------------------*/
+  58:portable/port.c **** 
+  59:portable/port.c **** /*
+  60:portable/port.c **** 	Changes from V2.5.2
+  61:portable/port.c **** 		
+  62:portable/port.c **** 	+ ulCriticalNesting is now saved as part of the task context, as is 
+  63:portable/port.c **** 	  therefore added to the initial task stack during pxPortInitialiseStack.
+  64:portable/port.c **** 
+  65:portable/port.c **** 	Changes from V3.2.2
+  66:portable/port.c **** 
+  67:portable/port.c **** 	+ Bug fix - The prescale value for the timer setup is now written to T0_PR 
+  68:portable/port.c **** 	  instead of T0_PC.  This bug would have had no effect unless a prescale 
+  69:portable/port.c **** 	  value was actually used.
+  70:portable/port.c **** */
+  71:portable/port.c **** 
+  72:portable/port.c **** 
+  73:portable/port.c **** /* Standard includes. */
+  74:portable/port.c **** #include <stdlib.h>
+  75:portable/port.c **** 
+  76:portable/port.c **** /* Scheduler includes. */
+  77:portable/port.c **** #include "FreeRTOS.h"
+  78:portable/port.c **** #include "task.h"
+  79:portable/port.c **** 
+  80:portable/port.c **** /* Constants required to setup the task context. */
+  81:portable/port.c **** #define portINITIAL_SPSR				( ( portSTACK_TYPE ) 0x1f ) /* System mode, ARM mode, interrupts enable
+  82:portable/port.c **** #define portTHUMB_MODE_BIT				( ( portSTACK_TYPE ) 0x20 )
+  83:portable/port.c **** #define portINSTRUCTION_SIZE			( ( portSTACK_TYPE ) 4 )
+  84:portable/port.c **** #define portNO_CRITICAL_SECTION_NESTING	( ( portSTACK_TYPE ) 0 )
+  85:portable/port.c **** 
+  86:portable/port.c **** /* Constants required to setup the tick ISR. */
+  87:portable/port.c **** #define portENABLE_TIMER			( ( unsigned portCHAR ) 0x01 )
+  88:portable/port.c **** #define portPRESCALE_VALUE			0x00
+  89:portable/port.c **** #define portINTERRUPT_ON_MATCH		( ( unsigned portLONG ) 0x01 )
+  90:portable/port.c **** #define portRESET_COUNT_ON_MATCH	( ( unsigned portLONG ) 0x02 )
+  91:portable/port.c **** 
+  92:portable/port.c **** /* Constants required to setup the VIC for the tick ISR. */
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 3
+
+
+  93:portable/port.c **** #define portTIMER_VIC_CHANNEL		( ( unsigned portLONG ) 0x0004 )
+  94:portable/port.c **** #define portTIMER_VIC_CHANNEL_BIT	( ( unsigned portLONG ) 0x0010 )
+  95:portable/port.c **** #define portTIMER_VIC_ENABLE		( ( unsigned portLONG ) 0x0020 )
+  96:portable/port.c **** 
+  97:portable/port.c **** /*-----------------------------------------------------------*/
+  98:portable/port.c **** 
+  99:portable/port.c **** /* Setup the timer to generate the tick interrupts. */
+ 100:portable/port.c **** static void prvSetupTimerInterrupt( void );
+ 101:portable/port.c **** 
+ 102:portable/port.c **** /* 
+ 103:portable/port.c ****  * The scheduler can only be started from ARM mode, so 
+ 104:portable/port.c ****  * vPortISRStartFirstSTask() is defined in portISR.c. 
+ 105:portable/port.c ****  */
+ 106:portable/port.c **** extern void vPortISRStartFirstTask( void );
+ 107:portable/port.c **** 
+ 108:portable/port.c **** /*-----------------------------------------------------------*/
+ 109:portable/port.c **** 
+ 110:portable/port.c **** /* 
+ 111:portable/port.c ****  * Initialise the stack of a task to look exactly as if a call to 
+ 112:portable/port.c ****  * portSAVE_CONTEXT had been called.
+ 113:portable/port.c ****  *
+ 114:portable/port.c ****  * See header file for description. 
+ 115:portable/port.c ****  */
+ 116:portable/port.c **** portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE pxCode, void *pvPa
+ 117:portable/port.c **** {
+  19              		.loc 1 117 0
+  20              	.LVL0:
+ 118:portable/port.c **** portSTACK_TYPE *pxOriginalTOS;
+ 119:portable/port.c **** 
+ 120:portable/port.c **** 	pxOriginalTOS = pxTopOfStack;
+ 121:portable/port.c **** 
+ 122:portable/port.c **** 	/* Setup the initial stack of the task.  The stack is set exactly as 
+ 123:portable/port.c **** 	expected by the portRESTORE_CONTEXT() macro. */
+ 124:portable/port.c **** 
+ 125:portable/port.c **** 	/* First on the stack is the return address - which in this case is the
+ 126:portable/port.c **** 	start of the task.  The offset is added to make the return address appear
+ 127:portable/port.c **** 	as it would within an IRQ ISR. */
+ 128:portable/port.c **** 	*pxTopOfStack = ( portSTACK_TYPE ) pxCode + portINSTRUCTION_SIZE;		
+  21              		.loc 1 128 0
+  22 0000 0431     		add	r1, r1, #4
+  23              	.LVL1:
+ 129:portable/port.c **** 	pxTopOfStack--;
+ 130:portable/port.c **** 
+ 131:portable/port.c **** 	*pxTopOfStack = ( portSTACK_TYPE ) 0xaaaaaaaa;	/* R14 */
+  24              		.loc 1 131 0
+  25 0002 1B4B     		ldr	r3, .L3
+  26              		.loc 1 128 0
+  27 0004 0160     		str	r1, [r0]
+  28              		.loc 1 129 0
+  29 0006 011F     		sub	r1, r0, #4
+  30              	.LVL2:
+  31              		.loc 1 131 0
+  32 0008 0B60     		str	r3, [r1]
+ 132:portable/port.c **** 	pxTopOfStack--;	
+  33              		.loc 1 132 0
+  34 000a 031C     		mov	r3, r0
+  35 000c 083B     		sub	r3, r3, #8
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 4
+
+
+  36              	.LVL3:
+ 133:portable/port.c **** 	*pxTopOfStack = ( portSTACK_TYPE ) pxOriginalTOS; /* Stack used when task starts goes in R13. */
+  37              		.loc 1 133 0
+  38 000e 1860     		str	r0, [r3]
+ 134:portable/port.c **** 	pxTopOfStack--;
+ 135:portable/port.c **** 	*pxTopOfStack = ( portSTACK_TYPE ) 0x12121212;	/* R12 */
+  39              		.loc 1 135 0
+  40 0010 184B     		ldr	r3, .L3+4
+  41              	.LVL4:
+  42              		.loc 1 134 0
+  43 0012 0839     		sub	r1, r1, #8
+  44              	.LVL5:
+  45              		.loc 1 135 0
+  46 0014 0B60     		str	r3, [r1]
+ 136:portable/port.c **** 	pxTopOfStack--;	
+ 137:portable/port.c **** 	*pxTopOfStack = ( portSTACK_TYPE ) 0x11111111;	/* R11 */
+  47              		.loc 1 137 0
+  48 0016 184B     		ldr	r3, .L3+8
+  49              		.loc 1 136 0
+  50 0018 0439     		sub	r1, r1, #4
+  51              	.LVL6:
+  52              		.loc 1 137 0
+  53 001a 0B60     		str	r3, [r1]
+ 138:portable/port.c **** 	pxTopOfStack--;	
+ 139:portable/port.c **** 	*pxTopOfStack = ( portSTACK_TYPE ) 0x10101010;	/* R10 */
+  54              		.loc 1 139 0
+  55 001c 174B     		ldr	r3, .L3+12
+  56              		.loc 1 138 0
+  57 001e 0439     		sub	r1, r1, #4
+  58              	.LVL7:
+  59              		.loc 1 139 0
+  60 0020 0B60     		str	r3, [r1]
+ 140:portable/port.c **** 	pxTopOfStack--;	
+ 141:portable/port.c **** 	*pxTopOfStack = ( portSTACK_TYPE ) 0x09090909;	/* R9 */
+  61              		.loc 1 141 0
+  62 0022 174B     		ldr	r3, .L3+16
+  63              		.loc 1 140 0
+  64 0024 0439     		sub	r1, r1, #4
+  65              	.LVL8:
+  66              		.loc 1 141 0
+  67 0026 0B60     		str	r3, [r1]
+ 142:portable/port.c **** 	pxTopOfStack--;	
+ 143:portable/port.c **** 	*pxTopOfStack = ( portSTACK_TYPE ) 0x08080808;	/* R8 */
+  68              		.loc 1 143 0
+  69 0028 164B     		ldr	r3, .L3+20
+  70              		.loc 1 142 0
+  71 002a 0439     		sub	r1, r1, #4
+  72              	.LVL9:
+  73              		.loc 1 143 0
+  74 002c 0B60     		str	r3, [r1]
+ 144:portable/port.c **** 	pxTopOfStack--;	
+ 145:portable/port.c **** 	*pxTopOfStack = ( portSTACK_TYPE ) 0x07070707;	/* R7 */
+  75              		.loc 1 145 0
+  76 002e 164B     		ldr	r3, .L3+24
+  77              		.loc 1 144 0
+  78 0030 0439     		sub	r1, r1, #4
+  79              	.LVL10:
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 5
+
+
+  80              		.loc 1 145 0
+  81 0032 0B60     		str	r3, [r1]
+ 146:portable/port.c **** 	pxTopOfStack--;	
+ 147:portable/port.c **** 	*pxTopOfStack = ( portSTACK_TYPE ) 0x06060606;	/* R6 */
+  82              		.loc 1 147 0
+  83 0034 154B     		ldr	r3, .L3+28
+  84              		.loc 1 146 0
+  85 0036 0439     		sub	r1, r1, #4
+  86              	.LVL11:
+  87              		.loc 1 147 0
+  88 0038 0B60     		str	r3, [r1]
+ 148:portable/port.c **** 	pxTopOfStack--;	
+ 149:portable/port.c **** 	*pxTopOfStack = ( portSTACK_TYPE ) 0x05050505;	/* R5 */
+  89              		.loc 1 149 0
+  90 003a 154B     		ldr	r3, .L3+32
+  91              		.loc 1 148 0
+  92 003c 0439     		sub	r1, r1, #4
+  93              	.LVL12:
+  94              		.loc 1 149 0
+  95 003e 0B60     		str	r3, [r1]
+ 150:portable/port.c **** 	pxTopOfStack--;	
+ 151:portable/port.c **** 	*pxTopOfStack = ( portSTACK_TYPE ) 0x04040404;	/* R4 */
+  96              		.loc 1 151 0
+  97 0040 144B     		ldr	r3, .L3+36
+  98              		.loc 1 150 0
+  99 0042 0439     		sub	r1, r1, #4
+ 100              	.LVL13:
+ 101              		.loc 1 151 0
+ 102 0044 0B60     		str	r3, [r1]
+ 152:portable/port.c **** 	pxTopOfStack--;	
+ 153:portable/port.c **** 	*pxTopOfStack = ( portSTACK_TYPE ) 0x03030303;	/* R3 */
+ 103              		.loc 1 153 0
+ 104 0046 144B     		ldr	r3, .L3+40
+ 105              		.loc 1 152 0
+ 106 0048 0439     		sub	r1, r1, #4
+ 107              	.LVL14:
+ 108              		.loc 1 153 0
+ 109 004a 0B60     		str	r3, [r1]
+ 154:portable/port.c **** 	pxTopOfStack--;	
+ 155:portable/port.c **** 	*pxTopOfStack = ( portSTACK_TYPE ) 0x02020202;	/* R2 */
+ 110              		.loc 1 155 0
+ 111 004c 134B     		ldr	r3, .L3+44
+ 112              		.loc 1 154 0
+ 113 004e 0439     		sub	r1, r1, #4
+ 114              	.LVL15:
+ 115              		.loc 1 155 0
+ 116 0050 0B60     		str	r3, [r1]
+ 156:portable/port.c **** 	pxTopOfStack--;	
+ 157:portable/port.c **** 	*pxTopOfStack = ( portSTACK_TYPE ) 0x01010101;	/* R1 */
+ 117              		.loc 1 157 0
+ 118 0052 134B     		ldr	r3, .L3+48
+ 119              		.loc 1 156 0
+ 120 0054 0439     		sub	r1, r1, #4
+ 121              	.LVL16:
+ 122              		.loc 1 157 0
+ 123 0056 0B60     		str	r3, [r1]
+ 158:portable/port.c **** 	pxTopOfStack--;	
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 6
+
+
+ 124              		.loc 1 158 0
+ 125 0058 031C     		mov	r3, r0
+ 126 005a 3C3B     		sub	r3, r3, #60
+ 127              	.LVL17:
+ 159:portable/port.c **** 
+ 160:portable/port.c **** 	/* When the task starts is will expect to find the function parameter in
+ 161:portable/port.c **** 	R0. */
+ 162:portable/port.c **** 	*pxTopOfStack = ( portSTACK_TYPE ) pvParameters; /* R0 */
+ 128              		.loc 1 162 0
+ 129 005c 1A60     		str	r2, [r3]
+ 163:portable/port.c **** 	pxTopOfStack--;
+ 130              		.loc 1 163 0
+ 131 005e 021C     		mov	r2, r0
+ 132              	.LVL18:
+ 133 0060 403A     		sub	r2, r2, #64
+ 134              	.LVL19:
+ 164:portable/port.c **** 
+ 165:portable/port.c **** 	/* The last thing onto the stack is the status register, which is set for
+ 166:portable/port.c **** 	system mode, with interrupts enabled. */
+ 167:portable/port.c **** 	*pxTopOfStack = ( portSTACK_TYPE ) portINITIAL_SPSR;
+ 168:portable/port.c **** 
+ 169:portable/port.c **** 	#ifdef THUMB_INTERWORK
+ 170:portable/port.c **** 	{
+ 171:portable/port.c **** 		/* We want the task to start in thumb mode. */
+ 172:portable/port.c **** 		*pxTopOfStack |= portTHUMB_MODE_BIT;
+ 135              		.loc 1 172 0
+ 136 0062 3F23     		mov	r3, #63
+ 137 0064 1360     		str	r3, [r2]
+ 173:portable/port.c **** 	}
+ 174:portable/port.c **** 	#endif
+ 175:portable/port.c **** 
+ 176:portable/port.c **** 	pxTopOfStack--;
+ 138              		.loc 1 176 0
+ 139 0066 4438     		sub	r0, r0, #68
+ 140              	.LVL20:
+ 177:portable/port.c **** 
+ 178:portable/port.c **** 	/* Some optimisation levels use the stack differently to others.  This 
+ 179:portable/port.c **** 	means the interrupt flags cannot always be stored on the stack and will
+ 180:portable/port.c **** 	instead be stored in a variable, which is then saved as part of the
+ 181:portable/port.c **** 	tasks context. */
+ 182:portable/port.c **** 	*pxTopOfStack = portNO_CRITICAL_SECTION_NESTING;
+ 141              		.loc 1 182 0
+ 142 0068 0023     		mov	r3, #0
+ 143              		.loc 1 117 0
+ 144              		@ lr needed for prologue
+ 145              		.loc 1 182 0
+ 146 006a 0360     		str	r3, [r0]
+ 147              	.LVL21:
+ 183:portable/port.c **** 
+ 184:portable/port.c **** 	return pxTopOfStack;
+ 185:portable/port.c **** }
+ 148              		.loc 1 185 0
+ 149              		@ sp needed for prologue
+ 150 006c 7047     		bx	lr
+ 151              	.L4:
+ 152 006e C046     		.align	2
+ 153              	.L3:
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 7
+
+
+ 154 0070 AAAAAAAA 		.word	-1431655766
+ 155 0074 12121212 		.word	303174162
+ 156 0078 11111111 		.word	286331153
+ 157 007c 10101010 		.word	269488144
+ 158 0080 09090909 		.word	151587081
+ 159 0084 08080808 		.word	134744072
+ 160 0088 07070707 		.word	117901063
+ 161 008c 06060606 		.word	101058054
+ 162 0090 05050505 		.word	84215045
+ 163 0094 04040404 		.word	67372036
+ 164 0098 03030303 		.word	50529027
+ 165 009c 02020202 		.word	33686018
+ 166 00a0 01010101 		.word	16843009
+ 167              	.LFE2:
+ 168              		.size	pxPortInitialiseStack, .-pxPortInitialiseStack
+ 169              		.align	2
+ 170              		.global	vPortEndScheduler
+ 171              		.code 16
+ 172              		.thumb_func
+ 173              		.type	vPortEndScheduler, %function
+ 174              	vPortEndScheduler:
+ 175              	.LFB4:
+ 186:portable/port.c **** /*-----------------------------------------------------------*/
+ 187:portable/port.c **** 
+ 188:portable/port.c **** portBASE_TYPE xPortStartScheduler( void )
+ 189:portable/port.c **** {
+ 190:portable/port.c **** 	/* Start the timer that generates the tick ISR.  Interrupts are disabled
+ 191:portable/port.c **** 	here already. */
+ 192:portable/port.c **** 	prvSetupTimerInterrupt();
+ 193:portable/port.c **** 
+ 194:portable/port.c **** 	/* Start the first task. */
+ 195:portable/port.c **** 	vPortISRStartFirstTask();	
+ 196:portable/port.c **** 
+ 197:portable/port.c **** 	/* Should not get here! */
+ 198:portable/port.c **** 	return 0;
+ 199:portable/port.c **** }
+ 200:portable/port.c **** /*-----------------------------------------------------------*/
+ 201:portable/port.c **** 
+ 202:portable/port.c **** void vPortEndScheduler( void )
+ 203:portable/port.c **** {
+ 176              		.loc 1 203 0
+ 177              		@ lr needed for prologue
+ 204:portable/port.c **** 	/* It is unlikely that the ARM port will require this function as there
+ 205:portable/port.c **** 	is nothing to return to.  */
+ 206:portable/port.c **** }
+ 178              		.loc 1 206 0
+ 179              		@ sp needed for prologue
+ 180 00a4 7047     		bx	lr
+ 181              	.LFE4:
+ 182              		.size	vPortEndScheduler, .-vPortEndScheduler
+ 183 00a6 C046     		.align	2
+ 184              		.global	xPortStartScheduler
+ 185              		.code 16
+ 186              		.thumb_func
+ 187              		.type	xPortStartScheduler, %function
+ 188              	xPortStartScheduler:
+ 189              	.LFB3:
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 8
+
+
+ 190              		.loc 1 189 0
+ 191 00a8 00B5     		push	{lr}
+ 192              	.LCFI0:
+ 193              	.LBB4:
+ 194              	.LBB5:
+ 207:portable/port.c **** /*-----------------------------------------------------------*/
+ 208:portable/port.c **** 
+ 209:portable/port.c **** /*
+ 210:portable/port.c ****  * Setup the timer 0 to generate the tick interrupts at the required frequency.
+ 211:portable/port.c ****  */
+ 212:portable/port.c **** static void prvSetupTimerInterrupt( void )
+ 213:portable/port.c **** {
+ 214:portable/port.c **** unsigned portLONG ulCompareMatch;
+ 215:portable/port.c **** extern void ( vTickISR )( void );
+ 216:portable/port.c **** 
+ 217:portable/port.c **** 	/* A 1ms tick does not require the use of the timer prescale.  This is
+ 218:portable/port.c **** 	defaulted to zero but can be used if necessary. */
+ 219:portable/port.c **** 	T0_PR = portPRESCALE_VALUE;
+ 195              		.loc 1 219 0
+ 196 00aa 104B     		ldr	r3, .L9
+ 197 00ac 0022     		mov	r2, #0
+ 198 00ae 1A60     		str	r2, [r3]
+ 220:portable/port.c **** 
+ 221:portable/port.c **** 	/* Calculate the match value required for our wanted tick rate. */
+ 222:portable/port.c **** 	ulCompareMatch = configCPU_CLOCK_HZ / configTICK_RATE_HZ;
+ 223:portable/port.c **** 
+ 224:portable/port.c **** 	/* Protect against divide by zero.  Using an if() statement still results
+ 225:portable/port.c **** 	in a warning - hence the #if. */
+ 226:portable/port.c **** 	#if portPRESCALE_VALUE != 0
+ 227:portable/port.c **** 	{
+ 228:portable/port.c **** 		ulCompareMatch /= ( portPRESCALE_VALUE + 1 );
+ 229:portable/port.c **** 	}
+ 230:portable/port.c **** 	#endif
+ 231:portable/port.c **** 	T0_MR0 = ulCompareMatch;
+ 199              		.loc 1 231 0
+ 200 00b0 0F4A     		ldr	r2, .L9+4
+ 201 00b2 0C33     		add	r3, r3, #12
+ 202 00b4 1A60     		str	r2, [r3]
+ 232:portable/port.c **** 
+ 233:portable/port.c **** 	/* Generate tick with timer 0 compare match. */
+ 234:portable/port.c **** 	T0_MCR = portRESET_COUNT_ON_MATCH | portINTERRUPT_ON_MATCH;
+ 203              		.loc 1 234 0
+ 204 00b6 0322     		mov	r2, #3
+ 205 00b8 043B     		sub	r3, r3, #4
+ 206 00ba 1A60     		str	r2, [r3]
+ 235:portable/port.c **** 
+ 236:portable/port.c **** 	/* Setup the VIC for the timer. */
+ 237:portable/port.c **** 	VICIntSelect &= ~( portTIMER_VIC_CHANNEL_BIT );
+ 207              		.loc 1 237 0
+ 208 00bc 0D4A     		ldr	r2, .L9+8
+ 209 00be 1368     		ldr	r3, [r2]
+ 210 00c0 1021     		mov	r1, #16
+ 211 00c2 8B43     		bic	r3, r3, r1
+ 212 00c4 1360     		str	r3, [r2]
+ 238:portable/port.c **** 	VICIntEnable |= portTIMER_VIC_CHANNEL_BIT;
+ 213              		.loc 1 238 0
+ 214 00c6 0432     		add	r2, r2, #4
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 9
+
+
+ 215 00c8 1368     		ldr	r3, [r2]
+ 216 00ca 0B43     		orr	r3, r3, r1
+ 217 00cc 1360     		str	r3, [r2]
+ 239:portable/port.c **** 	
+ 240:portable/port.c **** 	/* The ISR installed depends on whether the preemptive or cooperative
+ 241:portable/port.c **** 	scheduler is being used. */
+ 242:portable/port.c **** 
+ 243:portable/port.c **** 	VICVectAddr0 = ( portLONG ) vTickISR;
+ 218              		.loc 1 243 0
+ 219 00ce 0A4A     		ldr	r2, .L9+12
+ 220 00d0 0A4B     		ldr	r3, .L9+16
+ 221 00d2 1A60     		str	r2, [r3]
+ 244:portable/port.c **** 	VICVectCntl0 = portTIMER_VIC_CHANNEL | portTIMER_VIC_ENABLE;
+ 222              		.loc 1 244 0
+ 223 00d4 0A4B     		ldr	r3, .L9+20
+ 224 00d6 2422     		mov	r2, #36
+ 225 00d8 1A60     		str	r2, [r3]
+ 245:portable/port.c **** 
+ 246:portable/port.c **** 	/* Start the timer - interrupts are disabled when this function is called
+ 247:portable/port.c **** 	so it is okay to do this here. */
+ 248:portable/port.c **** 	T0_TCR = portENABLE_TIMER;
+ 226              		.loc 1 248 0
+ 227 00da 0A4B     		ldr	r3, .L9+24
+ 228 00dc 0122     		mov	r2, #1
+ 229 00de 1A60     		str	r2, [r3]
+ 230              	.LBE5:
+ 231              	.LBE4:
+ 232              		.loc 1 195 0
+ 233 00e0 FFF7FEFF 		bl	vPortISRStartFirstTask
+ 234              		.loc 1 199 0
+ 235 00e4 0020     		mov	r0, #0
+ 236              		@ sp needed for prologue
+ 237 00e6 02BC     		pop	{r1}
+ 238 00e8 0847     		bx	r1
+ 239              	.L10:
+ 240 00ea C046     		.align	2
+ 241              	.L9:
+ 242 00ec 0C4000E0 		.word	-536854516
+ 243 00f0 60EA0000 		.word	60000
+ 244 00f4 0CF0FFFF 		.word	-4084
+ 245 00f8 00000000 		.word	vTickISR
+ 246 00fc 00F1FFFF 		.word	-3840
+ 247 0100 00F2FFFF 		.word	-3584
+ 248 0104 044000E0 		.word	-536854524
+ 249              	.LFE3:
+ 250              		.size	xPortStartScheduler, .-xPortStartScheduler
+ 251              		.section	.debug_frame,"",%progbits
+ 252              	.Lframe0:
+ 253 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ 254              	.LSCIE0:
+ 255 0004 FFFFFFFF 		.4byte	0xffffffff
+ 256 0008 01       		.byte	0x1
+ 257 0009 00       		.ascii	"\000"
+ 258 000a 01       		.uleb128 0x1
+ 259 000b 7C       		.sleb128 -4
+ 260 000c 0E       		.byte	0xe
+ 261 000d 0C       		.byte	0xc
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 10
+
+
+ 262 000e 0D       		.uleb128 0xd
+ 263 000f 00       		.uleb128 0x0
+ 264              		.align	2
+ 265              	.LECIE0:
+ 266              	.LSFDE0:
+ 267 0010 0C000000 		.4byte	.LEFDE0-.LASFDE0
+ 268              	.LASFDE0:
+ 269 0014 00000000 		.4byte	.Lframe0
+ 270 0018 00000000 		.4byte	.LFB2
+ 271 001c A4000000 		.4byte	.LFE2-.LFB2
+ 272              		.align	2
+ 273              	.LEFDE0:
+ 274              	.LSFDE2:
+ 275 0020 0C000000 		.4byte	.LEFDE2-.LASFDE2
+ 276              	.LASFDE2:
+ 277 0024 00000000 		.4byte	.Lframe0
+ 278 0028 A4000000 		.4byte	.LFB4
+ 279 002c 02000000 		.4byte	.LFE4-.LFB4
+ 280              		.align	2
+ 281              	.LEFDE2:
+ 282              	.LSFDE4:
+ 283 0030 14000000 		.4byte	.LEFDE4-.LASFDE4
+ 284              	.LASFDE4:
+ 285 0034 00000000 		.4byte	.Lframe0
+ 286 0038 A8000000 		.4byte	.LFB3
+ 287 003c 60000000 		.4byte	.LFE3-.LFB3
+ 288 0040 42       		.byte	0x4
+ 289              		.4byte	.LCFI0-.LFB3
+ 290 0041 0E       		.byte	0xe
+ 291 0042 04       		.uleb128 0x4
+ 292 0043 8E       		.byte	0x8e
+ 293 0044 01       		.uleb128 0x1
+ 294 0045 000000   		.align	2
+ 295              	.LEFDE4:
+ 296              		.text
+ 297              	.Letext0:
+ 298              		.section	.debug_loc,"",%progbits
+ 299              	.Ldebug_loc0:
+ 300              	.LLST1:
+ 301 0000 00000000 		.4byte	.LVL0-.Ltext0
+ 302 0004 08000000 		.4byte	.LVL2-.Ltext0
+ 303 0008 0100     		.2byte	0x1
+ 304 000a 50       		.byte	0x50
+ 305 000b 08000000 		.4byte	.LVL2-.Ltext0
+ 306 000f 0E000000 		.4byte	.LVL3-.Ltext0
+ 307 0013 0100     		.2byte	0x1
+ 308 0015 51       		.byte	0x51
+ 309 0016 0E000000 		.4byte	.LVL3-.Ltext0
+ 310 001a 12000000 		.4byte	.LVL4-.Ltext0
+ 311 001e 0100     		.2byte	0x1
+ 312 0020 53       		.byte	0x53
+ 313 0021 12000000 		.4byte	.LVL4-.Ltext0
+ 314 0025 14000000 		.4byte	.LVL5-.Ltext0
+ 315 0029 0100     		.2byte	0x1
+ 316 002b 50       		.byte	0x50
+ 317 002c 14000000 		.4byte	.LVL5-.Ltext0
+ 318 0030 5C000000 		.4byte	.LVL17-.Ltext0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 11
+
+
+ 319 0034 0100     		.2byte	0x1
+ 320 0036 51       		.byte	0x51
+ 321 0037 5C000000 		.4byte	.LVL17-.Ltext0
+ 322 003b 62000000 		.4byte	.LVL19-.Ltext0
+ 323 003f 0100     		.2byte	0x1
+ 324 0041 53       		.byte	0x53
+ 325 0042 62000000 		.4byte	.LVL19-.Ltext0
+ 326 0046 68000000 		.4byte	.LVL20-.Ltext0
+ 327 004a 0100     		.2byte	0x1
+ 328 004c 52       		.byte	0x52
+ 329 004d 68000000 		.4byte	.LVL20-.Ltext0
+ 330 0051 6C000000 		.4byte	.LVL21-.Ltext0
+ 331 0055 0100     		.2byte	0x1
+ 332 0057 50       		.byte	0x50
+ 333 0058 00000000 		.4byte	0x0
+ 334 005c 00000000 		.4byte	0x0
+ 335              	.LLST2:
+ 336 0060 00000000 		.4byte	.LVL0-.Ltext0
+ 337 0064 02000000 		.4byte	.LVL1-.Ltext0
+ 338 0068 0100     		.2byte	0x1
+ 339 006a 51       		.byte	0x51
+ 340 006b 00000000 		.4byte	0x0
+ 341 006f 00000000 		.4byte	0x0
+ 342              	.LLST3:
+ 343 0073 00000000 		.4byte	.LVL0-.Ltext0
+ 344 0077 60000000 		.4byte	.LVL18-.Ltext0
+ 345 007b 0100     		.2byte	0x1
+ 346 007d 52       		.byte	0x52
+ 347 007e 00000000 		.4byte	0x0
+ 348 0082 00000000 		.4byte	0x0
+ 349              	.LLST5:
+ 350 0086 A8000000 		.4byte	.LFB3-.Ltext0
+ 351 008a AA000000 		.4byte	.LCFI0-.Ltext0
+ 352 008e 0100     		.2byte	0x1
+ 353 0090 5D       		.byte	0x5d
+ 354 0091 AA000000 		.4byte	.LCFI0-.Ltext0
+ 355 0095 08010000 		.4byte	.LFE3-.Ltext0
+ 356 0099 0200     		.2byte	0x2
+ 357 009b 7D       		.byte	0x7d
+ 358 009c 04       		.sleb128 4
+ 359 009d 00000000 		.4byte	0x0
+ 360 00a1 00000000 		.4byte	0x0
+ 361              		.file 2 "./FreeRTOS/include/projdefs.h"
+ 362              		.section	.debug_info
+ 363 0000 50010000 		.4byte	0x150
+ 364 0004 0200     		.2byte	0x2
+ 365 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 366 000a 04       		.byte	0x4
+ 367 000b 01       		.uleb128 0x1
+ 368 000c 55000000 		.4byte	.LASF15
+ 369 0010 01       		.byte	0x1
+ 370 0011 EE000000 		.4byte	.LASF16
+ 371 0015 42010000 		.4byte	.LASF17
+ 372 0019 00000000 		.4byte	.Ltext0
+ 373 001d 08010000 		.4byte	.Letext0
+ 374 0021 00000000 		.4byte	.Ldebug_line0
+ 375 0025 02       		.uleb128 0x2
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 12
+
+
+ 376 0026 04       		.byte	0x4
+ 377 0027 07       		.byte	0x7
+ 378 0028 D5000000 		.4byte	.LASF0
+ 379 002c 03       		.uleb128 0x3
+ 380 002d 04       		.byte	0x4
+ 381 002e 05       		.byte	0x5
+ 382 002f 696E7400 		.ascii	"int\000"
+ 383 0033 02       		.uleb128 0x2
+ 384 0034 04       		.byte	0x4
+ 385 0035 05       		.byte	0x5
+ 386 0036 CC000000 		.4byte	.LASF1
+ 387 003a 02       		.uleb128 0x2
+ 388 003b 08       		.byte	0x8
+ 389 003c 05       		.byte	0x5
+ 390 003d 00000000 		.4byte	.LASF2
+ 391 0041 02       		.uleb128 0x2
+ 392 0042 04       		.byte	0x4
+ 393 0043 07       		.byte	0x7
+ 394 0044 0E000000 		.4byte	.LASF3
+ 395 0048 04       		.uleb128 0x4
+ 396 0049 04       		.byte	0x4
+ 397 004a 07       		.byte	0x7
+ 398 004b 02       		.uleb128 0x2
+ 399 004c 01       		.byte	0x1
+ 400 004d 08       		.byte	0x8
+ 401 004e B9000000 		.4byte	.LASF4
+ 402 0052 05       		.uleb128 0x5
+ 403 0053 04       		.byte	0x4
+ 404 0054 02       		.uleb128 0x2
+ 405 0055 02       		.byte	0x2
+ 406 0056 05       		.byte	0x5
+ 407 0057 38010000 		.4byte	.LASF5
+ 408 005b 02       		.uleb128 0x2
+ 409 005c 01       		.byte	0x1
+ 410 005d 08       		.byte	0x8
+ 411 005e C7000000 		.4byte	.LASF6
+ 412 0062 02       		.uleb128 0x2
+ 413 0063 02       		.byte	0x2
+ 414 0064 07       		.byte	0x7
+ 415 0065 FE000000 		.4byte	.LASF7
+ 416 0069 02       		.uleb128 0x2
+ 417 006a 08       		.byte	0x8
+ 418 006b 07       		.byte	0x7
+ 419 006c 61000000 		.4byte	.LASF8
+ 420 0070 06       		.uleb128 0x6
+ 421 0071 9B000000 		.4byte	.LASF18
+ 422 0075 02       		.byte	0x2
+ 423 0076 36       		.byte	0x36
+ 424 0077 7B000000 		.4byte	0x7b
+ 425 007b 07       		.uleb128 0x7
+ 426 007c 04       		.byte	0x4
+ 427 007d 81000000 		.4byte	0x81
+ 428 0081 08       		.uleb128 0x8
+ 429 0082 01       		.byte	0x1
+ 430 0083 8D000000 		.4byte	0x8d
+ 431 0087 09       		.uleb128 0x9
+ 432 0088 52000000 		.4byte	0x52
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 13
+
+
+ 433 008c 00       		.byte	0x0
+ 434 008d 02       		.uleb128 0x2
+ 435 008e 01       		.byte	0x1
+ 436 008f 06       		.byte	0x6
+ 437 0090 11010000 		.4byte	.LASF9
+ 438 0094 0A       		.uleb128 0xa
+ 439 0095 01       		.byte	0x1
+ 440 0096 85000000 		.4byte	.LASF19
+ 441 009a 01       		.byte	0x1
+ 442 009b 75       		.byte	0x75
+ 443 009c 01       		.byte	0x1
+ 444 009d E8000000 		.4byte	0xe8
+ 445 00a1 00000000 		.4byte	.LFB2
+ 446 00a5 A4000000 		.4byte	.LFE2
+ 447 00a9 01       		.byte	0x1
+ 448 00aa 5D       		.byte	0x5d
+ 449 00ab E8000000 		.4byte	0xe8
+ 450 00af 0B       		.uleb128 0xb
+ 451 00b0 78000000 		.4byte	.LASF10
+ 452 00b4 01       		.byte	0x1
+ 453 00b5 74       		.byte	0x74
+ 454 00b6 E8000000 		.4byte	0xe8
+ 455 00ba 00000000 		.4byte	.LLST1
+ 456 00be 0B       		.uleb128 0xb
+ 457 00bf E7000000 		.4byte	.LASF11
+ 458 00c3 01       		.byte	0x1
+ 459 00c4 74       		.byte	0x74
+ 460 00c5 70000000 		.4byte	0x70
+ 461 00c9 60000000 		.4byte	.LLST2
+ 462 00cd 0B       		.uleb128 0xb
+ 463 00ce 2B010000 		.4byte	.LASF12
+ 464 00d2 01       		.byte	0x1
+ 465 00d3 74       		.byte	0x74
+ 466 00d4 52000000 		.4byte	0x52
+ 467 00d8 73000000 		.4byte	.LLST3
+ 468 00dc 0C       		.uleb128 0xc
+ 469 00dd 1D010000 		.4byte	.LASF13
+ 470 00e1 01       		.byte	0x1
+ 471 00e2 76       		.byte	0x76
+ 472 00e3 E8000000 		.4byte	0xe8
+ 473 00e7 00       		.byte	0x0
+ 474 00e8 07       		.uleb128 0x7
+ 475 00e9 04       		.byte	0x4
+ 476 00ea 25000000 		.4byte	0x25
+ 477 00ee 0D       		.uleb128 0xd
+ 478 00ef 01       		.byte	0x1
+ 479 00f0 A7000000 		.4byte	.LASF20
+ 480 00f4 01       		.byte	0x1
+ 481 00f5 CB       		.byte	0xcb
+ 482 00f6 01       		.byte	0x1
+ 483 00f7 A4000000 		.4byte	.LFB4
+ 484 00fb A6000000 		.4byte	.LFE4
+ 485 00ff 01       		.byte	0x1
+ 486 0100 5D       		.byte	0x5d
+ 487 0101 0E       		.uleb128 0xe
+ 488 0102 2A000000 		.4byte	.LASF21
+ 489 0106 01       		.byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 14
+
+
+ 490 0107 D5       		.byte	0xd5
+ 491 0108 01       		.byte	0x1
+ 492 0109 01       		.byte	0x1
+ 493 010a 1A010000 		.4byte	0x11a
+ 494 010e 0C       		.uleb128 0xc
+ 495 010f 1B000000 		.4byte	.LASF14
+ 496 0113 01       		.byte	0x1
+ 497 0114 D6       		.byte	0xd6
+ 498 0115 25000000 		.4byte	0x25
+ 499 0119 00       		.byte	0x0
+ 500 011a 0F       		.uleb128 0xf
+ 501 011b 01       		.byte	0x1
+ 502 011c 41000000 		.4byte	.LASF22
+ 503 0120 01       		.byte	0x1
+ 504 0121 BD       		.byte	0xbd
+ 505 0122 01       		.byte	0x1
+ 506 0123 33000000 		.4byte	0x33
+ 507 0127 A8000000 		.4byte	.LFB3
+ 508 012b 08010000 		.4byte	.LFE3
+ 509 012f 86000000 		.4byte	.LLST5
+ 510 0133 10       		.uleb128 0x10
+ 511 0134 01010000 		.4byte	0x101
+ 512 0138 AA000000 		.4byte	.LBB4
+ 513 013c E0000000 		.4byte	.LBE4
+ 514 0140 01       		.byte	0x1
+ 515 0141 C0       		.byte	0xc0
+ 516 0142 11       		.uleb128 0x11
+ 517 0143 AA000000 		.4byte	.LBB5
+ 518 0147 E0000000 		.4byte	.LBE5
+ 519 014b 12       		.uleb128 0x12
+ 520 014c 0E010000 		.4byte	0x10e
+ 521 0150 00       		.byte	0x0
+ 522 0151 00       		.byte	0x0
+ 523 0152 00       		.byte	0x0
+ 524 0153 00       		.byte	0x0
+ 525              		.section	.debug_abbrev
+ 526 0000 01       		.uleb128 0x1
+ 527 0001 11       		.uleb128 0x11
+ 528 0002 01       		.byte	0x1
+ 529 0003 25       		.uleb128 0x25
+ 530 0004 0E       		.uleb128 0xe
+ 531 0005 13       		.uleb128 0x13
+ 532 0006 0B       		.uleb128 0xb
+ 533 0007 03       		.uleb128 0x3
+ 534 0008 0E       		.uleb128 0xe
+ 535 0009 1B       		.uleb128 0x1b
+ 536 000a 0E       		.uleb128 0xe
+ 537 000b 11       		.uleb128 0x11
+ 538 000c 01       		.uleb128 0x1
+ 539 000d 12       		.uleb128 0x12
+ 540 000e 01       		.uleb128 0x1
+ 541 000f 10       		.uleb128 0x10
+ 542 0010 06       		.uleb128 0x6
+ 543 0011 00       		.byte	0x0
+ 544 0012 00       		.byte	0x0
+ 545 0013 02       		.uleb128 0x2
+ 546 0014 24       		.uleb128 0x24
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 15
+
+
+ 547 0015 00       		.byte	0x0
+ 548 0016 0B       		.uleb128 0xb
+ 549 0017 0B       		.uleb128 0xb
+ 550 0018 3E       		.uleb128 0x3e
+ 551 0019 0B       		.uleb128 0xb
+ 552 001a 03       		.uleb128 0x3
+ 553 001b 0E       		.uleb128 0xe
+ 554 001c 00       		.byte	0x0
+ 555 001d 00       		.byte	0x0
+ 556 001e 03       		.uleb128 0x3
+ 557 001f 24       		.uleb128 0x24
+ 558 0020 00       		.byte	0x0
+ 559 0021 0B       		.uleb128 0xb
+ 560 0022 0B       		.uleb128 0xb
+ 561 0023 3E       		.uleb128 0x3e
+ 562 0024 0B       		.uleb128 0xb
+ 563 0025 03       		.uleb128 0x3
+ 564 0026 08       		.uleb128 0x8
+ 565 0027 00       		.byte	0x0
+ 566 0028 00       		.byte	0x0
+ 567 0029 04       		.uleb128 0x4
+ 568 002a 24       		.uleb128 0x24
+ 569 002b 00       		.byte	0x0
+ 570 002c 0B       		.uleb128 0xb
+ 571 002d 0B       		.uleb128 0xb
+ 572 002e 3E       		.uleb128 0x3e
+ 573 002f 0B       		.uleb128 0xb
+ 574 0030 00       		.byte	0x0
+ 575 0031 00       		.byte	0x0
+ 576 0032 05       		.uleb128 0x5
+ 577 0033 0F       		.uleb128 0xf
+ 578 0034 00       		.byte	0x0
+ 579 0035 0B       		.uleb128 0xb
+ 580 0036 0B       		.uleb128 0xb
+ 581 0037 00       		.byte	0x0
+ 582 0038 00       		.byte	0x0
+ 583 0039 06       		.uleb128 0x6
+ 584 003a 16       		.uleb128 0x16
+ 585 003b 00       		.byte	0x0
+ 586 003c 03       		.uleb128 0x3
+ 587 003d 0E       		.uleb128 0xe
+ 588 003e 3A       		.uleb128 0x3a
+ 589 003f 0B       		.uleb128 0xb
+ 590 0040 3B       		.uleb128 0x3b
+ 591 0041 0B       		.uleb128 0xb
+ 592 0042 49       		.uleb128 0x49
+ 593 0043 13       		.uleb128 0x13
+ 594 0044 00       		.byte	0x0
+ 595 0045 00       		.byte	0x0
+ 596 0046 07       		.uleb128 0x7
+ 597 0047 0F       		.uleb128 0xf
+ 598 0048 00       		.byte	0x0
+ 599 0049 0B       		.uleb128 0xb
+ 600 004a 0B       		.uleb128 0xb
+ 601 004b 49       		.uleb128 0x49
+ 602 004c 13       		.uleb128 0x13
+ 603 004d 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 16
+
+
+ 604 004e 00       		.byte	0x0
+ 605 004f 08       		.uleb128 0x8
+ 606 0050 15       		.uleb128 0x15
+ 607 0051 01       		.byte	0x1
+ 608 0052 27       		.uleb128 0x27
+ 609 0053 0C       		.uleb128 0xc
+ 610 0054 01       		.uleb128 0x1
+ 611 0055 13       		.uleb128 0x13
+ 612 0056 00       		.byte	0x0
+ 613 0057 00       		.byte	0x0
+ 614 0058 09       		.uleb128 0x9
+ 615 0059 05       		.uleb128 0x5
+ 616 005a 00       		.byte	0x0
+ 617 005b 49       		.uleb128 0x49
+ 618 005c 13       		.uleb128 0x13
+ 619 005d 00       		.byte	0x0
+ 620 005e 00       		.byte	0x0
+ 621 005f 0A       		.uleb128 0xa
+ 622 0060 2E       		.uleb128 0x2e
+ 623 0061 01       		.byte	0x1
+ 624 0062 3F       		.uleb128 0x3f
+ 625 0063 0C       		.uleb128 0xc
+ 626 0064 03       		.uleb128 0x3
+ 627 0065 0E       		.uleb128 0xe
+ 628 0066 3A       		.uleb128 0x3a
+ 629 0067 0B       		.uleb128 0xb
+ 630 0068 3B       		.uleb128 0x3b
+ 631 0069 0B       		.uleb128 0xb
+ 632 006a 27       		.uleb128 0x27
+ 633 006b 0C       		.uleb128 0xc
+ 634 006c 49       		.uleb128 0x49
+ 635 006d 13       		.uleb128 0x13
+ 636 006e 11       		.uleb128 0x11
+ 637 006f 01       		.uleb128 0x1
+ 638 0070 12       		.uleb128 0x12
+ 639 0071 01       		.uleb128 0x1
+ 640 0072 40       		.uleb128 0x40
+ 641 0073 0A       		.uleb128 0xa
+ 642 0074 01       		.uleb128 0x1
+ 643 0075 13       		.uleb128 0x13
+ 644 0076 00       		.byte	0x0
+ 645 0077 00       		.byte	0x0
+ 646 0078 0B       		.uleb128 0xb
+ 647 0079 05       		.uleb128 0x5
+ 648 007a 00       		.byte	0x0
+ 649 007b 03       		.uleb128 0x3
+ 650 007c 0E       		.uleb128 0xe
+ 651 007d 3A       		.uleb128 0x3a
+ 652 007e 0B       		.uleb128 0xb
+ 653 007f 3B       		.uleb128 0x3b
+ 654 0080 0B       		.uleb128 0xb
+ 655 0081 49       		.uleb128 0x49
+ 656 0082 13       		.uleb128 0x13
+ 657 0083 02       		.uleb128 0x2
+ 658 0084 06       		.uleb128 0x6
+ 659 0085 00       		.byte	0x0
+ 660 0086 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 17
+
+
+ 661 0087 0C       		.uleb128 0xc
+ 662 0088 34       		.uleb128 0x34
+ 663 0089 00       		.byte	0x0
+ 664 008a 03       		.uleb128 0x3
+ 665 008b 0E       		.uleb128 0xe
+ 666 008c 3A       		.uleb128 0x3a
+ 667 008d 0B       		.uleb128 0xb
+ 668 008e 3B       		.uleb128 0x3b
+ 669 008f 0B       		.uleb128 0xb
+ 670 0090 49       		.uleb128 0x49
+ 671 0091 13       		.uleb128 0x13
+ 672 0092 00       		.byte	0x0
+ 673 0093 00       		.byte	0x0
+ 674 0094 0D       		.uleb128 0xd
+ 675 0095 2E       		.uleb128 0x2e
+ 676 0096 00       		.byte	0x0
+ 677 0097 3F       		.uleb128 0x3f
+ 678 0098 0C       		.uleb128 0xc
+ 679 0099 03       		.uleb128 0x3
+ 680 009a 0E       		.uleb128 0xe
+ 681 009b 3A       		.uleb128 0x3a
+ 682 009c 0B       		.uleb128 0xb
+ 683 009d 3B       		.uleb128 0x3b
+ 684 009e 0B       		.uleb128 0xb
+ 685 009f 27       		.uleb128 0x27
+ 686 00a0 0C       		.uleb128 0xc
+ 687 00a1 11       		.uleb128 0x11
+ 688 00a2 01       		.uleb128 0x1
+ 689 00a3 12       		.uleb128 0x12
+ 690 00a4 01       		.uleb128 0x1
+ 691 00a5 40       		.uleb128 0x40
+ 692 00a6 0A       		.uleb128 0xa
+ 693 00a7 00       		.byte	0x0
+ 694 00a8 00       		.byte	0x0
+ 695 00a9 0E       		.uleb128 0xe
+ 696 00aa 2E       		.uleb128 0x2e
+ 697 00ab 01       		.byte	0x1
+ 698 00ac 03       		.uleb128 0x3
+ 699 00ad 0E       		.uleb128 0xe
+ 700 00ae 3A       		.uleb128 0x3a
+ 701 00af 0B       		.uleb128 0xb
+ 702 00b0 3B       		.uleb128 0x3b
+ 703 00b1 0B       		.uleb128 0xb
+ 704 00b2 27       		.uleb128 0x27
+ 705 00b3 0C       		.uleb128 0xc
+ 706 00b4 20       		.uleb128 0x20
+ 707 00b5 0B       		.uleb128 0xb
+ 708 00b6 01       		.uleb128 0x1
+ 709 00b7 13       		.uleb128 0x13
+ 710 00b8 00       		.byte	0x0
+ 711 00b9 00       		.byte	0x0
+ 712 00ba 0F       		.uleb128 0xf
+ 713 00bb 2E       		.uleb128 0x2e
+ 714 00bc 01       		.byte	0x1
+ 715 00bd 3F       		.uleb128 0x3f
+ 716 00be 0C       		.uleb128 0xc
+ 717 00bf 03       		.uleb128 0x3
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 18
+
+
+ 718 00c0 0E       		.uleb128 0xe
+ 719 00c1 3A       		.uleb128 0x3a
+ 720 00c2 0B       		.uleb128 0xb
+ 721 00c3 3B       		.uleb128 0x3b
+ 722 00c4 0B       		.uleb128 0xb
+ 723 00c5 27       		.uleb128 0x27
+ 724 00c6 0C       		.uleb128 0xc
+ 725 00c7 49       		.uleb128 0x49
+ 726 00c8 13       		.uleb128 0x13
+ 727 00c9 11       		.uleb128 0x11
+ 728 00ca 01       		.uleb128 0x1
+ 729 00cb 12       		.uleb128 0x12
+ 730 00cc 01       		.uleb128 0x1
+ 731 00cd 40       		.uleb128 0x40
+ 732 00ce 06       		.uleb128 0x6
+ 733 00cf 00       		.byte	0x0
+ 734 00d0 00       		.byte	0x0
+ 735 00d1 10       		.uleb128 0x10
+ 736 00d2 1D       		.uleb128 0x1d
+ 737 00d3 01       		.byte	0x1
+ 738 00d4 31       		.uleb128 0x31
+ 739 00d5 13       		.uleb128 0x13
+ 740 00d6 11       		.uleb128 0x11
+ 741 00d7 01       		.uleb128 0x1
+ 742 00d8 12       		.uleb128 0x12
+ 743 00d9 01       		.uleb128 0x1
+ 744 00da 58       		.uleb128 0x58
+ 745 00db 0B       		.uleb128 0xb
+ 746 00dc 59       		.uleb128 0x59
+ 747 00dd 0B       		.uleb128 0xb
+ 748 00de 00       		.byte	0x0
+ 749 00df 00       		.byte	0x0
+ 750 00e0 11       		.uleb128 0x11
+ 751 00e1 0B       		.uleb128 0xb
+ 752 00e2 01       		.byte	0x1
+ 753 00e3 11       		.uleb128 0x11
+ 754 00e4 01       		.uleb128 0x1
+ 755 00e5 12       		.uleb128 0x12
+ 756 00e6 01       		.uleb128 0x1
+ 757 00e7 00       		.byte	0x0
+ 758 00e8 00       		.byte	0x0
+ 759 00e9 12       		.uleb128 0x12
+ 760 00ea 34       		.uleb128 0x34
+ 761 00eb 00       		.byte	0x0
+ 762 00ec 31       		.uleb128 0x31
+ 763 00ed 13       		.uleb128 0x13
+ 764 00ee 00       		.byte	0x0
+ 765 00ef 00       		.byte	0x0
+ 766 00f0 00       		.byte	0x0
+ 767              		.section	.debug_pubnames,"",%progbits
+ 768 0000 56000000 		.4byte	0x56
+ 769 0004 0200     		.2byte	0x2
+ 770 0006 00000000 		.4byte	.Ldebug_info0
+ 771 000a 54010000 		.4byte	0x154
+ 772 000e 94000000 		.4byte	0x94
+ 773 0012 7078506F 		.ascii	"pxPortInitialiseStack\000"
+ 773      7274496E 
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 19
+
+
+ 773      69746961 
+ 773      6C697365 
+ 773      53746163 
+ 774 0028 EE000000 		.4byte	0xee
+ 775 002c 76506F72 		.ascii	"vPortEndScheduler\000"
+ 775      74456E64 
+ 775      53636865 
+ 775      64756C65 
+ 775      7200
+ 776 003e 1A010000 		.4byte	0x11a
+ 777 0042 78506F72 		.ascii	"xPortStartScheduler\000"
+ 777      74537461 
+ 777      72745363 
+ 777      68656475 
+ 777      6C657200 
+ 778 0056 00000000 		.4byte	0x0
+ 779              		.section	.debug_aranges,"",%progbits
+ 780 0000 1C000000 		.4byte	0x1c
+ 781 0004 0200     		.2byte	0x2
+ 782 0006 00000000 		.4byte	.Ldebug_info0
+ 783 000a 04       		.byte	0x4
+ 784 000b 00       		.byte	0x0
+ 785 000c 0000     		.2byte	0x0
+ 786 000e 0000     		.2byte	0x0
+ 787 0010 00000000 		.4byte	.Ltext0
+ 788 0014 08010000 		.4byte	.Letext0-.Ltext0
+ 789 0018 00000000 		.4byte	0x0
+ 790 001c 00000000 		.4byte	0x0
+ 791              		.section	.debug_str,"MS",%progbits,1
+ 792              	.LASF2:
+ 793 0000 6C6F6E67 		.ascii	"long long int\000"
+ 793      206C6F6E 
+ 793      6720696E 
+ 793      7400
+ 794              	.LASF3:
+ 795 000e 756E7369 		.ascii	"unsigned int\000"
+ 795      676E6564 
+ 795      20696E74 
+ 795      00
+ 796              	.LASF14:
+ 797 001b 756C436F 		.ascii	"ulCompareMatch\000"
+ 797      6D706172 
+ 797      654D6174 
+ 797      636800
+ 798              	.LASF21:
+ 799 002a 70727653 		.ascii	"prvSetupTimerInterrupt\000"
+ 799      65747570 
+ 799      54696D65 
+ 799      72496E74 
+ 799      65727275 
+ 800              	.LASF22:
+ 801 0041 78506F72 		.ascii	"xPortStartScheduler\000"
+ 801      74537461 
+ 801      72745363 
+ 801      68656475 
+ 801      6C657200 
+ 802              	.LASF15:
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 20
+
+
+ 803 0055 474E5520 		.ascii	"GNU C 4.2.2\000"
+ 803      4320342E 
+ 803      322E3200 
+ 804              	.LASF8:
+ 805 0061 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 805      206C6F6E 
+ 805      6720756E 
+ 805      7369676E 
+ 805      65642069 
+ 806              	.LASF10:
+ 807 0078 7078546F 		.ascii	"pxTopOfStack\000"
+ 807      704F6653 
+ 807      7461636B 
+ 807      00
+ 808              	.LASF19:
+ 809 0085 7078506F 		.ascii	"pxPortInitialiseStack\000"
+ 809      7274496E 
+ 809      69746961 
+ 809      6C697365 
+ 809      53746163 
+ 810              	.LASF18:
+ 811 009b 70645441 		.ascii	"pdTASK_CODE\000"
+ 811      534B5F43 
+ 811      4F444500 
+ 812              	.LASF20:
+ 813 00a7 76506F72 		.ascii	"vPortEndScheduler\000"
+ 813      74456E64 
+ 813      53636865 
+ 813      64756C65 
+ 813      7200
+ 814              	.LASF4:
+ 815 00b9 756E7369 		.ascii	"unsigned char\000"
+ 815      676E6564 
+ 815      20636861 
+ 815      7200
+ 816              	.LASF6:
+ 817 00c7 63686172 		.ascii	"char\000"
+ 817      00
+ 818              	.LASF1:
+ 819 00cc 6C6F6E67 		.ascii	"long int\000"
+ 819      20696E74 
+ 819      00
+ 820              	.LASF0:
+ 821 00d5 6C6F6E67 		.ascii	"long unsigned int\000"
+ 821      20756E73 
+ 821      69676E65 
+ 821      6420696E 
+ 821      7400
+ 822              	.LASF11:
+ 823 00e7 7078436F 		.ascii	"pxCode\000"
+ 823      646500
+ 824              	.LASF16:
+ 825 00ee 706F7274 		.ascii	"portable/port.c\000"
+ 825      61626C65 
+ 825      2F706F72 
+ 825      742E6300 
+ 826              	.LASF7:
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 21
+
+
+ 827 00fe 73686F72 		.ascii	"short unsigned int\000"
+ 827      7420756E 
+ 827      7369676E 
+ 827      65642069 
+ 827      6E7400
+ 828              	.LASF9:
+ 829 0111 7369676E 		.ascii	"signed char\000"
+ 829      65642063 
+ 829      68617200 
+ 830              	.LASF13:
+ 831 011d 70784F72 		.ascii	"pxOriginalTOS\000"
+ 831      6967696E 
+ 831      616C544F 
+ 831      5300
+ 832              	.LASF12:
+ 833 012b 70765061 		.ascii	"pvParameters\000"
+ 833      72616D65 
+ 833      74657273 
+ 833      00
+ 834              	.LASF5:
+ 835 0138 73686F72 		.ascii	"short int\000"
+ 835      7420696E 
+ 835      7400
+ 836              	.LASF17:
+ 837 0142 2F637967 		.ascii	"/cygdrive/c/Downloads/EDU\000"
+ 837      64726976 
+ 837      652F632F 
+ 837      446F776E 
+ 837      6C6F6164 
+ 838              		.ident	"GCC: (GNU) 4.2.2"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s 			page 22
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 port.c
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s:1      .text:00000000 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s:16     .text:00000000 pxPortInitialiseStack
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s:154    .text:00000070 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s:174    .text:000000a4 vPortEndScheduler
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s:171    .text:000000a4 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s:188    .text:000000a8 xPortStartScheduler
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccorOhDd.s:242    .text:000000ec $d
+
+UNDEFINED SYMBOLS
+vPortISRStartFirstTask
+vTickISR

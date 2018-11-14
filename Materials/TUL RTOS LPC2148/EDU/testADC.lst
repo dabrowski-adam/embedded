@@ -1,0 +1,1134 @@
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 1
+
+
+   1              		.code	16
+   2              		.file	"testADC.c"
+   3              		.section	.debug_abbrev,"",%progbits
+   4              	.Ldebug_abbrev0:
+   5              		.section	.debug_info,"",%progbits
+   6              	.Ldebug_info0:
+   7              		.section	.debug_line,"",%progbits
+   8              	.Ldebug_line0:
+   9 0000 9B000000 		.text
+   9      02003400 
+   9      00000201 
+   9      FB0E0D00 
+   9      01010101 
+  10              	.Ltext0:
+  11              		.align	2
+  12              		.code 16
+  13              		.thumb_func
+  14              		.type	getAnalogueInput, %function
+  15              	getAnalogueInput:
+  16              	.LFB2:
+  17              		.file 1 "testADC.c"
+   1:testADC.c     **** #include "testMotor.h"
+   2:testADC.c     **** #include "FreeRTOS.h"
+   3:testADC.c     **** #include "task.h"
+   4:testADC.c     **** #include "testADC.h"
+   5:testADC.c     **** #include "testUART.h"
+   6:testADC.c     **** 
+   7:testADC.c     **** 
+   8:testADC.c     **** 
+   9:testADC.c     **** /******************************************************************************
+  10:testADC.c     ****  * Defines and typedefs
+  11:testADC.c     ****  *****************************************************************************/
+  12:testADC.c     **** 
+  13:testADC.c     **** #define AIN0 0
+  14:testADC.c     **** #define AIN1 1
+  15:testADC.c     **** #define AIN2 2
+  16:testADC.c     **** #define AIN3 3
+  17:testADC.c     **** #define AIN4 4
+  18:testADC.c     **** #define AIN5 5
+  19:testADC.c     **** #define AIN6 6
+  20:testADC.c     **** #define AIN7 7
+  21:testADC.c     **** 
+  22:testADC.c     **** #define VREF_IN_MV 2475
+  23:testADC.c     **** 
+  24:testADC.c     **** 
+  25:testADC.c     **** /*
+  26:testADC.c     **** void printf (char*str)
+  27:testADC.c     **** {
+  28:testADC.c     **** 	UARTWrStr(str);
+  29:testADC.c     **** }
+  30:testADC.c     **** 
+  31:testADC.c     **** static void delay37us(void)
+  32:testADC.c     **** {
+  33:testADC.c     ****  	volatile tU32 i;
+  34:testADC.c     **** 
+  35:testADC.c     **** 	for(i=0; i<2500; i++)
+  36:testADC.c     ****     asm volatile (" nop"); //delay 15 ns x 2500 = about 37 us delay
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 2
+
+
+  37:testADC.c     **** }
+  38:testADC.c     ****  */
+  39:testADC.c     **** 
+  40:testADC.c     **** /*****************************************************************************
+  41:testADC.c     ****  *
+  42:testADC.c     ****  * Description:
+  43:testADC.c     ****  *    Start a conversion of one selected analogue input and return
+  44:testADC.c     ****  *    10-bit result.
+  45:testADC.c     ****  *
+  46:testADC.c     ****  * Params:
+  47:testADC.c     ****  *    [in] channel - analogue input channel to convert.
+  48:testADC.c     ****  *
+  49:testADC.c     ****  * Return:
+  50:testADC.c     ****  *    10-bit conversion result
+  51:testADC.c     ****  *
+  52:testADC.c     ****  ****************************************************************************/
+  53:testADC.c     **** static tU16 getAnalogueInput(tU8 channel)
+  54:testADC.c     **** {
+  18              		.loc 1 54 0
+  19              	.LVL0:
+  55:testADC.c     **** 	//start conversion now (for selected channel)
+  56:testADC.c     **** 	ADCR = (ADCR & 0xFFFFFF00) | (1 << channel) | (1 << 24);
+  20              		.loc 1 56 0
+  21 0000 0A49     		ldr	r1, .L7
+  22 0002 0A68     		ldr	r2, [r1]
+  23 0004 FF23     		mov	r3, #255
+  24 0006 9A43     		bic	r2, r2, r3
+  25 0008 8023     		mov	r3, #128
+  26 000a 5B04     		lsl	r3, r3, #17
+  27              		.loc 1 54 0
+  28 000c 0006     		lsl	r0, r0, #24
+  29              	.LVL1:
+  30              		.loc 1 56 0
+  31 000e 1A43     		orr	r2, r2, r3
+  32              		.loc 1 54 0
+  33 0010 000E     		lsr	r0, r0, #24
+  34              	.LVL2:
+  35              		.loc 1 56 0
+  36 0012 0123     		mov	r3, #1
+  37 0014 8340     		lsl	r3, r3, r0
+  38 0016 1A43     		orr	r2, r2, r3
+  39 0018 0A60     		str	r2, [r1]
+  40              		.loc 1 54 0
+  41              		@ lr needed for prologue
+  42              	.L2:
+  57:testADC.c     **** 
+  58:testADC.c     **** 	//wait til done
+  59:testADC.c     **** 	while((ADDR & 0x80000000) == 0)
+  43              		.loc 1 59 0
+  44 001a 0548     		ldr	r0, .L7+4
+  45              	.LVL3:
+  46 001c 0368     		ldr	r3, [r0]
+  47 001e 002B     		cmp	r3, #0
+  48 0020 FBDA     		bge	.L2
+  60:testADC.c     **** 	  ;
+  61:testADC.c     **** 
+  62:testADC.c     **** 	//get result and adjust to 10-bit integer
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 3
+
+
+  63:testADC.c     **** 	return (ADDR>>6) & 0x3FF;
+  49              		.loc 1 63 0
+  50 0022 0068     		ldr	r0, [r0]
+  51 0024 0004     		lsl	r0, r0, #16
+  52 0026 800D     		lsr	r0, r0, #22
+  64:testADC.c     **** }
+  53              		.loc 1 64 0
+  54              		@ sp needed for prologue
+  55 0028 7047     		bx	lr
+  56              	.L8:
+  57 002a C046     		.align	2
+  58              	.L7:
+  59 002c 004003E0 		.word	-536657920
+  60 0030 044003E0 		.word	-536657916
+  61              	.LFE2:
+  62              		.size	getAnalogueInput, .-getAnalogueInput
+  63              		.section	.rodata.str1.4,"aMS",%progbits,1
+  64              		.align	2
+  65              	.LC0:
+  66 0000 0A0A2A2A 		.ascii	"\012\012*******************************************"
+  66      2A2A2A2A 
+  66      2A2A2A2A 
+  66      2A2A2A2A 
+  66      2A2A2A2A 
+  67 002d 2A2A2A2A 		.ascii	"************\012\000"
+  67      2A2A2A2A 
+  67      2A2A2A2A 
+  67      0A00
+  68 003b 00       		.align	2
+  69              	.LC2:
+  70 003c 2A202020 		.ascii	"*                                                  "
+  70      20202020 
+  70      20202020 
+  70      20202020 
+  70      20202020 
+  71 006f 2020202A 		.ascii	"   *\012\000"
+  71      0A00
+  72 0075 000000   		.align	2
+  73              	.LC4:
+  74 0078 2A205468 		.ascii	"* The ADC will read the analogueinputs...          "
+  74      65204144 
+  74      43207769 
+  74      6C6C2072 
+  74      65616420 
+  75 00ab 2020202A 		.ascii	"   *\012\000"
+  75      0A00
+  76 00b1 000000   		.align	2
+  77              	.LC6:
+  78 00b4 2A2A2A2A 		.ascii	"***************************************************"
+  78      2A2A2A2A 
+  78      2A2A2A2A 
+  78      2A2A2A2A 
+  78      2A2A2A2A 
+  79 00e7 2A2A2A2A 		.ascii	"****\012\012\000"
+  79      0A0A00
+  80 00ee 0000     		.align	2
+  81              	.LC8:
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 4
+
+
+  82 00f0 0D41494E 		.ascii	"\015AIN1: \000"
+  82      313A2000 
+  83              		.align	2
+  84              	.LC10:
+  85 00f8 203D2000 		.ascii	" = \000"
+  86              		.align	2
+  87              	.LC12:
+  88 00fc 206D5600 		.ascii	" mV\000"
+  89              		.align	2
+  90              	.LC14:
+  91 0100 2C204149 		.ascii	", AIN2: \000"
+  91      4E323A20 
+  91      00
+  92 0109 000000   		.align	2
+  93              	.LC16:
+  94 010c 2C204441 		.ascii	", DAC = \000"
+  94      43203D20 
+  94      00
+  95 0115 000000   		.align	2
+  96              	.LC18:
+  97 0118 2C204149 		.ascii	", AIN3: \000"
+  97      4E333A20 
+  97      00
+  98 0121 000000   		.text
+  99              		.align	2
+ 100              		.global	testADC
+ 101              		.code 16
+ 102              		.thumb_func
+ 103              		.type	testADC, %function
+ 104              	testADC:
+ 105              	.LFB3:
+  65:testADC.c     **** 
+  66:testADC.c     **** 
+  67:testADC.c     **** /*****************************************************************************
+  68:testADC.c     ****  *
+  69:testADC.c     ****  * Description:
+  70:testADC.c     ****  *    A process entry function
+  71:testADC.c     ****  *
+  72:testADC.c     ****  ****************************************************************************/
+  73:testADC.c     **** void testADC(void *pvParameters)
+  74:testADC.c     **** {
+ 106              		.loc 1 74 0
+ 107 0034 F0B5     		push	{r4, r5, r6, r7, lr}
+ 108              	.LCFI0:
+ 109              	.LVL4:
+ 110 0036 83B0     		sub	sp, sp, #12
+ 111              	.LCFI1:
+  75:testADC.c     **** 	tU32 integerResult;
+  76:testADC.c     **** 	tU32 mvResult;
+  77:testADC.c     **** 	tU16 dacValue = 0;
+  78:testADC.c     **** 
+  79:testADC.c     ****   	printf("\n\n*******************************************************\n");
+ 112              		.loc 1 79 0
+ 113 0038 5D48     		ldr	r0, .L12
+ 114              	.LVL5:
+ 115 003a FFF7FEFF 		bl	UARTWrStr
+  80:testADC.c     ****   	printf("*                                                     *\n");
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 5
+
+
+ 116              		.loc 1 80 0
+ 117 003e 5D4C     		ldr	r4, .L12+4
+ 118 0040 201C     		mov	r0, r4
+ 119 0042 FFF7FEFF 		bl	UARTWrStr
+  81:testADC.c     ****   	printf("* The ADC will read the analogueinputs...             *\n");
+ 120              		.loc 1 81 0
+ 121 0046 5C48     		ldr	r0, .L12+8
+ 122 0048 FFF7FEFF 		bl	UARTWrStr
+  82:testADC.c     ****   	printf("*                                                     *\n");
+ 123              		.loc 1 82 0
+ 124 004c 201C     		mov	r0, r4
+ 125 004e FFF7FEFF 		bl	UARTWrStr
+  83:testADC.c     ****   	printf("*******************************************************\n\n");
+ 126              		.loc 1 83 0
+ 127 0052 5A48     		ldr	r0, .L12+12
+ 128 0054 FFF7FEFF 		bl	UARTWrStr
+  84:testADC.c     **** 
+  85:testADC.c     ****   	//set AIN1 = P0.28, AIN2 = P0.29, and AIN3 = P0.30
+  86:testADC.c     **** 	//  PINSEL1 &= ~0x3f0c0000;
+  87:testADC.c     **** 	//  PINSEL1 |=  0x15080000;
+  88:testADC.c     ****   	PINSEL1 &= ~0x0f0c0000;
+ 129              		.loc 1 88 0
+ 130 0058 5949     		ldr	r1, .L12+16
+ 131 005a 5A4A     		ldr	r2, .L12+20
+ 132 005c 0B68     		ldr	r3, [r1]
+ 133 005e 1340     		and	r3, r3, r2
+ 134 0060 0B60     		str	r3, [r1]
+  89:testADC.c     ****   	PINSEL1 |=  0x05080000;
+ 135              		.loc 1 89 0
+ 136 0062 A123     		mov	r3, #161
+ 137 0064 0A68     		ldr	r2, [r1]
+ 138 0066 DB04     		lsl	r3, r3, #19
+ 139 0068 1A43     		orr	r2, r2, r3
+ 140 006a 0A60     		str	r2, [r1]
+  90:testADC.c     **** 
+  91:testADC.c     ****   	//initialize ADC
+  92:testADC.c     ****   	ADCR = (1 << 0)                             |  //SEL = 1, dummy channel #1
+ 141              		.loc 1 92 0
+ 142 006c 564B     		ldr	r3, .L12+24
+ 143 006e 574A     		ldr	r2, .L12+28
+  93:testADC.c     ****             ((configCPU_CLOCK_HZ /
+  94:testADC.c     ****        configVPBDIV_FACTOR) / 4500000 - 1) << 8 |  //set clock division factor, so ADC clock is 4.5
+  95:testADC.c     ****            (0 << 16)                            |  //BURST = 0, conversions are SW controlled
+  96:testADC.c     ****            (0 << 17)                            |  //CLKS  = 0, 11 clocks = 10-bit result
+  97:testADC.c     ****            (1 << 21)                            |  //PDN   = 1, ADC is active
+  98:testADC.c     ****            (1 << 24)                            |  //START = 1, start a conversion now
+  99:testADC.c     ****            (0 << 27);							                 //EDGE  = 0, not relevant when start=1
+ 100:testADC.c     **** 
+ 101:testADC.c     ****   	//short delay and dummy read
+ 102:testADC.c     ****   	vTaskDelay(1);
+ 144              		.loc 1 102 0
+ 145 0070 0120     		mov	r0, #1
+ 146              		.loc 1 92 0
+ 147 0072 1A60     		str	r2, [r3]
+ 148              		.loc 1 102 0
+ 149 0074 FFF7FEFF 		bl	vTaskDelay
+ 103:testADC.c     ****   	integerResult = ADDR;
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 6
+
+
+ 150              		.loc 1 103 0
+ 151 0078 554B     		ldr	r3, .L12+32
+ 152 007a 1B68     		ldr	r3, [r3]
+ 153              	.LVL6:
+ 154 007c 0023     		mov	r3, #0
+ 155              	.LVL7:
+ 156 007e 0293     		str	r3, [sp, #8]
+ 157              	.LVL8:
+ 158              	.L10:
+ 104:testADC.c     **** 
+ 105:testADC.c     ****   	for(;;)
+ 106:testADC.c     ****   	{
+ 107:testADC.c     ****   		//get AIN1 (P0.28)
+ 108:testADC.c     ****   		integerResult = getAnalogueInput(AIN1);
+ 159              		.loc 1 108 0
+ 160 0080 0120     		mov	r0, #1
+ 161 0082 FFF7BDFF 		bl	getAnalogueInput
+ 109:testADC.c     **** 
+ 110:testADC.c     ****  	  	//calculate result in mV
+ 111:testADC.c     ****  	  	mvResult  = integerResult * VREF_IN_MV;
+ 162              		.loc 1 111 0
+ 163 0086 8300     		lsl	r3, r0, #2
+ 164 0088 1B18     		add	r3, r3, r0
+ 165 008a 1C01     		lsl	r4, r3, #4
+ 166 008c E41A     		sub	r4, r4, r3
+ 167              		.loc 1 108 0
+ 168 008e 051C     		mov	r5, r0
+ 169              		.loc 1 111 0
+ 170 0090 6301     		lsl	r3, r4, #5
+ 112:testADC.c     ****     	mvResult /= 1024;
+ 113:testADC.c     **** 
+ 114:testADC.c     **** //    printf("\rAIN1: %d = %d mV", integerResult, mvResult);
+ 115:testADC.c     **** 
+ 116:testADC.c     ****     	printf("\rAIN1: ");
+ 171              		.loc 1 116 0
+ 172 0092 5048     		ldr	r0, .L12+36
+ 173              		.loc 1 111 0
+ 174 0094 E418     		add	r4, r4, r3
+ 175              		.loc 1 116 0
+ 176 0096 FFF7FEFF 		bl	UARTWrStr
+ 117:testADC.c     ****     	SendNumber(10,4,FALSE,' ', integerResult);
+ 177              		.loc 1 117 0
+ 178 009a 0421     		mov	r1, #4
+ 179 009c 0022     		mov	r2, #0
+ 180 009e 0A20     		mov	r0, #10
+ 181 00a0 2023     		mov	r3, #32
+ 182 00a2 0095     		str	r5, [sp]
+ 183 00a4 FFF7FEFF 		bl	SendNumber
+ 118:testADC.c     ****     	printf(" = ");
+ 184              		.loc 1 118 0
+ 185 00a8 4B4B     		ldr	r3, .L12+40
+ 186 00aa 181C     		mov	r0, r3
+ 187 00ac 0193     		str	r3, [sp, #4]
+ 119:testADC.c     ****     	SendNumber(10,4,FALSE,' ', mvResult);
+ 188              		.loc 1 119 0
+ 189 00ae A40A     		lsr	r4, r4, #10
+ 190              		.loc 1 118 0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 7
+
+
+ 191 00b0 FFF7FEFF 		bl	UARTWrStr
+ 192              		.loc 1 119 0
+ 193 00b4 0421     		mov	r1, #4
+ 194 00b6 0022     		mov	r2, #0
+ 195 00b8 2023     		mov	r3, #32
+ 196 00ba 0A20     		mov	r0, #10
+ 197 00bc 0094     		str	r4, [sp]
+ 198 00be FFF7FEFF 		bl	SendNumber
+ 120:testADC.c     ****     	printf(" mV");
+ 199              		.loc 1 120 0
+ 200 00c2 464F     		ldr	r7, .L12+44
+ 201 00c4 381C     		mov	r0, r7
+ 202 00c6 FFF7FEFF 		bl	UARTWrStr
+ 121:testADC.c     **** 
+ 122:testADC.c     ****  	  	//get AIN2 (P0.29)
+ 123:testADC.c     ****  	  	integerResult = getAnalogueInput(AIN2);
+ 203              		.loc 1 123 0
+ 204 00ca 0220     		mov	r0, #2
+ 205 00cc FFF798FF 		bl	getAnalogueInput
+ 124:testADC.c     **** 
+ 125:testADC.c     ****  	  	//calculate result in mV
+ 126:testADC.c     ****  	  	mvResult  = integerResult * VREF_IN_MV;
+ 206              		.loc 1 126 0
+ 207 00d0 8300     		lsl	r3, r0, #2
+ 208 00d2 1B18     		add	r3, r3, r0
+ 209 00d4 1C01     		lsl	r4, r3, #4
+ 210 00d6 E41A     		sub	r4, r4, r3
+ 211              		.loc 1 123 0
+ 212 00d8 051C     		mov	r5, r0
+ 213              		.loc 1 126 0
+ 214 00da 6301     		lsl	r3, r4, #5
+ 127:testADC.c     ****     	mvResult /= 1024;
+ 128:testADC.c     **** 
+ 129:testADC.c     **** //    printf(", AIN2: %d = %d mV", integerResult, mvResult);
+ 130:testADC.c     ****     	printf(", AIN2: ");
+ 215              		.loc 1 130 0
+ 216 00dc 4048     		ldr	r0, .L12+48
+ 217              		.loc 1 126 0
+ 218 00de E418     		add	r4, r4, r3
+ 219              		.loc 1 130 0
+ 220 00e0 FFF7FEFF 		bl	UARTWrStr
+ 131:testADC.c     ****     	SendNumber(10,4,FALSE,' ', integerResult);
+ 221              		.loc 1 131 0
+ 222 00e4 0421     		mov	r1, #4
+ 223 00e6 0022     		mov	r2, #0
+ 224 00e8 2023     		mov	r3, #32
+ 225 00ea 0A20     		mov	r0, #10
+ 226 00ec 0095     		str	r5, [sp]
+ 227 00ee FFF7FEFF 		bl	SendNumber
+ 132:testADC.c     ****     	printf(" = ");
+ 228              		.loc 1 132 0
+ 229 00f2 0198     		ldr	r0, [sp, #4]
+ 230 00f4 FFF7FEFF 		bl	UARTWrStr
+ 133:testADC.c     ****     	SendNumber(10,4,FALSE,' ', mvResult);
+ 231              		.loc 1 133 0
+ 232 00f8 A40A     		lsr	r4, r4, #10
+ 233 00fa 0421     		mov	r1, #4
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 8
+
+
+ 234 00fc 0022     		mov	r2, #0
+ 235 00fe 2023     		mov	r3, #32
+ 236 0100 0A20     		mov	r0, #10
+ 237 0102 0094     		str	r4, [sp]
+ 238 0104 FFF7FEFF 		bl	SendNumber
+ 134:testADC.c     ****     	printf(" mV");
+ 239              		.loc 1 134 0
+ 240 0108 381C     		mov	r0, r7
+ 241 010a FFF7FEFF 		bl	UARTWrStr
+ 135:testADC.c     **** 
+ 136:testADC.c     ****     	//set analogue output
+ 137:testADC.c     ****     	DACR = (dacValue << 6) |  //actual value to output
+ 242              		.loc 1 137 0
+ 243 010e 029B     		ldr	r3, [sp, #8]
+ 244 0110 9A01     		lsl	r2, r3, #6
+ 245 0112 8023     		mov	r3, #128
+ 246 0114 5B02     		lsl	r3, r3, #9
+ 247 0116 1A43     		orr	r2, r2, r3
+ 248 0118 324B     		ldr	r3, .L12+52
+ 249 011a 1A60     		str	r2, [r3]
+ 138:testADC.c     ****                (1 << 16);         //BIAS = 1, 2.5uS settling time
+ 139:testADC.c     ****     	dacValue++;
+ 250              		.loc 1 139 0
+ 251 011c 029A     		ldr	r2, [sp, #8]
+ 140:testADC.c     ****     	dacValue &= 0x03ff;
+ 252              		.loc 1 140 0
+ 253 011e 324B     		ldr	r3, .L12+56
+ 254              		.loc 1 139 0
+ 255 0120 0132     		add	r2, r2, #1
+ 256              	.LVL9:
+ 257              		.loc 1 140 0
+ 258 0122 1A40     		and	r2, r2, r3
+ 141:testADC.c     **** //    printf(", DAC = %d", dacValue);
+ 142:testADC.c     **** 	    printf(", DAC = ");
+ 259              		.loc 1 142 0
+ 260 0124 3148     		ldr	r0, .L12+60
+ 261              		.loc 1 140 0
+ 262 0126 0292     		str	r2, [sp, #8]
+ 263              		.loc 1 142 0
+ 264 0128 FFF7FEFF 		bl	UARTWrStr
+ 265              	.LVL10:
+ 143:testADC.c     ****     	SendNumber(10,4,FALSE,' ', dacValue);
+ 266              		.loc 1 143 0
+ 267 012c 029B     		ldr	r3, [sp, #8]
+ 144:testADC.c     **** 
+ 145:testADC.c     ****     	//wait for DAC value to settle
+ 146:testADC.c     ****     	vTaskDelay(1);
+ 147:testADC.c     **** 
+ 148:testADC.c     **** 	  	//get AIN3 (P0.30)
+ 149:testADC.c     ****     	PINSEL1 &= ~0x30000000;
+ 268              		.loc 1 149 0
+ 269 012e 244C     		ldr	r4, .L12+16
+ 270              		.loc 1 143 0
+ 271 0130 0421     		mov	r1, #4
+ 272 0132 0093     		str	r3, [sp]
+ 273 0134 0022     		mov	r2, #0
+ 274 0136 2023     		mov	r3, #32
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 9
+
+
+ 275 0138 0A20     		mov	r0, #10
+ 276 013a FFF7FEFF 		bl	SendNumber
+ 277              		.loc 1 146 0
+ 278 013e 0120     		mov	r0, #1
+ 279 0140 FFF7FEFF 		bl	vTaskDelay
+ 280              		.loc 1 149 0
+ 281 0144 2A4E     		ldr	r6, .L12+64
+ 282 0146 2368     		ldr	r3, [r4]
+ 283 0148 3340     		and	r3, r3, r6
+ 284 014a 2360     		str	r3, [r4]
+ 150:testADC.c     ****     	PINSEL1 |=  0x10000000; //set P0.30 = AIN3
+ 285              		.loc 1 150 0
+ 286 014c 8023     		mov	r3, #128
+ 287 014e 2268     		ldr	r2, [r4]
+ 288 0150 5B05     		lsl	r3, r3, #21
+ 289 0152 1A43     		orr	r2, r2, r3
+ 290 0154 2260     		str	r2, [r4]
+ 151:testADC.c     **** //    	delay37us();
+ 152:testADC.c     **** 		vTaskDelay(1);
+ 291              		.loc 1 152 0
+ 292 0156 0120     		mov	r0, #1
+ 293 0158 FFF7FEFF 		bl	vTaskDelay
+ 153:testADC.c     **** 	  	integerResult = getAnalogueInput(AIN3);
+ 294              		.loc 1 153 0
+ 295 015c 0320     		mov	r0, #3
+ 296 015e FFF74FFF 		bl	getAnalogueInput
+ 154:testADC.c     ****     	PINSEL1 &= ~0x30000000; //set P0.30 back to GPIO
+ 297              		.loc 1 154 0
+ 298 0162 2368     		ldr	r3, [r4]
+ 299 0164 3340     		and	r3, r3, r6
+ 300 0166 2360     		str	r3, [r4]
+ 155:testADC.c     **** 
+ 156:testADC.c     **** 	  	//calculate result in mV
+ 157:testADC.c     **** 	  	mvResult  = integerResult * VREF_IN_MV;
+ 301              		.loc 1 157 0
+ 302 0168 8300     		lsl	r3, r0, #2
+ 303 016a 1B18     		add	r3, r3, r0
+ 304 016c 1C01     		lsl	r4, r3, #4
+ 305 016e E41A     		sub	r4, r4, r3
+ 306              		.loc 1 153 0
+ 307 0170 051C     		mov	r5, r0
+ 308              		.loc 1 157 0
+ 309 0172 6301     		lsl	r3, r4, #5
+ 158:testADC.c     ****     	mvResult /= 1024;
+ 159:testADC.c     **** 
+ 160:testADC.c     **** //    printf(", AIN3: %d = %d mV", integerResult, mvResult);
+ 161:testADC.c     ****     	printf(", AIN3: ");
+ 310              		.loc 1 161 0
+ 311 0174 1F48     		ldr	r0, .L12+68
+ 312              		.loc 1 157 0
+ 313 0176 E418     		add	r4, r4, r3
+ 314              		.loc 1 161 0
+ 315 0178 FFF7FEFF 		bl	UARTWrStr
+ 162:testADC.c     ****     	SendNumber(10,4,FALSE,' ', integerResult);
+ 316              		.loc 1 162 0
+ 317 017c 0421     		mov	r1, #4
+ 318 017e 0022     		mov	r2, #0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 10
+
+
+ 319 0180 2023     		mov	r3, #32
+ 320 0182 0A20     		mov	r0, #10
+ 321 0184 0095     		str	r5, [sp]
+ 322 0186 FFF7FEFF 		bl	SendNumber
+ 163:testADC.c     ****     	printf(" = ");
+ 323              		.loc 1 163 0
+ 324 018a 0198     		ldr	r0, [sp, #4]
+ 325 018c FFF7FEFF 		bl	UARTWrStr
+ 164:testADC.c     ****     	SendNumber(10,4,FALSE,' ', mvResult);
+ 326              		.loc 1 164 0
+ 327 0190 A40A     		lsr	r4, r4, #10
+ 328 0192 0421     		mov	r1, #4
+ 329 0194 0022     		mov	r2, #0
+ 330 0196 2023     		mov	r3, #32
+ 331 0198 0A20     		mov	r0, #10
+ 332 019a 0094     		str	r4, [sp]
+ 333 019c FFF7FEFF 		bl	SendNumber
+ 165:testADC.c     ****     	printf(" mV");
+ 334              		.loc 1 165 0
+ 335 01a0 381C     		mov	r0, r7
+ 336 01a2 FFF7FEFF 		bl	UARTWrStr
+ 166:testADC.c     **** 
+ 167:testADC.c     ****     	//wait 2500 ms
+ 168:testADC.c     ****     	vTaskDelay(100);
+ 337              		.loc 1 168 0
+ 338 01a6 6420     		mov	r0, #100
+ 339 01a8 FFF7FEFF 		bl	vTaskDelay
+ 340 01ac 68E7     		b	.L10
+ 341              	.L13:
+ 342 01ae C046     		.align	2
+ 343              	.L12:
+ 344 01b0 00000000 		.word	.LC0
+ 345 01b4 3C000000 		.word	.LC2
+ 346 01b8 78000000 		.word	.LC4
+ 347 01bc B4000000 		.word	.LC6
+ 348 01c0 04C002E0 		.word	-536690684
+ 349 01c4 FFFFF3F0 		.word	-252444673
+ 350 01c8 004003E0 		.word	-536657920
+ 351 01cc 010C2001 		.word	18877441
+ 352 01d0 044003E0 		.word	-536657916
+ 353 01d4 F0000000 		.word	.LC8
+ 354 01d8 F8000000 		.word	.LC10
+ 355 01dc FC000000 		.word	.LC12
+ 356 01e0 00010000 		.word	.LC14
+ 357 01e4 00C006E0 		.word	-536428544
+ 358 01e8 FF030000 		.word	1023
+ 359 01ec 0C010000 		.word	.LC16
+ 360 01f0 FFFFFFCF 		.word	-805306369
+ 361 01f4 18010000 		.word	.LC18
+ 362              	.LFE3:
+ 363              		.size	testADC, .-testADC
+ 364              		.section	.debug_frame,"",%progbits
+ 365              	.Lframe0:
+ 366 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ 367              	.LSCIE0:
+ 368 0004 FFFFFFFF 		.4byte	0xffffffff
+ 369 0008 01       		.byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 11
+
+
+ 370 0009 00       		.ascii	"\000"
+ 371 000a 01       		.uleb128 0x1
+ 372 000b 7C       		.sleb128 -4
+ 373 000c 0E       		.byte	0xe
+ 374 000d 0C       		.byte	0xc
+ 375 000e 0D       		.uleb128 0xd
+ 376 000f 00       		.uleb128 0x0
+ 377              		.align	2
+ 378              	.LECIE0:
+ 379              	.LSFDE0:
+ 380 0010 0C000000 		.4byte	.LEFDE0-.LASFDE0
+ 381              	.LASFDE0:
+ 382 0014 00000000 		.4byte	.Lframe0
+ 383 0018 00000000 		.4byte	.LFB2
+ 384 001c 34000000 		.4byte	.LFE2-.LFB2
+ 385              		.align	2
+ 386              	.LEFDE0:
+ 387              	.LSFDE2:
+ 388 0020 1C000000 		.4byte	.LEFDE2-.LASFDE2
+ 389              	.LASFDE2:
+ 390 0024 00000000 		.4byte	.Lframe0
+ 391 0028 34000000 		.4byte	.LFB3
+ 392 002c C4010000 		.4byte	.LFE3-.LFB3
+ 393 0030 42       		.byte	0x4
+ 394              		.4byte	.LCFI0-.LFB3
+ 395 0031 0E       		.byte	0xe
+ 396 0032 14       		.uleb128 0x14
+ 397 0033 84       		.byte	0x84
+ 398 0034 05       		.uleb128 0x5
+ 399 0035 85       		.byte	0x85
+ 400 0036 04       		.uleb128 0x4
+ 401 0037 86       		.byte	0x86
+ 402 0038 03       		.uleb128 0x3
+ 403 0039 87       		.byte	0x87
+ 404 003a 02       		.uleb128 0x2
+ 405 003b 8E       		.byte	0x8e
+ 406 003c 01       		.uleb128 0x1
+ 407 003d 42       		.byte	0x4
+ 408              		.4byte	.LCFI1-.LCFI0
+ 409 003e 0E       		.byte	0xe
+ 410 003f 20       		.uleb128 0x20
+ 411              		.align	2
+ 412              	.LEFDE2:
+ 413              		.text
+ 414              	.Letext0:
+ 415              		.section	.debug_loc,"",%progbits
+ 416              	.Ldebug_loc0:
+ 417              	.LLST1:
+ 418 0000 00000000 		.4byte	.LVL0-.Ltext0
+ 419 0004 0E000000 		.4byte	.LVL1-.Ltext0
+ 420 0008 0100     		.2byte	0x1
+ 421 000a 50       		.byte	0x50
+ 422 000b 12000000 		.4byte	.LVL2-.Ltext0
+ 423 000f 1C000000 		.4byte	.LVL3-.Ltext0
+ 424 0013 0100     		.2byte	0x1
+ 425 0015 50       		.byte	0x50
+ 426 0016 00000000 		.4byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 12
+
+
+ 427 001a 00000000 		.4byte	0x0
+ 428              	.LLST2:
+ 429 001e 34000000 		.4byte	.LFB3-.Ltext0
+ 430 0022 36000000 		.4byte	.LCFI0-.Ltext0
+ 431 0026 0100     		.2byte	0x1
+ 432 0028 5D       		.byte	0x5d
+ 433 0029 36000000 		.4byte	.LCFI0-.Ltext0
+ 434 002d 38000000 		.4byte	.LCFI1-.Ltext0
+ 435 0031 0200     		.2byte	0x2
+ 436 0033 7D       		.byte	0x7d
+ 437 0034 14       		.sleb128 20
+ 438 0035 38000000 		.4byte	.LCFI1-.Ltext0
+ 439 0039 F8010000 		.4byte	.LFE3-.Ltext0
+ 440 003d 0200     		.2byte	0x2
+ 441 003f 7D       		.byte	0x7d
+ 442 0040 20       		.sleb128 32
+ 443 0041 00000000 		.4byte	0x0
+ 444 0045 00000000 		.4byte	0x0
+ 445              	.LLST3:
+ 446 0049 36000000 		.4byte	.LVL4-.Ltext0
+ 447 004d 3A000000 		.4byte	.LVL5-.Ltext0
+ 448 0051 0100     		.2byte	0x1
+ 449 0053 50       		.byte	0x50
+ 450 0054 00000000 		.4byte	0x0
+ 451 0058 00000000 		.4byte	0x0
+ 452              	.LLST4:
+ 453 005c 7C000000 		.4byte	.LVL6-.Ltext0
+ 454 0060 7E000000 		.4byte	.LVL7-.Ltext0
+ 455 0064 0100     		.2byte	0x1
+ 456 0066 53       		.byte	0x53
+ 457 0067 00000000 		.4byte	0x0
+ 458 006b 00000000 		.4byte	0x0
+ 459              	.LLST5:
+ 460 006f 80000000 		.4byte	.LVL8-.Ltext0
+ 461 0073 22010000 		.4byte	.LVL9-.Ltext0
+ 462 0077 0200     		.2byte	0x2
+ 463 0079 91       		.byte	0x91
+ 464 007a 7C       		.sleb128 -4
+ 465 007b 22010000 		.4byte	.LVL9-.Ltext0
+ 466 007f 2C010000 		.4byte	.LVL10-.Ltext0
+ 467 0083 0100     		.2byte	0x1
+ 468 0085 52       		.byte	0x52
+ 469 0086 2C010000 		.4byte	.LVL10-.Ltext0
+ 470 008a F8010000 		.4byte	.LFE3-.Ltext0
+ 471 008e 0200     		.2byte	0x2
+ 472 0090 91       		.byte	0x91
+ 473 0091 7C       		.sleb128 -4
+ 474 0092 00000000 		.4byte	0x0
+ 475 0096 00000000 		.4byte	0x0
+ 476              		.file 2 "FreeRTOSConfig.h"
+ 477              		.section	.debug_info
+ 478 0000 F5000000 		.4byte	0xf5
+ 479 0004 0200     		.2byte	0x2
+ 480 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 481 000a 04       		.byte	0x4
+ 482 000b 01       		.uleb128 0x1
+ 483 000c 00000000 		.4byte	.LASF13
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 13
+
+
+ 484 0010 01       		.byte	0x1
+ 485 0011 CC000000 		.4byte	.LASF14
+ 486 0015 95000000 		.4byte	.LASF15
+ 487 0019 00000000 		.4byte	.Ltext0
+ 488 001d F8010000 		.4byte	.Letext0
+ 489 0021 00000000 		.4byte	.Ldebug_line0
+ 490 0025 02       		.uleb128 0x2
+ 491 0026 74553800 		.ascii	"tU8\000"
+ 492 002a 02       		.byte	0x2
+ 493 002b A0       		.byte	0xa0
+ 494 002c 30000000 		.4byte	0x30
+ 495 0030 03       		.uleb128 0x3
+ 496 0031 01       		.byte	0x1
+ 497 0032 08       		.byte	0x8
+ 498 0033 34000000 		.4byte	.LASF1
+ 499 0037 04       		.uleb128 0x4
+ 500 0038 74000000 		.4byte	.LASF0
+ 501 003c 02       		.byte	0x2
+ 502 003d A1       		.byte	0xa1
+ 503 003e 42000000 		.4byte	0x42
+ 504 0042 03       		.uleb128 0x3
+ 505 0043 02       		.byte	0x2
+ 506 0044 07       		.byte	0x7
+ 507 0045 54000000 		.4byte	.LASF2
+ 508 0049 04       		.uleb128 0x4
+ 509 004a 79000000 		.4byte	.LASF3
+ 510 004e 02       		.byte	0x2
+ 511 004f A2       		.byte	0xa2
+ 512 0050 54000000 		.4byte	0x54
+ 513 0054 03       		.uleb128 0x3
+ 514 0055 04       		.byte	0x4
+ 515 0056 07       		.byte	0x7
+ 516 0057 67000000 		.4byte	.LASF4
+ 517 005b 03       		.uleb128 0x3
+ 518 005c 01       		.byte	0x1
+ 519 005d 06       		.byte	0x6
+ 520 005e B8000000 		.4byte	.LASF5
+ 521 0062 03       		.uleb128 0x3
+ 522 0063 02       		.byte	0x2
+ 523 0064 05       		.byte	0x5
+ 524 0065 8B000000 		.4byte	.LASF6
+ 525 0069 05       		.uleb128 0x5
+ 526 006a 04       		.byte	0x4
+ 527 006b 05       		.byte	0x5
+ 528 006c 696E7400 		.ascii	"int\000"
+ 529 0070 03       		.uleb128 0x3
+ 530 0071 04       		.byte	0x4
+ 531 0072 05       		.byte	0x5
+ 532 0073 AF000000 		.4byte	.LASF7
+ 533 0077 03       		.uleb128 0x3
+ 534 0078 04       		.byte	0x4
+ 535 0079 07       		.byte	0x7
+ 536 007a 42000000 		.4byte	.LASF8
+ 537 007e 06       		.uleb128 0x6
+ 538 007f 04       		.byte	0x4
+ 539 0080 07       		.uleb128 0x7
+ 540 0081 D6000000 		.4byte	.LASF16
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 14
+
+
+ 541 0085 01       		.byte	0x1
+ 542 0086 36       		.byte	0x36
+ 543 0087 01       		.byte	0x1
+ 544 0088 37000000 		.4byte	0x37
+ 545 008c 00000000 		.4byte	.LFB2
+ 546 0090 34000000 		.4byte	.LFE2
+ 547 0094 01       		.byte	0x1
+ 548 0095 5D       		.byte	0x5d
+ 549 0096 AA000000 		.4byte	0xaa
+ 550 009a 08       		.uleb128 0x8
+ 551 009b 0C000000 		.4byte	.LASF9
+ 552 009f 01       		.byte	0x1
+ 553 00a0 35       		.byte	0x35
+ 554 00a1 25000000 		.4byte	0x25
+ 555 00a5 00000000 		.4byte	.LLST1
+ 556 00a9 00       		.byte	0x0
+ 557 00aa 09       		.uleb128 0x9
+ 558 00ab 01       		.byte	0x1
+ 559 00ac C4000000 		.4byte	.LASF17
+ 560 00b0 01       		.byte	0x1
+ 561 00b1 4A       		.byte	0x4a
+ 562 00b2 01       		.byte	0x1
+ 563 00b3 34000000 		.4byte	.LFB3
+ 564 00b7 F8010000 		.4byte	.LFE3
+ 565 00bb 1E000000 		.4byte	.LLST2
+ 566 00bf 08       		.uleb128 0x8
+ 567 00c0 7E000000 		.4byte	.LASF10
+ 568 00c4 01       		.byte	0x1
+ 569 00c5 49       		.byte	0x49
+ 570 00c6 7E000000 		.4byte	0x7e
+ 571 00ca 49000000 		.4byte	.LLST3
+ 572 00ce 0A       		.uleb128 0xa
+ 573 00cf 14000000 		.4byte	.LASF11
+ 574 00d3 01       		.byte	0x1
+ 575 00d4 4B       		.byte	0x4b
+ 576 00d5 49000000 		.4byte	0x49
+ 577 00d9 5C000000 		.4byte	.LLST4
+ 578 00dd 0B       		.uleb128 0xb
+ 579 00de 2B000000 		.4byte	.LASF18
+ 580 00e2 01       		.byte	0x1
+ 581 00e3 4C       		.byte	0x4c
+ 582 00e4 49000000 		.4byte	0x49
+ 583 00e8 0A       		.uleb128 0xa
+ 584 00e9 22000000 		.4byte	.LASF12
+ 585 00ed 01       		.byte	0x1
+ 586 00ee 4D       		.byte	0x4d
+ 587 00ef 37000000 		.4byte	0x37
+ 588 00f3 6F000000 		.4byte	.LLST5
+ 589 00f7 00       		.byte	0x0
+ 590 00f8 00       		.byte	0x0
+ 591              		.section	.debug_abbrev
+ 592 0000 01       		.uleb128 0x1
+ 593 0001 11       		.uleb128 0x11
+ 594 0002 01       		.byte	0x1
+ 595 0003 25       		.uleb128 0x25
+ 596 0004 0E       		.uleb128 0xe
+ 597 0005 13       		.uleb128 0x13
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 15
+
+
+ 598 0006 0B       		.uleb128 0xb
+ 599 0007 03       		.uleb128 0x3
+ 600 0008 0E       		.uleb128 0xe
+ 601 0009 1B       		.uleb128 0x1b
+ 602 000a 0E       		.uleb128 0xe
+ 603 000b 11       		.uleb128 0x11
+ 604 000c 01       		.uleb128 0x1
+ 605 000d 12       		.uleb128 0x12
+ 606 000e 01       		.uleb128 0x1
+ 607 000f 10       		.uleb128 0x10
+ 608 0010 06       		.uleb128 0x6
+ 609 0011 00       		.byte	0x0
+ 610 0012 00       		.byte	0x0
+ 611 0013 02       		.uleb128 0x2
+ 612 0014 16       		.uleb128 0x16
+ 613 0015 00       		.byte	0x0
+ 614 0016 03       		.uleb128 0x3
+ 615 0017 08       		.uleb128 0x8
+ 616 0018 3A       		.uleb128 0x3a
+ 617 0019 0B       		.uleb128 0xb
+ 618 001a 3B       		.uleb128 0x3b
+ 619 001b 0B       		.uleb128 0xb
+ 620 001c 49       		.uleb128 0x49
+ 621 001d 13       		.uleb128 0x13
+ 622 001e 00       		.byte	0x0
+ 623 001f 00       		.byte	0x0
+ 624 0020 03       		.uleb128 0x3
+ 625 0021 24       		.uleb128 0x24
+ 626 0022 00       		.byte	0x0
+ 627 0023 0B       		.uleb128 0xb
+ 628 0024 0B       		.uleb128 0xb
+ 629 0025 3E       		.uleb128 0x3e
+ 630 0026 0B       		.uleb128 0xb
+ 631 0027 03       		.uleb128 0x3
+ 632 0028 0E       		.uleb128 0xe
+ 633 0029 00       		.byte	0x0
+ 634 002a 00       		.byte	0x0
+ 635 002b 04       		.uleb128 0x4
+ 636 002c 16       		.uleb128 0x16
+ 637 002d 00       		.byte	0x0
+ 638 002e 03       		.uleb128 0x3
+ 639 002f 0E       		.uleb128 0xe
+ 640 0030 3A       		.uleb128 0x3a
+ 641 0031 0B       		.uleb128 0xb
+ 642 0032 3B       		.uleb128 0x3b
+ 643 0033 0B       		.uleb128 0xb
+ 644 0034 49       		.uleb128 0x49
+ 645 0035 13       		.uleb128 0x13
+ 646 0036 00       		.byte	0x0
+ 647 0037 00       		.byte	0x0
+ 648 0038 05       		.uleb128 0x5
+ 649 0039 24       		.uleb128 0x24
+ 650 003a 00       		.byte	0x0
+ 651 003b 0B       		.uleb128 0xb
+ 652 003c 0B       		.uleb128 0xb
+ 653 003d 3E       		.uleb128 0x3e
+ 654 003e 0B       		.uleb128 0xb
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 16
+
+
+ 655 003f 03       		.uleb128 0x3
+ 656 0040 08       		.uleb128 0x8
+ 657 0041 00       		.byte	0x0
+ 658 0042 00       		.byte	0x0
+ 659 0043 06       		.uleb128 0x6
+ 660 0044 0F       		.uleb128 0xf
+ 661 0045 00       		.byte	0x0
+ 662 0046 0B       		.uleb128 0xb
+ 663 0047 0B       		.uleb128 0xb
+ 664 0048 00       		.byte	0x0
+ 665 0049 00       		.byte	0x0
+ 666 004a 07       		.uleb128 0x7
+ 667 004b 2E       		.uleb128 0x2e
+ 668 004c 01       		.byte	0x1
+ 669 004d 03       		.uleb128 0x3
+ 670 004e 0E       		.uleb128 0xe
+ 671 004f 3A       		.uleb128 0x3a
+ 672 0050 0B       		.uleb128 0xb
+ 673 0051 3B       		.uleb128 0x3b
+ 674 0052 0B       		.uleb128 0xb
+ 675 0053 27       		.uleb128 0x27
+ 676 0054 0C       		.uleb128 0xc
+ 677 0055 49       		.uleb128 0x49
+ 678 0056 13       		.uleb128 0x13
+ 679 0057 11       		.uleb128 0x11
+ 680 0058 01       		.uleb128 0x1
+ 681 0059 12       		.uleb128 0x12
+ 682 005a 01       		.uleb128 0x1
+ 683 005b 40       		.uleb128 0x40
+ 684 005c 0A       		.uleb128 0xa
+ 685 005d 01       		.uleb128 0x1
+ 686 005e 13       		.uleb128 0x13
+ 687 005f 00       		.byte	0x0
+ 688 0060 00       		.byte	0x0
+ 689 0061 08       		.uleb128 0x8
+ 690 0062 05       		.uleb128 0x5
+ 691 0063 00       		.byte	0x0
+ 692 0064 03       		.uleb128 0x3
+ 693 0065 0E       		.uleb128 0xe
+ 694 0066 3A       		.uleb128 0x3a
+ 695 0067 0B       		.uleb128 0xb
+ 696 0068 3B       		.uleb128 0x3b
+ 697 0069 0B       		.uleb128 0xb
+ 698 006a 49       		.uleb128 0x49
+ 699 006b 13       		.uleb128 0x13
+ 700 006c 02       		.uleb128 0x2
+ 701 006d 06       		.uleb128 0x6
+ 702 006e 00       		.byte	0x0
+ 703 006f 00       		.byte	0x0
+ 704 0070 09       		.uleb128 0x9
+ 705 0071 2E       		.uleb128 0x2e
+ 706 0072 01       		.byte	0x1
+ 707 0073 3F       		.uleb128 0x3f
+ 708 0074 0C       		.uleb128 0xc
+ 709 0075 03       		.uleb128 0x3
+ 710 0076 0E       		.uleb128 0xe
+ 711 0077 3A       		.uleb128 0x3a
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 17
+
+
+ 712 0078 0B       		.uleb128 0xb
+ 713 0079 3B       		.uleb128 0x3b
+ 714 007a 0B       		.uleb128 0xb
+ 715 007b 27       		.uleb128 0x27
+ 716 007c 0C       		.uleb128 0xc
+ 717 007d 11       		.uleb128 0x11
+ 718 007e 01       		.uleb128 0x1
+ 719 007f 12       		.uleb128 0x12
+ 720 0080 01       		.uleb128 0x1
+ 721 0081 40       		.uleb128 0x40
+ 722 0082 06       		.uleb128 0x6
+ 723 0083 00       		.byte	0x0
+ 724 0084 00       		.byte	0x0
+ 725 0085 0A       		.uleb128 0xa
+ 726 0086 34       		.uleb128 0x34
+ 727 0087 00       		.byte	0x0
+ 728 0088 03       		.uleb128 0x3
+ 729 0089 0E       		.uleb128 0xe
+ 730 008a 3A       		.uleb128 0x3a
+ 731 008b 0B       		.uleb128 0xb
+ 732 008c 3B       		.uleb128 0x3b
+ 733 008d 0B       		.uleb128 0xb
+ 734 008e 49       		.uleb128 0x49
+ 735 008f 13       		.uleb128 0x13
+ 736 0090 02       		.uleb128 0x2
+ 737 0091 06       		.uleb128 0x6
+ 738 0092 00       		.byte	0x0
+ 739 0093 00       		.byte	0x0
+ 740 0094 0B       		.uleb128 0xb
+ 741 0095 34       		.uleb128 0x34
+ 742 0096 00       		.byte	0x0
+ 743 0097 03       		.uleb128 0x3
+ 744 0098 0E       		.uleb128 0xe
+ 745 0099 3A       		.uleb128 0x3a
+ 746 009a 0B       		.uleb128 0xb
+ 747 009b 3B       		.uleb128 0x3b
+ 748 009c 0B       		.uleb128 0xb
+ 749 009d 49       		.uleb128 0x49
+ 750 009e 13       		.uleb128 0x13
+ 751 009f 00       		.byte	0x0
+ 752 00a0 00       		.byte	0x0
+ 753 00a1 00       		.byte	0x0
+ 754              		.section	.debug_pubnames,"",%progbits
+ 755 0000 1A000000 		.4byte	0x1a
+ 756 0004 0200     		.2byte	0x2
+ 757 0006 00000000 		.4byte	.Ldebug_info0
+ 758 000a F9000000 		.4byte	0xf9
+ 759 000e AA000000 		.4byte	0xaa
+ 760 0012 74657374 		.ascii	"testADC\000"
+ 760      41444300 
+ 761 001a 00000000 		.4byte	0x0
+ 762              		.section	.debug_aranges,"",%progbits
+ 763 0000 1C000000 		.4byte	0x1c
+ 764 0004 0200     		.2byte	0x2
+ 765 0006 00000000 		.4byte	.Ldebug_info0
+ 766 000a 04       		.byte	0x4
+ 767 000b 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 18
+
+
+ 768 000c 0000     		.2byte	0x0
+ 769 000e 0000     		.2byte	0x0
+ 770 0010 00000000 		.4byte	.Ltext0
+ 771 0014 F8010000 		.4byte	.Letext0-.Ltext0
+ 772 0018 00000000 		.4byte	0x0
+ 773 001c 00000000 		.4byte	0x0
+ 774              		.section	.debug_str,"MS",%progbits,1
+ 775              	.LASF13:
+ 776 0000 474E5520 		.ascii	"GNU C 4.2.2\000"
+ 776      4320342E 
+ 776      322E3200 
+ 777              	.LASF9:
+ 778 000c 6368616E 		.ascii	"channel\000"
+ 778      6E656C00 
+ 779              	.LASF11:
+ 780 0014 696E7465 		.ascii	"integerResult\000"
+ 780      67657252 
+ 780      6573756C 
+ 780      7400
+ 781              	.LASF12:
+ 782 0022 64616356 		.ascii	"dacValue\000"
+ 782      616C7565 
+ 782      00
+ 783              	.LASF18:
+ 784 002b 6D765265 		.ascii	"mvResult\000"
+ 784      73756C74 
+ 784      00
+ 785              	.LASF1:
+ 786 0034 756E7369 		.ascii	"unsigned char\000"
+ 786      676E6564 
+ 786      20636861 
+ 786      7200
+ 787              	.LASF8:
+ 788 0042 6C6F6E67 		.ascii	"long unsigned int\000"
+ 788      20756E73 
+ 788      69676E65 
+ 788      6420696E 
+ 788      7400
+ 789              	.LASF2:
+ 790 0054 73686F72 		.ascii	"short unsigned int\000"
+ 790      7420756E 
+ 790      7369676E 
+ 790      65642069 
+ 790      6E7400
+ 791              	.LASF4:
+ 792 0067 756E7369 		.ascii	"unsigned int\000"
+ 792      676E6564 
+ 792      20696E74 
+ 792      00
+ 793              	.LASF0:
+ 794 0074 74553136 		.ascii	"tU16\000"
+ 794      00
+ 795              	.LASF3:
+ 796 0079 74553332 		.ascii	"tU32\000"
+ 796      00
+ 797              	.LASF10:
+ 798 007e 70765061 		.ascii	"pvParameters\000"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 19
+
+
+ 798      72616D65 
+ 798      74657273 
+ 798      00
+ 799              	.LASF6:
+ 800 008b 73686F72 		.ascii	"short int\000"
+ 800      7420696E 
+ 800      7400
+ 801              	.LASF15:
+ 802 0095 2F637967 		.ascii	"/cygdrive/c/Downloads/EDU\000"
+ 802      64726976 
+ 802      652F632F 
+ 802      446F776E 
+ 802      6C6F6164 
+ 803              	.LASF7:
+ 804 00af 6C6F6E67 		.ascii	"long int\000"
+ 804      20696E74 
+ 804      00
+ 805              	.LASF5:
+ 806 00b8 7369676E 		.ascii	"signed char\000"
+ 806      65642063 
+ 806      68617200 
+ 807              	.LASF17:
+ 808 00c4 74657374 		.ascii	"testADC\000"
+ 808      41444300 
+ 809              	.LASF14:
+ 810 00cc 74657374 		.ascii	"testADC.c\000"
+ 810      4144432E 
+ 810      6300
+ 811              	.LASF16:
+ 812 00d6 67657441 		.ascii	"getAnalogueInput\000"
+ 812      6E616C6F 
+ 812      67756549 
+ 812      6E707574 
+ 812      00
+ 813              		.ident	"GCC: (GNU) 4.2.2"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s 			page 20
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 testADC.c
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s:1      .text:00000000 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s:15     .text:00000000 getAnalogueInput
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s:59     .text:0000002c $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s:104    .text:00000034 testADC
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s:101    .text:00000034 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccU8yu21.s:344    .text:000001b0 $d
+
+UNDEFINED SYMBOLS
+UARTWrStr
+vTaskDelay
+SendNumber

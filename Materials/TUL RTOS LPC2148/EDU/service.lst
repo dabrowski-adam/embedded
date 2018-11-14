@@ -1,0 +1,1503 @@
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 1
+
+
+   1              		.code	16
+   2              		.file	"service.cc"
+   3              		.section	.debug_abbrev,"",%progbits
+   4              	.Ldebug_abbrev0:
+   5              		.section	.debug_info,"",%progbits
+   6              	.Ldebug_info0:
+   7              		.section	.debug_line,"",%progbits
+   8              	.Ldebug_line0:
+   9 0000 85000000 		.text
+   9      02004B00 
+   9      00000201 
+   9      FB0E0D00 
+   9      01010101 
+  10              	.Ltext0:
+  11              		.align	2
+  12              		.global	_Z12dummy_CreatePv
+  13              		.code 16
+  14              		.thumb_func
+  15              		.type	_Z12dummy_CreatePv, %function
+  16              	_Z12dummy_CreatePv:
+  17              	.LFB5:
+  18              		.file 1 "service.cc"
+   1:service.cc    **** #include "Service.h"
+   2:service.cc    **** 
+   3:service.cc    **** 
+   4:service.cc    **** /* Standard includes. */
+   5:service.cc    **** #include <stdlib.h>
+   6:service.cc    **** #include <string.h>
+   7:service.cc    **** 
+   8:service.cc    **** 
+   9:service.cc    **** 
+  10:service.cc    **** char def_Name[] ="A";
+  11:service.cc    **** 
+  12:service.cc    **** void dummy_Create (void * pvParameters);
+  13:service.cc    **** void dummy_Create (void * pvParameters)
+  19              		.loc 1 13 0
+  20 0000 00B5     		push	{lr}
+  21              	.LCFI0:
+  22              	.LVL0:
+  14:service.cc    **** {
+  15:service.cc    **** 	((Service*)pvParameters) -> Body();
+  23              		.loc 1 15 0
+  24 0002 0368     		ldr	r3, [r0]
+  25 0004 1B68     		ldr	r3, [r3]
+  26 0006 00F04FF8 		bl	.L3
+  27              	.LVL1:
+  16:service.cc    **** }
+  28              		.loc 1 16 0
+  29              		@ sp needed for prologue
+  30 000a 01BC     		pop	{r0}
+  31 000c 0047     		bx	r0
+  32              	.LFE5:
+  33              		.size	_Z12dummy_CreatePv, .-_Z12dummy_CreatePv
+  34              		.global	__gxx_personality_sj0
+  35 000e C046     		.align	2
+  36              		.global	_ZN7Service3RunEv
+  37              		.code 16
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 2
+
+
+  38              		.thumb_func
+  39              		.type	_ZN7Service3RunEv, %function
+  40              	_ZN7Service3RunEv:
+  41              	.LFB10:
+  17:service.cc    **** 
+  18:service.cc    **** Service::Service()
+  19:service.cc    **** {
+  20:service.cc    **** 	strcpy (def_Name, Name);
+  21:service.cc    **** 	StackDepth = configMINIMAL_STACK_SIZE;
+  22:service.cc    **** 	Priority = tskIDLE_PRIORITY;
+  23:service.cc    **** 	FreeRTOS_Handle = NULL;
+  24:service.cc    **** 	def_Name[0] += 1; // ¿eby kolejne nazwy by³y "A", "B", "C", ...
+  25:service.cc    **** }
+  26:service.cc    **** 
+  27:service.cc    **** void Service::Body()
+  28:service.cc    **** {
+  29:service.cc    **** 	for ( ;; )
+  30:service.cc    **** 	{
+  31:service.cc    **** 		vTaskDelay(1000000); // Znaczy nic nie robi, ale nie pozwala siê skoñczyæ, co jest wa¿ne.
+  32:service.cc    **** 	}
+  33:service.cc    **** }
+  34:service.cc    **** 
+  35:service.cc    **** 
+  36:service.cc    **** void Service::Run()
+  42              		.loc 1 36 0
+  43 0010 10B5     		push	{r4, lr}
+  44              	.LCFI1:
+  45              	.LVL2:
+  46 0012 031C     		mov	r3, r0
+  37:service.cc    **** {
+  38:service.cc    **** 	xTaskCreate (dummy_Create,
+  39:service.cc    **** 	             (signed char *)Name,
+  40:service.cc    **** 				 StackDepth,
+  41:service.cc    **** 				 (void*)this,
+  42:service.cc    **** 				 Priority,
+  43:service.cc    **** 				 &FreeRTOS_Handle);
+  47              		.loc 1 43 0
+  48 0014 9C69     		ldr	r4, [r3, #24]
+  49              		.loc 1 36 0
+  50 0016 82B0     		sub	sp, sp, #8
+  51              	.LCFI2:
+  52              		.loc 1 43 0
+  53 0018 9A8A     		ldrh	r2, [r3, #20]
+  54 001a 0094     		str	r4, [sp]
+  55 001c 1C1C     		mov	r4, r3
+  56 001e 191D     		add	r1, r3, #4
+  57 0020 1C34     		add	r4, r4, #28
+  58 0022 0448     		ldr	r0, .L6
+  59              	.LVL3:
+  60 0024 0194     		str	r4, [sp, #4]
+  61 0026 FFF7FEFF 		bl	xTaskCreate
+  62              	.LVL4:
+  44:service.cc    **** }
+  63              		.loc 1 44 0
+  64 002a 02B0     		add	sp, sp, #8
+  65              		@ sp needed for prologue
+  66 002c 10BC     		pop	{r4}
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 3
+
+
+  67 002e 01BC     		pop	{r0}
+  68 0030 0047     		bx	r0
+  69              	.L7:
+  70 0032 C046     		.align	2
+  71              	.L6:
+  72 0034 00000000 		.word	_Z12dummy_CreatePv
+  73              	.LFE10:
+  74              		.size	_ZN7Service3RunEv, .-_ZN7Service3RunEv
+  75              		.align	2
+  76              		.global	_ZN7Service4BodyEv
+  77              		.code 16
+  78              		.thumb_func
+  79              		.type	_ZN7Service4BodyEv, %function
+  80              	_ZN7Service4BodyEv:
+  81              	.LFB9:
+  82              		.loc 1 27 0
+  83 0038 00B5     		push	{lr}
+  84              	.LCFI3:
+  85              	.LVL5:
+  86              	.L10:
+  87              		.loc 1 31 0
+  88 003a 0248     		ldr	r0, .L12
+  89              	.LVL6:
+  90 003c FFF7FEFF 		bl	vTaskDelay
+  91 0040 FBE7     		b	.L10
+  92              	.L13:
+  93 0042 C046     		.align	2
+  94              	.L12:
+  95 0044 40420F00 		.word	1000000
+  96              	.LFE9:
+  97              		.size	_ZN7Service4BodyEv, .-_ZN7Service4BodyEv
+  98              		.align	2
+  99              		.global	_ZN7ServiceC1Ev
+ 100              		.code 16
+ 101              		.thumb_func
+ 102              		.type	_ZN7ServiceC1Ev, %function
+ 103              	_ZN7ServiceC1Ev:
+ 104              	.LFB8:
+ 105              		.loc 1 18 0
+ 106 0048 30B5     		push	{r4, r5, lr}
+ 107              	.LCFI4:
+ 108              	.LVL7:
+ 109              	.LBB2:
+ 110              		.loc 1 20 0
+ 111 004a 094D     		ldr	r5, .L16
+ 112              		.loc 1 18 0
+ 113 004c 094B     		ldr	r3, .L16+4
+ 114 004e 011C     		mov	r1, r0
+ 115              	.LBE2:
+ 116 0050 041C     		mov	r4, r0
+ 117              	.LBB3:
+ 118 0052 08C1     		stmia	r1!, {r3}
+ 119              		.loc 1 20 0
+ 120 0054 281C     		mov	r0, r5
+ 121              	.LVL8:
+ 122 0056 FFF7FEFF 		bl	strcpy
+ 123              		.loc 1 21 0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 4
+
+
+ 124 005a 8023     		mov	r3, #128
+ 125 005c A382     		strh	r3, [r4, #20]
+ 126              		.loc 1 22 0
+ 127 005e 0023     		mov	r3, #0
+ 128 0060 A361     		str	r3, [r4, #24]
+ 129              		.loc 1 23 0
+ 130 0062 E361     		str	r3, [r4, #28]
+ 131              		.loc 1 24 0
+ 132 0064 2B78     		ldrb	r3, [r5]
+ 133 0066 0133     		add	r3, r3, #1
+ 134 0068 2B70     		strb	r3, [r5]
+ 135              	.LBE3:
+ 136              		.loc 1 25 0
+ 137              		@ sp needed for prologue
+ 138              	.LVL9:
+ 139 006a 30BC     		pop	{r4, r5}
+ 140 006c 01BC     		pop	{r0}
+ 141 006e 0047     		bx	r0
+ 142              	.L17:
+ 143              		.align	2
+ 144              	.L16:
+ 145 0070 00000000 		.word	def_Name
+ 146 0074 08000000 		.word	_ZTV7Service+8
+ 147              	.LFE8:
+ 148              		.size	_ZN7ServiceC1Ev, .-_ZN7ServiceC1Ev
+ 149              		.align	2
+ 150              		.global	_ZN7ServiceC2Ev
+ 151              		.code 16
+ 152              		.thumb_func
+ 153              		.type	_ZN7ServiceC2Ev, %function
+ 154              	_ZN7ServiceC2Ev:
+ 155              	.LFB7:
+ 156              		.loc 1 18 0
+ 157 0078 30B5     		push	{r4, r5, lr}
+ 158              	.LCFI5:
+ 159              	.LVL10:
+ 160              	.LBB4:
+ 161              		.loc 1 20 0
+ 162 007a 094D     		ldr	r5, .L20
+ 163              		.loc 1 18 0
+ 164 007c 094B     		ldr	r3, .L20+4
+ 165 007e 011C     		mov	r1, r0
+ 166              	.LBE4:
+ 167 0080 041C     		mov	r4, r0
+ 168              	.LBB5:
+ 169 0082 08C1     		stmia	r1!, {r3}
+ 170              		.loc 1 20 0
+ 171 0084 281C     		mov	r0, r5
+ 172              	.LVL11:
+ 173 0086 FFF7FEFF 		bl	strcpy
+ 174              		.loc 1 21 0
+ 175 008a 8023     		mov	r3, #128
+ 176 008c A382     		strh	r3, [r4, #20]
+ 177              		.loc 1 22 0
+ 178 008e 0023     		mov	r3, #0
+ 179 0090 A361     		str	r3, [r4, #24]
+ 180              		.loc 1 23 0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 5
+
+
+ 181 0092 E361     		str	r3, [r4, #28]
+ 182              		.loc 1 24 0
+ 183 0094 2B78     		ldrb	r3, [r5]
+ 184 0096 0133     		add	r3, r3, #1
+ 185 0098 2B70     		strb	r3, [r5]
+ 186              	.LBE5:
+ 187              		.loc 1 25 0
+ 188              		@ sp needed for prologue
+ 189              	.LVL12:
+ 190 009a 30BC     		pop	{r4, r5}
+ 191 009c 01BC     		pop	{r0}
+ 192 009e 0047     		bx	r0
+ 193              	.L21:
+ 194              		.align	2
+ 195              	.L20:
+ 196 00a0 00000000 		.word	def_Name
+ 197 00a4 08000000 		.word	_ZTV7Service+8
+ 198              	.LFE7:
+ 199              		.size	_ZN7ServiceC2Ev, .-_ZN7ServiceC2Ev
+ 200              		.global	def_Name
+ 201              		.data
+ 202              		.align	2
+ 203              		.type	def_Name, %object
+ 204              		.size	def_Name, 2
+ 205              	def_Name:
+ 206 0000 4100     		.ascii	"A\000"
+ 207              		.weak	_ZTV7Service
+ 208 0002 0000     		.section	.rodata._ZTV7Service,"aG",%progbits,_ZTV7Service,comdat
+ 209              		.align	2
+ 210              		.type	_ZTV7Service, %object
+ 211              		.size	_ZTV7Service, 12
+ 212              	_ZTV7Service:
+ 213 0000 00000000 		.word	0
+ 214 0004 00000000 		.word	_ZTI7Service
+ 215 0008 00000000 		.word	_ZN7Service4BodyEv
+ 216              		.weak	_ZTS7Service
+ 217              		.section	.rodata._ZTS7Service,"aG",%progbits,_ZTS7Service,comdat
+ 218              		.align	2
+ 219              		.type	_ZTS7Service, %object
+ 220              		.size	_ZTS7Service, 9
+ 221              	_ZTS7Service:
+ 222 0000 37536572 		.ascii	"7Service\000"
+ 222      76696365 
+ 222      00
+ 223              		.weak	_ZTI7Service
+ 224 0009 000000   		.section	.rodata._ZTI7Service,"aG",%progbits,_ZTI7Service,comdat
+ 225              		.align	2
+ 226              		.type	_ZTI7Service, %object
+ 227              		.size	_ZTI7Service, 8
+ 228              	_ZTI7Service:
+ 229 0000 08000000 		.word	_ZTVN10__cxxabiv117__class_type_infoE+8
+ 230 0004 00000000 		.word	_ZTS7Service
+ 231              		.section	.debug_frame,"",%progbits
+ 232              	.Lframe0:
+ 233 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ 234              	.LSCIE0:
+ 235 0004 FFFFFFFF 		.4byte	0xffffffff
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 6
+
+
+ 236 0008 01       		.byte	0x1
+ 237 0009 00       		.ascii	"\000"
+ 238 000a 01       		.uleb128 0x1
+ 239 000b 7C       		.sleb128 -4
+ 240 000c 0E       		.byte	0xe
+ 241 000d 0C       		.byte	0xc
+ 242 000e 0D       		.uleb128 0xd
+ 243 000f 00       		.uleb128 0x0
+ 244              		.align	2
+ 245              	.LECIE0:
+ 246              	.LSFDE0:
+ 247 0010 14000000 		.4byte	.LEFDE0-.LASFDE0
+ 248              	.LASFDE0:
+ 249 0014 00000000 		.4byte	.Lframe0
+ 250 0018 00000000 		.4byte	.LFB5
+ 251 001c 0E000000 		.4byte	.LFE5-.LFB5
+ 252 0020 42       		.byte	0x4
+ 253              		.4byte	.LCFI0-.LFB5
+ 254 0021 0E       		.byte	0xe
+ 255 0022 04       		.uleb128 0x4
+ 256 0023 8E       		.byte	0x8e
+ 257 0024 01       		.uleb128 0x1
+ 258 0025 000000   		.align	2
+ 259              	.LEFDE0:
+ 260              	.LSFDE2:
+ 261 0028 18000000 		.4byte	.LEFDE2-.LASFDE2
+ 262              	.LASFDE2:
+ 263 002c 00000000 		.4byte	.Lframe0
+ 264 0030 10000000 		.4byte	.LFB10
+ 265 0034 28000000 		.4byte	.LFE10-.LFB10
+ 266 0038 42       		.byte	0x4
+ 267              		.4byte	.LCFI1-.LFB10
+ 268 0039 0E       		.byte	0xe
+ 269 003a 08       		.uleb128 0x8
+ 270 003b 84       		.byte	0x84
+ 271 003c 02       		.uleb128 0x2
+ 272 003d 8E       		.byte	0x8e
+ 273 003e 01       		.uleb128 0x1
+ 274 003f 46       		.byte	0x4
+ 275              		.4byte	.LCFI2-.LCFI1
+ 276 0040 0E       		.byte	0xe
+ 277 0041 10       		.uleb128 0x10
+ 278 0042 0000     		.align	2
+ 279              	.LEFDE2:
+ 280              	.LSFDE4:
+ 281 0044 14000000 		.4byte	.LEFDE4-.LASFDE4
+ 282              	.LASFDE4:
+ 283 0048 00000000 		.4byte	.Lframe0
+ 284 004c 38000000 		.4byte	.LFB9
+ 285 0050 10000000 		.4byte	.LFE9-.LFB9
+ 286 0054 42       		.byte	0x4
+ 287              		.4byte	.LCFI3-.LFB9
+ 288 0055 0E       		.byte	0xe
+ 289 0056 04       		.uleb128 0x4
+ 290 0057 8E       		.byte	0x8e
+ 291 0058 01       		.uleb128 0x1
+ 292 0059 000000   		.align	2
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 7
+
+
+ 293              	.LEFDE4:
+ 294              	.LSFDE6:
+ 295 005c 18000000 		.4byte	.LEFDE6-.LASFDE6
+ 296              	.LASFDE6:
+ 297 0060 00000000 		.4byte	.Lframe0
+ 298 0064 48000000 		.4byte	.LFB8
+ 299 0068 30000000 		.4byte	.LFE8-.LFB8
+ 300 006c 42       		.byte	0x4
+ 301              		.4byte	.LCFI4-.LFB8
+ 302 006d 0E       		.byte	0xe
+ 303 006e 0C       		.uleb128 0xc
+ 304 006f 84       		.byte	0x84
+ 305 0070 03       		.uleb128 0x3
+ 306 0071 85       		.byte	0x85
+ 307 0072 02       		.uleb128 0x2
+ 308 0073 8E       		.byte	0x8e
+ 309 0074 01       		.uleb128 0x1
+ 310 0075 000000   		.align	2
+ 311              	.LEFDE6:
+ 312              	.LSFDE8:
+ 313 0078 18000000 		.4byte	.LEFDE8-.LASFDE8
+ 314              	.LASFDE8:
+ 315 007c 00000000 		.4byte	.Lframe0
+ 316 0080 78000000 		.4byte	.LFB7
+ 317 0084 30000000 		.4byte	.LFE7-.LFB7
+ 318 0088 42       		.byte	0x4
+ 319              		.4byte	.LCFI5-.LFB7
+ 320 0089 0E       		.byte	0xe
+ 321 008a 0C       		.uleb128 0xc
+ 322 008b 84       		.byte	0x84
+ 323 008c 03       		.uleb128 0x3
+ 324 008d 85       		.byte	0x85
+ 325 008e 02       		.uleb128 0x2
+ 326 008f 8E       		.byte	0x8e
+ 327 0090 01       		.uleb128 0x1
+ 328 0091 000000   		.align	2
+ 329              	.LEFDE8:
+ 330              		.text
+ 331              	.Letext0:
+ 332              		.section	.debug_loc,"",%progbits
+ 333              	.Ldebug_loc0:
+ 334              	.LLST0:
+ 335 0000 00000000 		.4byte	.LFB5-.Ltext0
+ 336 0004 02000000 		.4byte	.LCFI0-.Ltext0
+ 337 0008 0100     		.2byte	0x1
+ 338 000a 5D       		.byte	0x5d
+ 339 000b 02000000 		.4byte	.LCFI0-.Ltext0
+ 340 000f 0E000000 		.4byte	.LFE5-.Ltext0
+ 341 0013 0200     		.2byte	0x2
+ 342 0015 7D       		.byte	0x7d
+ 343 0016 04       		.sleb128 4
+ 344 0017 00000000 		.4byte	0x0
+ 345 001b 00000000 		.4byte	0x0
+ 346              	.LLST1:
+ 347 001f 02000000 		.4byte	.LVL0-.Ltext0
+ 348 0023 0A000000 		.4byte	.LVL1-.Ltext0
+ 349 0027 0100     		.2byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 8
+
+
+ 350 0029 50       		.byte	0x50
+ 351 002a 00000000 		.4byte	0x0
+ 352 002e 00000000 		.4byte	0x0
+ 353              	.LLST2:
+ 354 0032 10000000 		.4byte	.LFB10-.Ltext0
+ 355 0036 12000000 		.4byte	.LCFI1-.Ltext0
+ 356 003a 0100     		.2byte	0x1
+ 357 003c 5D       		.byte	0x5d
+ 358 003d 12000000 		.4byte	.LCFI1-.Ltext0
+ 359 0041 18000000 		.4byte	.LCFI2-.Ltext0
+ 360 0045 0200     		.2byte	0x2
+ 361 0047 7D       		.byte	0x7d
+ 362 0048 08       		.sleb128 8
+ 363 0049 18000000 		.4byte	.LCFI2-.Ltext0
+ 364 004d 38000000 		.4byte	.LFE10-.Ltext0
+ 365 0051 0200     		.2byte	0x2
+ 366 0053 7D       		.byte	0x7d
+ 367 0054 10       		.sleb128 16
+ 368 0055 00000000 		.4byte	0x0
+ 369 0059 00000000 		.4byte	0x0
+ 370              	.LLST3:
+ 371 005d 12000000 		.4byte	.LVL2-.Ltext0
+ 372 0061 24000000 		.4byte	.LVL3-.Ltext0
+ 373 0065 0100     		.2byte	0x1
+ 374 0067 50       		.byte	0x50
+ 375 0068 24000000 		.4byte	.LVL3-.Ltext0
+ 376 006c 2A000000 		.4byte	.LVL4-.Ltext0
+ 377 0070 0100     		.2byte	0x1
+ 378 0072 53       		.byte	0x53
+ 379 0073 00000000 		.4byte	0x0
+ 380 0077 00000000 		.4byte	0x0
+ 381              	.LLST4:
+ 382 007b 38000000 		.4byte	.LFB9-.Ltext0
+ 383 007f 3A000000 		.4byte	.LCFI3-.Ltext0
+ 384 0083 0100     		.2byte	0x1
+ 385 0085 5D       		.byte	0x5d
+ 386 0086 3A000000 		.4byte	.LCFI3-.Ltext0
+ 387 008a 48000000 		.4byte	.LFE9-.Ltext0
+ 388 008e 0200     		.2byte	0x2
+ 389 0090 7D       		.byte	0x7d
+ 390 0091 04       		.sleb128 4
+ 391 0092 00000000 		.4byte	0x0
+ 392 0096 00000000 		.4byte	0x0
+ 393              	.LLST5:
+ 394 009a 3A000000 		.4byte	.LVL5-.Ltext0
+ 395 009e 3C000000 		.4byte	.LVL6-.Ltext0
+ 396 00a2 0100     		.2byte	0x1
+ 397 00a4 50       		.byte	0x50
+ 398 00a5 00000000 		.4byte	0x0
+ 399 00a9 00000000 		.4byte	0x0
+ 400              	.LLST6:
+ 401 00ad 48000000 		.4byte	.LFB8-.Ltext0
+ 402 00b1 4A000000 		.4byte	.LCFI4-.Ltext0
+ 403 00b5 0100     		.2byte	0x1
+ 404 00b7 5D       		.byte	0x5d
+ 405 00b8 4A000000 		.4byte	.LCFI4-.Ltext0
+ 406 00bc 78000000 		.4byte	.LFE8-.Ltext0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 9
+
+
+ 407 00c0 0200     		.2byte	0x2
+ 408 00c2 7D       		.byte	0x7d
+ 409 00c3 0C       		.sleb128 12
+ 410 00c4 00000000 		.4byte	0x0
+ 411 00c8 00000000 		.4byte	0x0
+ 412              	.LLST7:
+ 413 00cc 4A000000 		.4byte	.LVL7-.Ltext0
+ 414 00d0 56000000 		.4byte	.LVL8-.Ltext0
+ 415 00d4 0100     		.2byte	0x1
+ 416 00d6 50       		.byte	0x50
+ 417 00d7 56000000 		.4byte	.LVL8-.Ltext0
+ 418 00db 6A000000 		.4byte	.LVL9-.Ltext0
+ 419 00df 0100     		.2byte	0x1
+ 420 00e1 54       		.byte	0x54
+ 421 00e2 00000000 		.4byte	0x0
+ 422 00e6 00000000 		.4byte	0x0
+ 423              	.LLST8:
+ 424 00ea 78000000 		.4byte	.LFB7-.Ltext0
+ 425 00ee 7A000000 		.4byte	.LCFI5-.Ltext0
+ 426 00f2 0100     		.2byte	0x1
+ 427 00f4 5D       		.byte	0x5d
+ 428 00f5 7A000000 		.4byte	.LCFI5-.Ltext0
+ 429 00f9 A8000000 		.4byte	.LFE7-.Ltext0
+ 430 00fd 0200     		.2byte	0x2
+ 431 00ff 7D       		.byte	0x7d
+ 432 0100 0C       		.sleb128 12
+ 433 0101 00000000 		.4byte	0x0
+ 434 0105 00000000 		.4byte	0x0
+ 435              	.LLST9:
+ 436 0109 7A000000 		.4byte	.LVL10-.Ltext0
+ 437 010d 86000000 		.4byte	.LVL11-.Ltext0
+ 438 0111 0100     		.2byte	0x1
+ 439 0113 50       		.byte	0x50
+ 440 0114 86000000 		.4byte	.LVL11-.Ltext0
+ 441 0118 9A000000 		.4byte	.LVL12-.Ltext0
+ 442 011c 0100     		.2byte	0x1
+ 443 011e 54       		.byte	0x54
+ 444 011f 00000000 		.4byte	0x0
+ 445 0123 00000000 		.4byte	0x0
+ 446              		.file 2 "Service.h"
+ 447              		.file 3 "./FreeRTOS/include/task.h"
+ 448              		.section	.debug_info
+ 449 0000 7D020000 		.4byte	0x27d
+ 450 0004 0200     		.2byte	0x2
+ 451 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 452 000a 04       		.byte	0x4
+ 453 000b 01       		.uleb128 0x1
+ 454 000c 5B010000 		.4byte	.LASF17
+ 455 0010 04       		.byte	0x4
+ 456 0011 2C000000 		.4byte	.LASF18
+ 457 0015 08010000 		.4byte	.LASF19
+ 458 0019 00000000 		.4byte	.Ltext0
+ 459 001d A8000000 		.4byte	.Letext0
+ 460 0021 00000000 		.4byte	.Ldebug_line0
+ 461 0025 02       		.uleb128 0x2
+ 462 0026 01       		.byte	0x1
+ 463 0027 08       		.byte	0x8
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 10
+
+
+ 464 0028 37000000 		.4byte	.LASF0
+ 465 002c 02       		.uleb128 0x2
+ 466 002d 02       		.byte	0x2
+ 467 002e 07       		.byte	0x7
+ 468 002f 65000000 		.4byte	.LASF1
+ 469 0033 02       		.uleb128 0x2
+ 470 0034 04       		.byte	0x4
+ 471 0035 07       		.byte	0x7
+ 472 0036 9D000000 		.4byte	.LASF2
+ 473 003a 02       		.uleb128 0x2
+ 474 003b 01       		.byte	0x1
+ 475 003c 06       		.byte	0x6
+ 476 003d 69010000 		.4byte	.LASF3
+ 477 0041 02       		.uleb128 0x2
+ 478 0042 02       		.byte	0x2
+ 479 0043 05       		.byte	0x5
+ 480 0044 FE000000 		.4byte	.LASF4
+ 481 0048 03       		.uleb128 0x3
+ 482 0049 04       		.byte	0x4
+ 483 004a 05       		.byte	0x5
+ 484 004b 696E7400 		.ascii	"int\000"
+ 485 004f 02       		.uleb128 0x2
+ 486 0050 04       		.byte	0x4
+ 487 0051 05       		.byte	0x5
+ 488 0052 52010000 		.4byte	.LASF5
+ 489 0056 02       		.uleb128 0x2
+ 490 0057 04       		.byte	0x4
+ 491 0058 07       		.byte	0x7
+ 492 0059 53000000 		.4byte	.LASF6
+ 493 005d 04       		.uleb128 0x4
+ 494 005e 04       		.byte	0x4
+ 495 005f 05       		.uleb128 0x5
+ 496 0060 20000000 		.4byte	.LASF20
+ 497 0064 03       		.byte	0x3
+ 498 0065 52       		.byte	0x52
+ 499 0066 5D000000 		.4byte	0x5d
+ 500 006a 02       		.uleb128 0x2
+ 501 006b 08       		.byte	0x8
+ 502 006c 05       		.byte	0x5
+ 503 006d D6000000 		.4byte	.LASF7
+ 504 0071 06       		.uleb128 0x6
+ 505 0072 04       		.byte	0x4
+ 506 0073 07       		.byte	0x7
+ 507 0074 02       		.uleb128 0x2
+ 508 0075 01       		.byte	0x1
+ 509 0076 08       		.byte	0x8
+ 510 0077 EC000000 		.4byte	.LASF8
+ 511 007b 02       		.uleb128 0x2
+ 512 007c 08       		.byte	0x8
+ 513 007d 07       		.byte	0x7
+ 514 007e BA000000 		.4byte	.LASF9
+ 515 0082 07       		.uleb128 0x7
+ 516 0083 E4000000 		.4byte	.LASF14
+ 517 0087 20       		.byte	0x20
+ 518 0088 02       		.byte	0x2
+ 519 0089 09       		.byte	0x9
+ 520 008a 82000000 		.4byte	0x82
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 11
+
+
+ 521 008e 56010000 		.4byte	0x156
+ 522 0092 08       		.uleb128 0x8
+ 523 0093 32010000 		.4byte	.LASF21
+ 524 0097 61010000 		.4byte	0x161
+ 525 009b 02       		.byte	0x2
+ 526 009c 23       		.byte	0x23
+ 527 009d 00       		.uleb128 0x0
+ 528 009e 01       		.byte	0x1
+ 529 009f 09       		.uleb128 0x9
+ 530 00a0 75010000 		.4byte	.LASF10
+ 531 00a4 02       		.byte	0x2
+ 532 00a5 0B       		.byte	0xb
+ 533 00a6 71010000 		.4byte	0x171
+ 534 00aa 02       		.byte	0x2
+ 535 00ab 23       		.byte	0x23
+ 536 00ac 04       		.uleb128 0x4
+ 537 00ad 02       		.byte	0x2
+ 538 00ae 09       		.uleb128 0x9
+ 539 00af 7A010000 		.4byte	.LASF11
+ 540 00b3 02       		.byte	0x2
+ 541 00b4 0C       		.byte	0xc
+ 542 00b5 2C000000 		.4byte	0x2c
+ 543 00b9 02       		.byte	0x2
+ 544 00ba 23       		.byte	0x23
+ 545 00bb 14       		.uleb128 0x14
+ 546 00bc 02       		.byte	0x2
+ 547 00bd 09       		.uleb128 0x9
+ 548 00be 81000000 		.4byte	.LASF12
+ 549 00c2 02       		.byte	0x2
+ 550 00c3 0D       		.byte	0xd
+ 551 00c4 4F000000 		.4byte	0x4f
+ 552 00c8 02       		.byte	0x2
+ 553 00c9 23       		.byte	0x23
+ 554 00ca 18       		.uleb128 0x18
+ 555 00cb 02       		.byte	0x2
+ 556 00cc 09       		.uleb128 0x9
+ 557 00cd 22010000 		.4byte	.LASF13
+ 558 00d1 02       		.byte	0x2
+ 559 00d2 0E       		.byte	0xe
+ 560 00d3 5F000000 		.4byte	0x5f
+ 561 00d7 02       		.byte	0x2
+ 562 00d8 23       		.byte	0x23
+ 563 00d9 1C       		.uleb128 0x1c
+ 564 00da 02       		.byte	0x2
+ 565 00db 0A       		.uleb128 0xa
+ 566 00dc 01       		.byte	0x1
+ 567 00dd E4000000 		.4byte	.LASF14
+ 568 00e1 01       		.byte	0x1
+ 569 00e2 01       		.byte	0x1
+ 570 00e3 F3000000 		.4byte	0xf3
+ 571 00e7 0B       		.uleb128 0xb
+ 572 00e8 81010000 		.4byte	0x181
+ 573 00ec 01       		.byte	0x1
+ 574 00ed 0C       		.uleb128 0xc
+ 575 00ee 87010000 		.4byte	0x187
+ 576 00f2 00       		.byte	0x0
+ 577 00f3 0D       		.uleb128 0xd
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 12
+
+
+ 578 00f4 01       		.byte	0x1
+ 579 00f5 E4000000 		.4byte	.LASF14
+ 580 00f9 01       		.byte	0x1
+ 581 00fa 12       		.byte	0x12
+ 582 00fb 01       		.byte	0x1
+ 583 00fc 07010000 		.4byte	0x107
+ 584 0100 0B       		.uleb128 0xb
+ 585 0101 81010000 		.4byte	0x181
+ 586 0105 01       		.byte	0x1
+ 587 0106 00       		.byte	0x0
+ 588 0107 0D       		.uleb128 0xd
+ 589 0108 01       		.byte	0x1
+ 590 0109 4A000000 		.4byte	.LASF15
+ 591 010d 02       		.byte	0x2
+ 592 010e 11       		.byte	0x11
+ 593 010f 01       		.byte	0x1
+ 594 0110 21010000 		.4byte	0x121
+ 595 0114 0B       		.uleb128 0xb
+ 596 0115 81010000 		.4byte	0x181
+ 597 0119 01       		.byte	0x1
+ 598 011a 0B       		.uleb128 0xb
+ 599 011b 48000000 		.4byte	0x48
+ 600 011f 01       		.byte	0x1
+ 601 0120 00       		.byte	0x0
+ 602 0121 0E       		.uleb128 0xe
+ 603 0122 01       		.byte	0x1
+ 604 0123 D1000000 		.4byte	.LASF22
+ 605 0127 01       		.byte	0x1
+ 606 0128 1B       		.byte	0x1b
+ 607 0129 00000000 		.4byte	.LASF23
+ 608 012d 01       		.byte	0x1
+ 609 012e 02       		.byte	0x2
+ 610 012f 10       		.byte	0x10
+ 611 0130 00       		.uleb128 0x0
+ 612 0131 82000000 		.4byte	0x82
+ 613 0135 01       		.byte	0x1
+ 614 0136 41010000 		.4byte	0x141
+ 615 013a 0B       		.uleb128 0xb
+ 616 013b 81010000 		.4byte	0x181
+ 617 013f 01       		.byte	0x1
+ 618 0140 00       		.byte	0x0
+ 619 0141 0F       		.uleb128 0xf
+ 620 0142 01       		.byte	0x1
+ 621 0143 52756E00 		.ascii	"Run\000"
+ 622 0147 01       		.byte	0x1
+ 623 0148 24       		.byte	0x24
+ 624 0149 40010000 		.4byte	.LASF24
+ 625 014d 01       		.byte	0x1
+ 626 014e 0B       		.uleb128 0xb
+ 627 014f 81010000 		.4byte	0x181
+ 628 0153 01       		.byte	0x1
+ 629 0154 00       		.byte	0x0
+ 630 0155 00       		.byte	0x0
+ 631 0156 10       		.uleb128 0x10
+ 632 0157 48000000 		.4byte	0x48
+ 633 015b 61010000 		.4byte	0x161
+ 634 015f 11       		.uleb128 0x11
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 13
+
+
+ 635 0160 00       		.byte	0x0
+ 636 0161 12       		.uleb128 0x12
+ 637 0162 04       		.byte	0x4
+ 638 0163 67010000 		.4byte	0x167
+ 639 0167 13       		.uleb128 0x13
+ 640 0168 04       		.byte	0x4
+ 641 0169 AA000000 		.4byte	.LASF25
+ 642 016d 56010000 		.4byte	0x156
+ 643 0171 14       		.uleb128 0x14
+ 644 0172 74000000 		.4byte	0x74
+ 645 0176 81010000 		.4byte	0x181
+ 646 017a 15       		.uleb128 0x15
+ 647 017b 71000000 		.4byte	0x71
+ 648 017f 0F       		.byte	0xf
+ 649 0180 00       		.byte	0x0
+ 650 0181 12       		.uleb128 0x12
+ 651 0182 04       		.byte	0x4
+ 652 0183 82000000 		.4byte	0x82
+ 653 0187 16       		.uleb128 0x16
+ 654 0188 04       		.byte	0x4
+ 655 0189 8D010000 		.4byte	0x18d
+ 656 018d 17       		.uleb128 0x17
+ 657 018e 82000000 		.4byte	0x82
+ 658 0192 18       		.uleb128 0x18
+ 659 0193 01       		.byte	0x1
+ 660 0194 13000000 		.4byte	.LASF26
+ 661 0198 01       		.byte	0x1
+ 662 0199 0D       		.byte	0xd
+ 663 019a 8A000000 		.4byte	.LASF27
+ 664 019e 00000000 		.4byte	.LFB5
+ 665 01a2 0E000000 		.4byte	.LFE5
+ 666 01a6 00000000 		.4byte	.LLST0
+ 667 01aa BE010000 		.4byte	0x1be
+ 668 01ae 19       		.uleb128 0x19
+ 669 01af F1000000 		.4byte	.LASF28
+ 670 01b3 01       		.byte	0x1
+ 671 01b4 0D       		.byte	0xd
+ 672 01b5 5D000000 		.4byte	0x5d
+ 673 01b9 1F000000 		.4byte	.LLST1
+ 674 01bd 00       		.byte	0x0
+ 675 01be 1A       		.uleb128 0x1a
+ 676 01bf 41010000 		.4byte	0x141
+ 677 01c3 10000000 		.4byte	.LFB10
+ 678 01c7 38000000 		.4byte	.LFE10
+ 679 01cb 32000000 		.4byte	.LLST2
+ 680 01cf E2010000 		.4byte	0x1e2
+ 681 01d3 1B       		.uleb128 0x1b
+ 682 01d4 45000000 		.4byte	.LASF16
+ 683 01d8 E2010000 		.4byte	0x1e2
+ 684 01dc 01       		.byte	0x1
+ 685 01dd 5D000000 		.4byte	.LLST3
+ 686 01e1 00       		.byte	0x0
+ 687 01e2 17       		.uleb128 0x17
+ 688 01e3 81010000 		.4byte	0x181
+ 689 01e7 1A       		.uleb128 0x1a
+ 690 01e8 21010000 		.4byte	0x121
+ 691 01ec 38000000 		.4byte	.LFB9
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 14
+
+
+ 692 01f0 48000000 		.4byte	.LFE9
+ 693 01f4 7B000000 		.4byte	.LLST4
+ 694 01f8 0B020000 		.4byte	0x20b
+ 695 01fc 1B       		.uleb128 0x1b
+ 696 01fd 45000000 		.4byte	.LASF16
+ 697 0201 E2010000 		.4byte	0x1e2
+ 698 0205 01       		.byte	0x1
+ 699 0206 9A000000 		.4byte	.LLST5
+ 700 020a 00       		.byte	0x0
+ 701 020b 1C       		.uleb128 0x1c
+ 702 020c F3000000 		.4byte	0xf3
+ 703 0210 00       		.byte	0x0
+ 704 0211 20020000 		.4byte	0x220
+ 705 0215 1D       		.uleb128 0x1d
+ 706 0216 45000000 		.4byte	.LASF16
+ 707 021a E2010000 		.4byte	0x1e2
+ 708 021e 01       		.byte	0x1
+ 709 021f 00       		.byte	0x0
+ 710 0220 1E       		.uleb128 0x1e
+ 711 0221 0B020000 		.4byte	0x20b
+ 712 0225 48000000 		.4byte	.LFB8
+ 713 0229 78000000 		.4byte	.LFE8
+ 714 022d AD000000 		.4byte	.LLST6
+ 715 0231 3F020000 		.4byte	0x23f
+ 716 0235 1F       		.uleb128 0x1f
+ 717 0236 15020000 		.4byte	0x215
+ 718 023a CC000000 		.4byte	.LLST7
+ 719 023e 00       		.byte	0x0
+ 720 023f 1E       		.uleb128 0x1e
+ 721 0240 0B020000 		.4byte	0x20b
+ 722 0244 78000000 		.4byte	.LFB7
+ 723 0248 A8000000 		.4byte	.LFE7
+ 724 024c EA000000 		.4byte	.LLST8
+ 725 0250 5E020000 		.4byte	0x25e
+ 726 0254 1F       		.uleb128 0x1f
+ 727 0255 15020000 		.4byte	0x215
+ 728 0259 09010000 		.4byte	.LLST9
+ 729 025d 00       		.byte	0x0
+ 730 025e 14       		.uleb128 0x14
+ 731 025f 74000000 		.4byte	0x74
+ 732 0263 6E020000 		.4byte	0x26e
+ 733 0267 15       		.uleb128 0x15
+ 734 0268 71000000 		.4byte	0x71
+ 735 026c 01       		.byte	0x1
+ 736 026d 00       		.byte	0x0
+ 737 026e 20       		.uleb128 0x20
+ 738 026f 78000000 		.4byte	.LASF29
+ 739 0273 01       		.byte	0x1
+ 740 0274 0A       		.byte	0xa
+ 741 0275 5E020000 		.4byte	0x25e
+ 742 0279 01       		.byte	0x1
+ 743 027a 05       		.byte	0x5
+ 744 027b 03       		.byte	0x3
+ 745 027c 00000000 		.4byte	def_Name
+ 746 0280 00       		.byte	0x0
+ 747              		.section	.debug_abbrev
+ 748 0000 01       		.uleb128 0x1
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 15
+
+
+ 749 0001 11       		.uleb128 0x11
+ 750 0002 01       		.byte	0x1
+ 751 0003 25       		.uleb128 0x25
+ 752 0004 0E       		.uleb128 0xe
+ 753 0005 13       		.uleb128 0x13
+ 754 0006 0B       		.uleb128 0xb
+ 755 0007 03       		.uleb128 0x3
+ 756 0008 0E       		.uleb128 0xe
+ 757 0009 1B       		.uleb128 0x1b
+ 758 000a 0E       		.uleb128 0xe
+ 759 000b 11       		.uleb128 0x11
+ 760 000c 01       		.uleb128 0x1
+ 761 000d 12       		.uleb128 0x12
+ 762 000e 01       		.uleb128 0x1
+ 763 000f 10       		.uleb128 0x10
+ 764 0010 06       		.uleb128 0x6
+ 765 0011 00       		.byte	0x0
+ 766 0012 00       		.byte	0x0
+ 767 0013 02       		.uleb128 0x2
+ 768 0014 24       		.uleb128 0x24
+ 769 0015 00       		.byte	0x0
+ 770 0016 0B       		.uleb128 0xb
+ 771 0017 0B       		.uleb128 0xb
+ 772 0018 3E       		.uleb128 0x3e
+ 773 0019 0B       		.uleb128 0xb
+ 774 001a 03       		.uleb128 0x3
+ 775 001b 0E       		.uleb128 0xe
+ 776 001c 00       		.byte	0x0
+ 777 001d 00       		.byte	0x0
+ 778 001e 03       		.uleb128 0x3
+ 779 001f 24       		.uleb128 0x24
+ 780 0020 00       		.byte	0x0
+ 781 0021 0B       		.uleb128 0xb
+ 782 0022 0B       		.uleb128 0xb
+ 783 0023 3E       		.uleb128 0x3e
+ 784 0024 0B       		.uleb128 0xb
+ 785 0025 03       		.uleb128 0x3
+ 786 0026 08       		.uleb128 0x8
+ 787 0027 00       		.byte	0x0
+ 788 0028 00       		.byte	0x0
+ 789 0029 04       		.uleb128 0x4
+ 790 002a 0F       		.uleb128 0xf
+ 791 002b 00       		.byte	0x0
+ 792 002c 0B       		.uleb128 0xb
+ 793 002d 0B       		.uleb128 0xb
+ 794 002e 00       		.byte	0x0
+ 795 002f 00       		.byte	0x0
+ 796 0030 05       		.uleb128 0x5
+ 797 0031 16       		.uleb128 0x16
+ 798 0032 00       		.byte	0x0
+ 799 0033 03       		.uleb128 0x3
+ 800 0034 0E       		.uleb128 0xe
+ 801 0035 3A       		.uleb128 0x3a
+ 802 0036 0B       		.uleb128 0xb
+ 803 0037 3B       		.uleb128 0x3b
+ 804 0038 0B       		.uleb128 0xb
+ 805 0039 49       		.uleb128 0x49
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 16
+
+
+ 806 003a 13       		.uleb128 0x13
+ 807 003b 00       		.byte	0x0
+ 808 003c 00       		.byte	0x0
+ 809 003d 06       		.uleb128 0x6
+ 810 003e 24       		.uleb128 0x24
+ 811 003f 00       		.byte	0x0
+ 812 0040 0B       		.uleb128 0xb
+ 813 0041 0B       		.uleb128 0xb
+ 814 0042 3E       		.uleb128 0x3e
+ 815 0043 0B       		.uleb128 0xb
+ 816 0044 00       		.byte	0x0
+ 817 0045 00       		.byte	0x0
+ 818 0046 07       		.uleb128 0x7
+ 819 0047 13       		.uleb128 0x13
+ 820 0048 01       		.byte	0x1
+ 821 0049 03       		.uleb128 0x3
+ 822 004a 0E       		.uleb128 0xe
+ 823 004b 0B       		.uleb128 0xb
+ 824 004c 0B       		.uleb128 0xb
+ 825 004d 3A       		.uleb128 0x3a
+ 826 004e 0B       		.uleb128 0xb
+ 827 004f 3B       		.uleb128 0x3b
+ 828 0050 0B       		.uleb128 0xb
+ 829 0051 1D       		.uleb128 0x1d
+ 830 0052 13       		.uleb128 0x13
+ 831 0053 01       		.uleb128 0x1
+ 832 0054 13       		.uleb128 0x13
+ 833 0055 00       		.byte	0x0
+ 834 0056 00       		.byte	0x0
+ 835 0057 08       		.uleb128 0x8
+ 836 0058 0D       		.uleb128 0xd
+ 837 0059 00       		.byte	0x0
+ 838 005a 03       		.uleb128 0x3
+ 839 005b 0E       		.uleb128 0xe
+ 840 005c 49       		.uleb128 0x49
+ 841 005d 13       		.uleb128 0x13
+ 842 005e 38       		.uleb128 0x38
+ 843 005f 0A       		.uleb128 0xa
+ 844 0060 34       		.uleb128 0x34
+ 845 0061 0C       		.uleb128 0xc
+ 846 0062 00       		.byte	0x0
+ 847 0063 00       		.byte	0x0
+ 848 0064 09       		.uleb128 0x9
+ 849 0065 0D       		.uleb128 0xd
+ 850 0066 00       		.byte	0x0
+ 851 0067 03       		.uleb128 0x3
+ 852 0068 0E       		.uleb128 0xe
+ 853 0069 3A       		.uleb128 0x3a
+ 854 006a 0B       		.uleb128 0xb
+ 855 006b 3B       		.uleb128 0x3b
+ 856 006c 0B       		.uleb128 0xb
+ 857 006d 49       		.uleb128 0x49
+ 858 006e 13       		.uleb128 0x13
+ 859 006f 38       		.uleb128 0x38
+ 860 0070 0A       		.uleb128 0xa
+ 861 0071 32       		.uleb128 0x32
+ 862 0072 0B       		.uleb128 0xb
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 17
+
+
+ 863 0073 00       		.byte	0x0
+ 864 0074 00       		.byte	0x0
+ 865 0075 0A       		.uleb128 0xa
+ 866 0076 2E       		.uleb128 0x2e
+ 867 0077 01       		.byte	0x1
+ 868 0078 3F       		.uleb128 0x3f
+ 869 0079 0C       		.uleb128 0xc
+ 870 007a 03       		.uleb128 0x3
+ 871 007b 0E       		.uleb128 0xe
+ 872 007c 34       		.uleb128 0x34
+ 873 007d 0C       		.uleb128 0xc
+ 874 007e 3C       		.uleb128 0x3c
+ 875 007f 0C       		.uleb128 0xc
+ 876 0080 01       		.uleb128 0x1
+ 877 0081 13       		.uleb128 0x13
+ 878 0082 00       		.byte	0x0
+ 879 0083 00       		.byte	0x0
+ 880 0084 0B       		.uleb128 0xb
+ 881 0085 05       		.uleb128 0x5
+ 882 0086 00       		.byte	0x0
+ 883 0087 49       		.uleb128 0x49
+ 884 0088 13       		.uleb128 0x13
+ 885 0089 34       		.uleb128 0x34
+ 886 008a 0C       		.uleb128 0xc
+ 887 008b 00       		.byte	0x0
+ 888 008c 00       		.byte	0x0
+ 889 008d 0C       		.uleb128 0xc
+ 890 008e 05       		.uleb128 0x5
+ 891 008f 00       		.byte	0x0
+ 892 0090 49       		.uleb128 0x49
+ 893 0091 13       		.uleb128 0x13
+ 894 0092 00       		.byte	0x0
+ 895 0093 00       		.byte	0x0
+ 896 0094 0D       		.uleb128 0xd
+ 897 0095 2E       		.uleb128 0x2e
+ 898 0096 01       		.byte	0x1
+ 899 0097 3F       		.uleb128 0x3f
+ 900 0098 0C       		.uleb128 0xc
+ 901 0099 03       		.uleb128 0x3
+ 902 009a 0E       		.uleb128 0xe
+ 903 009b 3A       		.uleb128 0x3a
+ 904 009c 0B       		.uleb128 0xb
+ 905 009d 3B       		.uleb128 0x3b
+ 906 009e 0B       		.uleb128 0xb
+ 907 009f 3C       		.uleb128 0x3c
+ 908 00a0 0C       		.uleb128 0xc
+ 909 00a1 01       		.uleb128 0x1
+ 910 00a2 13       		.uleb128 0x13
+ 911 00a3 00       		.byte	0x0
+ 912 00a4 00       		.byte	0x0
+ 913 00a5 0E       		.uleb128 0xe
+ 914 00a6 2E       		.uleb128 0x2e
+ 915 00a7 01       		.byte	0x1
+ 916 00a8 3F       		.uleb128 0x3f
+ 917 00a9 0C       		.uleb128 0xc
+ 918 00aa 03       		.uleb128 0x3
+ 919 00ab 0E       		.uleb128 0xe
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 18
+
+
+ 920 00ac 3A       		.uleb128 0x3a
+ 921 00ad 0B       		.uleb128 0xb
+ 922 00ae 3B       		.uleb128 0x3b
+ 923 00af 0B       		.uleb128 0xb
+ 924 00b0 8740     		.uleb128 0x2007
+ 925 00b2 0E       		.uleb128 0xe
+ 926 00b3 4C       		.uleb128 0x4c
+ 927 00b4 0B       		.uleb128 0xb
+ 928 00b5 4D       		.uleb128 0x4d
+ 929 00b6 0A       		.uleb128 0xa
+ 930 00b7 1D       		.uleb128 0x1d
+ 931 00b8 13       		.uleb128 0x13
+ 932 00b9 3C       		.uleb128 0x3c
+ 933 00ba 0C       		.uleb128 0xc
+ 934 00bb 01       		.uleb128 0x1
+ 935 00bc 13       		.uleb128 0x13
+ 936 00bd 00       		.byte	0x0
+ 937 00be 00       		.byte	0x0
+ 938 00bf 0F       		.uleb128 0xf
+ 939 00c0 2E       		.uleb128 0x2e
+ 940 00c1 01       		.byte	0x1
+ 941 00c2 3F       		.uleb128 0x3f
+ 942 00c3 0C       		.uleb128 0xc
+ 943 00c4 03       		.uleb128 0x3
+ 944 00c5 08       		.uleb128 0x8
+ 945 00c6 3A       		.uleb128 0x3a
+ 946 00c7 0B       		.uleb128 0xb
+ 947 00c8 3B       		.uleb128 0x3b
+ 948 00c9 0B       		.uleb128 0xb
+ 949 00ca 8740     		.uleb128 0x2007
+ 950 00cc 0E       		.uleb128 0xe
+ 951 00cd 3C       		.uleb128 0x3c
+ 952 00ce 0C       		.uleb128 0xc
+ 953 00cf 00       		.byte	0x0
+ 954 00d0 00       		.byte	0x0
+ 955 00d1 10       		.uleb128 0x10
+ 956 00d2 15       		.uleb128 0x15
+ 957 00d3 01       		.byte	0x1
+ 958 00d4 49       		.uleb128 0x49
+ 959 00d5 13       		.uleb128 0x13
+ 960 00d6 01       		.uleb128 0x1
+ 961 00d7 13       		.uleb128 0x13
+ 962 00d8 00       		.byte	0x0
+ 963 00d9 00       		.byte	0x0
+ 964 00da 11       		.uleb128 0x11
+ 965 00db 18       		.uleb128 0x18
+ 966 00dc 00       		.byte	0x0
+ 967 00dd 00       		.byte	0x0
+ 968 00de 00       		.byte	0x0
+ 969 00df 12       		.uleb128 0x12
+ 970 00e0 0F       		.uleb128 0xf
+ 971 00e1 00       		.byte	0x0
+ 972 00e2 0B       		.uleb128 0xb
+ 973 00e3 0B       		.uleb128 0xb
+ 974 00e4 49       		.uleb128 0x49
+ 975 00e5 13       		.uleb128 0x13
+ 976 00e6 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 19
+
+
+ 977 00e7 00       		.byte	0x0
+ 978 00e8 13       		.uleb128 0x13
+ 979 00e9 0F       		.uleb128 0xf
+ 980 00ea 00       		.byte	0x0
+ 981 00eb 0B       		.uleb128 0xb
+ 982 00ec 0B       		.uleb128 0xb
+ 983 00ed 03       		.uleb128 0x3
+ 984 00ee 0E       		.uleb128 0xe
+ 985 00ef 49       		.uleb128 0x49
+ 986 00f0 13       		.uleb128 0x13
+ 987 00f1 00       		.byte	0x0
+ 988 00f2 00       		.byte	0x0
+ 989 00f3 14       		.uleb128 0x14
+ 990 00f4 01       		.uleb128 0x1
+ 991 00f5 01       		.byte	0x1
+ 992 00f6 49       		.uleb128 0x49
+ 993 00f7 13       		.uleb128 0x13
+ 994 00f8 01       		.uleb128 0x1
+ 995 00f9 13       		.uleb128 0x13
+ 996 00fa 00       		.byte	0x0
+ 997 00fb 00       		.byte	0x0
+ 998 00fc 15       		.uleb128 0x15
+ 999 00fd 21       		.uleb128 0x21
+ 1000 00fe 00       		.byte	0x0
+ 1001 00ff 49       		.uleb128 0x49
+ 1002 0100 13       		.uleb128 0x13
+ 1003 0101 2F       		.uleb128 0x2f
+ 1004 0102 0B       		.uleb128 0xb
+ 1005 0103 00       		.byte	0x0
+ 1006 0104 00       		.byte	0x0
+ 1007 0105 16       		.uleb128 0x16
+ 1008 0106 10       		.uleb128 0x10
+ 1009 0107 00       		.byte	0x0
+ 1010 0108 0B       		.uleb128 0xb
+ 1011 0109 0B       		.uleb128 0xb
+ 1012 010a 49       		.uleb128 0x49
+ 1013 010b 13       		.uleb128 0x13
+ 1014 010c 00       		.byte	0x0
+ 1015 010d 00       		.byte	0x0
+ 1016 010e 17       		.uleb128 0x17
+ 1017 010f 26       		.uleb128 0x26
+ 1018 0110 00       		.byte	0x0
+ 1019 0111 49       		.uleb128 0x49
+ 1020 0112 13       		.uleb128 0x13
+ 1021 0113 00       		.byte	0x0
+ 1022 0114 00       		.byte	0x0
+ 1023 0115 18       		.uleb128 0x18
+ 1024 0116 2E       		.uleb128 0x2e
+ 1025 0117 01       		.byte	0x1
+ 1026 0118 3F       		.uleb128 0x3f
+ 1027 0119 0C       		.uleb128 0xc
+ 1028 011a 03       		.uleb128 0x3
+ 1029 011b 0E       		.uleb128 0xe
+ 1030 011c 3A       		.uleb128 0x3a
+ 1031 011d 0B       		.uleb128 0xb
+ 1032 011e 3B       		.uleb128 0x3b
+ 1033 011f 0B       		.uleb128 0xb
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 20
+
+
+ 1034 0120 8740     		.uleb128 0x2007
+ 1035 0122 0E       		.uleb128 0xe
+ 1036 0123 11       		.uleb128 0x11
+ 1037 0124 01       		.uleb128 0x1
+ 1038 0125 12       		.uleb128 0x12
+ 1039 0126 01       		.uleb128 0x1
+ 1040 0127 40       		.uleb128 0x40
+ 1041 0128 06       		.uleb128 0x6
+ 1042 0129 01       		.uleb128 0x1
+ 1043 012a 13       		.uleb128 0x13
+ 1044 012b 00       		.byte	0x0
+ 1045 012c 00       		.byte	0x0
+ 1046 012d 19       		.uleb128 0x19
+ 1047 012e 05       		.uleb128 0x5
+ 1048 012f 00       		.byte	0x0
+ 1049 0130 03       		.uleb128 0x3
+ 1050 0131 0E       		.uleb128 0xe
+ 1051 0132 3A       		.uleb128 0x3a
+ 1052 0133 0B       		.uleb128 0xb
+ 1053 0134 3B       		.uleb128 0x3b
+ 1054 0135 0B       		.uleb128 0xb
+ 1055 0136 49       		.uleb128 0x49
+ 1056 0137 13       		.uleb128 0x13
+ 1057 0138 02       		.uleb128 0x2
+ 1058 0139 06       		.uleb128 0x6
+ 1059 013a 00       		.byte	0x0
+ 1060 013b 00       		.byte	0x0
+ 1061 013c 1A       		.uleb128 0x1a
+ 1062 013d 2E       		.uleb128 0x2e
+ 1063 013e 01       		.byte	0x1
+ 1064 013f 47       		.uleb128 0x47
+ 1065 0140 13       		.uleb128 0x13
+ 1066 0141 11       		.uleb128 0x11
+ 1067 0142 01       		.uleb128 0x1
+ 1068 0143 12       		.uleb128 0x12
+ 1069 0144 01       		.uleb128 0x1
+ 1070 0145 40       		.uleb128 0x40
+ 1071 0146 06       		.uleb128 0x6
+ 1072 0147 01       		.uleb128 0x1
+ 1073 0148 13       		.uleb128 0x13
+ 1074 0149 00       		.byte	0x0
+ 1075 014a 00       		.byte	0x0
+ 1076 014b 1B       		.uleb128 0x1b
+ 1077 014c 05       		.uleb128 0x5
+ 1078 014d 00       		.byte	0x0
+ 1079 014e 03       		.uleb128 0x3
+ 1080 014f 0E       		.uleb128 0xe
+ 1081 0150 49       		.uleb128 0x49
+ 1082 0151 13       		.uleb128 0x13
+ 1083 0152 34       		.uleb128 0x34
+ 1084 0153 0C       		.uleb128 0xc
+ 1085 0154 02       		.uleb128 0x2
+ 1086 0155 06       		.uleb128 0x6
+ 1087 0156 00       		.byte	0x0
+ 1088 0157 00       		.byte	0x0
+ 1089 0158 1C       		.uleb128 0x1c
+ 1090 0159 2E       		.uleb128 0x2e
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 21
+
+
+ 1091 015a 01       		.byte	0x1
+ 1092 015b 47       		.uleb128 0x47
+ 1093 015c 13       		.uleb128 0x13
+ 1094 015d 20       		.uleb128 0x20
+ 1095 015e 0B       		.uleb128 0xb
+ 1096 015f 01       		.uleb128 0x1
+ 1097 0160 13       		.uleb128 0x13
+ 1098 0161 00       		.byte	0x0
+ 1099 0162 00       		.byte	0x0
+ 1100 0163 1D       		.uleb128 0x1d
+ 1101 0164 05       		.uleb128 0x5
+ 1102 0165 00       		.byte	0x0
+ 1103 0166 03       		.uleb128 0x3
+ 1104 0167 0E       		.uleb128 0xe
+ 1105 0168 49       		.uleb128 0x49
+ 1106 0169 13       		.uleb128 0x13
+ 1107 016a 34       		.uleb128 0x34
+ 1108 016b 0C       		.uleb128 0xc
+ 1109 016c 00       		.byte	0x0
+ 1110 016d 00       		.byte	0x0
+ 1111 016e 1E       		.uleb128 0x1e
+ 1112 016f 2E       		.uleb128 0x2e
+ 1113 0170 01       		.byte	0x1
+ 1114 0171 31       		.uleb128 0x31
+ 1115 0172 13       		.uleb128 0x13
+ 1116 0173 11       		.uleb128 0x11
+ 1117 0174 01       		.uleb128 0x1
+ 1118 0175 12       		.uleb128 0x12
+ 1119 0176 01       		.uleb128 0x1
+ 1120 0177 40       		.uleb128 0x40
+ 1121 0178 06       		.uleb128 0x6
+ 1122 0179 01       		.uleb128 0x1
+ 1123 017a 13       		.uleb128 0x13
+ 1124 017b 00       		.byte	0x0
+ 1125 017c 00       		.byte	0x0
+ 1126 017d 1F       		.uleb128 0x1f
+ 1127 017e 05       		.uleb128 0x5
+ 1128 017f 00       		.byte	0x0
+ 1129 0180 31       		.uleb128 0x31
+ 1130 0181 13       		.uleb128 0x13
+ 1131 0182 02       		.uleb128 0x2
+ 1132 0183 06       		.uleb128 0x6
+ 1133 0184 00       		.byte	0x0
+ 1134 0185 00       		.byte	0x0
+ 1135 0186 20       		.uleb128 0x20
+ 1136 0187 34       		.uleb128 0x34
+ 1137 0188 00       		.byte	0x0
+ 1138 0189 03       		.uleb128 0x3
+ 1139 018a 0E       		.uleb128 0xe
+ 1140 018b 3A       		.uleb128 0x3a
+ 1141 018c 0B       		.uleb128 0xb
+ 1142 018d 3B       		.uleb128 0x3b
+ 1143 018e 0B       		.uleb128 0xb
+ 1144 018f 49       		.uleb128 0x49
+ 1145 0190 13       		.uleb128 0x13
+ 1146 0191 3F       		.uleb128 0x3f
+ 1147 0192 0C       		.uleb128 0xc
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 22
+
+
+ 1148 0193 02       		.uleb128 0x2
+ 1149 0194 0A       		.uleb128 0xa
+ 1150 0195 00       		.byte	0x0
+ 1151 0196 00       		.byte	0x0
+ 1152 0197 00       		.byte	0x0
+ 1153              		.section	.debug_pubnames,"",%progbits
+ 1154 0000 79000000 		.4byte	0x79
+ 1155 0004 0200     		.2byte	0x2
+ 1156 0006 00000000 		.4byte	.Ldebug_info0
+ 1157 000a 81020000 		.4byte	0x281
+ 1158 000e 92010000 		.4byte	0x192
+ 1159 0012 64756D6D 		.ascii	"dummy_Create\000"
+ 1159      795F4372 
+ 1159      65617465 
+ 1159      00
+ 1160 001f BE010000 		.4byte	0x1be
+ 1161 0023 53657276 		.ascii	"Service::Run\000"
+ 1161      6963653A 
+ 1161      3A52756E 
+ 1161      00
+ 1162 0030 E7010000 		.4byte	0x1e7
+ 1163 0034 53657276 		.ascii	"Service::Body\000"
+ 1163      6963653A 
+ 1163      3A426F64 
+ 1163      7900
+ 1164 0042 20020000 		.4byte	0x220
+ 1165 0046 53657276 		.ascii	"Service::Service\000"
+ 1165      6963653A 
+ 1165      3A536572 
+ 1165      76696365 
+ 1165      00
+ 1166 0057 3F020000 		.4byte	0x23f
+ 1167 005b 53657276 		.ascii	"Service::Service\000"
+ 1167      6963653A 
+ 1167      3A536572 
+ 1167      76696365 
+ 1167      00
+ 1168 006c 6E020000 		.4byte	0x26e
+ 1169 0070 6465665F 		.ascii	"def_Name\000"
+ 1169      4E616D65 
+ 1169      00
+ 1170 0079 00000000 		.4byte	0x0
+ 1171              		.section	.debug_aranges,"",%progbits
+ 1172 0000 1C000000 		.4byte	0x1c
+ 1173 0004 0200     		.2byte	0x2
+ 1174 0006 00000000 		.4byte	.Ldebug_info0
+ 1175 000a 04       		.byte	0x4
+ 1176 000b 00       		.byte	0x0
+ 1177 000c 0000     		.2byte	0x0
+ 1178 000e 0000     		.2byte	0x0
+ 1179 0010 00000000 		.4byte	.Ltext0
+ 1180 0014 A8000000 		.4byte	.Letext0-.Ltext0
+ 1181 0018 00000000 		.4byte	0x0
+ 1182 001c 00000000 		.4byte	0x0
+ 1183              		.section	.debug_str,"MS",%progbits,1
+ 1184              	.LASF23:
+ 1185 0000 5F5A4E37 		.ascii	"_ZN7Service4BodyEv\000"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 23
+
+
+ 1185      53657276 
+ 1185      69636534 
+ 1185      426F6479 
+ 1185      457600
+ 1186              	.LASF26:
+ 1187 0013 64756D6D 		.ascii	"dummy_Create\000"
+ 1187      795F4372 
+ 1187      65617465 
+ 1187      00
+ 1188              	.LASF20:
+ 1189 0020 78546173 		.ascii	"xTaskHandle\000"
+ 1189      6B48616E 
+ 1189      646C6500 
+ 1190              	.LASF18:
+ 1191 002c 73657276 		.ascii	"service.cc\000"
+ 1191      6963652E 
+ 1191      636300
+ 1192              	.LASF0:
+ 1193 0037 756E7369 		.ascii	"unsigned char\000"
+ 1193      676E6564 
+ 1193      20636861 
+ 1193      7200
+ 1194              	.LASF16:
+ 1195 0045 74686973 		.ascii	"this\000"
+ 1195      00
+ 1196              	.LASF15:
+ 1197 004a 7E536572 		.ascii	"~Service\000"
+ 1197      76696365 
+ 1197      00
+ 1198              	.LASF6:
+ 1199 0053 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1199      20756E73 
+ 1199      69676E65 
+ 1199      6420696E 
+ 1199      7400
+ 1200              	.LASF1:
+ 1201 0065 73686F72 		.ascii	"short unsigned int\000"
+ 1201      7420756E 
+ 1201      7369676E 
+ 1201      65642069 
+ 1201      6E7400
+ 1202              	.LASF29:
+ 1203 0078 6465665F 		.ascii	"def_Name\000"
+ 1203      4E616D65 
+ 1203      00
+ 1204              	.LASF12:
+ 1205 0081 5072696F 		.ascii	"Priority\000"
+ 1205      72697479 
+ 1205      00
+ 1206              	.LASF27:
+ 1207 008a 5F5A3132 		.ascii	"_Z12dummy_CreatePv\000"
+ 1207      64756D6D 
+ 1207      795F4372 
+ 1207      65617465 
+ 1207      507600
+ 1208              	.LASF2:
+ 1209 009d 756E7369 		.ascii	"unsigned int\000"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 24
+
+
+ 1209      676E6564 
+ 1209      20696E74 
+ 1209      00
+ 1210              	.LASF25:
+ 1211 00aa 5F5F7674 		.ascii	"__vtbl_ptr_type\000"
+ 1211      626C5F70 
+ 1211      74725F74 
+ 1211      79706500 
+ 1212              	.LASF9:
+ 1213 00ba 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1213      206C6F6E 
+ 1213      6720756E 
+ 1213      7369676E 
+ 1213      65642069 
+ 1214              	.LASF22:
+ 1215 00d1 426F6479 		.ascii	"Body\000"
+ 1215      00
+ 1216              	.LASF7:
+ 1217 00d6 6C6F6E67 		.ascii	"long long int\000"
+ 1217      206C6F6E 
+ 1217      6720696E 
+ 1217      7400
+ 1218              	.LASF14:
+ 1219 00e4 53657276 		.ascii	"Service\000"
+ 1219      69636500 
+ 1220              	.LASF8:
+ 1221 00ec 63686172 		.ascii	"char\000"
+ 1221      00
+ 1222              	.LASF28:
+ 1223 00f1 70765061 		.ascii	"pvParameters\000"
+ 1223      72616D65 
+ 1223      74657273 
+ 1223      00
+ 1224              	.LASF4:
+ 1225 00fe 73686F72 		.ascii	"short int\000"
+ 1225      7420696E 
+ 1225      7400
+ 1226              	.LASF19:
+ 1227 0108 2F637967 		.ascii	"/cygdrive/c/Downloads/EDU\000"
+ 1227      64726976 
+ 1227      652F632F 
+ 1227      446F776E 
+ 1227      6C6F6164 
+ 1228              	.LASF13:
+ 1229 0122 46726565 		.ascii	"FreeRTOS_Handle\000"
+ 1229      52544F53 
+ 1229      5F48616E 
+ 1229      646C6500 
+ 1230              	.LASF21:
+ 1231 0132 5F767074 		.ascii	"_vptr.Service\000"
+ 1231      722E5365 
+ 1231      72766963 
+ 1231      6500
+ 1232              	.LASF24:
+ 1233 0140 5F5A4E37 		.ascii	"_ZN7Service3RunEv\000"
+ 1233      53657276 
+ 1233      69636533 
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 25
+
+
+ 1233      52756E45 
+ 1233      7600
+ 1234              	.LASF5:
+ 1235 0152 6C6F6E67 		.ascii	"long int\000"
+ 1235      20696E74 
+ 1235      00
+ 1236              	.LASF17:
+ 1237 015b 474E5520 		.ascii	"GNU C++ 4.2.2\000"
+ 1237      432B2B20 
+ 1237      342E322E 
+ 1237      3200
+ 1238              	.LASF3:
+ 1239 0169 7369676E 		.ascii	"signed char\000"
+ 1239      65642063 
+ 1239      68617200 
+ 1240              	.LASF10:
+ 1241 0175 4E616D65 		.ascii	"Name\000"
+ 1241      00
+ 1242              	.LASF11:
+ 1243 017a 53746163 		.ascii	"StackDepth\000"
+ 1243      6B446570 
+ 1243      746800
+ 1244              		.ident	"GCC: (GNU) 4.2.2"
+ 1245              		.text
+ 1246              		.code 16
+ 1247              		.align	1
+ 1248              	.L3:
+ 1249 00a8 1847C046 		bx	r3
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s 			page 26
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 service.cc
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:1      .text:00000000 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:16     .text:00000000 _Z12dummy_CreatePv
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:40     .text:00000010 _ZN7Service3RunEv
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:72     .text:00000034 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:80     .text:00000038 _ZN7Service4BodyEv
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:77     .text:00000038 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:95     .text:00000044 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:103    .text:00000048 _ZN7ServiceC1Ev
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:100    .text:00000048 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:145    .text:00000070 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:205    .data:00000000 def_Name
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:212    .rodata._ZTV7Service:00000000 _ZTV7Service
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:154    .text:00000078 _ZN7ServiceC2Ev
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:151    .text:00000078 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:196    .text:000000a0 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:213    .rodata._ZTV7Service:00000000 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:228    .rodata._ZTI7Service:00000000 _ZTI7Service
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:221    .rodata._ZTS7Service:00000000 _ZTS7Service
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:229    .rodata._ZTI7Service:00000000 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc3vfOKJ.s:1246   .text:000000a8 $t
+
+UNDEFINED SYMBOLS
+__gxx_personality_sj0
+xTaskCreate
+vTaskDelay
+strcpy
+_ZTVN10__cxxabiv117__class_type_infoE

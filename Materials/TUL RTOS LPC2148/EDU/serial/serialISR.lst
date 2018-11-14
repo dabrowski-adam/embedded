@@ -1,0 +1,1274 @@
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 1
+
+
+   1              		.file	"serialISR.c"
+   2              		.section	.debug_abbrev,"",%progbits
+   3              	.Ldebug_abbrev0:
+   4              		.section	.debug_info,"",%progbits
+   5              	.Ldebug_info0:
+   6              		.section	.debug_line,"",%progbits
+   7              	.Ldebug_line0:
+   8 0000 8A000000 		.text
+   8      02004700 
+   8      00000201 
+   8      FB0E0D00 
+   8      01010101 
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	vUART_ISR_Handler
+  12              		.type	vUART_ISR_Handler, %function
+  13              	vUART_ISR_Handler:
+  14              	.LFB4:
+  15              		.file 1 "serial/serialISR.c"
+   1:serial/serialISR.c **** /*
+   2:serial/serialISR.c **** 	FreeRTOS.org V5.1.1 - Copyright (C) 2003-2008 Richard Barry.
+   3:serial/serialISR.c **** 
+   4:serial/serialISR.c **** 	This file is part of the FreeRTOS.org distribution.
+   5:serial/serialISR.c **** 
+   6:serial/serialISR.c **** 	FreeRTOS.org is free software; you can redistribute it and/or modify
+   7:serial/serialISR.c **** 	it under the terms of the GNU General Public License as published by
+   8:serial/serialISR.c **** 	the Free Software Foundation; either version 2 of the License, or
+   9:serial/serialISR.c **** 	(at your option) any later version.
+  10:serial/serialISR.c **** 
+  11:serial/serialISR.c **** 	FreeRTOS.org is distributed in the hope that it will be useful,
+  12:serial/serialISR.c **** 	but WITHOUT ANY WARRANTY; without even the implied warranty of
+  13:serial/serialISR.c **** 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  14:serial/serialISR.c **** 	GNU General Public License for more details.
+  15:serial/serialISR.c **** 
+  16:serial/serialISR.c **** 	You should have received a copy of the GNU General Public License
+  17:serial/serialISR.c **** 	along with FreeRTOS.org; if not, write to the Free Software
+  18:serial/serialISR.c **** 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  19:serial/serialISR.c **** 
+  20:serial/serialISR.c **** 	A special exception to the GPL can be applied should you wish to distribute
+  21:serial/serialISR.c **** 	a combined work that includes FreeRTOS.org, without being obliged to provide
+  22:serial/serialISR.c **** 	the source code for any proprietary components.  See the licensing section 
+  23:serial/serialISR.c **** 	of http://www.FreeRTOS.org for full details of how and when the exception
+  24:serial/serialISR.c **** 	can be applied.
+  25:serial/serialISR.c **** 
+  26:serial/serialISR.c ****     ***************************************************************************
+  27:serial/serialISR.c ****     ***************************************************************************
+  28:serial/serialISR.c ****     *                                                                         *
+  29:serial/serialISR.c ****     * SAVE TIME AND MONEY!  We can port FreeRTOS.org to your own hardware,    *
+  30:serial/serialISR.c ****     * and even write all or part of your application on your behalf.          *
+  31:serial/serialISR.c ****     * See http://www.OpenRTOS.com for details of the services we provide to   *
+  32:serial/serialISR.c ****     * expedite your project.                                                  *
+  33:serial/serialISR.c ****     *                                                                         *
+  34:serial/serialISR.c ****     ***************************************************************************
+  35:serial/serialISR.c ****     ***************************************************************************
+  36:serial/serialISR.c **** 
+  37:serial/serialISR.c **** 	Please ensure to read the configuration and relevant port sections of the
+  38:serial/serialISR.c **** 	online documentation.
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 2
+
+
+  39:serial/serialISR.c **** 
+  40:serial/serialISR.c **** 	http://www.FreeRTOS.org - Documentation, latest information, license and 
+  41:serial/serialISR.c **** 	contact details.
+  42:serial/serialISR.c **** 
+  43:serial/serialISR.c **** 	http://www.SafeRTOS.com - A version that is certified for use in safety 
+  44:serial/serialISR.c **** 	critical systems.
+  45:serial/serialISR.c **** 
+  46:serial/serialISR.c **** 	http://www.OpenRTOS.com - Commercial support, development, porting, 
+  47:serial/serialISR.c **** 	licensing and training services.
+  48:serial/serialISR.c **** */
+  49:serial/serialISR.c **** 
+  50:serial/serialISR.c **** 
+  51:serial/serialISR.c **** /* 
+  52:serial/serialISR.c **** 	BASIC INTERRUPT DRIVEN SERIAL PORT DRIVER FOR UART0. 
+  53:serial/serialISR.c **** 
+  54:serial/serialISR.c **** 	This file contains all the serial port components that must be compiled
+  55:serial/serialISR.c **** 	to ARM mode.  The components that can be compiled to either ARM or THUMB
+  56:serial/serialISR.c **** 	mode are contained in serial.c.
+  57:serial/serialISR.c **** 
+  58:serial/serialISR.c **** */
+  59:serial/serialISR.c **** 
+  60:serial/serialISR.c **** /* Standard includes. */
+  61:serial/serialISR.c **** #include <stdlib.h>
+  62:serial/serialISR.c **** 
+  63:serial/serialISR.c **** /* Scheduler includes. */
+  64:serial/serialISR.c **** #include "FreeRTOS.h"
+  65:serial/serialISR.c **** #include "queue.h"
+  66:serial/serialISR.c **** #include "task.h"
+  67:serial/serialISR.c **** 
+  68:serial/serialISR.c **** /* Demo application includes. */
+  69:serial/serialISR.c **** #include "serial.h"
+  70:serial/serialISR.c **** 
+  71:serial/serialISR.c **** /*-----------------------------------------------------------*/
+  72:serial/serialISR.c **** 
+  73:serial/serialISR.c **** /* Constant to access the VIC. */
+  74:serial/serialISR.c **** #define serCLEAR_VIC_INTERRUPT			( ( unsigned portLONG ) 0 )
+  75:serial/serialISR.c **** 
+  76:serial/serialISR.c **** /* Constants to determine the ISR source. */
+  77:serial/serialISR.c **** #define serSOURCE_THRE					( ( unsigned portCHAR ) 0x02 )
+  78:serial/serialISR.c **** #define serSOURCE_RX_TIMEOUT			( ( unsigned portCHAR ) 0x0c )
+  79:serial/serialISR.c **** #define serSOURCE_ERROR					( ( unsigned portCHAR ) 0x06 )
+  80:serial/serialISR.c **** #define serSOURCE_RX					( ( unsigned portCHAR ) 0x04 )
+  81:serial/serialISR.c **** #define serINTERRUPT_SOURCE_MASK		( ( unsigned portCHAR ) 0x0f )
+  82:serial/serialISR.c **** 
+  83:serial/serialISR.c **** /* Queues used to hold received characters, and characters waiting to be
+  84:serial/serialISR.c **** transmitted. */
+  85:serial/serialISR.c **** static xQueueHandle xRxedChars; 
+  86:serial/serialISR.c **** static xQueueHandle xCharsForTx; 
+  87:serial/serialISR.c **** static volatile portLONG lTHREEmpty;
+  88:serial/serialISR.c **** 
+  89:serial/serialISR.c **** /*-----------------------------------------------------------*/
+  90:serial/serialISR.c **** 
+  91:serial/serialISR.c **** /* 
+  92:serial/serialISR.c ****  * The queues are created in serialISR.c as they are used from the ISR.
+  93:serial/serialISR.c ****  * Obtain references to the queues and THRE Empty flag. 
+  94:serial/serialISR.c ****  */
+  95:serial/serialISR.c **** void vSerialISRCreateQueues( unsigned portBASE_TYPE uxQueueLength, xQueueHandle *pxRxedChars, xQueu
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 3
+
+
+  96:serial/serialISR.c **** 
+  97:serial/serialISR.c **** /* UART0 interrupt service routine entry point. */
+  98:serial/serialISR.c **** void vUART_ISR_Wrapper( void ) __attribute__ ((naked));
+  99:serial/serialISR.c **** 
+ 100:serial/serialISR.c **** /* UART0 interrupt service routine handler. */
+ 101:serial/serialISR.c **** void vUART_ISR_Handler( void );
+ 102:serial/serialISR.c **** 
+ 103:serial/serialISR.c **** /*-----------------------------------------------------------*/
+ 104:serial/serialISR.c **** void vSerialISRCreateQueues(	unsigned portBASE_TYPE uxQueueLength, xQueueHandle *pxRxedChars, 
+ 105:serial/serialISR.c **** 								xQueueHandle *pxCharsForTx, portLONG volatile **pplTHREEmptyFlag )
+ 106:serial/serialISR.c **** {
+ 107:serial/serialISR.c **** 	/* Create the queues used to hold Rx and Tx characters. */
+ 108:serial/serialISR.c **** 	xRxedChars = xQueueCreate( uxQueueLength, ( unsigned portBASE_TYPE ) sizeof( signed portCHAR ) );
+ 109:serial/serialISR.c **** 	xCharsForTx = xQueueCreate( uxQueueLength + 1, ( unsigned portBASE_TYPE ) sizeof( signed portCHAR 
+ 110:serial/serialISR.c **** 
+ 111:serial/serialISR.c **** 	/* Pass back a reference to the queues so the serial API file can 
+ 112:serial/serialISR.c **** 	post/receive characters. */
+ 113:serial/serialISR.c **** 	*pxRxedChars = xRxedChars;
+ 114:serial/serialISR.c **** 	*pxCharsForTx = xCharsForTx;
+ 115:serial/serialISR.c **** 
+ 116:serial/serialISR.c **** 	/* Initialise the THRE empty flag - and pass back a reference. */
+ 117:serial/serialISR.c **** 	lTHREEmpty = ( portLONG ) pdTRUE;
+ 118:serial/serialISR.c **** 	*pplTHREEmptyFlag = &lTHREEmpty;
+ 119:serial/serialISR.c **** }
+ 120:serial/serialISR.c **** /*-----------------------------------------------------------*/
+ 121:serial/serialISR.c **** 
+ 122:serial/serialISR.c **** void vUART_ISR_Wrapper( void )
+ 123:serial/serialISR.c **** {
+ 124:serial/serialISR.c **** 	/* Save the context of the interrupted task. */
+ 125:serial/serialISR.c **** 	portSAVE_CONTEXT();
+ 126:serial/serialISR.c **** 
+ 127:serial/serialISR.c **** 	/* Call the handler.  This must be a separate function from the wrapper
+ 128:serial/serialISR.c **** 	to ensure the correct stack frame is set up. */
+ 129:serial/serialISR.c **** 	vUART_ISR_Handler();
+ 130:serial/serialISR.c **** 
+ 131:serial/serialISR.c **** 	/* Restore the context of whichever task is going to run next. */
+ 132:serial/serialISR.c **** 	portRESTORE_CONTEXT();
+ 133:serial/serialISR.c **** }
+ 134:serial/serialISR.c **** /*-----------------------------------------------------------*/
+ 135:serial/serialISR.c **** 
+ 136:serial/serialISR.c **** void vUART_ISR_Handler( void )
+ 137:serial/serialISR.c **** {
+  16              		.loc 1 137 0
+  17              		@ Function supports interworking.
+  18              		@ args = 0, pretend = 0, frame = 8
+  19              		@ frame_needed = 0, uses_anonymous_args = 0
+  20 0000 04E02DE5 		str	lr, [sp, #-4]!
+  21              	.LCFI0:
+ 138:serial/serialISR.c **** signed portCHAR cChar;
+ 139:serial/serialISR.c **** portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+  22              		.loc 1 139 0
+  23 0004 0030A0E3 		mov	r3, #0
+  24              		.loc 1 137 0
+  25 0008 08D04DE2 		sub	sp, sp, #8
+  26              	.LCFI1:
+  27              		.loc 1 139 0
+  28 000c 00308DE5 		str	r3, [sp, #0]
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 4
+
+
+  29              	.LVL0:
+ 140:serial/serialISR.c **** 
+ 141:serial/serialISR.c **** 	/* What caused the interrupt? */
+ 142:serial/serialISR.c **** 	switch( UART0_IIR & serINTERRUPT_SOURCE_MASK )
+  30              		.loc 1 142 0
+  31 0010 C8309FE5 		ldr	r3, .L13
+  32 0014 083093E5 		ldr	r3, [r3, #8]
+  33 0018 0F3003E2 		and	r3, r3, #15
+  34 001c 023043E2 		sub	r3, r3, #2
+  35 0020 0A0053E3 		cmp	r3, #10
+  36 0024 03F19F97 		ldrls	pc, [pc, r3, asl #2]
+  37 0028 230000EA 		b	.L2
+  38              		.p2align 2
+  39              	.L6:
+  40 002c 68000000 		.word	.L3
+  41 0030 BC000000 		.word	.L2
+  42 0034 98000000 		.word	.L4
+  43 0038 BC000000 		.word	.L2
+  44 003c 58000000 		.word	.L5
+  45 0040 BC000000 		.word	.L2
+  46 0044 BC000000 		.word	.L2
+  47 0048 BC000000 		.word	.L2
+  48 004c BC000000 		.word	.L2
+  49 0050 BC000000 		.word	.L2
+  50 0054 98000000 		.word	.L4
+  51              	.L5:
+ 143:serial/serialISR.c **** 	{
+ 144:serial/serialISR.c **** 		case serSOURCE_ERROR :	/* Not handling this, but clear the interrupt. */
+ 145:serial/serialISR.c **** 								cChar = UART0_LSR;
+  52              		.loc 1 145 0
+  53 0058 80309FE5 		ldr	r3, .L13
+  54 005c 143093E5 		ldr	r3, [r3, #20]
+  55 0060 0730CDE5 		strb	r3, [sp, #7]
+  56              	.LVL1:
+  57 0064 140000EA 		b	.L2
+  58              	.LVL2:
+  59              	.L3:
+ 146:serial/serialISR.c **** 								break;
+ 147:serial/serialISR.c **** 
+ 148:serial/serialISR.c **** 		case serSOURCE_THRE	:	/* The THRE is empty.  If there is another
+ 149:serial/serialISR.c **** 								character in the Tx queue, send it now. */
+ 150:serial/serialISR.c **** 								if( xQueueReceiveFromISR( xCharsForTx, &cChar, &xHigherPriorityTaskWoken ) == pdTRUE )
+  60              		.loc 1 150 0
+  61 0068 74309FE5 		ldr	r3, .L13+4
+  62 006c 0D20A0E1 		mov	r2, sp
+  63 0070 000093E5 		ldr	r0, [r3, #0]
+  64 0074 07108DE2 		add	r1, sp, #7
+  65 0078 FEFFFFEB 		bl	xQueueReceiveFromISR
+  66 007c 010050E3 		cmp	r0, #1
+ 151:serial/serialISR.c **** 								{
+ 152:serial/serialISR.c **** 									UART0_THR = cChar;
+  67              		.loc 1 152 0
+  68 0080 D720DD01 		ldreqsb	r2, [sp, #7]
+  69              	.LVL3:
+  70 0084 54309F05 		ldreq	r3, .L13
+ 153:serial/serialISR.c **** 								}
+ 154:serial/serialISR.c **** 								else
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 5
+
+
+ 155:serial/serialISR.c **** 								{
+ 156:serial/serialISR.c **** 									/* There are no further characters 
+ 157:serial/serialISR.c **** 									queued to send so we can indicate 
+ 158:serial/serialISR.c **** 									that the THRE is available. */
+ 159:serial/serialISR.c **** 									lTHREEmpty = pdTRUE;
+  71              		.loc 1 159 0
+  72 0088 58309F15 		ldrne	r3, .L13+8
+  73 008c 0120A013 		movne	r2, #1
+  74 0090 002083E5 		str	r2, [r3, #0]
+  75 0094 080000EA 		b	.L2
+  76              	.LVL4:
+  77              	.L4:
+ 160:serial/serialISR.c **** 								}
+ 161:serial/serialISR.c **** 								break;
+ 162:serial/serialISR.c **** 
+ 163:serial/serialISR.c **** 		case serSOURCE_RX_TIMEOUT :
+ 164:serial/serialISR.c **** 		case serSOURCE_RX	:	/* A character was received.  Place it in 
+ 165:serial/serialISR.c **** 								the queue of received characters. */
+ 166:serial/serialISR.c **** 								cChar = UART0_RBR;
+  78              		.loc 1 166 0
+  79 0098 40309FE5 		ldr	r3, .L13
+  80 009c 003093E5 		ldr	r3, [r3, #0]
+  81 00a0 08108DE2 		add	r1, sp, #8
+  82 00a4 013061E5 		strb	r3, [r1, #-1]!
+  83              	.LVL5:
+ 167:serial/serialISR.c **** 								xQueueSendFromISR( xRxedChars, &cChar, &xHigherPriorityTaskWoken );
+  84              		.loc 1 167 0
+  85 00a8 3C309FE5 		ldr	r3, .L13+12
+  86 00ac 0D20A0E1 		mov	r2, sp
+  87 00b0 000093E5 		ldr	r0, [r3, #0]
+  88 00b4 0030A0E3 		mov	r3, #0
+  89 00b8 FEFFFFEB 		bl	xQueueGenericSendFromISR
+  90              	.LVL6:
+  91              	.L2:
+ 168:serial/serialISR.c **** 								break;
+ 169:serial/serialISR.c **** 
+ 170:serial/serialISR.c **** 		default				:	/* There is nothing to do, leave the ISR. */
+ 171:serial/serialISR.c **** 								break;
+ 172:serial/serialISR.c **** 	}
+ 173:serial/serialISR.c **** 
+ 174:serial/serialISR.c **** 	if( xHigherPriorityTaskWoken )
+  92              		.loc 1 174 0
+  93 00bc 00309DE5 		ldr	r3, [sp, #0]
+  94 00c0 000053E3 		cmp	r3, #0
+  95              	.LVL7:
+ 175:serial/serialISR.c **** 	{
+ 176:serial/serialISR.c **** 		portYIELD_FROM_ISR();
+  96              		.loc 1 176 0
+  97 00c4 FEFFFF1B 		blne	vTaskSwitchContext
+  98              	.LVL8:
+  99              	.L9:
+ 177:serial/serialISR.c **** 	}
+ 178:serial/serialISR.c **** 
+ 179:serial/serialISR.c **** 	/* Clear the ISR in the VIC. */
+ 180:serial/serialISR.c **** 	VICVectAddr = serCLEAR_VIC_INTERRUPT;
+ 100              		.loc 1 180 0
+ 101 00c8 0020A0E3 		mov	r2, #0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 6
+
+
+ 102 00cc 0030E0E3 		mvn	r3, #0
+ 103 00d0 CF2F03E5 		str	r2, [r3, #-4047]
+ 181:serial/serialISR.c **** }
+ 104              		.loc 1 181 0
+ 105 00d4 08D08DE2 		add	sp, sp, #8
+ 106 00d8 04E09DE4 		ldr	lr, [sp], #4
+ 107 00dc 1EFF2FE1 		bx	lr
+ 108              	.L14:
+ 109              		.align	2
+ 110              	.L13:
+ 111 00e0 00C000E0 		.word	-536821760
+ 112 00e4 04000000 		.word	xCharsForTx
+ 113 00e8 08000000 		.word	lTHREEmpty
+ 114 00ec 00000000 		.word	xRxedChars
+ 115              	.LFE4:
+ 116              		.size	vUART_ISR_Handler, .-vUART_ISR_Handler
+ 117              		.align	2
+ 118              		.global	vUART_ISR_Wrapper
+ 119              		.type	vUART_ISR_Wrapper, %function
+ 120              	vUART_ISR_Wrapper:
+ 121              	.LFB3:
+ 122              		.loc 1 123 0
+ 123              		@ Function supports interworking.
+ 124              		@ Naked Function: prologue and epilogue provided by programmer.
+ 125              		@ args = 0, pretend = 0, frame = 0
+ 126              		@ frame_needed = 0, uses_anonymous_args = 0
+ 127              		.loc 1 125 0
+ 128 00f0 01002DE9 		STMDB	SP!, {R0}											
+ 129 00f4 00204DE9 		STMDB	SP,{SP}^											
+ 130 00f8 0000A0E1 		NOP														
+ 131 00fc 04D04DE2 		SUB	SP, SP, #4											
+ 132 0100 0100BDE8 		LDMIA	SP!,{R0}											
+ 133 0104 004020E9 		STMDB	R0!, {LR}											
+ 134 0108 00E0A0E1 		MOV	LR, R0												
+ 135 010c 0100BDE8 		LDMIA	SP!, {R0}											
+ 136 0110 FF7F4EE9 		STMDB	LR,{R0-LR}^											
+ 137 0114 0000A0E1 		NOP														
+ 138 0118 3CE04EE2 		SUB	LR, LR, #60											
+ 139 011c 00004FE1 		MRS	R0, SPSR											
+ 140 0120 01002EE9 		STMDB	LR!, {R0}											
+ 141 0124 CC009FE5 		LDR	R0, =ulCriticalNesting								
+ 142 0128 000090E5 		LDR	R0, [R0]											
+ 143 012c 01002EE9 		STMDB	LR!, {R0}											
+ 144 0130 C4009FE5 		LDR	R0, =pxCurrentTCB									
+ 145 0134 000090E5 		LDR	R0, [R0]											
+ 146 0138 00E080E5 		STR	LR, [R0]											
+ 147              		
+ 148 013c 44409FE5 		ldr	r4, .L17
+ 149 0140 44509FE5 		ldr	r5, .L17+4
+ 150 0144 003094E5 		ldr	r3, [r4, #0]
+ 151 0148 003095E5 		ldr	r3, [r5, #0]
+ 152              		.loc 1 129 0
+ 153 014c FEFFFFEB 		bl	vUART_ISR_Handler
+ 154              		.loc 1 132 0
+ 155 0150 A4009FE5 		LDR		R0, =pxCurrentTCB								
+ 156 0154 000090E5 		LDR		R0, [R0]										
+ 157 0158 00E090E5 		LDR		LR, [R0]										
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 7
+
+
+ 158 015c 94009FE5 		LDR		R0, =ulCriticalNesting							
+ 159 0160 0200BEE8 		LDMFD	LR!, {R1}											
+ 160 0164 001080E5 		STR		R1, [R0]										
+ 161 0168 0100BEE8 		LDMFD	LR!, {R0}											
+ 162 016c 00F069E1 		MSR		SPSR, R0										
+ 163 0170 FF7FDEE8 		LDMFD	LR, {R0-R14}^										
+ 164 0174 0000A0E1 		NOP														
+ 165 0178 3CE09EE5 		LDR		LR, [LR, #+60]									
+ 166 017c 04F05EE2 		SUBS	PC, LR, #4											
+ 167              		
+ 168 0180 003094E5 		ldr	r3, [r4, #0]
+ 169 0184 003095E5 		ldr	r3, [r5, #0]
+ 170              		.loc 1 133 0
+ 171              	.L18:
+ 172              		.align	2
+ 173              	.L17:
+ 174 0188 00000000 		.word	ulCriticalNesting
+ 175 018c 00000000 		.word	pxCurrentTCB
+ 176              	.LFE3:
+ 177              		.size	vUART_ISR_Wrapper, .-vUART_ISR_Wrapper
+ 178              		.align	2
+ 179              		.global	vSerialISRCreateQueues
+ 180              		.type	vSerialISRCreateQueues, %function
+ 181              	vSerialISRCreateQueues:
+ 182              	.LFB2:
+ 183              		.loc 1 106 0
+ 184              		@ Function supports interworking.
+ 185              		@ args = 0, pretend = 0, frame = 0
+ 186              		@ frame_needed = 0, uses_anonymous_args = 0
+ 187              	.LVL9:
+ 188 0190 F0412DE9 		stmfd	sp!, {r4, r5, r6, r7, r8, lr}
+ 189              	.LCFI2:
+ 190              		.loc 1 106 0
+ 191 0194 0170A0E1 		mov	r7, r1
+ 192              		.loc 1 108 0
+ 193 0198 0110A0E3 		mov	r1, #1
+ 194              	.LVL10:
+ 195              		.loc 1 106 0
+ 196 019c 0260A0E1 		mov	r6, r2
+ 197 01a0 0380A0E1 		mov	r8, r3
+ 198 01a4 0040A0E1 		mov	r4, r0
+ 199              		.loc 1 108 0
+ 200 01a8 FEFFFFEB 		bl	xQueueCreate
+ 201              	.LVL11:
+ 202 01ac 38509FE5 		ldr	r5, .L21
+ 203              		.loc 1 109 0
+ 204 01b0 0110A0E3 		mov	r1, #1
+ 205              		.loc 1 108 0
+ 206 01b4 000085E5 		str	r0, [r5, #0]
+ 207              		.loc 1 109 0
+ 208 01b8 010084E2 		add	r0, r4, #1
+ 209 01bc FEFFFFEB 		bl	xQueueCreate
+ 210 01c0 28309FE5 		ldr	r3, .L21+4
+ 211              		.loc 1 113 0
+ 212 01c4 002095E5 		ldr	r2, [r5, #0]
+ 213              		.loc 1 117 0
+ 214 01c8 24109FE5 		ldr	r1, .L21+8
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 8
+
+
+ 215              		.loc 1 109 0
+ 216 01cc 000083E5 		str	r0, [r3, #0]
+ 217              		.loc 1 117 0
+ 218 01d0 0130A0E3 		mov	r3, #1
+ 219              		.loc 1 113 0
+ 220 01d4 002087E5 		str	r2, [r7, #0]
+ 221              		.loc 1 114 0
+ 222 01d8 000086E5 		str	r0, [r6, #0]
+ 223              		.loc 1 117 0
+ 224 01dc 003081E5 		str	r3, [r1, #0]
+ 225              		.loc 1 118 0
+ 226 01e0 001088E5 		str	r1, [r8, #0]
+ 227              		.loc 1 119 0
+ 228 01e4 F041BDE8 		ldmfd	sp!, {r4, r5, r6, r7, r8, lr}
+ 229 01e8 1EFF2FE1 		bx	lr
+ 230              	.L22:
+ 231              		.align	2
+ 232              	.L21:
+ 233 01ec 00000000 		.word	xRxedChars
+ 234 01f0 04000000 		.word	xCharsForTx
+ 235 01f4 08000000 		.word	lTHREEmpty
+ 236              	.LFE2:
+ 237              		.size	vSerialISRCreateQueues, .-vSerialISRCreateQueues
+ 238              		.bss
+ 239              		.align	2
+ 240              	xRxedChars:
+ 241 0000 00000000 		.space	4
+ 242              		.align	2
+ 243              	xCharsForTx:
+ 244 0004 00000000 		.space	4
+ 245              		.align	2
+ 246              	lTHREEmpty:
+ 247 0008 00000000 		.space	4
+ 248              		.section	.debug_frame,"",%progbits
+ 249              	.Lframe0:
+ 250 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ 251              	.LSCIE0:
+ 252 0004 FFFFFFFF 		.4byte	0xffffffff
+ 253 0008 01       		.byte	0x1
+ 254 0009 00       		.ascii	"\000"
+ 255 000a 01       		.uleb128 0x1
+ 256 000b 7C       		.sleb128 -4
+ 257 000c 0E       		.byte	0xe
+ 258 000d 0C       		.byte	0xc
+ 259 000e 0D       		.uleb128 0xd
+ 260 000f 00       		.uleb128 0x0
+ 261              		.align	2
+ 262              	.LECIE0:
+ 263              	.LSFDE0:
+ 264 0010 14000000 		.4byte	.LEFDE0-.LASFDE0
+ 265              	.LASFDE0:
+ 266 0014 00000000 		.4byte	.Lframe0
+ 267 0018 00000000 		.4byte	.LFB4
+ 268 001c F0000000 		.4byte	.LFE4-.LFB4
+ 269 0020 44       		.byte	0x4
+ 270              		.4byte	.LCFI0-.LFB4
+ 271 0021 0E       		.byte	0xe
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 9
+
+
+ 272 0022 04       		.uleb128 0x4
+ 273 0023 48       		.byte	0x4
+ 274              		.4byte	.LCFI1-.LCFI0
+ 275 0024 0E       		.byte	0xe
+ 276 0025 0C       		.uleb128 0xc
+ 277 0026 8E       		.byte	0x8e
+ 278 0027 01       		.uleb128 0x1
+ 279              		.align	2
+ 280              	.LEFDE0:
+ 281              	.LSFDE2:
+ 282 0028 0C000000 		.4byte	.LEFDE2-.LASFDE2
+ 283              	.LASFDE2:
+ 284 002c 00000000 		.4byte	.Lframe0
+ 285 0030 F0000000 		.4byte	.LFB3
+ 286 0034 A0000000 		.4byte	.LFE3-.LFB3
+ 287              		.align	2
+ 288              	.LEFDE2:
+ 289              	.LSFDE4:
+ 290 0038 1C000000 		.4byte	.LEFDE4-.LASFDE4
+ 291              	.LASFDE4:
+ 292 003c 00000000 		.4byte	.Lframe0
+ 293 0040 90010000 		.4byte	.LFB2
+ 294 0044 68000000 		.4byte	.LFE2-.LFB2
+ 295 0048 44       		.byte	0x4
+ 296              		.4byte	.LCFI2-.LFB2
+ 297 0049 0E       		.byte	0xe
+ 298 004a 18       		.uleb128 0x18
+ 299 004b 8E       		.byte	0x8e
+ 300 004c 01       		.uleb128 0x1
+ 301 004d 88       		.byte	0x88
+ 302 004e 02       		.uleb128 0x2
+ 303 004f 87       		.byte	0x87
+ 304 0050 03       		.uleb128 0x3
+ 305 0051 86       		.byte	0x86
+ 306 0052 04       		.uleb128 0x4
+ 307 0053 85       		.byte	0x85
+ 308 0054 05       		.uleb128 0x5
+ 309 0055 84       		.byte	0x84
+ 310 0056 06       		.uleb128 0x6
+ 311 0057 00       		.align	2
+ 312              	.LEFDE4:
+ 313              		.text
+ 314              	.Letext0:
+ 315              		.section	.debug_loc,"",%progbits
+ 316              	.Ldebug_loc0:
+ 317              	.LLST0:
+ 318 0000 00000000 		.4byte	.LFB4-.Ltext0
+ 319 0004 04000000 		.4byte	.LCFI0-.Ltext0
+ 320 0008 0100     		.2byte	0x1
+ 321 000a 5D       		.byte	0x5d
+ 322 000b 04000000 		.4byte	.LCFI0-.Ltext0
+ 323 000f 0C000000 		.4byte	.LCFI1-.Ltext0
+ 324 0013 0200     		.2byte	0x2
+ 325 0015 7D       		.byte	0x7d
+ 326 0016 04       		.sleb128 4
+ 327 0017 0C000000 		.4byte	.LCFI1-.Ltext0
+ 328 001b F0000000 		.4byte	.LFE4-.Ltext0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 10
+
+
+ 329 001f 0200     		.2byte	0x2
+ 330 0021 7D       		.byte	0x7d
+ 331 0022 0C       		.sleb128 12
+ 332 0023 00000000 		.4byte	0x0
+ 333 0027 00000000 		.4byte	0x0
+ 334              	.LLST1:
+ 335 002b 64000000 		.4byte	.LVL1-.Ltext0
+ 336 002f 68000000 		.4byte	.LVL2-.Ltext0
+ 337 0033 0200     		.2byte	0x2
+ 338 0035 91       		.byte	0x91
+ 339 0036 77       		.sleb128 -9
+ 340 0037 84000000 		.4byte	.LVL3-.Ltext0
+ 341 003b 98000000 		.4byte	.LVL4-.Ltext0
+ 342 003f 0200     		.2byte	0x2
+ 343 0041 91       		.byte	0x91
+ 344 0042 77       		.sleb128 -9
+ 345 0043 A8000000 		.4byte	.LVL5-.Ltext0
+ 346 0047 BC000000 		.4byte	.LVL6-.Ltext0
+ 347 004b 0200     		.2byte	0x2
+ 348 004d 71       		.byte	0x71
+ 349 004e 7F       		.sleb128 -1
+ 350 004f BC000000 		.4byte	.LVL6-.Ltext0
+ 351 0053 F0000000 		.4byte	.LFE4-.Ltext0
+ 352 0057 0200     		.2byte	0x2
+ 353 0059 91       		.byte	0x91
+ 354 005a 77       		.sleb128 -9
+ 355 005b 00000000 		.4byte	0x0
+ 356 005f 00000000 		.4byte	0x0
+ 357              	.LLST2:
+ 358 0063 10000000 		.4byte	.LVL0-.Ltext0
+ 359 0067 C4000000 		.4byte	.LVL7-.Ltext0
+ 360 006b 0200     		.2byte	0x2
+ 361 006d 91       		.byte	0x91
+ 362 006e 70       		.sleb128 -16
+ 363 006f C4000000 		.4byte	.LVL7-.Ltext0
+ 364 0073 C8000000 		.4byte	.LVL8-.Ltext0
+ 365 0077 0100     		.2byte	0x1
+ 366 0079 53       		.byte	0x53
+ 367 007a C8000000 		.4byte	.LVL8-.Ltext0
+ 368 007e F0000000 		.4byte	.LFE4-.Ltext0
+ 369 0082 0200     		.2byte	0x2
+ 370 0084 91       		.byte	0x91
+ 371 0085 70       		.sleb128 -16
+ 372 0086 00000000 		.4byte	0x0
+ 373 008a 00000000 		.4byte	0x0
+ 374              	.LLST4:
+ 375 008e 90010000 		.4byte	.LFB2-.Ltext0
+ 376 0092 94010000 		.4byte	.LCFI2-.Ltext0
+ 377 0096 0100     		.2byte	0x1
+ 378 0098 5D       		.byte	0x5d
+ 379 0099 94010000 		.4byte	.LCFI2-.Ltext0
+ 380 009d F8010000 		.4byte	.LFE2-.Ltext0
+ 381 00a1 0200     		.2byte	0x2
+ 382 00a3 7D       		.byte	0x7d
+ 383 00a4 18       		.sleb128 24
+ 384 00a5 00000000 		.4byte	0x0
+ 385 00a9 00000000 		.4byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 11
+
+
+ 386              	.LLST5:
+ 387 00ad 90010000 		.4byte	.LVL9-.Ltext0
+ 388 00b1 AC010000 		.4byte	.LVL11-.Ltext0
+ 389 00b5 0100     		.2byte	0x1
+ 390 00b7 50       		.byte	0x50
+ 391 00b8 AC010000 		.4byte	.LVL11-.Ltext0
+ 392 00bc F8010000 		.4byte	.LFE2-.Ltext0
+ 393 00c0 0100     		.2byte	0x1
+ 394 00c2 54       		.byte	0x54
+ 395 00c3 00000000 		.4byte	0x0
+ 396 00c7 00000000 		.4byte	0x0
+ 397              	.LLST6:
+ 398 00cb 90010000 		.4byte	.LVL9-.Ltext0
+ 399 00cf 9C010000 		.4byte	.LVL10-.Ltext0
+ 400 00d3 0100     		.2byte	0x1
+ 401 00d5 51       		.byte	0x51
+ 402 00d6 9C010000 		.4byte	.LVL10-.Ltext0
+ 403 00da F8010000 		.4byte	.LFE2-.Ltext0
+ 404 00de 0100     		.2byte	0x1
+ 405 00e0 57       		.byte	0x57
+ 406 00e1 00000000 		.4byte	0x0
+ 407 00e5 00000000 		.4byte	0x0
+ 408              	.LLST7:
+ 409 00e9 90010000 		.4byte	.LVL9-.Ltext0
+ 410 00ed AC010000 		.4byte	.LVL11-.Ltext0
+ 411 00f1 0100     		.2byte	0x1
+ 412 00f3 52       		.byte	0x52
+ 413 00f4 AC010000 		.4byte	.LVL11-.Ltext0
+ 414 00f8 F8010000 		.4byte	.LFE2-.Ltext0
+ 415 00fc 0100     		.2byte	0x1
+ 416 00fe 56       		.byte	0x56
+ 417 00ff 00000000 		.4byte	0x0
+ 418 0103 00000000 		.4byte	0x0
+ 419              	.LLST8:
+ 420 0107 90010000 		.4byte	.LVL9-.Ltext0
+ 421 010b AC010000 		.4byte	.LVL11-.Ltext0
+ 422 010f 0100     		.2byte	0x1
+ 423 0111 53       		.byte	0x53
+ 424 0112 AC010000 		.4byte	.LVL11-.Ltext0
+ 425 0116 F8010000 		.4byte	.LFE2-.Ltext0
+ 426 011a 0100     		.2byte	0x1
+ 427 011c 58       		.byte	0x58
+ 428 011d 00000000 		.4byte	0x0
+ 429 0121 00000000 		.4byte	0x0
+ 430              		.file 2 "./FreeRTOS/include/queue.h"
+ 431              		.section	.debug_info
+ 432 0000 95010000 		.4byte	0x195
+ 433 0004 0200     		.2byte	0x2
+ 434 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 435 000a 04       		.byte	0x4
+ 436 000b 01       		.uleb128 0x1
+ 437 000c 8C000000 		.4byte	.LASF23
+ 438 0010 01       		.byte	0x1
+ 439 0011 0B010000 		.4byte	.LASF24
+ 440 0015 F1000000 		.4byte	.LASF25
+ 441 0019 00000000 		.4byte	.Ltext0
+ 442 001d F8010000 		.4byte	.Letext0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 12
+
+
+ 443 0021 00000000 		.4byte	.Ldebug_line0
+ 444 0025 02       		.uleb128 0x2
+ 445 0026 04       		.byte	0x4
+ 446 0027 07       		.byte	0x7
+ 447 0028 CD000000 		.4byte	.LASF0
+ 448 002c 03       		.uleb128 0x3
+ 449 002d 04       		.byte	0x4
+ 450 002e 05       		.byte	0x5
+ 451 002f 696E7400 		.ascii	"int\000"
+ 452 0033 02       		.uleb128 0x2
+ 453 0034 04       		.byte	0x4
+ 454 0035 05       		.byte	0x5
+ 455 0036 C4000000 		.4byte	.LASF1
+ 456 003a 02       		.uleb128 0x2
+ 457 003b 08       		.byte	0x8
+ 458 003c 05       		.byte	0x5
+ 459 003d 00000000 		.4byte	.LASF2
+ 460 0041 02       		.uleb128 0x2
+ 461 0042 04       		.byte	0x4
+ 462 0043 07       		.byte	0x7
+ 463 0044 1A000000 		.4byte	.LASF3
+ 464 0048 04       		.uleb128 0x4
+ 465 0049 04       		.byte	0x4
+ 466 004a 07       		.byte	0x7
+ 467 004b 02       		.uleb128 0x2
+ 468 004c 01       		.byte	0x1
+ 469 004d 08       		.byte	0x8
+ 470 004e A3000000 		.4byte	.LASF4
+ 471 0052 05       		.uleb128 0x5
+ 472 0053 04       		.byte	0x4
+ 473 0054 02       		.uleb128 0x2
+ 474 0055 02       		.byte	0x2
+ 475 0056 05       		.byte	0x5
+ 476 0057 7E010000 		.4byte	.LASF5
+ 477 005b 02       		.uleb128 0x2
+ 478 005c 01       		.byte	0x1
+ 479 005d 08       		.byte	0x8
+ 480 005e B1000000 		.4byte	.LASF6
+ 481 0062 02       		.uleb128 0x2
+ 482 0063 02       		.byte	0x2
+ 483 0064 07       		.byte	0x7
+ 484 0065 29010000 		.4byte	.LASF7
+ 485 0069 02       		.uleb128 0x2
+ 486 006a 08       		.byte	0x8
+ 487 006b 07       		.byte	0x7
+ 488 006c 63000000 		.4byte	.LASF8
+ 489 0070 02       		.uleb128 0x2
+ 490 0071 01       		.byte	0x1
+ 491 0072 06       		.byte	0x6
+ 492 0073 3C010000 		.4byte	.LASF9
+ 493 0077 06       		.uleb128 0x6
+ 494 0078 95010000 		.4byte	.LASF26
+ 495 007c 02       		.byte	0x2
+ 496 007d 3F       		.byte	0x3f
+ 497 007e 52000000 		.4byte	0x52
+ 498 0082 07       		.uleb128 0x7
+ 499 0083 25000000 		.4byte	0x25
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 13
+
+
+ 500 0087 08       		.uleb128 0x8
+ 501 0088 01       		.byte	0x1
+ 502 0089 7A000000 		.4byte	.LASF12
+ 503 008d 01       		.byte	0x1
+ 504 008e 89       		.byte	0x89
+ 505 008f 01       		.byte	0x1
+ 506 0090 00000000 		.4byte	.LFB4
+ 507 0094 F0000000 		.4byte	.LFE4
+ 508 0098 00000000 		.4byte	.LLST0
+ 509 009c BF000000 		.4byte	0xbf
+ 510 00a0 09       		.uleb128 0x9
+ 511 00a1 48010000 		.4byte	.LASF10
+ 512 00a5 01       		.byte	0x1
+ 513 00a6 8A       		.byte	0x8a
+ 514 00a7 70000000 		.4byte	0x70
+ 515 00ab 2B000000 		.4byte	.LLST1
+ 516 00af 09       		.uleb128 0x9
+ 517 00b0 27000000 		.4byte	.LASF11
+ 518 00b4 01       		.byte	0x1
+ 519 00b5 8B       		.byte	0x8b
+ 520 00b6 33000000 		.4byte	0x33
+ 521 00ba 63000000 		.4byte	.LLST2
+ 522 00be 00       		.byte	0x0
+ 523 00bf 0A       		.uleb128 0xa
+ 524 00c0 01       		.byte	0x1
+ 525 00c1 DF000000 		.4byte	.LASF27
+ 526 00c5 01       		.byte	0x1
+ 527 00c6 7B       		.byte	0x7b
+ 528 00c7 01       		.byte	0x1
+ 529 00c8 F0000000 		.4byte	.LFB3
+ 530 00cc 90010000 		.4byte	.LFE3
+ 531 00d0 01       		.byte	0x1
+ 532 00d1 5D       		.byte	0x5d
+ 533 00d2 08       		.uleb128 0x8
+ 534 00d3 01       		.byte	0x1
+ 535 00d4 5A010000 		.4byte	.LASF13
+ 536 00d8 01       		.byte	0x1
+ 537 00d9 6A       		.byte	0x6a
+ 538 00da 01       		.byte	0x1
+ 539 00db 90010000 		.4byte	.LFB2
+ 540 00df F8010000 		.4byte	.LFE2
+ 541 00e3 8E000000 		.4byte	.LLST4
+ 542 00e7 28010000 		.4byte	0x128
+ 543 00eb 0B       		.uleb128 0xb
+ 544 00ec B6000000 		.4byte	.LASF14
+ 545 00f0 01       		.byte	0x1
+ 546 00f1 68       		.byte	0x68
+ 547 00f2 25000000 		.4byte	0x25
+ 548 00f6 AD000000 		.4byte	.LLST5
+ 549 00fa 0B       		.uleb128 0xb
+ 550 00fb 0E000000 		.4byte	.LASF15
+ 551 00ff 01       		.byte	0x1
+ 552 0100 68       		.byte	0x68
+ 553 0101 28010000 		.4byte	0x128
+ 554 0105 CB000000 		.4byte	.LLST6
+ 555 0109 0B       		.uleb128 0xb
+ 556 010a 71010000 		.4byte	.LASF16
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 14
+
+
+ 557 010e 01       		.byte	0x1
+ 558 010f 69       		.byte	0x69
+ 559 0110 28010000 		.4byte	0x128
+ 560 0114 E9000000 		.4byte	.LLST7
+ 561 0118 0B       		.uleb128 0xb
+ 562 0119 52000000 		.4byte	.LASF17
+ 563 011d 01       		.byte	0x1
+ 564 011e 69       		.byte	0x69
+ 565 011f 2E010000 		.4byte	0x12e
+ 566 0123 07010000 		.4byte	.LLST8
+ 567 0127 00       		.byte	0x0
+ 568 0128 0C       		.uleb128 0xc
+ 569 0129 04       		.byte	0x4
+ 570 012a 77000000 		.4byte	0x77
+ 571 012e 0C       		.uleb128 0xc
+ 572 012f 04       		.byte	0x4
+ 573 0130 34010000 		.4byte	0x134
+ 574 0134 0C       		.uleb128 0xc
+ 575 0135 04       		.byte	0x4
+ 576 0136 3A010000 		.4byte	0x13a
+ 577 013a 07       		.uleb128 0x7
+ 578 013b 33000000 		.4byte	0x33
+ 579 013f 0D       		.uleb128 0xd
+ 580 0140 1E010000 		.4byte	.LASF18
+ 581 0144 01       		.byte	0x1
+ 582 0145 55       		.byte	0x55
+ 583 0146 77000000 		.4byte	0x77
+ 584 014a 05       		.byte	0x5
+ 585 014b 03       		.byte	0x3
+ 586 014c 00000000 		.4byte	xRxedChars
+ 587 0150 0D       		.uleb128 0xd
+ 588 0151 4E010000 		.4byte	.LASF19
+ 589 0155 01       		.byte	0x1
+ 590 0156 56       		.byte	0x56
+ 591 0157 77000000 		.4byte	0x77
+ 592 015b 05       		.byte	0x5
+ 593 015c 03       		.byte	0x3
+ 594 015d 04000000 		.4byte	xCharsForTx
+ 595 0161 0D       		.uleb128 0xd
+ 596 0162 98000000 		.4byte	.LASF20
+ 597 0166 01       		.byte	0x1
+ 598 0167 57       		.byte	0x57
+ 599 0168 3A010000 		.4byte	0x13a
+ 600 016c 05       		.byte	0x5
+ 601 016d 03       		.byte	0x3
+ 602 016e 08000000 		.4byte	lTHREEmpty
+ 603 0172 0E       		.uleb128 0xe
+ 604 0173 88010000 		.4byte	.LASF21
+ 605 0177 01       		.byte	0x1
+ 606 0178 84       		.byte	0x84
+ 607 0179 7F010000 		.4byte	0x17f
+ 608 017d 01       		.byte	0x1
+ 609 017e 01       		.byte	0x1
+ 610 017f 07       		.uleb128 0x7
+ 611 0180 84010000 		.4byte	0x184
+ 612 0184 0C       		.uleb128 0xc
+ 613 0185 04       		.byte	0x4
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 15
+
+
+ 614 0186 8A010000 		.4byte	0x18a
+ 615 018a 0F       		.uleb128 0xf
+ 616 018b 0E       		.uleb128 0xe
+ 617 018c 40000000 		.4byte	.LASF22
+ 618 0190 01       		.byte	0x1
+ 619 0191 84       		.byte	0x84
+ 620 0192 82000000 		.4byte	0x82
+ 621 0196 01       		.byte	0x1
+ 622 0197 01       		.byte	0x1
+ 623 0198 00       		.byte	0x0
+ 624              		.section	.debug_abbrev
+ 625 0000 01       		.uleb128 0x1
+ 626 0001 11       		.uleb128 0x11
+ 627 0002 01       		.byte	0x1
+ 628 0003 25       		.uleb128 0x25
+ 629 0004 0E       		.uleb128 0xe
+ 630 0005 13       		.uleb128 0x13
+ 631 0006 0B       		.uleb128 0xb
+ 632 0007 03       		.uleb128 0x3
+ 633 0008 0E       		.uleb128 0xe
+ 634 0009 1B       		.uleb128 0x1b
+ 635 000a 0E       		.uleb128 0xe
+ 636 000b 11       		.uleb128 0x11
+ 637 000c 01       		.uleb128 0x1
+ 638 000d 12       		.uleb128 0x12
+ 639 000e 01       		.uleb128 0x1
+ 640 000f 10       		.uleb128 0x10
+ 641 0010 06       		.uleb128 0x6
+ 642 0011 00       		.byte	0x0
+ 643 0012 00       		.byte	0x0
+ 644 0013 02       		.uleb128 0x2
+ 645 0014 24       		.uleb128 0x24
+ 646 0015 00       		.byte	0x0
+ 647 0016 0B       		.uleb128 0xb
+ 648 0017 0B       		.uleb128 0xb
+ 649 0018 3E       		.uleb128 0x3e
+ 650 0019 0B       		.uleb128 0xb
+ 651 001a 03       		.uleb128 0x3
+ 652 001b 0E       		.uleb128 0xe
+ 653 001c 00       		.byte	0x0
+ 654 001d 00       		.byte	0x0
+ 655 001e 03       		.uleb128 0x3
+ 656 001f 24       		.uleb128 0x24
+ 657 0020 00       		.byte	0x0
+ 658 0021 0B       		.uleb128 0xb
+ 659 0022 0B       		.uleb128 0xb
+ 660 0023 3E       		.uleb128 0x3e
+ 661 0024 0B       		.uleb128 0xb
+ 662 0025 03       		.uleb128 0x3
+ 663 0026 08       		.uleb128 0x8
+ 664 0027 00       		.byte	0x0
+ 665 0028 00       		.byte	0x0
+ 666 0029 04       		.uleb128 0x4
+ 667 002a 24       		.uleb128 0x24
+ 668 002b 00       		.byte	0x0
+ 669 002c 0B       		.uleb128 0xb
+ 670 002d 0B       		.uleb128 0xb
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 16
+
+
+ 671 002e 3E       		.uleb128 0x3e
+ 672 002f 0B       		.uleb128 0xb
+ 673 0030 00       		.byte	0x0
+ 674 0031 00       		.byte	0x0
+ 675 0032 05       		.uleb128 0x5
+ 676 0033 0F       		.uleb128 0xf
+ 677 0034 00       		.byte	0x0
+ 678 0035 0B       		.uleb128 0xb
+ 679 0036 0B       		.uleb128 0xb
+ 680 0037 00       		.byte	0x0
+ 681 0038 00       		.byte	0x0
+ 682 0039 06       		.uleb128 0x6
+ 683 003a 16       		.uleb128 0x16
+ 684 003b 00       		.byte	0x0
+ 685 003c 03       		.uleb128 0x3
+ 686 003d 0E       		.uleb128 0xe
+ 687 003e 3A       		.uleb128 0x3a
+ 688 003f 0B       		.uleb128 0xb
+ 689 0040 3B       		.uleb128 0x3b
+ 690 0041 0B       		.uleb128 0xb
+ 691 0042 49       		.uleb128 0x49
+ 692 0043 13       		.uleb128 0x13
+ 693 0044 00       		.byte	0x0
+ 694 0045 00       		.byte	0x0
+ 695 0046 07       		.uleb128 0x7
+ 696 0047 35       		.uleb128 0x35
+ 697 0048 00       		.byte	0x0
+ 698 0049 49       		.uleb128 0x49
+ 699 004a 13       		.uleb128 0x13
+ 700 004b 00       		.byte	0x0
+ 701 004c 00       		.byte	0x0
+ 702 004d 08       		.uleb128 0x8
+ 703 004e 2E       		.uleb128 0x2e
+ 704 004f 01       		.byte	0x1
+ 705 0050 3F       		.uleb128 0x3f
+ 706 0051 0C       		.uleb128 0xc
+ 707 0052 03       		.uleb128 0x3
+ 708 0053 0E       		.uleb128 0xe
+ 709 0054 3A       		.uleb128 0x3a
+ 710 0055 0B       		.uleb128 0xb
+ 711 0056 3B       		.uleb128 0x3b
+ 712 0057 0B       		.uleb128 0xb
+ 713 0058 27       		.uleb128 0x27
+ 714 0059 0C       		.uleb128 0xc
+ 715 005a 11       		.uleb128 0x11
+ 716 005b 01       		.uleb128 0x1
+ 717 005c 12       		.uleb128 0x12
+ 718 005d 01       		.uleb128 0x1
+ 719 005e 40       		.uleb128 0x40
+ 720 005f 06       		.uleb128 0x6
+ 721 0060 01       		.uleb128 0x1
+ 722 0061 13       		.uleb128 0x13
+ 723 0062 00       		.byte	0x0
+ 724 0063 00       		.byte	0x0
+ 725 0064 09       		.uleb128 0x9
+ 726 0065 34       		.uleb128 0x34
+ 727 0066 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 17
+
+
+ 728 0067 03       		.uleb128 0x3
+ 729 0068 0E       		.uleb128 0xe
+ 730 0069 3A       		.uleb128 0x3a
+ 731 006a 0B       		.uleb128 0xb
+ 732 006b 3B       		.uleb128 0x3b
+ 733 006c 0B       		.uleb128 0xb
+ 734 006d 49       		.uleb128 0x49
+ 735 006e 13       		.uleb128 0x13
+ 736 006f 02       		.uleb128 0x2
+ 737 0070 06       		.uleb128 0x6
+ 738 0071 00       		.byte	0x0
+ 739 0072 00       		.byte	0x0
+ 740 0073 0A       		.uleb128 0xa
+ 741 0074 2E       		.uleb128 0x2e
+ 742 0075 00       		.byte	0x0
+ 743 0076 3F       		.uleb128 0x3f
+ 744 0077 0C       		.uleb128 0xc
+ 745 0078 03       		.uleb128 0x3
+ 746 0079 0E       		.uleb128 0xe
+ 747 007a 3A       		.uleb128 0x3a
+ 748 007b 0B       		.uleb128 0xb
+ 749 007c 3B       		.uleb128 0x3b
+ 750 007d 0B       		.uleb128 0xb
+ 751 007e 27       		.uleb128 0x27
+ 752 007f 0C       		.uleb128 0xc
+ 753 0080 11       		.uleb128 0x11
+ 754 0081 01       		.uleb128 0x1
+ 755 0082 12       		.uleb128 0x12
+ 756 0083 01       		.uleb128 0x1
+ 757 0084 40       		.uleb128 0x40
+ 758 0085 0A       		.uleb128 0xa
+ 759 0086 00       		.byte	0x0
+ 760 0087 00       		.byte	0x0
+ 761 0088 0B       		.uleb128 0xb
+ 762 0089 05       		.uleb128 0x5
+ 763 008a 00       		.byte	0x0
+ 764 008b 03       		.uleb128 0x3
+ 765 008c 0E       		.uleb128 0xe
+ 766 008d 3A       		.uleb128 0x3a
+ 767 008e 0B       		.uleb128 0xb
+ 768 008f 3B       		.uleb128 0x3b
+ 769 0090 0B       		.uleb128 0xb
+ 770 0091 49       		.uleb128 0x49
+ 771 0092 13       		.uleb128 0x13
+ 772 0093 02       		.uleb128 0x2
+ 773 0094 06       		.uleb128 0x6
+ 774 0095 00       		.byte	0x0
+ 775 0096 00       		.byte	0x0
+ 776 0097 0C       		.uleb128 0xc
+ 777 0098 0F       		.uleb128 0xf
+ 778 0099 00       		.byte	0x0
+ 779 009a 0B       		.uleb128 0xb
+ 780 009b 0B       		.uleb128 0xb
+ 781 009c 49       		.uleb128 0x49
+ 782 009d 13       		.uleb128 0x13
+ 783 009e 00       		.byte	0x0
+ 784 009f 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 18
+
+
+ 785 00a0 0D       		.uleb128 0xd
+ 786 00a1 34       		.uleb128 0x34
+ 787 00a2 00       		.byte	0x0
+ 788 00a3 03       		.uleb128 0x3
+ 789 00a4 0E       		.uleb128 0xe
+ 790 00a5 3A       		.uleb128 0x3a
+ 791 00a6 0B       		.uleb128 0xb
+ 792 00a7 3B       		.uleb128 0x3b
+ 793 00a8 0B       		.uleb128 0xb
+ 794 00a9 49       		.uleb128 0x49
+ 795 00aa 13       		.uleb128 0x13
+ 796 00ab 02       		.uleb128 0x2
+ 797 00ac 0A       		.uleb128 0xa
+ 798 00ad 00       		.byte	0x0
+ 799 00ae 00       		.byte	0x0
+ 800 00af 0E       		.uleb128 0xe
+ 801 00b0 34       		.uleb128 0x34
+ 802 00b1 00       		.byte	0x0
+ 803 00b2 03       		.uleb128 0x3
+ 804 00b3 0E       		.uleb128 0xe
+ 805 00b4 3A       		.uleb128 0x3a
+ 806 00b5 0B       		.uleb128 0xb
+ 807 00b6 3B       		.uleb128 0x3b
+ 808 00b7 0B       		.uleb128 0xb
+ 809 00b8 49       		.uleb128 0x49
+ 810 00b9 13       		.uleb128 0x13
+ 811 00ba 3F       		.uleb128 0x3f
+ 812 00bb 0C       		.uleb128 0xc
+ 813 00bc 3C       		.uleb128 0x3c
+ 814 00bd 0C       		.uleb128 0xc
+ 815 00be 00       		.byte	0x0
+ 816 00bf 00       		.byte	0x0
+ 817 00c0 0F       		.uleb128 0xf
+ 818 00c1 35       		.uleb128 0x35
+ 819 00c2 00       		.byte	0x0
+ 820 00c3 00       		.byte	0x0
+ 821 00c4 00       		.byte	0x0
+ 822 00c5 00       		.byte	0x0
+ 823              		.section	.debug_pubnames,"",%progbits
+ 824 0000 55000000 		.4byte	0x55
+ 825 0004 0200     		.2byte	0x2
+ 826 0006 00000000 		.4byte	.Ldebug_info0
+ 827 000a 99010000 		.4byte	0x199
+ 828 000e 87000000 		.4byte	0x87
+ 829 0012 76554152 		.ascii	"vUART_ISR_Handler\000"
+ 829      545F4953 
+ 829      525F4861 
+ 829      6E646C65 
+ 829      7200
+ 830 0024 BF000000 		.4byte	0xbf
+ 831 0028 76554152 		.ascii	"vUART_ISR_Wrapper\000"
+ 831      545F4953 
+ 831      525F5772 
+ 831      61707065 
+ 831      7200
+ 832 003a D2000000 		.4byte	0xd2
+ 833 003e 76536572 		.ascii	"vSerialISRCreateQueues\000"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 19
+
+
+ 833      69616C49 
+ 833      53524372 
+ 833      65617465 
+ 833      51756575 
+ 834 0055 00000000 		.4byte	0x0
+ 835              		.section	.debug_aranges,"",%progbits
+ 836 0000 1C000000 		.4byte	0x1c
+ 837 0004 0200     		.2byte	0x2
+ 838 0006 00000000 		.4byte	.Ldebug_info0
+ 839 000a 04       		.byte	0x4
+ 840 000b 00       		.byte	0x0
+ 841 000c 0000     		.2byte	0x0
+ 842 000e 0000     		.2byte	0x0
+ 843 0010 00000000 		.4byte	.Ltext0
+ 844 0014 F8010000 		.4byte	.Letext0-.Ltext0
+ 845 0018 00000000 		.4byte	0x0
+ 846 001c 00000000 		.4byte	0x0
+ 847              		.section	.debug_str,"MS",%progbits,1
+ 848              	.LASF2:
+ 849 0000 6C6F6E67 		.ascii	"long long int\000"
+ 849      206C6F6E 
+ 849      6720696E 
+ 849      7400
+ 850              	.LASF15:
+ 851 000e 70785278 		.ascii	"pxRxedChars\000"
+ 851      65644368 
+ 851      61727300 
+ 852              	.LASF3:
+ 853 001a 756E7369 		.ascii	"unsigned int\000"
+ 853      676E6564 
+ 853      20696E74 
+ 853      00
+ 854              	.LASF11:
+ 855 0027 78486967 		.ascii	"xHigherPriorityTaskWoken\000"
+ 855      68657250 
+ 855      72696F72 
+ 855      69747954 
+ 855      61736B57 
+ 856              	.LASF22:
+ 857 0040 756C4372 		.ascii	"ulCriticalNesting\000"
+ 857      69746963 
+ 857      616C4E65 
+ 857      7374696E 
+ 857      6700
+ 858              	.LASF17:
+ 859 0052 70706C54 		.ascii	"pplTHREEmptyFlag\000"
+ 859      48524545 
+ 859      6D707479 
+ 859      466C6167 
+ 859      00
+ 860              	.LASF8:
+ 861 0063 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 861      206C6F6E 
+ 861      6720756E 
+ 861      7369676E 
+ 861      65642069 
+ 862              	.LASF12:
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 20
+
+
+ 863 007a 76554152 		.ascii	"vUART_ISR_Handler\000"
+ 863      545F4953 
+ 863      525F4861 
+ 863      6E646C65 
+ 863      7200
+ 864              	.LASF23:
+ 865 008c 474E5520 		.ascii	"GNU C 4.2.2\000"
+ 865      4320342E 
+ 865      322E3200 
+ 866              	.LASF20:
+ 867 0098 6C544852 		.ascii	"lTHREEmpty\000"
+ 867      45456D70 
+ 867      747900
+ 868              	.LASF4:
+ 869 00a3 756E7369 		.ascii	"unsigned char\000"
+ 869      676E6564 
+ 869      20636861 
+ 869      7200
+ 870              	.LASF6:
+ 871 00b1 63686172 		.ascii	"char\000"
+ 871      00
+ 872              	.LASF14:
+ 873 00b6 75785175 		.ascii	"uxQueueLength\000"
+ 873      6575654C 
+ 873      656E6774 
+ 873      6800
+ 874              	.LASF1:
+ 875 00c4 6C6F6E67 		.ascii	"long int\000"
+ 875      20696E74 
+ 875      00
+ 876              	.LASF0:
+ 877 00cd 6C6F6E67 		.ascii	"long unsigned int\000"
+ 877      20756E73 
+ 877      69676E65 
+ 877      6420696E 
+ 877      7400
+ 878              	.LASF27:
+ 879 00df 76554152 		.ascii	"vUART_ISR_Wrapper\000"
+ 879      545F4953 
+ 879      525F5772 
+ 879      61707065 
+ 879      7200
+ 880              	.LASF25:
+ 881 00f1 2F637967 		.ascii	"/cygdrive/c/Downloads/EDU\000"
+ 881      64726976 
+ 881      652F632F 
+ 881      446F776E 
+ 881      6C6F6164 
+ 882              	.LASF24:
+ 883 010b 73657269 		.ascii	"serial/serialISR.c\000"
+ 883      616C2F73 
+ 883      65726961 
+ 883      6C495352 
+ 883      2E6300
+ 884              	.LASF18:
+ 885 011e 78527865 		.ascii	"xRxedChars\000"
+ 885      64436861 
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 21
+
+
+ 885      727300
+ 886              	.LASF7:
+ 887 0129 73686F72 		.ascii	"short unsigned int\000"
+ 887      7420756E 
+ 887      7369676E 
+ 887      65642069 
+ 887      6E7400
+ 888              	.LASF9:
+ 889 013c 7369676E 		.ascii	"signed char\000"
+ 889      65642063 
+ 889      68617200 
+ 890              	.LASF10:
+ 891 0148 63436861 		.ascii	"cChar\000"
+ 891      7200
+ 892              	.LASF19:
+ 893 014e 78436861 		.ascii	"xCharsForTx\000"
+ 893      7273466F 
+ 893      72547800 
+ 894              	.LASF13:
+ 895 015a 76536572 		.ascii	"vSerialISRCreateQueues\000"
+ 895      69616C49 
+ 895      53524372 
+ 895      65617465 
+ 895      51756575 
+ 896              	.LASF16:
+ 897 0171 70784368 		.ascii	"pxCharsForTx\000"
+ 897      61727346 
+ 897      6F725478 
+ 897      00
+ 898              	.LASF5:
+ 899 017e 73686F72 		.ascii	"short int\000"
+ 899      7420696E 
+ 899      7400
+ 900              	.LASF21:
+ 901 0188 70784375 		.ascii	"pxCurrentTCB\000"
+ 901      7272656E 
+ 901      74544342 
+ 901      00
+ 902              	.LASF26:
+ 903 0195 78517565 		.ascii	"xQueueHandle\000"
+ 903      75654861 
+ 903      6E646C65 
+ 903      00
+ 904              		.ident	"GCC: (GNU) 4.2.2"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s 			page 22
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 serialISR.c
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s:13     .text:00000000 vUART_ISR_Handler
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s:20     .text:00000000 $a
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s:40     .text:0000002c $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s:53     .text:00000058 $a
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s:111    .text:000000e0 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s:243    .bss:00000004 xCharsForTx
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s:246    .bss:00000008 lTHREEmpty
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s:240    .bss:00000000 xRxedChars
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s:120    .text:000000f0 vUART_ISR_Wrapper
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s:128    .text:000000f0 $a
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s:174    .text:00000188 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s:181    .text:00000190 vSerialISRCreateQueues
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s:188    .text:00000190 $a
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVJuWuG.s:233    .text:000001ec $d
+
+UNDEFINED SYMBOLS
+xQueueReceiveFromISR
+xQueueGenericSendFromISR
+vTaskSwitchContext
+ulCriticalNesting
+pxCurrentTCB
+xQueueCreate

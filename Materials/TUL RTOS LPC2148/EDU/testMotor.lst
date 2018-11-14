@@ -1,0 +1,698 @@
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc6oBEDR.s 			page 1
+
+
+   1              		.code	16
+   2              		.file	"testMotor.c"
+   3              		.section	.debug_abbrev,"",%progbits
+   4              	.Ldebug_abbrev0:
+   5              		.section	.debug_info,"",%progbits
+   6              	.Ldebug_info0:
+   7              		.section	.debug_line,"",%progbits
+   8              	.Ldebug_line0:
+   9 0000 6D000000 		.text
+   9      02003600 
+   9      00000201 
+   9      FB0E0D00 
+   9      01010101 
+  10              	.Ltext0:
+  11              		.align	2
+  12              		.global	testMotor
+  13              		.code 16
+  14              		.thumb_func
+  15              		.type	testMotor, %function
+  16              	testMotor:
+  17              	.LFB2:
+  18              		.file 1 "testMotor.c"
+   1:testMotor.c   **** #include "testMotor.h"
+   2:testMotor.c   **** #include "FreeRTOS.h"
+   3:testMotor.c   **** #include "task.h"
+   4:testMotor.c   **** 
+   5:testMotor.c   **** 
+   6:testMotor.c   **** void testMotor(void *pvParameters)
+   7:testMotor.c   **** {
+  19              		.loc 1 7 0
+  20 0000 70B5     		push	{r4, r5, r6, lr}
+  21              	.LCFI0:
+  22              	.LVL0:
+   8:testMotor.c   **** 	tU8  continueTest;
+   9:testMotor.c   **** 	tU32 counter = 0;
+  10:testMotor.c   **** 	tU8  direction = 0;
+  11:testMotor.c   **** 	tU8  forward = 0;
+  12:testMotor.c   **** 
+  13:testMotor.c   ****   	IOSET = ~0x2000;
+  23              		.loc 1 13 0
+  24 0002 2D4C     		ldr	r4, .L15
+  25 0004 2D4B     		ldr	r3, .L15+4
+  14:testMotor.c   ****   	PINSEL0 |= 0x000a0000;  //Enable PWM4 on P0.8 and PWM6 on P0.9
+  26              		.loc 1 14 0
+  27 0006 2E49     		ldr	r1, .L15+8
+  28              		.loc 1 13 0
+  29 0008 2360     		str	r3, [r4]
+  30              		.loc 1 14 0
+  31 000a A023     		mov	r3, #160
+  32 000c 0A68     		ldr	r2, [r1]
+  33 000e 1B03     		lsl	r3, r3, #12
+  34 0010 1A43     		orr	r2, r2, r3
+  35 0012 0A60     		str	r2, [r1]
+  15:testMotor.c   ****   	IODIR0  |= 0x00000400;  //P0.10 = output
+  36              		.loc 1 15 0
+  37 0014 2B4A     		ldr	r2, .L15+12
+  38 0016 8020     		mov	r0, #128
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc6oBEDR.s 			page 2
+
+
+  39              	.LVL1:
+  40 0018 1368     		ldr	r3, [r2]
+  41 001a C000     		lsl	r0, r0, #3
+  42 001c 0343     		orr	r3, r3, r0
+  43 001e 1360     		str	r3, [r2]
+  16:testMotor.c   ****   	IOCLR0   = 0x00000400;  //set P0.10 low = disable motor
+  44              		.loc 1 16 0
+  45 0020 294B     		ldr	r3, .L15+16
+  46 0022 1860     		str	r0, [r3]
+  17:testMotor.c   **** 
+  18:testMotor.c   ****   	//PULSE WIDTH MODULATION INIT*********************************************
+  19:testMotor.c   ****   	PWM_PR  = 0x00;    // Prescale Register
+  47              		.loc 1 19 0
+  48 0024 294B     		ldr	r3, .L15+20
+  49 0026 0021     		mov	r1, #0
+  50 0028 1960     		str	r1, [r3]
+  20:testMotor.c   ****   	PWM_MCR = 0x02;    // Match Control Register
+  51              		.loc 1 20 0
+  52 002a 0222     		mov	r2, #2
+  53 002c 0833     		add	r3, r3, #8
+  54 002e 1A60     		str	r2, [r3]
+  21:testMotor.c   ****   	PWM_MR0 = 0x1000;    // TOTAL PERIODTID   T
+  55              		.loc 1 21 0
+  56 0030 274A     		ldr	r2, .L15+24
+  57 0032 8023     		mov	r3, #128
+  58 0034 5B01     		lsl	r3, r3, #5
+  59 0036 1360     		str	r3, [r2]
+  22:testMotor.c   ****   	PWM_MR4 = 0x0000;    // HÖG SIGNAL        t
+  60              		.loc 1 22 0
+  61 0038 264B     		ldr	r3, .L15+28
+  62 003a 1960     		str	r1, [r3]
+  23:testMotor.c   ****   	PWM_MR6 = 0x0000;    // HÖG SIGNAL        t
+  63              		.loc 1 23 0
+  64 003c 0833     		add	r3, r3, #8
+  65 003e 1960     		str	r1, [r3]
+  24:testMotor.c   ****   	PWM_LER = 0x51;    // Latch Enable Register
+  66              		.loc 1 24 0
+  67 0040 5122     		mov	r2, #81
+  68 0042 0833     		add	r3, r3, #8
+  69 0044 1A60     		str	r2, [r3]
+  25:testMotor.c   ****   	PWM_PCR = 0x5000;  // Prescale Counter Register PWMENA4, PWMENA6
+  70              		.loc 1 25 0
+  71 0046 244A     		ldr	r2, .L15+32
+  72 0048 A023     		mov	r3, #160
+  73 004a DB01     		lsl	r3, r3, #7
+  74 004c 1360     		str	r3, [r2]
+  26:testMotor.c   ****   	PWM_TCR = 0x09;    // Counter Enable och PWM Enable
+  75              		.loc 1 26 0
+  76 004e 234B     		ldr	r3, .L15+36
+  77 0050 0922     		mov	r2, #9
+  78 0052 1A60     		str	r2, [r3]
+  27:testMotor.c   ****   	//************************************************************************
+  28:testMotor.c   ****   	IOSET0   = 0x00000400;  //set P0.10 high = enable motor
+  79              		.loc 1 28 0
+  80 0054 0026     		mov	r6, #0
+  81              	.LVL2:
+  82 0056 2060     		str	r0, [r4]
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc6oBEDR.s 			page 3
+
+
+  83 0058 0025     		mov	r5, #0
+  84              	.LVL3:
+  85 005a 0024     		mov	r4, #0
+  86              	.LVL4:
+  87              	.L2:
+  29:testMotor.c   **** 
+  30:testMotor.c   **** 	for(;;)
+  31:testMotor.c   ****   	{
+  32:testMotor.c   ****     	if (direction == 0)
+  88              		.loc 1 32 0
+  89 005c 002E     		cmp	r6, #0
+  90 005e 06D1     		bne	.L3
+  33:testMotor.c   ****     	{
+  34:testMotor.c   ****       		counter += 0x0010;
+  35:testMotor.c   ****       		if (counter > 0x1100)
+  91              		.loc 1 35 0
+  92 0060 8823     		mov	r3, #136
+  93              		.loc 1 34 0
+  94 0062 1034     		add	r4, r4, #16
+  95              		.loc 1 35 0
+  96 0064 5B01     		lsl	r3, r3, #5
+  97 0066 9C42     		cmp	r4, r3
+  98 0068 14D9     		bls	.L5
+  99 006a 0126     		mov	r6, #1
+ 100 006c 12E0     		b	.L5
+ 101              	.L3:
+  36:testMotor.c   ****       		{
+  37:testMotor.c   ****         		direction = 1;
+  38:testMotor.c   ****       		}
+  39:testMotor.c   ****     	}
+  40:testMotor.c   ****     	else
+  41:testMotor.c   ****     	{
+  42:testMotor.c   ****   	  		if (counter == 0x0000)
+ 102              		.loc 1 42 0
+ 103 006e 002C     		cmp	r4, #0
+ 104 0070 0FD1     		bne	.L7
+  43:testMotor.c   ****   	  		{
+  44:testMotor.c   ****   		  		direction = 0;
+  45:testMotor.c   **** 
+  46:testMotor.c   ****         		PWM_MR4 = counter;    // HÖG SIGNAL
+ 105              		.loc 1 46 0
+ 106 0072 184B     		ldr	r3, .L15+28
+ 107 0074 1C60     		str	r4, [r3]
+  47:testMotor.c   ****         		PWM_MR6 = counter;    // HÖG SIGNAL
+ 108              		.loc 1 47 0
+ 109 0076 0833     		add	r3, r3, #8
+ 110 0078 1C60     		str	r4, [r3]
+  48:testMotor.c   ****         		PWM_LER = 0x50;    // Latch Enable Register
+ 111              		.loc 1 48 0
+ 112 007a 5022     		mov	r2, #80
+ 113 007c 0833     		add	r3, r3, #8
+ 114 007e 1A60     		str	r2, [r3]
+  49:testMotor.c   **** 
+  50:testMotor.c   ****         		forward++;
+ 115              		.loc 1 50 0
+ 116 0080 6B1C     		add	r3, r5, #1
+ 117 0082 1B06     		lsl	r3, r3, #24
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc6oBEDR.s 			page 4
+
+
+ 118 0084 1D0E     		lsr	r5, r3, #24
+  51:testMotor.c   ****         		if (forward > 1)
+ 119              		.loc 1 51 0
+ 120 0086 012D     		cmp	r5, #1
+ 121 0088 01D9     		bls	.L9
+ 122 008a 0026     		mov	r6, #0
+ 123 008c 04E0     		b	.L11
+ 124              	.L9:
+ 125 008e 0026     		mov	r6, #0
+ 126 0090 00E0     		b	.L5
+ 127              	.L7:
+  52:testMotor.c   ****         		{
+  53:testMotor.c   ****           			forward = 0;
+  54:testMotor.c   **** 					//continueTest = FALSE;
+  55:testMotor.c   ****         		}
+  56:testMotor.c   **** 
+  57:testMotor.c   ****       		}
+  58:testMotor.c   ****       		else
+  59:testMotor.c   ****         		counter -= 0x0010;
+ 128              		.loc 1 59 0
+ 129 0092 103C     		sub	r4, r4, #16
+ 130              	.L5:
+  60:testMotor.c   ****     	}
+  61:testMotor.c   **** 
+  62:testMotor.c   ****     	if (forward == 0)
+ 131              		.loc 1 62 0
+ 132 0094 002D     		cmp	r5, #0
+ 133 0096 06D1     		bne	.L12
+ 134              	.L11:
+  63:testMotor.c   ****     	{
+  64:testMotor.c   ****       		PWM_MR4 = counter;    // HÖG SIGNAL
+ 135              		.loc 1 64 0
+ 136 0098 0E4B     		ldr	r3, .L15+28
+  65:testMotor.c   ****       		PWM_LER = 0x10;    // Latch Enable Register
+ 137              		.loc 1 65 0
+ 138 009a 1022     		mov	r2, #16
+ 139              		.loc 1 64 0
+ 140 009c 1C60     		str	r4, [r3]
+ 141              		.loc 1 65 0
+ 142 009e 0025     		mov	r5, #0
+ 143 00a0 1033     		add	r3, r3, #16
+ 144 00a2 1A60     		str	r2, [r3]
+ 145 00a4 04E0     		b	.L13
+ 146              	.L12:
+  66:testMotor.c   ****     	}
+  67:testMotor.c   ****     	else
+  68:testMotor.c   ****     	{
+  69:testMotor.c   ****       		PWM_MR6 = counter;    // HÖG SIGNAL
+ 147              		.loc 1 69 0
+ 148 00a6 0E4B     		ldr	r3, .L15+40
+  70:testMotor.c   ****       		PWM_LER = 0x40;    // Latch Enable Register
+ 149              		.loc 1 70 0
+ 150 00a8 4022     		mov	r2, #64
+ 151              		.loc 1 69 0
+ 152 00aa 1C60     		str	r4, [r3]
+ 153              		.loc 1 70 0
+ 154 00ac 0833     		add	r3, r3, #8
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc6oBEDR.s 			page 5
+
+
+ 155 00ae 1A60     		str	r2, [r3]
+ 156              	.L13:
+  71:testMotor.c   ****     	}
+  72:testMotor.c   **** 
+  73:testMotor.c   ****     	vTaskDelay(10);
+ 157              		.loc 1 73 0
+ 158 00b0 0A20     		mov	r0, #10
+ 159 00b2 FFF7FEFF 		bl	vTaskDelay
+ 160 00b6 D1E7     		b	.L2
+ 161              	.L16:
+ 162              		.align	2
+ 163              	.L15:
+ 164 00b8 048002E0 		.word	-536707068
+ 165 00bc FFDFFFFF 		.word	-8193
+ 166 00c0 00C002E0 		.word	-536690688
+ 167 00c4 088002E0 		.word	-536707064
+ 168 00c8 0C8002E0 		.word	-536707060
+ 169 00cc 0C4001E0 		.word	-536788980
+ 170 00d0 184001E0 		.word	-536788968
+ 171 00d4 404001E0 		.word	-536788928
+ 172 00d8 4C4001E0 		.word	-536788916
+ 173 00dc 044001E0 		.word	-536788988
+ 174 00e0 484001E0 		.word	-536788920
+ 175              	.LFE2:
+ 176              		.size	testMotor, .-testMotor
+ 177              		.section	.debug_frame,"",%progbits
+ 178              	.Lframe0:
+ 179 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ 180              	.LSCIE0:
+ 181 0004 FFFFFFFF 		.4byte	0xffffffff
+ 182 0008 01       		.byte	0x1
+ 183 0009 00       		.ascii	"\000"
+ 184 000a 01       		.uleb128 0x1
+ 185 000b 7C       		.sleb128 -4
+ 186 000c 0E       		.byte	0xe
+ 187 000d 0C       		.byte	0xc
+ 188 000e 0D       		.uleb128 0xd
+ 189 000f 00       		.uleb128 0x0
+ 190              		.align	2
+ 191              	.LECIE0:
+ 192              	.LSFDE0:
+ 193 0010 18000000 		.4byte	.LEFDE0-.LASFDE0
+ 194              	.LASFDE0:
+ 195 0014 00000000 		.4byte	.Lframe0
+ 196 0018 00000000 		.4byte	.LFB2
+ 197 001c E4000000 		.4byte	.LFE2-.LFB2
+ 198 0020 42       		.byte	0x4
+ 199              		.4byte	.LCFI0-.LFB2
+ 200 0021 0E       		.byte	0xe
+ 201 0022 10       		.uleb128 0x10
+ 202 0023 84       		.byte	0x84
+ 203 0024 04       		.uleb128 0x4
+ 204 0025 85       		.byte	0x85
+ 205 0026 03       		.uleb128 0x3
+ 206 0027 86       		.byte	0x86
+ 207 0028 02       		.uleb128 0x2
+ 208 0029 8E       		.byte	0x8e
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc6oBEDR.s 			page 6
+
+
+ 209 002a 01       		.uleb128 0x1
+ 210 002b 00       		.align	2
+ 211              	.LEFDE0:
+ 212              		.text
+ 213              	.Letext0:
+ 214              		.section	.debug_loc,"",%progbits
+ 215              	.Ldebug_loc0:
+ 216              	.LLST0:
+ 217 0000 00000000 		.4byte	.LFB2-.Ltext0
+ 218 0004 02000000 		.4byte	.LCFI0-.Ltext0
+ 219 0008 0100     		.2byte	0x1
+ 220 000a 5D       		.byte	0x5d
+ 221 000b 02000000 		.4byte	.LCFI0-.Ltext0
+ 222 000f E4000000 		.4byte	.LFE2-.Ltext0
+ 223 0013 0200     		.2byte	0x2
+ 224 0015 7D       		.byte	0x7d
+ 225 0016 10       		.sleb128 16
+ 226 0017 00000000 		.4byte	0x0
+ 227 001b 00000000 		.4byte	0x0
+ 228              	.LLST1:
+ 229 001f 02000000 		.4byte	.LVL0-.Ltext0
+ 230 0023 18000000 		.4byte	.LVL1-.Ltext0
+ 231 0027 0100     		.2byte	0x1
+ 232 0029 50       		.byte	0x50
+ 233 002a 00000000 		.4byte	0x0
+ 234 002e 00000000 		.4byte	0x0
+ 235              		.file 2 "FreeRTOSConfig.h"
+ 236              		.section	.debug_info
+ 237 0000 C9000000 		.4byte	0xc9
+ 238 0004 0200     		.2byte	0x2
+ 239 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 240 000a 04       		.byte	0x4
+ 241 000b 01       		.uleb128 0x1
+ 242 000c 00000000 		.4byte	.LASF11
+ 243 0010 01       		.byte	0x1
+ 244 0011 68000000 		.4byte	.LASF12
+ 245 0015 9D000000 		.4byte	.LASF13
+ 246 0019 00000000 		.4byte	.Ltext0
+ 247 001d E4000000 		.4byte	.Letext0
+ 248 0021 00000000 		.4byte	.Ldebug_line0
+ 249 0025 02       		.uleb128 0x2
+ 250 0026 74553800 		.ascii	"tU8\000"
+ 251 002a 02       		.byte	0x2
+ 252 002b A0       		.byte	0xa0
+ 253 002c 30000000 		.4byte	0x30
+ 254 0030 03       		.uleb128 0x3
+ 255 0031 01       		.byte	0x1
+ 256 0032 08       		.byte	0x8
+ 257 0033 1E000000 		.4byte	.LASF0
+ 258 0037 03       		.uleb128 0x3
+ 259 0038 02       		.byte	0x2
+ 260 0039 07       		.byte	0x7
+ 261 003a 4B000000 		.4byte	.LASF1
+ 262 003e 04       		.uleb128 0x4
+ 263 003f 81000000 		.4byte	.LASF2
+ 264 0043 02       		.byte	0x2
+ 265 0044 A2       		.byte	0xa2
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc6oBEDR.s 			page 7
+
+
+ 266 0045 49000000 		.4byte	0x49
+ 267 0049 03       		.uleb128 0x3
+ 268 004a 04       		.byte	0x4
+ 269 004b 07       		.byte	0x7
+ 270 004c 74000000 		.4byte	.LASF3
+ 271 0050 03       		.uleb128 0x3
+ 272 0051 01       		.byte	0x1
+ 273 0052 06       		.byte	0x6
+ 274 0053 C8000000 		.4byte	.LASF4
+ 275 0057 03       		.uleb128 0x3
+ 276 0058 02       		.byte	0x2
+ 277 0059 05       		.byte	0x5
+ 278 005a 93000000 		.4byte	.LASF5
+ 279 005e 05       		.uleb128 0x5
+ 280 005f 04       		.byte	0x4
+ 281 0060 05       		.byte	0x5
+ 282 0061 696E7400 		.ascii	"int\000"
+ 283 0065 03       		.uleb128 0x3
+ 284 0066 04       		.byte	0x4
+ 285 0067 05       		.byte	0x5
+ 286 0068 B7000000 		.4byte	.LASF6
+ 287 006c 03       		.uleb128 0x3
+ 288 006d 04       		.byte	0x4
+ 289 006e 07       		.byte	0x7
+ 290 006f 2C000000 		.4byte	.LASF7
+ 291 0073 06       		.uleb128 0x6
+ 292 0074 04       		.byte	0x4
+ 293 0075 07       		.uleb128 0x7
+ 294 0076 01       		.byte	0x1
+ 295 0077 5E000000 		.4byte	.LASF14
+ 296 007b 01       		.byte	0x1
+ 297 007c 07       		.byte	0x7
+ 298 007d 01       		.byte	0x1
+ 299 007e 00000000 		.4byte	.LFB2
+ 300 0082 E4000000 		.4byte	.LFE2
+ 301 0086 00000000 		.4byte	.LLST0
+ 302 008a 08       		.uleb128 0x8
+ 303 008b 86000000 		.4byte	.LASF15
+ 304 008f 01       		.byte	0x1
+ 305 0090 06       		.byte	0x6
+ 306 0091 73000000 		.4byte	0x73
+ 307 0095 1F000000 		.4byte	.LLST1
+ 308 0099 09       		.uleb128 0x9
+ 309 009a 3E000000 		.4byte	.LASF16
+ 310 009e 01       		.byte	0x1
+ 311 009f 08       		.byte	0x8
+ 312 00a0 25000000 		.4byte	0x25
+ 313 00a4 0A       		.uleb128 0xa
+ 314 00a5 16000000 		.4byte	.LASF8
+ 315 00a9 01       		.byte	0x1
+ 316 00aa 09       		.byte	0x9
+ 317 00ab 3E000000 		.4byte	0x3e
+ 318 00af 01       		.byte	0x1
+ 319 00b0 54       		.byte	0x54
+ 320 00b1 0A       		.uleb128 0xa
+ 321 00b2 0C000000 		.4byte	.LASF9
+ 322 00b6 01       		.byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc6oBEDR.s 			page 8
+
+
+ 323 00b7 0A       		.byte	0xa
+ 324 00b8 25000000 		.4byte	0x25
+ 325 00bc 01       		.byte	0x1
+ 326 00bd 56       		.byte	0x56
+ 327 00be 0A       		.uleb128 0xa
+ 328 00bf C0000000 		.4byte	.LASF10
+ 329 00c3 01       		.byte	0x1
+ 330 00c4 0B       		.byte	0xb
+ 331 00c5 25000000 		.4byte	0x25
+ 332 00c9 01       		.byte	0x1
+ 333 00ca 55       		.byte	0x55
+ 334 00cb 00       		.byte	0x0
+ 335 00cc 00       		.byte	0x0
+ 336              		.section	.debug_abbrev
+ 337 0000 01       		.uleb128 0x1
+ 338 0001 11       		.uleb128 0x11
+ 339 0002 01       		.byte	0x1
+ 340 0003 25       		.uleb128 0x25
+ 341 0004 0E       		.uleb128 0xe
+ 342 0005 13       		.uleb128 0x13
+ 343 0006 0B       		.uleb128 0xb
+ 344 0007 03       		.uleb128 0x3
+ 345 0008 0E       		.uleb128 0xe
+ 346 0009 1B       		.uleb128 0x1b
+ 347 000a 0E       		.uleb128 0xe
+ 348 000b 11       		.uleb128 0x11
+ 349 000c 01       		.uleb128 0x1
+ 350 000d 12       		.uleb128 0x12
+ 351 000e 01       		.uleb128 0x1
+ 352 000f 10       		.uleb128 0x10
+ 353 0010 06       		.uleb128 0x6
+ 354 0011 00       		.byte	0x0
+ 355 0012 00       		.byte	0x0
+ 356 0013 02       		.uleb128 0x2
+ 357 0014 16       		.uleb128 0x16
+ 358 0015 00       		.byte	0x0
+ 359 0016 03       		.uleb128 0x3
+ 360 0017 08       		.uleb128 0x8
+ 361 0018 3A       		.uleb128 0x3a
+ 362 0019 0B       		.uleb128 0xb
+ 363 001a 3B       		.uleb128 0x3b
+ 364 001b 0B       		.uleb128 0xb
+ 365 001c 49       		.uleb128 0x49
+ 366 001d 13       		.uleb128 0x13
+ 367 001e 00       		.byte	0x0
+ 368 001f 00       		.byte	0x0
+ 369 0020 03       		.uleb128 0x3
+ 370 0021 24       		.uleb128 0x24
+ 371 0022 00       		.byte	0x0
+ 372 0023 0B       		.uleb128 0xb
+ 373 0024 0B       		.uleb128 0xb
+ 374 0025 3E       		.uleb128 0x3e
+ 375 0026 0B       		.uleb128 0xb
+ 376 0027 03       		.uleb128 0x3
+ 377 0028 0E       		.uleb128 0xe
+ 378 0029 00       		.byte	0x0
+ 379 002a 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc6oBEDR.s 			page 9
+
+
+ 380 002b 04       		.uleb128 0x4
+ 381 002c 16       		.uleb128 0x16
+ 382 002d 00       		.byte	0x0
+ 383 002e 03       		.uleb128 0x3
+ 384 002f 0E       		.uleb128 0xe
+ 385 0030 3A       		.uleb128 0x3a
+ 386 0031 0B       		.uleb128 0xb
+ 387 0032 3B       		.uleb128 0x3b
+ 388 0033 0B       		.uleb128 0xb
+ 389 0034 49       		.uleb128 0x49
+ 390 0035 13       		.uleb128 0x13
+ 391 0036 00       		.byte	0x0
+ 392 0037 00       		.byte	0x0
+ 393 0038 05       		.uleb128 0x5
+ 394 0039 24       		.uleb128 0x24
+ 395 003a 00       		.byte	0x0
+ 396 003b 0B       		.uleb128 0xb
+ 397 003c 0B       		.uleb128 0xb
+ 398 003d 3E       		.uleb128 0x3e
+ 399 003e 0B       		.uleb128 0xb
+ 400 003f 03       		.uleb128 0x3
+ 401 0040 08       		.uleb128 0x8
+ 402 0041 00       		.byte	0x0
+ 403 0042 00       		.byte	0x0
+ 404 0043 06       		.uleb128 0x6
+ 405 0044 0F       		.uleb128 0xf
+ 406 0045 00       		.byte	0x0
+ 407 0046 0B       		.uleb128 0xb
+ 408 0047 0B       		.uleb128 0xb
+ 409 0048 00       		.byte	0x0
+ 410 0049 00       		.byte	0x0
+ 411 004a 07       		.uleb128 0x7
+ 412 004b 2E       		.uleb128 0x2e
+ 413 004c 01       		.byte	0x1
+ 414 004d 3F       		.uleb128 0x3f
+ 415 004e 0C       		.uleb128 0xc
+ 416 004f 03       		.uleb128 0x3
+ 417 0050 0E       		.uleb128 0xe
+ 418 0051 3A       		.uleb128 0x3a
+ 419 0052 0B       		.uleb128 0xb
+ 420 0053 3B       		.uleb128 0x3b
+ 421 0054 0B       		.uleb128 0xb
+ 422 0055 27       		.uleb128 0x27
+ 423 0056 0C       		.uleb128 0xc
+ 424 0057 11       		.uleb128 0x11
+ 425 0058 01       		.uleb128 0x1
+ 426 0059 12       		.uleb128 0x12
+ 427 005a 01       		.uleb128 0x1
+ 428 005b 40       		.uleb128 0x40
+ 429 005c 06       		.uleb128 0x6
+ 430 005d 00       		.byte	0x0
+ 431 005e 00       		.byte	0x0
+ 432 005f 08       		.uleb128 0x8
+ 433 0060 05       		.uleb128 0x5
+ 434 0061 00       		.byte	0x0
+ 435 0062 03       		.uleb128 0x3
+ 436 0063 0E       		.uleb128 0xe
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc6oBEDR.s 			page 10
+
+
+ 437 0064 3A       		.uleb128 0x3a
+ 438 0065 0B       		.uleb128 0xb
+ 439 0066 3B       		.uleb128 0x3b
+ 440 0067 0B       		.uleb128 0xb
+ 441 0068 49       		.uleb128 0x49
+ 442 0069 13       		.uleb128 0x13
+ 443 006a 02       		.uleb128 0x2
+ 444 006b 06       		.uleb128 0x6
+ 445 006c 00       		.byte	0x0
+ 446 006d 00       		.byte	0x0
+ 447 006e 09       		.uleb128 0x9
+ 448 006f 34       		.uleb128 0x34
+ 449 0070 00       		.byte	0x0
+ 450 0071 03       		.uleb128 0x3
+ 451 0072 0E       		.uleb128 0xe
+ 452 0073 3A       		.uleb128 0x3a
+ 453 0074 0B       		.uleb128 0xb
+ 454 0075 3B       		.uleb128 0x3b
+ 455 0076 0B       		.uleb128 0xb
+ 456 0077 49       		.uleb128 0x49
+ 457 0078 13       		.uleb128 0x13
+ 458 0079 00       		.byte	0x0
+ 459 007a 00       		.byte	0x0
+ 460 007b 0A       		.uleb128 0xa
+ 461 007c 34       		.uleb128 0x34
+ 462 007d 00       		.byte	0x0
+ 463 007e 03       		.uleb128 0x3
+ 464 007f 0E       		.uleb128 0xe
+ 465 0080 3A       		.uleb128 0x3a
+ 466 0081 0B       		.uleb128 0xb
+ 467 0082 3B       		.uleb128 0x3b
+ 468 0083 0B       		.uleb128 0xb
+ 469 0084 49       		.uleb128 0x49
+ 470 0085 13       		.uleb128 0x13
+ 471 0086 02       		.uleb128 0x2
+ 472 0087 0A       		.uleb128 0xa
+ 473 0088 00       		.byte	0x0
+ 474 0089 00       		.byte	0x0
+ 475 008a 00       		.byte	0x0
+ 476              		.section	.debug_pubnames,"",%progbits
+ 477 0000 1C000000 		.4byte	0x1c
+ 478 0004 0200     		.2byte	0x2
+ 479 0006 00000000 		.4byte	.Ldebug_info0
+ 480 000a CD000000 		.4byte	0xcd
+ 481 000e 75000000 		.4byte	0x75
+ 482 0012 74657374 		.ascii	"testMotor\000"
+ 482      4D6F746F 
+ 482      7200
+ 483 001c 00000000 		.4byte	0x0
+ 484              		.section	.debug_aranges,"",%progbits
+ 485 0000 1C000000 		.4byte	0x1c
+ 486 0004 0200     		.2byte	0x2
+ 487 0006 00000000 		.4byte	.Ldebug_info0
+ 488 000a 04       		.byte	0x4
+ 489 000b 00       		.byte	0x0
+ 490 000c 0000     		.2byte	0x0
+ 491 000e 0000     		.2byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc6oBEDR.s 			page 11
+
+
+ 492 0010 00000000 		.4byte	.Ltext0
+ 493 0014 E4000000 		.4byte	.Letext0-.Ltext0
+ 494 0018 00000000 		.4byte	0x0
+ 495 001c 00000000 		.4byte	0x0
+ 496              		.section	.debug_str,"MS",%progbits,1
+ 497              	.LASF11:
+ 498 0000 474E5520 		.ascii	"GNU C 4.2.2\000"
+ 498      4320342E 
+ 498      322E3200 
+ 499              	.LASF9:
+ 500 000c 64697265 		.ascii	"direction\000"
+ 500      6374696F 
+ 500      6E00
+ 501              	.LASF8:
+ 502 0016 636F756E 		.ascii	"counter\000"
+ 502      74657200 
+ 503              	.LASF0:
+ 504 001e 756E7369 		.ascii	"unsigned char\000"
+ 504      676E6564 
+ 504      20636861 
+ 504      7200
+ 505              	.LASF7:
+ 506 002c 6C6F6E67 		.ascii	"long unsigned int\000"
+ 506      20756E73 
+ 506      69676E65 
+ 506      6420696E 
+ 506      7400
+ 507              	.LASF16:
+ 508 003e 636F6E74 		.ascii	"continueTest\000"
+ 508      696E7565 
+ 508      54657374 
+ 508      00
+ 509              	.LASF1:
+ 510 004b 73686F72 		.ascii	"short unsigned int\000"
+ 510      7420756E 
+ 510      7369676E 
+ 510      65642069 
+ 510      6E7400
+ 511              	.LASF14:
+ 512 005e 74657374 		.ascii	"testMotor\000"
+ 512      4D6F746F 
+ 512      7200
+ 513              	.LASF12:
+ 514 0068 74657374 		.ascii	"testMotor.c\000"
+ 514      4D6F746F 
+ 514      722E6300 
+ 515              	.LASF3:
+ 516 0074 756E7369 		.ascii	"unsigned int\000"
+ 516      676E6564 
+ 516      20696E74 
+ 516      00
+ 517              	.LASF2:
+ 518 0081 74553332 		.ascii	"tU32\000"
+ 518      00
+ 519              	.LASF15:
+ 520 0086 70765061 		.ascii	"pvParameters\000"
+ 520      72616D65 
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc6oBEDR.s 			page 12
+
+
+ 520      74657273 
+ 520      00
+ 521              	.LASF5:
+ 522 0093 73686F72 		.ascii	"short int\000"
+ 522      7420696E 
+ 522      7400
+ 523              	.LASF13:
+ 524 009d 2F637967 		.ascii	"/cygdrive/c/Downloads/EDU\000"
+ 524      64726976 
+ 524      652F632F 
+ 524      446F776E 
+ 524      6C6F6164 
+ 525              	.LASF6:
+ 526 00b7 6C6F6E67 		.ascii	"long int\000"
+ 526      20696E74 
+ 526      00
+ 527              	.LASF10:
+ 528 00c0 666F7277 		.ascii	"forward\000"
+ 528      61726400 
+ 529              	.LASF4:
+ 530 00c8 7369676E 		.ascii	"signed char\000"
+ 530      65642063 
+ 530      68617200 
+ 531              		.ident	"GCC: (GNU) 4.2.2"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc6oBEDR.s 			page 13
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 testMotor.c
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc6oBEDR.s:1      .text:00000000 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc6oBEDR.s:16     .text:00000000 testMotor
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc6oBEDR.s:164    .text:000000b8 $d
+
+UNDEFINED SYMBOLS
+vTaskDelay

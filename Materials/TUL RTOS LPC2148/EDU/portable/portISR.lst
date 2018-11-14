@@ -1,0 +1,1115 @@
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 1
+
+
+   1              		.file	"portISR.c"
+   2              		.section	.debug_abbrev,"",%progbits
+   3              	.Ldebug_abbrev0:
+   4              		.section	.debug_info,"",%progbits
+   5              	.Ldebug_info0:
+   6              		.section	.debug_line,"",%progbits
+   7              	.Ldebug_line0:
+   8 0000 69000000 		.text
+   8      02002900 
+   8      00000201 
+   8      FB0E0D00 
+   8      01010101 
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	vPortISRStartFirstTask
+  12              		.type	vPortISRStartFirstTask, %function
+  13              	vPortISRStartFirstTask:
+  14              	.LFB2:
+  15              		.file 1 "portable/portISR.c"
+   1:portable/portISR.c **** /*
+   2:portable/portISR.c **** 	FreeRTOS.org V5.1.1 - Copyright (C) 2003-2008 Richard Barry.
+   3:portable/portISR.c **** 
+   4:portable/portISR.c **** 	This file is part of the FreeRTOS.org distribution.
+   5:portable/portISR.c **** 
+   6:portable/portISR.c **** 	FreeRTOS.org is free software; you can redistribute it and/or modify
+   7:portable/portISR.c **** 	it under the terms of the GNU General Public License as published by
+   8:portable/portISR.c **** 	the Free Software Foundation; either version 2 of the License, or
+   9:portable/portISR.c **** 	(at your option) any later version.
+  10:portable/portISR.c **** 
+  11:portable/portISR.c **** 	FreeRTOS.org is distributed in the hope that it will be useful,
+  12:portable/portISR.c **** 	but WITHOUT ANY WARRANTY; without even the implied warranty of
+  13:portable/portISR.c **** 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  14:portable/portISR.c **** 	GNU General Public License for more details.
+  15:portable/portISR.c **** 
+  16:portable/portISR.c **** 	You should have received a copy of the GNU General Public License
+  17:portable/portISR.c **** 	along with FreeRTOS.org; if not, write to the Free Software
+  18:portable/portISR.c **** 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  19:portable/portISR.c **** 
+  20:portable/portISR.c **** 	A special exception to the GPL can be applied should you wish to distribute
+  21:portable/portISR.c **** 	a combined work that includes FreeRTOS.org, without being obliged to provide
+  22:portable/portISR.c **** 	the source code for any proprietary components.  See the licensing section 
+  23:portable/portISR.c **** 	of http://www.FreeRTOS.org for full details of how and when the exception
+  24:portable/portISR.c **** 	can be applied.
+  25:portable/portISR.c **** 
+  26:portable/portISR.c ****     ***************************************************************************
+  27:portable/portISR.c ****     ***************************************************************************
+  28:portable/portISR.c ****     *                                                                         *
+  29:portable/portISR.c ****     * SAVE TIME AND MONEY!  We can port FreeRTOS.org to your own hardware,    *
+  30:portable/portISR.c ****     * and even write all or part of your application on your behalf.          *
+  31:portable/portISR.c ****     * See http://www.OpenRTOS.com for details of the services we provide to   *
+  32:portable/portISR.c ****     * expedite your project.                                                  *
+  33:portable/portISR.c ****     *                                                                         *
+  34:portable/portISR.c ****     ***************************************************************************
+  35:portable/portISR.c ****     ***************************************************************************
+  36:portable/portISR.c **** 
+  37:portable/portISR.c **** 	Please ensure to read the configuration and relevant port sections of the
+  38:portable/portISR.c **** 	online documentation.
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 2
+
+
+  39:portable/portISR.c **** 
+  40:portable/portISR.c **** 	http://www.FreeRTOS.org - Documentation, latest information, license and 
+  41:portable/portISR.c **** 	contact details.
+  42:portable/portISR.c **** 
+  43:portable/portISR.c **** 	http://www.SafeRTOS.com - A version that is certified for use in safety 
+  44:portable/portISR.c **** 	critical systems.
+  45:portable/portISR.c **** 
+  46:portable/portISR.c **** 	http://www.OpenRTOS.com - Commercial support, development, porting, 
+  47:portable/portISR.c **** 	licensing and training services.
+  48:portable/portISR.c **** */
+  49:portable/portISR.c **** 
+  50:portable/portISR.c **** 
+  51:portable/portISR.c **** /*-----------------------------------------------------------
+  52:portable/portISR.c ****  * Components that can be compiled to either ARM or THUMB mode are
+  53:portable/portISR.c ****  * contained in port.c  The ISR routines, which can only be compiled
+  54:portable/portISR.c ****  * to ARM mode, are contained in this file.
+  55:portable/portISR.c ****  *----------------------------------------------------------*/
+  56:portable/portISR.c **** 
+  57:portable/portISR.c **** /*
+  58:portable/portISR.c **** 	Changes from V2.5.2
+  59:portable/portISR.c **** 		
+  60:portable/portISR.c **** 	+ The critical section management functions have been changed.  These no
+  61:portable/portISR.c **** 	  longer modify the stack and are safe to use at all optimisation levels.
+  62:portable/portISR.c **** 	  The functions are now also the same for both ARM and THUMB modes.
+  63:portable/portISR.c **** 
+  64:portable/portISR.c **** 	Changes from V2.6.0
+  65:portable/portISR.c **** 
+  66:portable/portISR.c **** 	+ Removed the 'static' from the definition of vNonPreemptiveTick() to 
+  67:portable/portISR.c **** 	  allow the demo to link when using the cooperative scheduler.
+  68:portable/portISR.c **** 
+  69:portable/portISR.c **** 	Changes from V3.2.4
+  70:portable/portISR.c **** 
+  71:portable/portISR.c **** 	+ The assembler statements are now included in a single asm block rather
+  72:portable/portISR.c **** 	  than each line having its own asm block.
+  73:portable/portISR.c **** */
+  74:portable/portISR.c **** 
+  75:portable/portISR.c **** 
+  76:portable/portISR.c **** /* Scheduler includes. */
+  77:portable/portISR.c **** #include "FreeRTOS.h"
+  78:portable/portISR.c **** #include "task.h"
+  79:portable/portISR.c **** 
+  80:portable/portISR.c **** /* Constants required to handle interrupts. */
+  81:portable/portISR.c **** #define portTIMER_MATCH_ISR_BIT		( ( unsigned portCHAR ) 0x01 )
+  82:portable/portISR.c **** #define portCLEAR_VIC_INTERRUPT		( ( unsigned portLONG ) 0 )
+  83:portable/portISR.c **** 
+  84:portable/portISR.c **** /* Constants required to handle critical sections. */
+  85:portable/portISR.c **** #define portNO_CRITICAL_NESTING		( ( unsigned portLONG ) 0 )
+  86:portable/portISR.c **** volatile unsigned portLONG ulCriticalNesting = 9999UL;
+  87:portable/portISR.c **** 
+  88:portable/portISR.c **** /*-----------------------------------------------------------*/
+  89:portable/portISR.c **** 
+  90:portable/portISR.c **** /* ISR to handle manual context switches (from a call to taskYIELD()). */
+  91:portable/portISR.c **** void vPortYieldProcessor( void ) __attribute__((interrupt("SWI"), naked));
+  92:portable/portISR.c **** 
+  93:portable/portISR.c **** /* 
+  94:portable/portISR.c ****  * The scheduler can only be started from ARM mode, hence the inclusion of this
+  95:portable/portISR.c ****  * function here.
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 3
+
+
+  96:portable/portISR.c ****  */
+  97:portable/portISR.c **** void vPortISRStartFirstTask( void );
+  98:portable/portISR.c **** /*-----------------------------------------------------------*/
+  99:portable/portISR.c **** 
+ 100:portable/portISR.c **** void vPortISRStartFirstTask( void )
+ 101:portable/portISR.c **** {
+  16              		.loc 1 101 0
+  17              		@ Function supports interworking.
+  18              		@ args = 0, pretend = 0, frame = 0
+  19              		@ frame_needed = 0, uses_anonymous_args = 0
+  20              		@ link register save eliminated.
+  21              		@ lr needed for prologue
+ 102:portable/portISR.c **** 	/* Simply start the scheduler.  This is included here as it can only be
+ 103:portable/portISR.c **** 	called from ARM mode. */
+ 104:portable/portISR.c **** 	portRESTORE_CONTEXT();
+  22              		.loc 1 104 0
+  23 0000 48029FE5 		LDR		R0, =pxCurrentTCB								
+  24 0004 000090E5 		LDR		R0, [R0]										
+  25 0008 00E090E5 		LDR		LR, [R0]										
+  26 000c 40029FE5 		LDR		R0, =ulCriticalNesting							
+  27 0010 0200BEE8 		LDMFD	LR!, {R1}											
+  28 0014 001080E5 		STR		R1, [R0]										
+  29 0018 0100BEE8 		LDMFD	LR!, {R0}											
+  30 001c 00F069E1 		MSR		SPSR, R0										
+  31 0020 FF7FDEE8 		LDMFD	LR, {R0-R14}^										
+  32 0024 0000A0E1 		NOP														
+  33 0028 3CE09EE5 		LDR		LR, [LR, #+60]									
+  34 002c 04F05EE2 		SUBS	PC, LR, #4											
+  35              		
+  36 0030 0C309FE5 		ldr	r3, .L3
+  37 0034 003093E5 		ldr	r3, [r3, #0]
+  38 0038 08309FE5 		ldr	r3, .L3+4
+  39 003c 003093E5 		ldr	r3, [r3, #0]
+ 105:portable/portISR.c **** }
+  40              		.loc 1 105 0
+  41 0040 1EFF2FE1 		bx	lr
+  42              	.L4:
+  43              		.align	2
+  44              	.L3:
+  45 0044 00000000 		.word	ulCriticalNesting
+  46 0048 00000000 		.word	pxCurrentTCB
+  47              	.LFE2:
+  48              		.size	vPortISRStartFirstTask, .-vPortISRStartFirstTask
+  49              		.align	2
+  50              		.global	vPortDisableInterruptsFromThumb
+  51              		.type	vPortDisableInterruptsFromThumb, %function
+  52              	vPortDisableInterruptsFromThumb:
+  53              	.LFB5:
+ 106:portable/portISR.c **** /*-----------------------------------------------------------*/
+ 107:portable/portISR.c **** 
+ 108:portable/portISR.c **** /*
+ 109:portable/portISR.c ****  * Called by portYIELD() or taskYIELD() to manually force a context switch.
+ 110:portable/portISR.c ****  *
+ 111:portable/portISR.c ****  * When a context switch is performed from the task level the saved task 
+ 112:portable/portISR.c ****  * context is made to look as if it occurred from within the tick ISR.  This
+ 113:portable/portISR.c ****  * way the same restore context function can be used when restoring the context
+ 114:portable/portISR.c ****  * saved from the ISR or that saved from a call to vPortYieldProcessor.
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 4
+
+
+ 115:portable/portISR.c ****  */
+ 116:portable/portISR.c **** void vPortYieldProcessor( void )
+ 117:portable/portISR.c **** {
+ 118:portable/portISR.c **** 	/* Within an IRQ ISR the link register has an offset from the true return 
+ 119:portable/portISR.c **** 	address, but an SWI ISR does not.  Add the offset manually so the same 
+ 120:portable/portISR.c **** 	ISR return code can be used in both cases. */
+ 121:portable/portISR.c **** 	asm volatile ( "ADD		LR, LR, #4" );
+ 122:portable/portISR.c **** 
+ 123:portable/portISR.c **** 	/* Perform the context switch.  First save the context of the current task. */
+ 124:portable/portISR.c **** 	portSAVE_CONTEXT();
+ 125:portable/portISR.c **** 
+ 126:portable/portISR.c **** 	/* Find the highest priority task that is ready to run. */
+ 127:portable/portISR.c **** 	vTaskSwitchContext();
+ 128:portable/portISR.c **** 
+ 129:portable/portISR.c **** 	/* Restore the context of the new task. */
+ 130:portable/portISR.c **** 	portRESTORE_CONTEXT();	
+ 131:portable/portISR.c **** }
+ 132:portable/portISR.c **** /*-----------------------------------------------------------*/
+ 133:portable/portISR.c **** 
+ 134:portable/portISR.c **** /* 
+ 135:portable/portISR.c ****  * The ISR used for the scheduler tick.
+ 136:portable/portISR.c ****  */
+ 137:portable/portISR.c **** void vTickISR( void ) __attribute__((naked));
+ 138:portable/portISR.c **** void vTickISR( void )
+ 139:portable/portISR.c **** {
+ 140:portable/portISR.c **** 	/* Save the context of the interrupted task. */
+ 141:portable/portISR.c **** 	portSAVE_CONTEXT();	
+ 142:portable/portISR.c **** 
+ 143:portable/portISR.c **** 	/* Increment the RTOS tick count, then look for the highest priority 
+ 144:portable/portISR.c **** 	task that is ready to run. */
+ 145:portable/portISR.c **** 	vTaskIncrementTick();
+ 146:portable/portISR.c **** 
+ 147:portable/portISR.c **** 	#if configUSE_PREEMPTION == 1
+ 148:portable/portISR.c **** 		vTaskSwitchContext();
+ 149:portable/portISR.c **** 	#endif
+ 150:portable/portISR.c **** 
+ 151:portable/portISR.c **** 	/* Ready for the next interrupt. */
+ 152:portable/portISR.c **** 	T0_IR = portTIMER_MATCH_ISR_BIT;
+ 153:portable/portISR.c **** 	VICVectAddr = portCLEAR_VIC_INTERRUPT;
+ 154:portable/portISR.c **** 	
+ 155:portable/portISR.c **** 	/* Restore the context of the new task. */
+ 156:portable/portISR.c **** 	portRESTORE_CONTEXT();
+ 157:portable/portISR.c **** }
+ 158:portable/portISR.c **** /*-----------------------------------------------------------*/
+ 159:portable/portISR.c **** 
+ 160:portable/portISR.c **** /*
+ 161:portable/portISR.c ****  * The interrupt management utilities can only be called from ARM mode.  When
+ 162:portable/portISR.c ****  * THUMB_INTERWORK is defined the utilities are defined as functions here to
+ 163:portable/portISR.c ****  * ensure a switch to ARM mode.  When THUMB_INTERWORK is not defined then
+ 164:portable/portISR.c ****  * the utilities are defined as macros in portmacro.h - as per other ports.
+ 165:portable/portISR.c ****  */
+ 166:portable/portISR.c **** #ifdef THUMB_INTERWORK
+ 167:portable/portISR.c **** 
+ 168:portable/portISR.c **** 	void vPortDisableInterruptsFromThumb( void ) __attribute__ ((naked));
+ 169:portable/portISR.c **** 	void vPortEnableInterruptsFromThumb( void ) __attribute__ ((naked));
+ 170:portable/portISR.c **** 
+ 171:portable/portISR.c **** 	void vPortDisableInterruptsFromThumb( void )
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 5
+
+
+ 172:portable/portISR.c **** 	{
+  54              		.loc 1 172 0
+  55              		@ Function supports interworking.
+  56              		@ Naked Function: prologue and epilogue provided by programmer.
+  57              		@ args = 0, pretend = 0, frame = 0
+  58              		@ frame_needed = 0, uses_anonymous_args = 0
+ 173:portable/portISR.c **** 		asm volatile ( 
+  59              		.loc 1 173 0
+  60 004c 01002DE9 		STMDB	SP!, {R0}		
+  61 0050 00000FE1 		MRS	R0, CPSR		
+  62 0054 C00080E3 		ORR	R0, R0, #0xC0	
+  63 0058 00F029E1 		MSR	CPSR, R0		
+  64 005c 0100BDE8 		LDMIA	SP!, {R0}		
+  65 0060 1EFF2FE1 		BX		R14
+ 174:portable/portISR.c **** 			"STMDB	SP!, {R0}		\n\t"	/* Push R0.									*/
+ 175:portable/portISR.c **** 			"MRS	R0, CPSR		\n\t"	/* Get CPSR.								*/
+ 176:portable/portISR.c **** 			"ORR	R0, R0, #0xC0	\n\t"	/* Disable IRQ, FIQ.						*/
+ 177:portable/portISR.c **** 			"MSR	CPSR, R0		\n\t"	/* Write back modified value.				*/
+ 178:portable/portISR.c **** 			"LDMIA	SP!, {R0}		\n\t"	/* Pop R0.									*/
+ 179:portable/portISR.c **** 			"BX		R14" );					/* Return back to thumb.					*/
+ 180:portable/portISR.c **** 	}
+  66              		.loc 1 180 0
+  67              	.LFE5:
+  68              		.size	vPortDisableInterruptsFromThumb, .-vPortDisableInterruptsFromThumb
+  69              		.align	2
+  70              		.global	vPortEnableInterruptsFromThumb
+  71              		.type	vPortEnableInterruptsFromThumb, %function
+  72              	vPortEnableInterruptsFromThumb:
+  73              	.LFB6:
+ 181:portable/portISR.c **** 			
+ 182:portable/portISR.c **** 	void vPortEnableInterruptsFromThumb( void )
+ 183:portable/portISR.c **** 	{
+  74              		.loc 1 183 0
+  75              		@ Function supports interworking.
+  76              		@ Naked Function: prologue and epilogue provided by programmer.
+  77              		@ args = 0, pretend = 0, frame = 0
+  78              		@ frame_needed = 0, uses_anonymous_args = 0
+ 184:portable/portISR.c **** 		asm volatile ( 
+  79              		.loc 1 184 0
+  80 0064 01002DE9 		STMDB	SP!, {R0}		
+  81 0068 00000FE1 		MRS	R0, CPSR		
+  82 006c C000C0E3 		BIC	R0, R0, #0xC0	
+  83 0070 00F029E1 		MSR	CPSR, R0		
+  84 0074 0100BDE8 		LDMIA	SP!, {R0}		
+  85 0078 1EFF2FE1 		BX		R14
+ 185:portable/portISR.c **** 			"STMDB	SP!, {R0}		\n\t"	/* Push R0.									*/	
+ 186:portable/portISR.c **** 			"MRS	R0, CPSR		\n\t"	/* Get CPSR.								*/	
+ 187:portable/portISR.c **** 			"BIC	R0, R0, #0xC0	\n\t"	/* Enable IRQ, FIQ.							*/	
+ 188:portable/portISR.c **** 			"MSR	CPSR, R0		\n\t"	/* Write back modified value.				*/	
+ 189:portable/portISR.c **** 			"LDMIA	SP!, {R0}		\n\t"	/* Pop R0.									*/
+ 190:portable/portISR.c **** 			"BX		R14" );					/* Return back to thumb.					*/
+ 191:portable/portISR.c **** 	}
+  86              		.loc 1 191 0
+  87              	.LFE6:
+  88              		.size	vPortEnableInterruptsFromThumb, .-vPortEnableInterruptsFromThumb
+  89              		.align	2
+  90              		.global	vPortEnterCritical
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 6
+
+
+  91              		.type	vPortEnterCritical, %function
+  92              	vPortEnterCritical:
+  93              	.LFB7:
+ 192:portable/portISR.c **** 
+ 193:portable/portISR.c **** #endif /* THUMB_INTERWORK */
+ 194:portable/portISR.c **** 
+ 195:portable/portISR.c **** /* The code generated by the GCC compiler uses the stack in different ways at
+ 196:portable/portISR.c **** different optimisation levels.  The interrupt flags can therefore not always
+ 197:portable/portISR.c **** be saved to the stack.  Instead the critical section nesting level is stored
+ 198:portable/portISR.c **** in a variable, which is then saved as part of the stack context. */
+ 199:portable/portISR.c **** void vPortEnterCritical( void )
+ 200:portable/portISR.c **** {
+  94              		.loc 1 200 0
+  95              		@ Function supports interworking.
+  96              		@ args = 0, pretend = 0, frame = 0
+  97              		@ frame_needed = 0, uses_anonymous_args = 0
+  98              		@ link register save eliminated.
+  99              		@ lr needed for prologue
+ 201:portable/portISR.c **** 	/* Disable interrupts as per portDISABLE_INTERRUPTS(); 							*/
+ 202:portable/portISR.c **** 	asm volatile ( 
+ 100              		.loc 1 202 0
+ 101 007c 01002DE9 		STMDB	SP!, {R0}			
+ 102 0080 00000FE1 		MRS	R0, CPSR			
+ 103 0084 C00080E3 		ORR	R0, R0, #0xC0		
+ 104 0088 00F029E1 		MSR	CPSR, R0			
+ 105 008c 0100BDE8 		LDMIA	SP!, {R0}
+ 203:portable/portISR.c **** 		"STMDB	SP!, {R0}			\n\t"	/* Push R0.								*/
+ 204:portable/portISR.c **** 		"MRS	R0, CPSR			\n\t"	/* Get CPSR.							*/
+ 205:portable/portISR.c **** 		"ORR	R0, R0, #0xC0		\n\t"	/* Disable IRQ, FIQ.					*/
+ 206:portable/portISR.c **** 		"MSR	CPSR, R0			\n\t"	/* Write back modified value.			*/
+ 207:portable/portISR.c **** 		"LDMIA	SP!, {R0}" );				/* Pop R0.								*/
+ 208:portable/portISR.c **** 
+ 209:portable/portISR.c **** 	/* Now interrupts are disabled ulCriticalNesting can be accessed 
+ 210:portable/portISR.c **** 	directly.  Increment ulCriticalNesting to keep a count of how many times
+ 211:portable/portISR.c **** 	portENTER_CRITICAL() has been called. */
+ 212:portable/portISR.c **** 	ulCriticalNesting++;
+ 106              		.loc 1 212 0
+ 107 0090 0C209FE5 		ldr	r2, .L11
+ 108 0094 003092E5 		ldr	r3, [r2, #0]
+ 109 0098 013083E2 		add	r3, r3, #1
+ 110 009c 003082E5 		str	r3, [r2, #0]
+ 213:portable/portISR.c **** }
+ 111              		.loc 1 213 0
+ 112 00a0 1EFF2FE1 		bx	lr
+ 113              	.L12:
+ 114              		.align	2
+ 115              	.L11:
+ 116 00a4 00000000 		.word	ulCriticalNesting
+ 117              	.LFE7:
+ 118              		.size	vPortEnterCritical, .-vPortEnterCritical
+ 119              		.align	2
+ 120              		.global	vPortExitCritical
+ 121              		.type	vPortExitCritical, %function
+ 122              	vPortExitCritical:
+ 123              	.LFB8:
+ 214:portable/portISR.c **** 
+ 215:portable/portISR.c **** void vPortExitCritical( void )
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 7
+
+
+ 216:portable/portISR.c **** {
+ 124              		.loc 1 216 0
+ 125              		@ Function supports interworking.
+ 126              		@ args = 0, pretend = 0, frame = 0
+ 127              		@ frame_needed = 0, uses_anonymous_args = 0
+ 128              		@ link register save eliminated.
+ 217:portable/portISR.c **** 	if( ulCriticalNesting > portNO_CRITICAL_NESTING )
+ 129              		.loc 1 217 0
+ 130 00a8 38209FE5 		ldr	r2, .L18
+ 131 00ac 003092E5 		ldr	r3, [r2, #0]
+ 132 00b0 000053E3 		cmp	r3, #0
+ 133              		.loc 1 216 0
+ 134              		@ lr needed for prologue
+ 135              		.loc 1 217 0
+ 136 00b4 1EFF2F01 		bxeq	lr
+ 218:portable/portISR.c **** 	{
+ 219:portable/portISR.c **** 		/* Decrement the nesting count as we are leaving a critical section. */
+ 220:portable/portISR.c **** 		ulCriticalNesting--;
+ 137              		.loc 1 220 0
+ 138 00b8 003092E5 		ldr	r3, [r2, #0]
+ 139 00bc 013043E2 		sub	r3, r3, #1
+ 140 00c0 003082E5 		str	r3, [r2, #0]
+ 221:portable/portISR.c **** 
+ 222:portable/portISR.c **** 		/* If the nesting level has reached zero then interrupts should be
+ 223:portable/portISR.c **** 		re-enabled. */
+ 224:portable/portISR.c **** 		if( ulCriticalNesting == portNO_CRITICAL_NESTING )
+ 141              		.loc 1 224 0
+ 142 00c4 003092E5 		ldr	r3, [r2, #0]
+ 143 00c8 000053E3 		cmp	r3, #0
+ 144 00cc 1EFF2F11 		bxne	lr
+ 225:portable/portISR.c **** 		{
+ 226:portable/portISR.c **** 			/* Enable interrupts as per portEXIT_CRITICAL().					*/
+ 227:portable/portISR.c **** 			asm volatile ( 
+ 145              		.loc 1 227 0
+ 146 00d0 01002DE9 		STMDB	SP!, {R0}		
+ 147 00d4 00000FE1 		MRS	R0, CPSR		
+ 148 00d8 C000C0E3 		BIC	R0, R0, #0xC0	
+ 149 00dc 00F029E1 		MSR	CPSR, R0		
+ 150 00e0 0100BDE8 		LDMIA	SP!, {R0}
+ 151 00e4 1EFF2FE1 		bx	lr
+ 152              	.L19:
+ 153              		.align	2
+ 154              	.L18:
+ 155 00e8 00000000 		.word	ulCriticalNesting
+ 156              	.LFE8:
+ 157              		.size	vPortExitCritical, .-vPortExitCritical
+ 158              		.align	2
+ 159              		.global	vTickISR
+ 160              		.type	vTickISR, %function
+ 161              	vTickISR:
+ 162              	.LFB4:
+ 163              		.loc 1 139 0
+ 164              		@ Function supports interworking.
+ 165              		@ Naked Function: prologue and epilogue provided by programmer.
+ 166              		@ args = 0, pretend = 0, frame = 0
+ 167              		@ frame_needed = 0, uses_anonymous_args = 0
+ 168              		.loc 1 141 0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 8
+
+
+ 169 00ec 01002DE9 		STMDB	SP!, {R0}											
+ 170 00f0 00204DE9 		STMDB	SP,{SP}^											
+ 171 00f4 0000A0E1 		NOP														
+ 172 00f8 04D04DE2 		SUB	SP, SP, #4											
+ 173 00fc 0100BDE8 		LDMIA	SP!,{R0}											
+ 174 0100 004020E9 		STMDB	R0!, {LR}											
+ 175 0104 00E0A0E1 		MOV	LR, R0												
+ 176 0108 0100BDE8 		LDMIA	SP!, {R0}											
+ 177 010c FF7F4EE9 		STMDB	LR,{R0-LR}^											
+ 178 0110 0000A0E1 		NOP														
+ 179 0114 3CE04EE2 		SUB	LR, LR, #60											
+ 180 0118 00004FE1 		MRS	R0, SPSR											
+ 181 011c 01002EE9 		STMDB	LR!, {R0}											
+ 182 0120 2C019FE5 		LDR	R0, =ulCriticalNesting								
+ 183 0124 000090E5 		LDR	R0, [R0]											
+ 184 0128 01002EE9 		STMDB	LR!, {R0}											
+ 185 012c 1C019FE5 		LDR	R0, =pxCurrentTCB									
+ 186 0130 000090E5 		LDR	R0, [R0]											
+ 187 0134 00E080E5 		STR	LR, [R0]											
+ 188              		
+ 189 0138 60409FE5 		ldr	r4, .L22
+ 190 013c 60509FE5 		ldr	r5, .L22+4
+ 191 0140 003094E5 		ldr	r3, [r4, #0]
+ 192 0144 003095E5 		ldr	r3, [r5, #0]
+ 193              		.loc 1 145 0
+ 194 0148 FEFFFFEB 		bl	vTaskIncrementTick
+ 195              		.loc 1 148 0
+ 196 014c FEFFFFEB 		bl	vTaskSwitchContext
+ 197              		.loc 1 152 0
+ 198 0150 50309FE5 		ldr	r3, .L22+8
+ 199 0154 0120A0E3 		mov	r2, #1
+ 200 0158 002083E5 		str	r2, [r3, #0]
+ 201              		.loc 1 153 0
+ 202 015c 0020A0E3 		mov	r2, #0
+ 203 0160 0030E0E3 		mvn	r3, #0
+ 204 0164 CF2F03E5 		str	r2, [r3, #-4047]
+ 205              		.loc 1 156 0
+ 206 0168 E0009FE5 		LDR		R0, =pxCurrentTCB								
+ 207 016c 000090E5 		LDR		R0, [R0]										
+ 208 0170 00E090E5 		LDR		LR, [R0]										
+ 209 0174 D8009FE5 		LDR		R0, =ulCriticalNesting							
+ 210 0178 0200BEE8 		LDMFD	LR!, {R1}											
+ 211 017c 001080E5 		STR		R1, [R0]										
+ 212 0180 0100BEE8 		LDMFD	LR!, {R0}											
+ 213 0184 00F069E1 		MSR		SPSR, R0										
+ 214 0188 FF7FDEE8 		LDMFD	LR, {R0-R14}^										
+ 215 018c 0000A0E1 		NOP														
+ 216 0190 3CE09EE5 		LDR		LR, [LR, #+60]									
+ 217 0194 04F05EE2 		SUBS	PC, LR, #4											
+ 218              		
+ 219 0198 003094E5 		ldr	r3, [r4, #0]
+ 220 019c 003095E5 		ldr	r3, [r5, #0]
+ 221              		.loc 1 157 0
+ 222              	.L23:
+ 223              		.align	2
+ 224              	.L22:
+ 225 01a0 00000000 		.word	ulCriticalNesting
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 9
+
+
+ 226 01a4 00000000 		.word	pxCurrentTCB
+ 227 01a8 004000E0 		.word	-536854528
+ 228              	.LFE4:
+ 229              		.size	vTickISR, .-vTickISR
+ 230              		.align	2
+ 231              		.global	vPortYieldProcessor
+ 232              		.type	vPortYieldProcessor, %function
+ 233              	vPortYieldProcessor:
+ 234              	.LFB3:
+ 235              		.loc 1 117 0
+ 236              		@ ARM Exception Handler.
+ 237              		@ Naked Function: prologue and epilogue provided by programmer.
+ 238              		@ args = 0, pretend = 0, frame = 0
+ 239              		@ frame_needed = 0, uses_anonymous_args = 0
+ 240              		.loc 1 121 0
+ 241 01ac 04E08EE2 		ADD		LR, LR, #4
+ 242              		.loc 1 124 0
+ 243 01b0 01002DE9 		STMDB	SP!, {R0}											
+ 244 01b4 00204DE9 		STMDB	SP,{SP}^											
+ 245 01b8 0000A0E1 		NOP														
+ 246 01bc 04D04DE2 		SUB	SP, SP, #4											
+ 247 01c0 0100BDE8 		LDMIA	SP!,{R0}											
+ 248 01c4 004020E9 		STMDB	R0!, {LR}											
+ 249 01c8 00E0A0E1 		MOV	LR, R0												
+ 250 01cc 0100BDE8 		LDMIA	SP!, {R0}											
+ 251 01d0 FF7F4EE9 		STMDB	LR,{R0-LR}^											
+ 252 01d4 0000A0E1 		NOP														
+ 253 01d8 3CE04EE2 		SUB	LR, LR, #60											
+ 254 01dc 00004FE1 		MRS	R0, SPSR											
+ 255 01e0 01002EE9 		STMDB	LR!, {R0}											
+ 256 01e4 68009FE5 		LDR	R0, =ulCriticalNesting								
+ 257 01e8 000090E5 		LDR	R0, [R0]											
+ 258 01ec 01002EE9 		STMDB	LR!, {R0}											
+ 259 01f0 58009FE5 		LDR	R0, =pxCurrentTCB									
+ 260 01f4 000090E5 		LDR	R0, [R0]											
+ 261 01f8 00E080E5 		STR	LR, [R0]											
+ 262              		
+ 263 01fc 44409FE5 		ldr	r4, .L26
+ 264 0200 44509FE5 		ldr	r5, .L26+4
+ 265 0204 003094E5 		ldr	r3, [r4, #0]
+ 266 0208 003095E5 		ldr	r3, [r5, #0]
+ 267              		.loc 1 127 0
+ 268 020c FEFFFFEB 		bl	vTaskSwitchContext
+ 269              		.loc 1 130 0
+ 270 0210 38009FE5 		LDR		R0, =pxCurrentTCB								
+ 271 0214 000090E5 		LDR		R0, [R0]										
+ 272 0218 00E090E5 		LDR		LR, [R0]										
+ 273 021c 30009FE5 		LDR		R0, =ulCriticalNesting							
+ 274 0220 0200BEE8 		LDMFD	LR!, {R1}											
+ 275 0224 001080E5 		STR		R1, [R0]										
+ 276 0228 0100BEE8 		LDMFD	LR!, {R0}											
+ 277 022c 00F069E1 		MSR		SPSR, R0										
+ 278 0230 FF7FDEE8 		LDMFD	LR, {R0-R14}^										
+ 279 0234 0000A0E1 		NOP														
+ 280 0238 3CE09EE5 		LDR		LR, [LR, #+60]									
+ 281 023c 04F05EE2 		SUBS	PC, LR, #4											
+ 282              		
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 10
+
+
+ 283 0240 003094E5 		ldr	r3, [r4, #0]
+ 284 0244 003095E5 		ldr	r3, [r5, #0]
+ 285              		.loc 1 131 0
+ 286              	.L27:
+ 287              		.align	2
+ 288              	.L26:
+ 289 0248 00000000 		.word	ulCriticalNesting
+ 290 024c 00000000 		.word	pxCurrentTCB
+ 291              	.LFE3:
+ 292              		.size	vPortYieldProcessor, .-vPortYieldProcessor
+ 293              		.global	ulCriticalNesting
+ 294              		.data
+ 295              		.align	2
+ 296              		.type	ulCriticalNesting, %object
+ 297              		.size	ulCriticalNesting, 4
+ 298              	ulCriticalNesting:
+ 299 0000 0F270000 		.word	9999
+ 300              		.section	.debug_frame,"",%progbits
+ 301              	.Lframe0:
+ 302 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ 303              	.LSCIE0:
+ 304 0004 FFFFFFFF 		.4byte	0xffffffff
+ 305 0008 01       		.byte	0x1
+ 306 0009 00       		.ascii	"\000"
+ 307 000a 01       		.uleb128 0x1
+ 308 000b 7C       		.sleb128 -4
+ 309 000c 0E       		.byte	0xe
+ 310 000d 0C       		.byte	0xc
+ 311 000e 0D       		.uleb128 0xd
+ 312 000f 00       		.uleb128 0x0
+ 313              		.align	2
+ 314              	.LECIE0:
+ 315              	.LSFDE0:
+ 316 0010 0C000000 		.4byte	.LEFDE0-.LASFDE0
+ 317              	.LASFDE0:
+ 318 0014 00000000 		.4byte	.Lframe0
+ 319 0018 00000000 		.4byte	.LFB2
+ 320 001c 4C000000 		.4byte	.LFE2-.LFB2
+ 321              		.align	2
+ 322              	.LEFDE0:
+ 323              	.LSFDE2:
+ 324 0020 0C000000 		.4byte	.LEFDE2-.LASFDE2
+ 325              	.LASFDE2:
+ 326 0024 00000000 		.4byte	.Lframe0
+ 327 0028 4C000000 		.4byte	.LFB5
+ 328 002c 18000000 		.4byte	.LFE5-.LFB5
+ 329              		.align	2
+ 330              	.LEFDE2:
+ 331              	.LSFDE4:
+ 332 0030 0C000000 		.4byte	.LEFDE4-.LASFDE4
+ 333              	.LASFDE4:
+ 334 0034 00000000 		.4byte	.Lframe0
+ 335 0038 64000000 		.4byte	.LFB6
+ 336 003c 18000000 		.4byte	.LFE6-.LFB6
+ 337              		.align	2
+ 338              	.LEFDE4:
+ 339              	.LSFDE6:
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 11
+
+
+ 340 0040 0C000000 		.4byte	.LEFDE6-.LASFDE6
+ 341              	.LASFDE6:
+ 342 0044 00000000 		.4byte	.Lframe0
+ 343 0048 7C000000 		.4byte	.LFB7
+ 344 004c 2C000000 		.4byte	.LFE7-.LFB7
+ 345              		.align	2
+ 346              	.LEFDE6:
+ 347              	.LSFDE8:
+ 348 0050 0C000000 		.4byte	.LEFDE8-.LASFDE8
+ 349              	.LASFDE8:
+ 350 0054 00000000 		.4byte	.Lframe0
+ 351 0058 A8000000 		.4byte	.LFB8
+ 352 005c 44000000 		.4byte	.LFE8-.LFB8
+ 353              		.align	2
+ 354              	.LEFDE8:
+ 355              	.LSFDE10:
+ 356 0060 0C000000 		.4byte	.LEFDE10-.LASFDE10
+ 357              	.LASFDE10:
+ 358 0064 00000000 		.4byte	.Lframe0
+ 359 0068 EC000000 		.4byte	.LFB4
+ 360 006c C0000000 		.4byte	.LFE4-.LFB4
+ 361              		.align	2
+ 362              	.LEFDE10:
+ 363              	.LSFDE12:
+ 364 0070 0C000000 		.4byte	.LEFDE12-.LASFDE12
+ 365              	.LASFDE12:
+ 366 0074 00000000 		.4byte	.Lframe0
+ 367 0078 AC010000 		.4byte	.LFB3
+ 368 007c A4000000 		.4byte	.LFE3-.LFB3
+ 369              		.align	2
+ 370              	.LEFDE12:
+ 371              		.text
+ 372              	.Letext0:
+ 373              		.section	.debug_info
+ 374 0000 0F010000 		.4byte	0x10f
+ 375 0004 0200     		.2byte	0x2
+ 376 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 377 000a 04       		.byte	0x4
+ 378 000b 01       		.uleb128 0x1
+ 379 000c 00000000 		.4byte	.LASF16
+ 380 0010 01       		.byte	0x1
+ 381 0011 0C000000 		.4byte	.LASF17
+ 382 0015 D5000000 		.4byte	.LASF18
+ 383 0019 00000000 		.4byte	.Ltext0
+ 384 001d 50020000 		.4byte	.Letext0
+ 385 0021 00000000 		.4byte	.Ldebug_line0
+ 386 0025 02       		.uleb128 0x2
+ 387 0026 04       		.byte	0x4
+ 388 0027 05       		.byte	0x5
+ 389 0028 01010000 		.4byte	.LASF0
+ 390 002c 02       		.uleb128 0x2
+ 391 002d 04       		.byte	0x4
+ 392 002e 07       		.byte	0x7
+ 393 002f 2D000000 		.4byte	.LASF1
+ 394 0033 03       		.uleb128 0x3
+ 395 0034 04       		.byte	0x4
+ 396 0035 05       		.byte	0x5
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 12
+
+
+ 397 0036 696E7400 		.ascii	"int\000"
+ 398 003a 02       		.uleb128 0x2
+ 399 003b 01       		.byte	0x1
+ 400 003c 08       		.byte	0x8
+ 401 003d 1F000000 		.4byte	.LASF2
+ 402 0041 02       		.uleb128 0x2
+ 403 0042 02       		.byte	0x2
+ 404 0043 07       		.byte	0x7
+ 405 0044 3F000000 		.4byte	.LASF3
+ 406 0048 02       		.uleb128 0x2
+ 407 0049 04       		.byte	0x4
+ 408 004a 07       		.byte	0x7
+ 409 004b 7A000000 		.4byte	.LASF4
+ 410 004f 02       		.uleb128 0x2
+ 411 0050 01       		.byte	0x1
+ 412 0051 06       		.byte	0x6
+ 413 0052 30010000 		.4byte	.LASF5
+ 414 0056 02       		.uleb128 0x2
+ 415 0057 02       		.byte	0x2
+ 416 0058 05       		.byte	0x5
+ 417 0059 CB000000 		.4byte	.LASF6
+ 418 005d 04       		.uleb128 0x4
+ 419 005e 2C000000 		.4byte	0x2c
+ 420 0062 05       		.uleb128 0x5
+ 421 0063 01       		.byte	0x1
+ 422 0064 A7000000 		.4byte	.LASF7
+ 423 0068 01       		.byte	0x1
+ 424 0069 65       		.byte	0x65
+ 425 006a 01       		.byte	0x1
+ 426 006b 00000000 		.4byte	.LFB2
+ 427 006f 4C000000 		.4byte	.LFE2
+ 428 0073 01       		.byte	0x1
+ 429 0074 5D       		.byte	0x5d
+ 430 0075 05       		.uleb128 0x5
+ 431 0076 01       		.byte	0x1
+ 432 0077 87000000 		.4byte	.LASF8
+ 433 007b 01       		.byte	0x1
+ 434 007c AC       		.byte	0xac
+ 435 007d 01       		.byte	0x1
+ 436 007e 4C000000 		.4byte	.LFB5
+ 437 0082 64000000 		.4byte	.LFE5
+ 438 0086 01       		.byte	0x1
+ 439 0087 5D       		.byte	0x5d
+ 440 0088 05       		.uleb128 0x5
+ 441 0089 01       		.byte	0x1
+ 442 008a 5B000000 		.4byte	.LASF9
+ 443 008e 01       		.byte	0x1
+ 444 008f B7       		.byte	0xb7
+ 445 0090 01       		.byte	0x1
+ 446 0091 64000000 		.4byte	.LFB6
+ 447 0095 7C000000 		.4byte	.LFE6
+ 448 0099 01       		.byte	0x1
+ 449 009a 5D       		.byte	0x5d
+ 450 009b 05       		.uleb128 0x5
+ 451 009c 01       		.byte	0x1
+ 452 009d 3C010000 		.4byte	.LASF10
+ 453 00a1 01       		.byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 13
+
+
+ 454 00a2 C8       		.byte	0xc8
+ 455 00a3 01       		.byte	0x1
+ 456 00a4 7C000000 		.4byte	.LFB7
+ 457 00a8 A8000000 		.4byte	.LFE7
+ 458 00ac 01       		.byte	0x1
+ 459 00ad 5D       		.byte	0x5d
+ 460 00ae 05       		.uleb128 0x5
+ 461 00af 01       		.byte	0x1
+ 462 00b0 EF000000 		.4byte	.LASF11
+ 463 00b4 01       		.byte	0x1
+ 464 00b5 D8       		.byte	0xd8
+ 465 00b6 01       		.byte	0x1
+ 466 00b7 A8000000 		.4byte	.LFB8
+ 467 00bb EC000000 		.4byte	.LFE8
+ 468 00bf 01       		.byte	0x1
+ 469 00c0 5D       		.byte	0x5d
+ 470 00c1 05       		.uleb128 0x5
+ 471 00c2 01       		.byte	0x1
+ 472 00c3 52000000 		.4byte	.LASF12
+ 473 00c7 01       		.byte	0x1
+ 474 00c8 8B       		.byte	0x8b
+ 475 00c9 01       		.byte	0x1
+ 476 00ca EC000000 		.4byte	.LFB4
+ 477 00ce AC010000 		.4byte	.LFE4
+ 478 00d2 01       		.byte	0x1
+ 479 00d3 5D       		.byte	0x5d
+ 480 00d4 05       		.uleb128 0x5
+ 481 00d5 01       		.byte	0x1
+ 482 00d6 0A010000 		.4byte	.LASF13
+ 483 00da 01       		.byte	0x1
+ 484 00db 75       		.byte	0x75
+ 485 00dc 01       		.byte	0x1
+ 486 00dd AC010000 		.4byte	.LFB3
+ 487 00e1 50020000 		.4byte	.LFE3
+ 488 00e5 01       		.byte	0x1
+ 489 00e6 5D       		.byte	0x5d
+ 490 00e7 06       		.uleb128 0x6
+ 491 00e8 1E010000 		.4byte	.LASF14
+ 492 00ec 01       		.byte	0x1
+ 493 00ed 56       		.byte	0x56
+ 494 00ee 5D000000 		.4byte	0x5d
+ 495 00f2 01       		.byte	0x1
+ 496 00f3 05       		.byte	0x5
+ 497 00f4 03       		.byte	0x3
+ 498 00f5 00000000 		.4byte	ulCriticalNesting
+ 499 00f9 07       		.uleb128 0x7
+ 500 00fa BE000000 		.4byte	.LASF15
+ 501 00fe 01       		.byte	0x1
+ 502 00ff 9C       		.byte	0x9c
+ 503 0100 06010000 		.4byte	0x106
+ 504 0104 01       		.byte	0x1
+ 505 0105 01       		.byte	0x1
+ 506 0106 04       		.uleb128 0x4
+ 507 0107 0B010000 		.4byte	0x10b
+ 508 010b 08       		.uleb128 0x8
+ 509 010c 04       		.byte	0x4
+ 510 010d 11010000 		.4byte	0x111
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 14
+
+
+ 511 0111 09       		.uleb128 0x9
+ 512 0112 00       		.byte	0x0
+ 513              		.section	.debug_abbrev
+ 514 0000 01       		.uleb128 0x1
+ 515 0001 11       		.uleb128 0x11
+ 516 0002 01       		.byte	0x1
+ 517 0003 25       		.uleb128 0x25
+ 518 0004 0E       		.uleb128 0xe
+ 519 0005 13       		.uleb128 0x13
+ 520 0006 0B       		.uleb128 0xb
+ 521 0007 03       		.uleb128 0x3
+ 522 0008 0E       		.uleb128 0xe
+ 523 0009 1B       		.uleb128 0x1b
+ 524 000a 0E       		.uleb128 0xe
+ 525 000b 11       		.uleb128 0x11
+ 526 000c 01       		.uleb128 0x1
+ 527 000d 12       		.uleb128 0x12
+ 528 000e 01       		.uleb128 0x1
+ 529 000f 10       		.uleb128 0x10
+ 530 0010 06       		.uleb128 0x6
+ 531 0011 00       		.byte	0x0
+ 532 0012 00       		.byte	0x0
+ 533 0013 02       		.uleb128 0x2
+ 534 0014 24       		.uleb128 0x24
+ 535 0015 00       		.byte	0x0
+ 536 0016 0B       		.uleb128 0xb
+ 537 0017 0B       		.uleb128 0xb
+ 538 0018 3E       		.uleb128 0x3e
+ 539 0019 0B       		.uleb128 0xb
+ 540 001a 03       		.uleb128 0x3
+ 541 001b 0E       		.uleb128 0xe
+ 542 001c 00       		.byte	0x0
+ 543 001d 00       		.byte	0x0
+ 544 001e 03       		.uleb128 0x3
+ 545 001f 24       		.uleb128 0x24
+ 546 0020 00       		.byte	0x0
+ 547 0021 0B       		.uleb128 0xb
+ 548 0022 0B       		.uleb128 0xb
+ 549 0023 3E       		.uleb128 0x3e
+ 550 0024 0B       		.uleb128 0xb
+ 551 0025 03       		.uleb128 0x3
+ 552 0026 08       		.uleb128 0x8
+ 553 0027 00       		.byte	0x0
+ 554 0028 00       		.byte	0x0
+ 555 0029 04       		.uleb128 0x4
+ 556 002a 35       		.uleb128 0x35
+ 557 002b 00       		.byte	0x0
+ 558 002c 49       		.uleb128 0x49
+ 559 002d 13       		.uleb128 0x13
+ 560 002e 00       		.byte	0x0
+ 561 002f 00       		.byte	0x0
+ 562 0030 05       		.uleb128 0x5
+ 563 0031 2E       		.uleb128 0x2e
+ 564 0032 00       		.byte	0x0
+ 565 0033 3F       		.uleb128 0x3f
+ 566 0034 0C       		.uleb128 0xc
+ 567 0035 03       		.uleb128 0x3
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 15
+
+
+ 568 0036 0E       		.uleb128 0xe
+ 569 0037 3A       		.uleb128 0x3a
+ 570 0038 0B       		.uleb128 0xb
+ 571 0039 3B       		.uleb128 0x3b
+ 572 003a 0B       		.uleb128 0xb
+ 573 003b 27       		.uleb128 0x27
+ 574 003c 0C       		.uleb128 0xc
+ 575 003d 11       		.uleb128 0x11
+ 576 003e 01       		.uleb128 0x1
+ 577 003f 12       		.uleb128 0x12
+ 578 0040 01       		.uleb128 0x1
+ 579 0041 40       		.uleb128 0x40
+ 580 0042 0A       		.uleb128 0xa
+ 581 0043 00       		.byte	0x0
+ 582 0044 00       		.byte	0x0
+ 583 0045 06       		.uleb128 0x6
+ 584 0046 34       		.uleb128 0x34
+ 585 0047 00       		.byte	0x0
+ 586 0048 03       		.uleb128 0x3
+ 587 0049 0E       		.uleb128 0xe
+ 588 004a 3A       		.uleb128 0x3a
+ 589 004b 0B       		.uleb128 0xb
+ 590 004c 3B       		.uleb128 0x3b
+ 591 004d 0B       		.uleb128 0xb
+ 592 004e 49       		.uleb128 0x49
+ 593 004f 13       		.uleb128 0x13
+ 594 0050 3F       		.uleb128 0x3f
+ 595 0051 0C       		.uleb128 0xc
+ 596 0052 02       		.uleb128 0x2
+ 597 0053 0A       		.uleb128 0xa
+ 598 0054 00       		.byte	0x0
+ 599 0055 00       		.byte	0x0
+ 600 0056 07       		.uleb128 0x7
+ 601 0057 34       		.uleb128 0x34
+ 602 0058 00       		.byte	0x0
+ 603 0059 03       		.uleb128 0x3
+ 604 005a 0E       		.uleb128 0xe
+ 605 005b 3A       		.uleb128 0x3a
+ 606 005c 0B       		.uleb128 0xb
+ 607 005d 3B       		.uleb128 0x3b
+ 608 005e 0B       		.uleb128 0xb
+ 609 005f 49       		.uleb128 0x49
+ 610 0060 13       		.uleb128 0x13
+ 611 0061 3F       		.uleb128 0x3f
+ 612 0062 0C       		.uleb128 0xc
+ 613 0063 3C       		.uleb128 0x3c
+ 614 0064 0C       		.uleb128 0xc
+ 615 0065 00       		.byte	0x0
+ 616 0066 00       		.byte	0x0
+ 617 0067 08       		.uleb128 0x8
+ 618 0068 0F       		.uleb128 0xf
+ 619 0069 00       		.byte	0x0
+ 620 006a 0B       		.uleb128 0xb
+ 621 006b 0B       		.uleb128 0xb
+ 622 006c 49       		.uleb128 0x49
+ 623 006d 13       		.uleb128 0x13
+ 624 006e 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 16
+
+
+ 625 006f 00       		.byte	0x0
+ 626 0070 09       		.uleb128 0x9
+ 627 0071 35       		.uleb128 0x35
+ 628 0072 00       		.byte	0x0
+ 629 0073 00       		.byte	0x0
+ 630 0074 00       		.byte	0x0
+ 631 0075 00       		.byte	0x0
+ 632              		.section	.debug_pubnames,"",%progbits
+ 633 0000 D8000000 		.4byte	0xd8
+ 634 0004 0200     		.2byte	0x2
+ 635 0006 00000000 		.4byte	.Ldebug_info0
+ 636 000a 13010000 		.4byte	0x113
+ 637 000e 62000000 		.4byte	0x62
+ 638 0012 76506F72 		.ascii	"vPortISRStartFirstTask\000"
+ 638      74495352 
+ 638      53746172 
+ 638      74466972 
+ 638      73745461 
+ 639 0029 75000000 		.4byte	0x75
+ 640 002d 76506F72 		.ascii	"vPortDisableInterruptsFromThumb\000"
+ 640      74446973 
+ 640      61626C65 
+ 640      496E7465 
+ 640      72727570 
+ 641 004d 88000000 		.4byte	0x88
+ 642 0051 76506F72 		.ascii	"vPortEnableInterruptsFromThumb\000"
+ 642      74456E61 
+ 642      626C6549 
+ 642      6E746572 
+ 642      72757074 
+ 643 0070 9B000000 		.4byte	0x9b
+ 644 0074 76506F72 		.ascii	"vPortEnterCritical\000"
+ 644      74456E74 
+ 644      65724372 
+ 644      69746963 
+ 644      616C00
+ 645 0087 AE000000 		.4byte	0xae
+ 646 008b 76506F72 		.ascii	"vPortExitCritical\000"
+ 646      74457869 
+ 646      74437269 
+ 646      74696361 
+ 646      6C00
+ 647 009d C1000000 		.4byte	0xc1
+ 648 00a1 76546963 		.ascii	"vTickISR\000"
+ 648      6B495352 
+ 648      00
+ 649 00aa D4000000 		.4byte	0xd4
+ 650 00ae 76506F72 		.ascii	"vPortYieldProcessor\000"
+ 650      74596965 
+ 650      6C645072 
+ 650      6F636573 
+ 650      736F7200 
+ 651 00c2 E7000000 		.4byte	0xe7
+ 652 00c6 756C4372 		.ascii	"ulCriticalNesting\000"
+ 652      69746963 
+ 652      616C4E65 
+ 652      7374696E 
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 17
+
+
+ 652      6700
+ 653 00d8 00000000 		.4byte	0x0
+ 654              		.section	.debug_aranges,"",%progbits
+ 655 0000 1C000000 		.4byte	0x1c
+ 656 0004 0200     		.2byte	0x2
+ 657 0006 00000000 		.4byte	.Ldebug_info0
+ 658 000a 04       		.byte	0x4
+ 659 000b 00       		.byte	0x0
+ 660 000c 0000     		.2byte	0x0
+ 661 000e 0000     		.2byte	0x0
+ 662 0010 00000000 		.4byte	.Ltext0
+ 663 0014 50020000 		.4byte	.Letext0-.Ltext0
+ 664 0018 00000000 		.4byte	0x0
+ 665 001c 00000000 		.4byte	0x0
+ 666              		.section	.debug_str,"MS",%progbits,1
+ 667              	.LASF16:
+ 668 0000 474E5520 		.ascii	"GNU C 4.2.2\000"
+ 668      4320342E 
+ 668      322E3200 
+ 669              	.LASF17:
+ 670 000c 706F7274 		.ascii	"portable/portISR.c\000"
+ 670      61626C65 
+ 670      2F706F72 
+ 670      74495352 
+ 670      2E6300
+ 671              	.LASF2:
+ 672 001f 756E7369 		.ascii	"unsigned char\000"
+ 672      676E6564 
+ 672      20636861 
+ 672      7200
+ 673              	.LASF1:
+ 674 002d 6C6F6E67 		.ascii	"long unsigned int\000"
+ 674      20756E73 
+ 674      69676E65 
+ 674      6420696E 
+ 674      7400
+ 675              	.LASF3:
+ 676 003f 73686F72 		.ascii	"short unsigned int\000"
+ 676      7420756E 
+ 676      7369676E 
+ 676      65642069 
+ 676      6E7400
+ 677              	.LASF12:
+ 678 0052 76546963 		.ascii	"vTickISR\000"
+ 678      6B495352 
+ 678      00
+ 679              	.LASF9:
+ 680 005b 76506F72 		.ascii	"vPortEnableInterruptsFromThumb\000"
+ 680      74456E61 
+ 680      626C6549 
+ 680      6E746572 
+ 680      72757074 
+ 681              	.LASF4:
+ 682 007a 756E7369 		.ascii	"unsigned int\000"
+ 682      676E6564 
+ 682      20696E74 
+ 682      00
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 18
+
+
+ 683              	.LASF8:
+ 684 0087 76506F72 		.ascii	"vPortDisableInterruptsFromThumb\000"
+ 684      74446973 
+ 684      61626C65 
+ 684      496E7465 
+ 684      72727570 
+ 685              	.LASF7:
+ 686 00a7 76506F72 		.ascii	"vPortISRStartFirstTask\000"
+ 686      74495352 
+ 686      53746172 
+ 686      74466972 
+ 686      73745461 
+ 687              	.LASF15:
+ 688 00be 70784375 		.ascii	"pxCurrentTCB\000"
+ 688      7272656E 
+ 688      74544342 
+ 688      00
+ 689              	.LASF6:
+ 690 00cb 73686F72 		.ascii	"short int\000"
+ 690      7420696E 
+ 690      7400
+ 691              	.LASF18:
+ 692 00d5 2F637967 		.ascii	"/cygdrive/c/Downloads/EDU\000"
+ 692      64726976 
+ 692      652F632F 
+ 692      446F776E 
+ 692      6C6F6164 
+ 693              	.LASF11:
+ 694 00ef 76506F72 		.ascii	"vPortExitCritical\000"
+ 694      74457869 
+ 694      74437269 
+ 694      74696361 
+ 694      6C00
+ 695              	.LASF0:
+ 696 0101 6C6F6E67 		.ascii	"long int\000"
+ 696      20696E74 
+ 696      00
+ 697              	.LASF13:
+ 698 010a 76506F72 		.ascii	"vPortYieldProcessor\000"
+ 698      74596965 
+ 698      6C645072 
+ 698      6F636573 
+ 698      736F7200 
+ 699              	.LASF14:
+ 700 011e 756C4372 		.ascii	"ulCriticalNesting\000"
+ 700      69746963 
+ 700      616C4E65 
+ 700      7374696E 
+ 700      6700
+ 701              	.LASF5:
+ 702 0130 7369676E 		.ascii	"signed char\000"
+ 702      65642063 
+ 702      68617200 
+ 703              	.LASF10:
+ 704 013c 76506F72 		.ascii	"vPortEnterCritical\000"
+ 704      74456E74 
+ 704      65724372 
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 19
+
+
+ 704      69746963 
+ 704      616C00
+ 705              		.ident	"GCC: (GNU) 4.2.2"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s 			page 20
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 portISR.c
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:13     .text:00000000 vPortISRStartFirstTask
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:23     .text:00000000 $a
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:298    .data:00000000 ulCriticalNesting
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:45     .text:00000044 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:52     .text:0000004c vPortDisableInterruptsFromThumb
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:60     .text:0000004c $a
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:72     .text:00000064 vPortEnableInterruptsFromThumb
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:92     .text:0000007c vPortEnterCritical
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:116    .text:000000a4 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:122    .text:000000a8 vPortExitCritical
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:130    .text:000000a8 $a
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:155    .text:000000e8 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:161    .text:000000ec vTickISR
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:169    .text:000000ec $a
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:225    .text:000001a0 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:233    .text:000001ac vPortYieldProcessor
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:241    .text:000001ac $a
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:289    .text:00000248 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cc7Tjmkk.s:299    .data:00000000 $d
+
+UNDEFINED SYMBOLS
+pxCurrentTCB
+vTaskIncrementTick
+vTaskSwitchContext

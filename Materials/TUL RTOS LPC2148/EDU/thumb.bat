@@ -1,0 +1,6 @@
+set USE_THUMB_MODE=YES
+set DEBUG=1
+set RUN_MODE=RUN_FROM_ROM
+set LDSCRIPT=lpc2148-rom.ld
+rem make -n
+make

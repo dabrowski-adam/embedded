@@ -1,0 +1,1255 @@
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 1
+
+
+   1              		.code	16
+   2              		.file	"testLEDMatrix.c"
+   3              		.section	.debug_abbrev,"",%progbits
+   4              	.Ldebug_abbrev0:
+   5              		.section	.debug_info,"",%progbits
+   6              	.Ldebug_info0:
+   7              		.section	.debug_line,"",%progbits
+   8              	.Ldebug_line0:
+   9 0000 6C000000 		.text
+   9      02003A00 
+   9      00000201 
+   9      FB0E0D00 
+   9      01010101 
+  10              	.Ltext0:
+  11              		.align	2
+  12              		.global	testLEDMatrix
+  13              		.code 16
+  14              		.thumb_func
+  15              		.type	testLEDMatrix, %function
+  16              	testLEDMatrix:
+  17              	.LFB3:
+  18              		.file 1 "testLEDMatrix.c"
+   1:testLEDMatrix.c **** #include "testLEDMatrix.h"
+   2:testLEDMatrix.c **** #include "FreeRTOS.h"
+   3:testLEDMatrix.c **** #include "task.h"
+   4:testLEDMatrix.c **** 
+   5:testLEDMatrix.c **** 
+   6:testLEDMatrix.c **** #define  SPI_CS   0x00008000  //<= new board, old board = 0x00800000
+   7:testLEDMatrix.c **** 
+   8:testLEDMatrix.c **** 
+   9:testLEDMatrix.c **** const tU8 eaText[] = {
+  10:testLEDMatrix.c **** 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  11:testLEDMatrix.c **** 	0x08,0x08,0x08,0x08,0x08,0x08,0x00,0x00,
+  12:testLEDMatrix.c ****   0x7f,0x49,0x49,0x36,0x00,      //B
+  13:testLEDMatrix.c ****   0x7e,0x09,0x09,0x7e,0x00,      //A
+  14:testLEDMatrix.c ****   0x48,0x54,0x55,0x24,0x00,      //Œ
+  15:testLEDMatrix.c **** //  0x26,0x49,0x49,0x32,0x00,      //S
+  16:testLEDMatrix.c ****   0x7f,0x08,0x14,0x22,0x41,0x00, //K
+  17:testLEDMatrix.c ****   0x7e,0x09,0x09,0x7e,0x00,      //A
+  18:testLEDMatrix.c ****   0x00,0x00,0x00,0x00,0x00,
+  19:testLEDMatrix.c ****   0x01,0x01,0x7f,0x01,0x01,0x00, //T
+  20:testLEDMatrix.c ****   0x3E,0x41,0x41,0x3e,0x00,      //O
+  21:testLEDMatrix.c ****   0x00,0x00,0x00,0x00,0x00,
+  22:testLEDMatrix.c ****   0x7f,0x20,0x18,0x20,0x7f,0x00, //W
+  23:testLEDMatrix.c ****   0x26,0x49,0x49,0x32,0x00,      //S
+  24:testLEDMatrix.c ****   0x01,0x01,0x7f,0x01,0x01,0x00, //T
+  25:testLEDMatrix.c ****   0x7f,0x19,0x29,0x46,0x00,      //R
+  26:testLEDMatrix.c ****   0x7f,0x49,0xC9,0x41,0x00,      //Ê
+  27:testLEDMatrix.c ****   0x01,0x01,0x7f,0x01,0x01,0x00, //T
+  28:testLEDMatrix.c ****   0x7F,0x02,0x1C,0x20,0x7F,0x00, //N
+  29:testLEDMatrix.c ****   0x7e,0x09,0x09,0x7e,0x00,      //A
+  30:testLEDMatrix.c ****   0x00,0x00,0x00,0x00,0x00,
+  31:testLEDMatrix.c ****   0x7f,0x08,0x14,0x22,0x41,0x00, //K
+  32:testLEDMatrix.c ****   0x7f,0x48,0x44,0x40,0x00,      //£
+  33:testLEDMatrix.c ****   0x7e,0x09,0x09,0x7e,0x00,      //A
+  34:testLEDMatrix.c ****   0x7f,0x02,0x04,0x02,0x7f,0x00, //M
+  35:testLEDMatrix.c ****   0x3E,0x41,0x41,0x22,0x00,      //C
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 2
+
+
+  36:testLEDMatrix.c ****   0x61,0x59,0x45,0x43,0x00,      //Z
+  37:testLEDMatrix.c ****   0x3f,0x40,0x40,0x3F,0x00,      //U
+  38:testLEDMatrix.c ****   0x3E,0x41,0x41,0x22,0x00,      //C
+  39:testLEDMatrix.c ****   0x7F,0x08,0x08,0x7F,0x00,      //H
+  40:testLEDMatrix.c ****   0x7e,0x09,0x09,0x7e,0x00,      //A
+  41:testLEDMatrix.c ****   0x00,0x00,0x00,0x00,0x00,
+  42:testLEDMatrix.c ****   0x7e,0x09,0x09,0x7e,0x00,      //A
+  43:testLEDMatrix.c ****   0x00,0x00,0x00,0x00,0x00,
+  44:testLEDMatrix.c ****   0x7f,0x41,0x41,0x3e,0x00,      //D
+  45:testLEDMatrix.c ****   0x7f,0x49,0x49,0x41,0x00,      //E
+  46:testLEDMatrix.c ****   0x7f,0x02,0x04,0x02,0x7f,0x00, //M
+  47:testLEDMatrix.c ****   0x3f,0x40,0x40,0x3F,0x00,      //U
+  48:testLEDMatrix.c ****   0x48,0x54,0x55,0x24,0x00,      //Œ
+  49:testLEDMatrix.c **** //  0x26,0x49,0x49,0x32,0x00,      //S
+  50:testLEDMatrix.c ****   0x00,0x00,0x00,0x00,0x00,
+  51:testLEDMatrix.c ****   0x20,0x40,0x41,0x3F,0x00,      //J
+  52:testLEDMatrix.c ****   0x7f,0x49,0x49,0x41,0x00,      //E
+  53:testLEDMatrix.c ****   0x26,0x49,0x49,0x32,0x00,      //S
+  54:testLEDMatrix.c ****   0x61,0x59,0x45,0x43,0x00,      //Z
+  55:testLEDMatrix.c ****   0x3E,0x41,0x41,0x22,0x00,      //C
+  56:testLEDMatrix.c ****   0x61,0x59,0x45,0x43,0x00,      //Z
+  57:testLEDMatrix.c ****   0x7f,0x49,0x49,0x41,0x00,      //E
+  58:testLEDMatrix.c ****   0x00,0x00,0x00,0x00,0x00,
+  59:testLEDMatrix.c ****   0x3E,0x41,0x51,0x32,0x00,      //G
+  60:testLEDMatrix.c ****   0x3E,0x41,0x41,0x3e,0x00,      //O
+  61:testLEDMatrix.c ****   0x7f,0x19,0x29,0x46,0x00,      //R
+  62:testLEDMatrix.c ****   0x26,0x49,0x49,0x32,0x00,      //S
+  63:testLEDMatrix.c ****   0x61,0x59,0x45,0x43,0x00,      //Z
+  64:testLEDMatrix.c ****   0x03,0x04,0x78,0x04,0x03, 0x00,//Y
+  65:testLEDMatrix.c **** //  0x7f,0x49,0x49,0x41,0x00,      //E
+  66:testLEDMatrix.c **** //  0x7f,0x02,0x04,0x02,0x7f,0x00, //M
+  67:testLEDMatrix.c **** //  0x7f,0x49,0x49,0x36,0x00,      //B
+  68:testLEDMatrix.c **** //  0x7f,0x49,0x49,0x41,0x00,      //E
+  69:testLEDMatrix.c **** //  0x7f,0x41,0x41,0x3e,0x00,      //D
+  70:testLEDMatrix.c **** //  0x7f,0x41,0x41,0x3e,0x00,      //D
+  71:testLEDMatrix.c **** //  0x7f,0x49,0x49,0x41,0x00,      //E
+  72:testLEDMatrix.c **** //  0x7f,0x41,0x41,0x3e,0x00,      //D
+  73:testLEDMatrix.c **** //  0x00,0x00,0x00,0x00,0x00,
+  74:testLEDMatrix.c **** //  0x7e,0x09,0x09,0x7e,0x00,      //A
+  75:testLEDMatrix.c **** //  0x7f,0x19,0x29,0x46,0x00,      //R
+  76:testLEDMatrix.c **** //  0x01,0x01,0x7f,0x01,0x01,0x00, //T
+  77:testLEDMatrix.c **** //  0x7f,0x00,                     //I
+  78:testLEDMatrix.c **** //  0x26,0x49,0x49,0x32,0x00,      //S
+  79:testLEDMatrix.c **** //  0x01,0x01,0x7f,0x01,0x01,0x00, //T
+  80:testLEDMatrix.c **** //  0x26,0x49,0x49,0x32,0x00,      //S
+  81:testLEDMatrix.c **** //	0x00,0x00,0x08,0x08,0x08,0x08,0x08,0x08,
+  82:testLEDMatrix.c ****   0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+  83:testLEDMatrix.c **** 
+  84:testLEDMatrix.c **** tU8 pattern[8] = {1,3,7,15,31,63,127,255};
+  85:testLEDMatrix.c **** 
+  86:testLEDMatrix.c **** void ledMatrix(void);
+  87:testLEDMatrix.c **** 
+  88:testLEDMatrix.c **** 
+  89:testLEDMatrix.c **** /*****************************************************************************
+  90:testLEDMatrix.c ****  *
+  91:testLEDMatrix.c ****  * Description:
+  92:testLEDMatrix.c ****  *
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 3
+
+
+  93:testLEDMatrix.c ****  ****************************************************************************/
+  94:testLEDMatrix.c **** static void
+  95:testLEDMatrix.c **** startTimer1(tU32 delayInMs)
+  96:testLEDMatrix.c **** {
+  97:testLEDMatrix.c ****   //initialize VIC for Timer1 interrupts
+  98:testLEDMatrix.c ****   VICIntSelect &= ~0x20;           //Timer1 interrupt is assigned to IRQ (not FIQ)
+  99:testLEDMatrix.c ****   VICVectAddr5  = (tU32)ledMatrix; //register ISR address
+ 100:testLEDMatrix.c ****   VICVectCntl5  = 0x25;            //enable vector interrupt for timer1
+ 101:testLEDMatrix.c ****   VICIntEnable  = 0x20;            //enable timer1 interrupt
+ 102:testLEDMatrix.c **** 
+ 103:testLEDMatrix.c ****   //initialize and start Timer #1
+ 104:testLEDMatrix.c ****   T1TCR = 0x00000002;                           //disable and reset Timer1
+ 105:testLEDMatrix.c ****   T1PC  = 0x00000000;                           //no prescale of clock
+ 106:testLEDMatrix.c ****   T1MR0 = delayInMs *                           //calculate no of timer ticks
+ 107:testLEDMatrix.c ****          (configCPU_CLOCK_HZ / (1000 * configVPBDIV_FACTOR));
+ 108:testLEDMatrix.c ****   T1IR  = 0x000000ff;                           //reset all flags before enable IRQs
+ 109:testLEDMatrix.c ****   T1MCR = 0x00000003;                           //reset counter and generate IRQ on MR0 match
+ 110:testLEDMatrix.c ****   T1TCR = 0x00000001;                           //start Timer1
+ 111:testLEDMatrix.c **** }
+ 112:testLEDMatrix.c **** 
+ 113:testLEDMatrix.c **** 
+ 114:testLEDMatrix.c **** /*****************************************************************************
+ 115:testLEDMatrix.c ****  *
+ 116:testLEDMatrix.c ****  * Description:
+ 117:testLEDMatrix.c ****  *    A process entry function
+ 118:testLEDMatrix.c ****  *
+ 119:testLEDMatrix.c ****  ****************************************************************************/
+ 120:testLEDMatrix.c **** void testLEDMatrix(void *pvParameters)
+ 121:testLEDMatrix.c **** {
+  19              		.loc 1 121 0
+  20 0000 10B5     		push	{r4, lr}
+  21              	.LCFI0:
+  22              	.LVL0:
+ 122:testLEDMatrix.c ****   tU16 cntA = 0;
+ 123:testLEDMatrix.c ****   tU8 i;
+ 124:testLEDMatrix.c **** //  tU32 sw = 0x55555555;
+ 125:testLEDMatrix.c **** 
+ 126:testLEDMatrix.c ****   PINSEL0 |= 0x00001500 ;  //Inicjalizacja  SPI
+  23              		.loc 1 126 0
+  24 0002 2449     		ldr	r1, .L9
+  25 0004 A823     		mov	r3, #168
+  26 0006 0A68     		ldr	r2, [r1]
+  27 0008 5B01     		lsl	r3, r3, #5
+  28 000a 1A43     		orr	r2, r2, r3
+ 127:testLEDMatrix.c ****   SPI_SPCCR = 0x08;
+  29              		.loc 1 127 0
+  30 000c 224B     		ldr	r3, .L9+4
+  31              		.loc 1 126 0
+  32 000e 0A60     		str	r2, [r1]
+  33              		.loc 1 127 0
+  34 0010 0822     		mov	r2, #8
+  35 0012 1A60     		str	r2, [r3]
+ 128:testLEDMatrix.c ****   SPI_SPCR  = 0x60;
+  36              		.loc 1 128 0
+  37 0014 6022     		mov	r2, #96
+  38 0016 0C3B     		sub	r3, r3, #12
+  39 0018 1A60     		str	r2, [r3]
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 4
+
+
+ 129:testLEDMatrix.c ****   IODIR0 |= SPI_CS;
+  40              		.loc 1 129 0
+  41 001a 2049     		ldr	r1, .L9+8
+  42 001c 8023     		mov	r3, #128
+  43 001e 0A68     		ldr	r2, [r1]
+  44 0020 1B02     		lsl	r3, r3, #8
+  45 0022 1A43     		orr	r2, r2, r3
+  46 0024 0A60     		str	r2, [r1]
+  47              	.LBB4:
+  48              	.LBB5:
+  49              		.loc 1 98 0
+  50 0026 1E4A     		ldr	r2, .L9+12
+  51 0028 1368     		ldr	r3, [r2]
+  52 002a 2021     		mov	r1, #32
+  53 002c 8B43     		bic	r3, r3, r1
+  54 002e 1360     		str	r3, [r2]
+  55              		.loc 1 99 0
+  56 0030 1C4A     		ldr	r2, .L9+16
+  57 0032 1D4B     		ldr	r3, .L9+20
+  58 0034 1A60     		str	r2, [r3]
+  59              		.loc 1 100 0
+  60 0036 1D4B     		ldr	r3, .L9+24
+  61 0038 2522     		mov	r2, #37
+  62 003a 1A60     		str	r2, [r3]
+  63              		.loc 1 101 0
+  64 003c 1C4B     		ldr	r3, .L9+28
+  65 003e 1960     		str	r1, [r3]
+  66              		.loc 1 104 0
+  67 0040 1C49     		ldr	r1, .L9+32
+  68 0042 0223     		mov	r3, #2
+  69 0044 0B60     		str	r3, [r1]
+  70              		.loc 1 105 0
+  71 0046 1C4B     		ldr	r3, .L9+36
+  72 0048 0022     		mov	r2, #0
+  73 004a 1A60     		str	r2, [r3]
+  74              		.loc 1 106 0
+  75 004c 1B4A     		ldr	r2, .L9+40
+  76 004e 0833     		add	r3, r3, #8
+  77 0050 1A60     		str	r2, [r3]
+  78              		.loc 1 108 0
+  79 0052 FF22     		mov	r2, #255
+  80 0054 183B     		sub	r3, r3, #24
+  81 0056 1A60     		str	r2, [r3]
+  82              		.loc 1 109 0
+  83 0058 1433     		add	r3, r3, #20
+  84 005a 0322     		mov	r2, #3
+  85 005c 1A60     		str	r2, [r3]
+  86              		.loc 1 110 0
+  87 005e 0123     		mov	r3, #1
+  88 0060 0B60     		str	r3, [r1]
+  89 0062 0024     		mov	r4, #0
+  90              	.LVL1:
+  91              	.L2:
+  92              	.LBE5:
+  93              	.LBE4:
+ 130:testLEDMatrix.c **** 
+ 131:testLEDMatrix.c **** 
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 5
+
+
+ 132:testLEDMatrix.c ****   startTimer1(2);
+ 133:testLEDMatrix.c **** 
+ 134:testLEDMatrix.c ****   for(;;)
+ 135:testLEDMatrix.c ****   {
+ 136:testLEDMatrix.c ****   	vTaskDelay(200);
+  94              		.loc 1 136 0
+  95 0064 C820     		mov	r0, #200
+  96              	.LVL2:
+  97 0066 FFF7FEFF 		bl	vTaskDelay
+ 137:testLEDMatrix.c **** 
+ 138:testLEDMatrix.c **** //	GPIO_IOSET = sw;
+ 139:testLEDMatrix.c **** //  	GPIO_IOCLR = ~sw;
+ 140:testLEDMatrix.c **** //	sw = ~sw;
+ 141:testLEDMatrix.c **** 
+ 142:testLEDMatrix.c **** 	cntA++;
+  98              		.loc 1 142 0
+  99 006a 631C     		add	r3, r4, #1
+ 100 006c 1B04     		lsl	r3, r3, #16
+ 101 006e 1C0C     		lsr	r4, r3, #16
+ 143:testLEDMatrix.c **** //	cntA %= sizeof(eaText)-8;
+ 144:testLEDMatrix.c ****     if (cntA > sizeof(eaText)-8)
+ 102              		.loc 1 144 0
+ 103 0070 8C23     		mov	r3, #140
+ 104 0072 5B00     		lsl	r3, r3, #1
+ 105 0074 9C42     		cmp	r4, r3
+ 106 0076 00D9     		bls	.L3
+ 107 0078 0024     		mov	r4, #0
+ 108              	.L3:
+ 109 007a 114A     		ldr	r2, .L9+44
+ 110 007c 114B     		ldr	r3, .L9+48
+ 145:testLEDMatrix.c ****       cntA = 0;
+ 146:testLEDMatrix.c **** 
+ 147:testLEDMatrix.c **** 	for ( i=0; i < 8; i++)
+ 111              		.loc 1 147 0
+ 112 007e 101C     		mov	r0, r2
+ 113              		.loc 1 144 0
+ 114 0080 E118     		add	r1, r4, r3
+ 115              		.loc 1 147 0
+ 116 0082 0830     		add	r0, r0, #8
+ 117              	.L5:
+ 148:testLEDMatrix.c **** 	{
+ 149:testLEDMatrix.c **** 		pattern[i] = eaText[cntA+i];
+ 118              		.loc 1 149 0
+ 119 0084 0B78     		ldrb	r3, [r1]
+ 120 0086 1370     		strb	r3, [r2]
+ 121 0088 0132     		add	r2, r2, #1
+ 122 008a 0131     		add	r1, r1, #1
+ 123              		.loc 1 147 0
+ 124 008c 8242     		cmp	r2, r0
+ 125 008e F9D1     		bne	.L5
+ 126 0090 E8E7     		b	.L2
+ 127              	.L10:
+ 128 0092 C046     		.align	2
+ 129              	.L9:
+ 130 0094 00C002E0 		.word	-536690688
+ 131 0098 0C0002E0 		.word	-536739828
+ 132 009c 088002E0 		.word	-536707064
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 6
+
+
+ 133 00a0 0CF0FFFF 		.word	-4084
+ 134 00a4 00000000 		.word	ledMatrix
+ 135 00a8 14F1FFFF 		.word	-3820
+ 136 00ac 14F2FFFF 		.word	-3564
+ 137 00b0 10F0FFFF 		.word	-4080
+ 138 00b4 048000E0 		.word	-536838140
+ 139 00b8 108000E0 		.word	-536838128
+ 140 00bc C0D40100 		.word	120000
+ 141 00c0 00000000 		.word	pattern
+ 142 00c4 00000000 		.word	eaText
+ 143              	.LFE3:
+ 144              		.size	testLEDMatrix, .-testLEDMatrix
+ 145              		.global	eaText
+ 146              		.section	.rodata
+ 147              		.type	eaText, %object
+ 148              		.size	eaText, 288
+ 149              	eaText:
+ 150 0000 00       		.byte	0
+ 151 0001 00       		.byte	0
+ 152 0002 00       		.byte	0
+ 153 0003 00       		.byte	0
+ 154 0004 00       		.byte	0
+ 155 0005 00       		.byte	0
+ 156 0006 00       		.byte	0
+ 157 0007 00       		.byte	0
+ 158 0008 08       		.byte	8
+ 159 0009 08       		.byte	8
+ 160 000a 08       		.byte	8
+ 161 000b 08       		.byte	8
+ 162 000c 08       		.byte	8
+ 163 000d 08       		.byte	8
+ 164 000e 00       		.byte	0
+ 165 000f 00       		.byte	0
+ 166 0010 7F       		.byte	127
+ 167 0011 49       		.byte	73
+ 168 0012 49       		.byte	73
+ 169 0013 36       		.byte	54
+ 170 0014 00       		.byte	0
+ 171 0015 7E       		.byte	126
+ 172 0016 09       		.byte	9
+ 173 0017 09       		.byte	9
+ 174 0018 7E       		.byte	126
+ 175 0019 00       		.byte	0
+ 176 001a 48       		.byte	72
+ 177 001b 54       		.byte	84
+ 178 001c 55       		.byte	85
+ 179 001d 24       		.byte	36
+ 180 001e 00       		.byte	0
+ 181 001f 7F       		.byte	127
+ 182 0020 08       		.byte	8
+ 183 0021 14       		.byte	20
+ 184 0022 22       		.byte	34
+ 185 0023 41       		.byte	65
+ 186 0024 00       		.byte	0
+ 187 0025 7E       		.byte	126
+ 188 0026 09       		.byte	9
+ 189 0027 09       		.byte	9
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 7
+
+
+ 190 0028 7E       		.byte	126
+ 191 0029 00       		.byte	0
+ 192 002a 00       		.byte	0
+ 193 002b 00       		.byte	0
+ 194 002c 00       		.byte	0
+ 195 002d 00       		.byte	0
+ 196 002e 00       		.byte	0
+ 197 002f 01       		.byte	1
+ 198 0030 01       		.byte	1
+ 199 0031 7F       		.byte	127
+ 200 0032 01       		.byte	1
+ 201 0033 01       		.byte	1
+ 202 0034 00       		.byte	0
+ 203 0035 3E       		.byte	62
+ 204 0036 41       		.byte	65
+ 205 0037 41       		.byte	65
+ 206 0038 3E       		.byte	62
+ 207 0039 00       		.byte	0
+ 208 003a 00       		.byte	0
+ 209 003b 00       		.byte	0
+ 210 003c 00       		.byte	0
+ 211 003d 00       		.byte	0
+ 212 003e 00       		.byte	0
+ 213 003f 7F       		.byte	127
+ 214 0040 20       		.byte	32
+ 215 0041 18       		.byte	24
+ 216 0042 20       		.byte	32
+ 217 0043 7F       		.byte	127
+ 218 0044 00       		.byte	0
+ 219 0045 26       		.byte	38
+ 220 0046 49       		.byte	73
+ 221 0047 49       		.byte	73
+ 222 0048 32       		.byte	50
+ 223 0049 00       		.byte	0
+ 224 004a 01       		.byte	1
+ 225 004b 01       		.byte	1
+ 226 004c 7F       		.byte	127
+ 227 004d 01       		.byte	1
+ 228 004e 01       		.byte	1
+ 229 004f 00       		.byte	0
+ 230 0050 7F       		.byte	127
+ 231 0051 19       		.byte	25
+ 232 0052 29       		.byte	41
+ 233 0053 46       		.byte	70
+ 234 0054 00       		.byte	0
+ 235 0055 7F       		.byte	127
+ 236 0056 49       		.byte	73
+ 237 0057 C9       		.byte	-55
+ 238 0058 41       		.byte	65
+ 239 0059 00       		.byte	0
+ 240 005a 01       		.byte	1
+ 241 005b 01       		.byte	1
+ 242 005c 7F       		.byte	127
+ 243 005d 01       		.byte	1
+ 244 005e 01       		.byte	1
+ 245 005f 00       		.byte	0
+ 246 0060 7F       		.byte	127
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 8
+
+
+ 247 0061 02       		.byte	2
+ 248 0062 1C       		.byte	28
+ 249 0063 20       		.byte	32
+ 250 0064 7F       		.byte	127
+ 251 0065 00       		.byte	0
+ 252 0066 7E       		.byte	126
+ 253 0067 09       		.byte	9
+ 254 0068 09       		.byte	9
+ 255 0069 7E       		.byte	126
+ 256 006a 00       		.byte	0
+ 257 006b 00       		.byte	0
+ 258 006c 00       		.byte	0
+ 259 006d 00       		.byte	0
+ 260 006e 00       		.byte	0
+ 261 006f 00       		.byte	0
+ 262 0070 7F       		.byte	127
+ 263 0071 08       		.byte	8
+ 264 0072 14       		.byte	20
+ 265 0073 22       		.byte	34
+ 266 0074 41       		.byte	65
+ 267 0075 00       		.byte	0
+ 268 0076 7F       		.byte	127
+ 269 0077 48       		.byte	72
+ 270 0078 44       		.byte	68
+ 271 0079 40       		.byte	64
+ 272 007a 00       		.byte	0
+ 273 007b 7E       		.byte	126
+ 274 007c 09       		.byte	9
+ 275 007d 09       		.byte	9
+ 276 007e 7E       		.byte	126
+ 277 007f 00       		.byte	0
+ 278 0080 7F       		.byte	127
+ 279 0081 02       		.byte	2
+ 280 0082 04       		.byte	4
+ 281 0083 02       		.byte	2
+ 282 0084 7F       		.byte	127
+ 283 0085 00       		.byte	0
+ 284 0086 3E       		.byte	62
+ 285 0087 41       		.byte	65
+ 286 0088 41       		.byte	65
+ 287 0089 22       		.byte	34
+ 288 008a 00       		.byte	0
+ 289 008b 61       		.byte	97
+ 290 008c 59       		.byte	89
+ 291 008d 45       		.byte	69
+ 292 008e 43       		.byte	67
+ 293 008f 00       		.byte	0
+ 294 0090 3F       		.byte	63
+ 295 0091 40       		.byte	64
+ 296 0092 40       		.byte	64
+ 297 0093 3F       		.byte	63
+ 298 0094 00       		.byte	0
+ 299 0095 3E       		.byte	62
+ 300 0096 41       		.byte	65
+ 301 0097 41       		.byte	65
+ 302 0098 22       		.byte	34
+ 303 0099 00       		.byte	0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 9
+
+
+ 304 009a 7F       		.byte	127
+ 305 009b 08       		.byte	8
+ 306 009c 08       		.byte	8
+ 307 009d 7F       		.byte	127
+ 308 009e 00       		.byte	0
+ 309 009f 7E       		.byte	126
+ 310 00a0 09       		.byte	9
+ 311 00a1 09       		.byte	9
+ 312 00a2 7E       		.byte	126
+ 313 00a3 00       		.byte	0
+ 314 00a4 00       		.byte	0
+ 315 00a5 00       		.byte	0
+ 316 00a6 00       		.byte	0
+ 317 00a7 00       		.byte	0
+ 318 00a8 00       		.byte	0
+ 319 00a9 7E       		.byte	126
+ 320 00aa 09       		.byte	9
+ 321 00ab 09       		.byte	9
+ 322 00ac 7E       		.byte	126
+ 323 00ad 00       		.byte	0
+ 324 00ae 00       		.byte	0
+ 325 00af 00       		.byte	0
+ 326 00b0 00       		.byte	0
+ 327 00b1 00       		.byte	0
+ 328 00b2 00       		.byte	0
+ 329 00b3 7F       		.byte	127
+ 330 00b4 41       		.byte	65
+ 331 00b5 41       		.byte	65
+ 332 00b6 3E       		.byte	62
+ 333 00b7 00       		.byte	0
+ 334 00b8 7F       		.byte	127
+ 335 00b9 49       		.byte	73
+ 336 00ba 49       		.byte	73
+ 337 00bb 41       		.byte	65
+ 338 00bc 00       		.byte	0
+ 339 00bd 7F       		.byte	127
+ 340 00be 02       		.byte	2
+ 341 00bf 04       		.byte	4
+ 342 00c0 02       		.byte	2
+ 343 00c1 7F       		.byte	127
+ 344 00c2 00       		.byte	0
+ 345 00c3 3F       		.byte	63
+ 346 00c4 40       		.byte	64
+ 347 00c5 40       		.byte	64
+ 348 00c6 3F       		.byte	63
+ 349 00c7 00       		.byte	0
+ 350 00c8 48       		.byte	72
+ 351 00c9 54       		.byte	84
+ 352 00ca 55       		.byte	85
+ 353 00cb 24       		.byte	36
+ 354 00cc 00       		.byte	0
+ 355 00cd 00       		.byte	0
+ 356 00ce 00       		.byte	0
+ 357 00cf 00       		.byte	0
+ 358 00d0 00       		.byte	0
+ 359 00d1 00       		.byte	0
+ 360 00d2 20       		.byte	32
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 10
+
+
+ 361 00d3 40       		.byte	64
+ 362 00d4 41       		.byte	65
+ 363 00d5 3F       		.byte	63
+ 364 00d6 00       		.byte	0
+ 365 00d7 7F       		.byte	127
+ 366 00d8 49       		.byte	73
+ 367 00d9 49       		.byte	73
+ 368 00da 41       		.byte	65
+ 369 00db 00       		.byte	0
+ 370 00dc 26       		.byte	38
+ 371 00dd 49       		.byte	73
+ 372 00de 49       		.byte	73
+ 373 00df 32       		.byte	50
+ 374 00e0 00       		.byte	0
+ 375 00e1 61       		.byte	97
+ 376 00e2 59       		.byte	89
+ 377 00e3 45       		.byte	69
+ 378 00e4 43       		.byte	67
+ 379 00e5 00       		.byte	0
+ 380 00e6 3E       		.byte	62
+ 381 00e7 41       		.byte	65
+ 382 00e8 41       		.byte	65
+ 383 00e9 22       		.byte	34
+ 384 00ea 00       		.byte	0
+ 385 00eb 61       		.byte	97
+ 386 00ec 59       		.byte	89
+ 387 00ed 45       		.byte	69
+ 388 00ee 43       		.byte	67
+ 389 00ef 00       		.byte	0
+ 390 00f0 7F       		.byte	127
+ 391 00f1 49       		.byte	73
+ 392 00f2 49       		.byte	73
+ 393 00f3 41       		.byte	65
+ 394 00f4 00       		.byte	0
+ 395 00f5 00       		.byte	0
+ 396 00f6 00       		.byte	0
+ 397 00f7 00       		.byte	0
+ 398 00f8 00       		.byte	0
+ 399 00f9 00       		.byte	0
+ 400 00fa 3E       		.byte	62
+ 401 00fb 41       		.byte	65
+ 402 00fc 51       		.byte	81
+ 403 00fd 32       		.byte	50
+ 404 00fe 00       		.byte	0
+ 405 00ff 3E       		.byte	62
+ 406 0100 41       		.byte	65
+ 407 0101 41       		.byte	65
+ 408 0102 3E       		.byte	62
+ 409 0103 00       		.byte	0
+ 410 0104 7F       		.byte	127
+ 411 0105 19       		.byte	25
+ 412 0106 29       		.byte	41
+ 413 0107 46       		.byte	70
+ 414 0108 00       		.byte	0
+ 415 0109 26       		.byte	38
+ 416 010a 49       		.byte	73
+ 417 010b 49       		.byte	73
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 11
+
+
+ 418 010c 32       		.byte	50
+ 419 010d 00       		.byte	0
+ 420 010e 61       		.byte	97
+ 421 010f 59       		.byte	89
+ 422 0110 45       		.byte	69
+ 423 0111 43       		.byte	67
+ 424 0112 00       		.byte	0
+ 425 0113 03       		.byte	3
+ 426 0114 04       		.byte	4
+ 427 0115 78       		.byte	120
+ 428 0116 04       		.byte	4
+ 429 0117 03       		.byte	3
+ 430 0118 00       		.byte	0
+ 431 0119 00       		.byte	0
+ 432 011a 00       		.byte	0
+ 433 011b 00       		.byte	0
+ 434 011c 00       		.byte	0
+ 435 011d 00       		.byte	0
+ 436 011e 00       		.byte	0
+ 437 011f 00       		.byte	0
+ 438              		.global	pattern
+ 439              		.data
+ 440              		.type	pattern, %object
+ 441              		.size	pattern, 8
+ 442              	pattern:
+ 443 0000 01       		.byte	1
+ 444 0001 03       		.byte	3
+ 445 0002 07       		.byte	7
+ 446 0003 0F       		.byte	15
+ 447 0004 1F       		.byte	31
+ 448 0005 3F       		.byte	63
+ 449 0006 7F       		.byte	127
+ 450 0007 FF       		.byte	-1
+ 451              		.section	.debug_frame,"",%progbits
+ 452              	.Lframe0:
+ 453 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ 454              	.LSCIE0:
+ 455 0004 FFFFFFFF 		.4byte	0xffffffff
+ 456 0008 01       		.byte	0x1
+ 457 0009 00       		.ascii	"\000"
+ 458 000a 01       		.uleb128 0x1
+ 459 000b 7C       		.sleb128 -4
+ 460 000c 0E       		.byte	0xe
+ 461 000d 0C       		.byte	0xc
+ 462 000e 0D       		.uleb128 0xd
+ 463 000f 00       		.uleb128 0x0
+ 464              		.align	2
+ 465              	.LECIE0:
+ 466              	.LSFDE0:
+ 467 0010 14000000 		.4byte	.LEFDE0-.LASFDE0
+ 468              	.LASFDE0:
+ 469 0014 00000000 		.4byte	.Lframe0
+ 470 0018 00000000 		.4byte	.LFB3
+ 471 001c C8000000 		.4byte	.LFE3-.LFB3
+ 472 0020 42       		.byte	0x4
+ 473              		.4byte	.LCFI0-.LFB3
+ 474 0021 0E       		.byte	0xe
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 12
+
+
+ 475 0022 08       		.uleb128 0x8
+ 476 0023 84       		.byte	0x84
+ 477 0024 02       		.uleb128 0x2
+ 478 0025 8E       		.byte	0x8e
+ 479 0026 01       		.uleb128 0x1
+ 480 0027 00       		.align	2
+ 481              	.LEFDE0:
+ 482              		.text
+ 483              	.Letext0:
+ 484              		.section	.debug_loc,"",%progbits
+ 485              	.Ldebug_loc0:
+ 486              	.LLST0:
+ 487 0000 00000000 		.4byte	.LFB3-.Ltext0
+ 488 0004 02000000 		.4byte	.LCFI0-.Ltext0
+ 489 0008 0100     		.2byte	0x1
+ 490 000a 5D       		.byte	0x5d
+ 491 000b 02000000 		.4byte	.LCFI0-.Ltext0
+ 492 000f C8000000 		.4byte	.LFE3-.Ltext0
+ 493 0013 0200     		.2byte	0x2
+ 494 0015 7D       		.byte	0x7d
+ 495 0016 08       		.sleb128 8
+ 496 0017 00000000 		.4byte	0x0
+ 497 001b 00000000 		.4byte	0x0
+ 498              	.LLST1:
+ 499 001f 02000000 		.4byte	.LVL0-.Ltext0
+ 500 0023 66000000 		.4byte	.LVL2-.Ltext0
+ 501 0027 0100     		.2byte	0x1
+ 502 0029 50       		.byte	0x50
+ 503 002a 00000000 		.4byte	0x0
+ 504 002e 00000000 		.4byte	0x0
+ 505              		.file 2 "FreeRTOSConfig.h"
+ 506              		.section	.debug_info
+ 507 0000 37010000 		.4byte	0x137
+ 508 0004 0200     		.2byte	0x2
+ 509 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 510 000a 04       		.byte	0x4
+ 511 000b 01       		.uleb128 0x1
+ 512 000c 00000000 		.4byte	.LASF11
+ 513 0010 01       		.byte	0x1
+ 514 0011 16000000 		.4byte	.LASF12
+ 515 0015 B5000000 		.4byte	.LASF13
+ 516 0019 00000000 		.4byte	.Ltext0
+ 517 001d C8000000 		.4byte	.Letext0
+ 518 0021 00000000 		.4byte	.Ldebug_line0
+ 519 0025 02       		.uleb128 0x2
+ 520 0026 74553800 		.ascii	"tU8\000"
+ 521 002a 02       		.byte	0x2
+ 522 002b A0       		.byte	0xa0
+ 523 002c 30000000 		.4byte	0x30
+ 524 0030 03       		.uleb128 0x3
+ 525 0031 01       		.byte	0x1
+ 526 0032 08       		.byte	0x8
+ 527 0033 26000000 		.4byte	.LASF1
+ 528 0037 04       		.uleb128 0x4
+ 529 0038 8D000000 		.4byte	.LASF0
+ 530 003c 02       		.byte	0x2
+ 531 003d A1       		.byte	0xa1
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 13
+
+
+ 532 003e 42000000 		.4byte	0x42
+ 533 0042 03       		.uleb128 0x3
+ 534 0043 02       		.byte	0x2
+ 535 0044 07       		.byte	0x7
+ 536 0045 4B000000 		.4byte	.LASF2
+ 537 0049 04       		.uleb128 0x4
+ 538 004a 92000000 		.4byte	.LASF3
+ 539 004e 02       		.byte	0x2
+ 540 004f A2       		.byte	0xa2
+ 541 0050 54000000 		.4byte	0x54
+ 542 0054 03       		.uleb128 0x3
+ 543 0055 04       		.byte	0x4
+ 544 0056 07       		.byte	0x7
+ 545 0057 80000000 		.4byte	.LASF4
+ 546 005b 03       		.uleb128 0x3
+ 547 005c 01       		.byte	0x1
+ 548 005d 06       		.byte	0x6
+ 549 005e D8000000 		.4byte	.LASF5
+ 550 0062 03       		.uleb128 0x3
+ 551 0063 02       		.byte	0x2
+ 552 0064 05       		.byte	0x5
+ 553 0065 AB000000 		.4byte	.LASF6
+ 554 0069 05       		.uleb128 0x5
+ 555 006a 04       		.byte	0x4
+ 556 006b 05       		.byte	0x5
+ 557 006c 696E7400 		.ascii	"int\000"
+ 558 0070 03       		.uleb128 0x3
+ 559 0071 04       		.byte	0x4
+ 560 0072 05       		.byte	0x5
+ 561 0073 CF000000 		.4byte	.LASF7
+ 562 0077 03       		.uleb128 0x3
+ 563 0078 04       		.byte	0x4
+ 564 0079 07       		.byte	0x7
+ 565 007a 39000000 		.4byte	.LASF8
+ 566 007e 06       		.uleb128 0x6
+ 567 007f 04       		.byte	0x4
+ 568 0080 07       		.uleb128 0x7
+ 569 0081 74000000 		.4byte	.LASF14
+ 570 0085 01       		.byte	0x1
+ 571 0086 60       		.byte	0x60
+ 572 0087 01       		.byte	0x1
+ 573 0088 01       		.byte	0x1
+ 574 0089 99000000 		.4byte	0x99
+ 575 008d 08       		.uleb128 0x8
+ 576 008e 0C000000 		.4byte	.LASF15
+ 577 0092 01       		.byte	0x1
+ 578 0093 5F       		.byte	0x5f
+ 579 0094 49000000 		.4byte	0x49
+ 580 0098 00       		.byte	0x0
+ 581 0099 09       		.uleb128 0x9
+ 582 009a 01       		.byte	0x1
+ 583 009b 66000000 		.4byte	.LASF16
+ 584 009f 01       		.byte	0x1
+ 585 00a0 79       		.byte	0x79
+ 586 00a1 01       		.byte	0x1
+ 587 00a2 00000000 		.4byte	.LFB3
+ 588 00a6 C8000000 		.4byte	.LFE3
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 14
+
+
+ 589 00aa 00000000 		.4byte	.LLST0
+ 590 00ae ED000000 		.4byte	0xed
+ 591 00b2 0A       		.uleb128 0xa
+ 592 00b3 9E000000 		.4byte	.LASF17
+ 593 00b7 01       		.byte	0x1
+ 594 00b8 78       		.byte	0x78
+ 595 00b9 7E000000 		.4byte	0x7e
+ 596 00bd 1F000000 		.4byte	.LLST1
+ 597 00c1 0B       		.uleb128 0xb
+ 598 00c2 34000000 		.4byte	.LASF18
+ 599 00c6 01       		.byte	0x1
+ 600 00c7 7A       		.byte	0x7a
+ 601 00c8 37000000 		.4byte	0x37
+ 602 00cc 01       		.byte	0x1
+ 603 00cd 54       		.byte	0x54
+ 604 00ce 0C       		.uleb128 0xc
+ 605 00cf 6900     		.ascii	"i\000"
+ 606 00d1 01       		.byte	0x1
+ 607 00d2 7B       		.byte	0x7b
+ 608 00d3 25000000 		.4byte	0x25
+ 609 00d7 0D       		.uleb128 0xd
+ 610 00d8 80000000 		.4byte	0x80
+ 611 00dc 26000000 		.4byte	.LBB4
+ 612 00e0 64000000 		.4byte	.LBE4
+ 613 00e4 01       		.byte	0x1
+ 614 00e5 84       		.byte	0x84
+ 615 00e6 0E       		.uleb128 0xe
+ 616 00e7 8D000000 		.4byte	0x8d
+ 617 00eb 00       		.byte	0x0
+ 618 00ec 00       		.byte	0x0
+ 619 00ed 0F       		.uleb128 0xf
+ 620 00ee 25000000 		.4byte	0x25
+ 621 00f2 FE000000 		.4byte	0xfe
+ 622 00f6 10       		.uleb128 0x10
+ 623 00f7 FE000000 		.4byte	0xfe
+ 624 00fb 1F01     		.2byte	0x11f
+ 625 00fd 00       		.byte	0x0
+ 626 00fe 11       		.uleb128 0x11
+ 627 00ff 04       		.byte	0x4
+ 628 0100 07       		.byte	0x7
+ 629 0101 12       		.uleb128 0x12
+ 630 0102 97000000 		.4byte	.LASF9
+ 631 0106 01       		.byte	0x1
+ 632 0107 09       		.byte	0x9
+ 633 0108 13010000 		.4byte	0x113
+ 634 010c 01       		.byte	0x1
+ 635 010d 05       		.byte	0x5
+ 636 010e 03       		.byte	0x3
+ 637 010f 00000000 		.4byte	eaText
+ 638 0113 13       		.uleb128 0x13
+ 639 0114 ED000000 		.4byte	0xed
+ 640 0118 0F       		.uleb128 0xf
+ 641 0119 25000000 		.4byte	0x25
+ 642 011d 28010000 		.4byte	0x128
+ 643 0121 14       		.uleb128 0x14
+ 644 0122 FE000000 		.4byte	0xfe
+ 645 0126 07       		.byte	0x7
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 15
+
+
+ 646 0127 00       		.byte	0x0
+ 647 0128 12       		.uleb128 0x12
+ 648 0129 5E000000 		.4byte	.LASF10
+ 649 012d 01       		.byte	0x1
+ 650 012e 54       		.byte	0x54
+ 651 012f 18010000 		.4byte	0x118
+ 652 0133 01       		.byte	0x1
+ 653 0134 05       		.byte	0x5
+ 654 0135 03       		.byte	0x3
+ 655 0136 00000000 		.4byte	pattern
+ 656 013a 00       		.byte	0x0
+ 657              		.section	.debug_abbrev
+ 658 0000 01       		.uleb128 0x1
+ 659 0001 11       		.uleb128 0x11
+ 660 0002 01       		.byte	0x1
+ 661 0003 25       		.uleb128 0x25
+ 662 0004 0E       		.uleb128 0xe
+ 663 0005 13       		.uleb128 0x13
+ 664 0006 0B       		.uleb128 0xb
+ 665 0007 03       		.uleb128 0x3
+ 666 0008 0E       		.uleb128 0xe
+ 667 0009 1B       		.uleb128 0x1b
+ 668 000a 0E       		.uleb128 0xe
+ 669 000b 11       		.uleb128 0x11
+ 670 000c 01       		.uleb128 0x1
+ 671 000d 12       		.uleb128 0x12
+ 672 000e 01       		.uleb128 0x1
+ 673 000f 10       		.uleb128 0x10
+ 674 0010 06       		.uleb128 0x6
+ 675 0011 00       		.byte	0x0
+ 676 0012 00       		.byte	0x0
+ 677 0013 02       		.uleb128 0x2
+ 678 0014 16       		.uleb128 0x16
+ 679 0015 00       		.byte	0x0
+ 680 0016 03       		.uleb128 0x3
+ 681 0017 08       		.uleb128 0x8
+ 682 0018 3A       		.uleb128 0x3a
+ 683 0019 0B       		.uleb128 0xb
+ 684 001a 3B       		.uleb128 0x3b
+ 685 001b 0B       		.uleb128 0xb
+ 686 001c 49       		.uleb128 0x49
+ 687 001d 13       		.uleb128 0x13
+ 688 001e 00       		.byte	0x0
+ 689 001f 00       		.byte	0x0
+ 690 0020 03       		.uleb128 0x3
+ 691 0021 24       		.uleb128 0x24
+ 692 0022 00       		.byte	0x0
+ 693 0023 0B       		.uleb128 0xb
+ 694 0024 0B       		.uleb128 0xb
+ 695 0025 3E       		.uleb128 0x3e
+ 696 0026 0B       		.uleb128 0xb
+ 697 0027 03       		.uleb128 0x3
+ 698 0028 0E       		.uleb128 0xe
+ 699 0029 00       		.byte	0x0
+ 700 002a 00       		.byte	0x0
+ 701 002b 04       		.uleb128 0x4
+ 702 002c 16       		.uleb128 0x16
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 16
+
+
+ 703 002d 00       		.byte	0x0
+ 704 002e 03       		.uleb128 0x3
+ 705 002f 0E       		.uleb128 0xe
+ 706 0030 3A       		.uleb128 0x3a
+ 707 0031 0B       		.uleb128 0xb
+ 708 0032 3B       		.uleb128 0x3b
+ 709 0033 0B       		.uleb128 0xb
+ 710 0034 49       		.uleb128 0x49
+ 711 0035 13       		.uleb128 0x13
+ 712 0036 00       		.byte	0x0
+ 713 0037 00       		.byte	0x0
+ 714 0038 05       		.uleb128 0x5
+ 715 0039 24       		.uleb128 0x24
+ 716 003a 00       		.byte	0x0
+ 717 003b 0B       		.uleb128 0xb
+ 718 003c 0B       		.uleb128 0xb
+ 719 003d 3E       		.uleb128 0x3e
+ 720 003e 0B       		.uleb128 0xb
+ 721 003f 03       		.uleb128 0x3
+ 722 0040 08       		.uleb128 0x8
+ 723 0041 00       		.byte	0x0
+ 724 0042 00       		.byte	0x0
+ 725 0043 06       		.uleb128 0x6
+ 726 0044 0F       		.uleb128 0xf
+ 727 0045 00       		.byte	0x0
+ 728 0046 0B       		.uleb128 0xb
+ 729 0047 0B       		.uleb128 0xb
+ 730 0048 00       		.byte	0x0
+ 731 0049 00       		.byte	0x0
+ 732 004a 07       		.uleb128 0x7
+ 733 004b 2E       		.uleb128 0x2e
+ 734 004c 01       		.byte	0x1
+ 735 004d 03       		.uleb128 0x3
+ 736 004e 0E       		.uleb128 0xe
+ 737 004f 3A       		.uleb128 0x3a
+ 738 0050 0B       		.uleb128 0xb
+ 739 0051 3B       		.uleb128 0x3b
+ 740 0052 0B       		.uleb128 0xb
+ 741 0053 27       		.uleb128 0x27
+ 742 0054 0C       		.uleb128 0xc
+ 743 0055 20       		.uleb128 0x20
+ 744 0056 0B       		.uleb128 0xb
+ 745 0057 01       		.uleb128 0x1
+ 746 0058 13       		.uleb128 0x13
+ 747 0059 00       		.byte	0x0
+ 748 005a 00       		.byte	0x0
+ 749 005b 08       		.uleb128 0x8
+ 750 005c 05       		.uleb128 0x5
+ 751 005d 00       		.byte	0x0
+ 752 005e 03       		.uleb128 0x3
+ 753 005f 0E       		.uleb128 0xe
+ 754 0060 3A       		.uleb128 0x3a
+ 755 0061 0B       		.uleb128 0xb
+ 756 0062 3B       		.uleb128 0x3b
+ 757 0063 0B       		.uleb128 0xb
+ 758 0064 49       		.uleb128 0x49
+ 759 0065 13       		.uleb128 0x13
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 17
+
+
+ 760 0066 00       		.byte	0x0
+ 761 0067 00       		.byte	0x0
+ 762 0068 09       		.uleb128 0x9
+ 763 0069 2E       		.uleb128 0x2e
+ 764 006a 01       		.byte	0x1
+ 765 006b 3F       		.uleb128 0x3f
+ 766 006c 0C       		.uleb128 0xc
+ 767 006d 03       		.uleb128 0x3
+ 768 006e 0E       		.uleb128 0xe
+ 769 006f 3A       		.uleb128 0x3a
+ 770 0070 0B       		.uleb128 0xb
+ 771 0071 3B       		.uleb128 0x3b
+ 772 0072 0B       		.uleb128 0xb
+ 773 0073 27       		.uleb128 0x27
+ 774 0074 0C       		.uleb128 0xc
+ 775 0075 11       		.uleb128 0x11
+ 776 0076 01       		.uleb128 0x1
+ 777 0077 12       		.uleb128 0x12
+ 778 0078 01       		.uleb128 0x1
+ 779 0079 40       		.uleb128 0x40
+ 780 007a 06       		.uleb128 0x6
+ 781 007b 01       		.uleb128 0x1
+ 782 007c 13       		.uleb128 0x13
+ 783 007d 00       		.byte	0x0
+ 784 007e 00       		.byte	0x0
+ 785 007f 0A       		.uleb128 0xa
+ 786 0080 05       		.uleb128 0x5
+ 787 0081 00       		.byte	0x0
+ 788 0082 03       		.uleb128 0x3
+ 789 0083 0E       		.uleb128 0xe
+ 790 0084 3A       		.uleb128 0x3a
+ 791 0085 0B       		.uleb128 0xb
+ 792 0086 3B       		.uleb128 0x3b
+ 793 0087 0B       		.uleb128 0xb
+ 794 0088 49       		.uleb128 0x49
+ 795 0089 13       		.uleb128 0x13
+ 796 008a 02       		.uleb128 0x2
+ 797 008b 06       		.uleb128 0x6
+ 798 008c 00       		.byte	0x0
+ 799 008d 00       		.byte	0x0
+ 800 008e 0B       		.uleb128 0xb
+ 801 008f 34       		.uleb128 0x34
+ 802 0090 00       		.byte	0x0
+ 803 0091 03       		.uleb128 0x3
+ 804 0092 0E       		.uleb128 0xe
+ 805 0093 3A       		.uleb128 0x3a
+ 806 0094 0B       		.uleb128 0xb
+ 807 0095 3B       		.uleb128 0x3b
+ 808 0096 0B       		.uleb128 0xb
+ 809 0097 49       		.uleb128 0x49
+ 810 0098 13       		.uleb128 0x13
+ 811 0099 02       		.uleb128 0x2
+ 812 009a 0A       		.uleb128 0xa
+ 813 009b 00       		.byte	0x0
+ 814 009c 00       		.byte	0x0
+ 815 009d 0C       		.uleb128 0xc
+ 816 009e 34       		.uleb128 0x34
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 18
+
+
+ 817 009f 00       		.byte	0x0
+ 818 00a0 03       		.uleb128 0x3
+ 819 00a1 08       		.uleb128 0x8
+ 820 00a2 3A       		.uleb128 0x3a
+ 821 00a3 0B       		.uleb128 0xb
+ 822 00a4 3B       		.uleb128 0x3b
+ 823 00a5 0B       		.uleb128 0xb
+ 824 00a6 49       		.uleb128 0x49
+ 825 00a7 13       		.uleb128 0x13
+ 826 00a8 00       		.byte	0x0
+ 827 00a9 00       		.byte	0x0
+ 828 00aa 0D       		.uleb128 0xd
+ 829 00ab 1D       		.uleb128 0x1d
+ 830 00ac 01       		.byte	0x1
+ 831 00ad 31       		.uleb128 0x31
+ 832 00ae 13       		.uleb128 0x13
+ 833 00af 11       		.uleb128 0x11
+ 834 00b0 01       		.uleb128 0x1
+ 835 00b1 12       		.uleb128 0x12
+ 836 00b2 01       		.uleb128 0x1
+ 837 00b3 58       		.uleb128 0x58
+ 838 00b4 0B       		.uleb128 0xb
+ 839 00b5 59       		.uleb128 0x59
+ 840 00b6 0B       		.uleb128 0xb
+ 841 00b7 00       		.byte	0x0
+ 842 00b8 00       		.byte	0x0
+ 843 00b9 0E       		.uleb128 0xe
+ 844 00ba 05       		.uleb128 0x5
+ 845 00bb 00       		.byte	0x0
+ 846 00bc 31       		.uleb128 0x31
+ 847 00bd 13       		.uleb128 0x13
+ 848 00be 00       		.byte	0x0
+ 849 00bf 00       		.byte	0x0
+ 850 00c0 0F       		.uleb128 0xf
+ 851 00c1 01       		.uleb128 0x1
+ 852 00c2 01       		.byte	0x1
+ 853 00c3 49       		.uleb128 0x49
+ 854 00c4 13       		.uleb128 0x13
+ 855 00c5 01       		.uleb128 0x1
+ 856 00c6 13       		.uleb128 0x13
+ 857 00c7 00       		.byte	0x0
+ 858 00c8 00       		.byte	0x0
+ 859 00c9 10       		.uleb128 0x10
+ 860 00ca 21       		.uleb128 0x21
+ 861 00cb 00       		.byte	0x0
+ 862 00cc 49       		.uleb128 0x49
+ 863 00cd 13       		.uleb128 0x13
+ 864 00ce 2F       		.uleb128 0x2f
+ 865 00cf 05       		.uleb128 0x5
+ 866 00d0 00       		.byte	0x0
+ 867 00d1 00       		.byte	0x0
+ 868 00d2 11       		.uleb128 0x11
+ 869 00d3 24       		.uleb128 0x24
+ 870 00d4 00       		.byte	0x0
+ 871 00d5 0B       		.uleb128 0xb
+ 872 00d6 0B       		.uleb128 0xb
+ 873 00d7 3E       		.uleb128 0x3e
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 19
+
+
+ 874 00d8 0B       		.uleb128 0xb
+ 875 00d9 00       		.byte	0x0
+ 876 00da 00       		.byte	0x0
+ 877 00db 12       		.uleb128 0x12
+ 878 00dc 34       		.uleb128 0x34
+ 879 00dd 00       		.byte	0x0
+ 880 00de 03       		.uleb128 0x3
+ 881 00df 0E       		.uleb128 0xe
+ 882 00e0 3A       		.uleb128 0x3a
+ 883 00e1 0B       		.uleb128 0xb
+ 884 00e2 3B       		.uleb128 0x3b
+ 885 00e3 0B       		.uleb128 0xb
+ 886 00e4 49       		.uleb128 0x49
+ 887 00e5 13       		.uleb128 0x13
+ 888 00e6 3F       		.uleb128 0x3f
+ 889 00e7 0C       		.uleb128 0xc
+ 890 00e8 02       		.uleb128 0x2
+ 891 00e9 0A       		.uleb128 0xa
+ 892 00ea 00       		.byte	0x0
+ 893 00eb 00       		.byte	0x0
+ 894 00ec 13       		.uleb128 0x13
+ 895 00ed 26       		.uleb128 0x26
+ 896 00ee 00       		.byte	0x0
+ 897 00ef 49       		.uleb128 0x49
+ 898 00f0 13       		.uleb128 0x13
+ 899 00f1 00       		.byte	0x0
+ 900 00f2 00       		.byte	0x0
+ 901 00f3 14       		.uleb128 0x14
+ 902 00f4 21       		.uleb128 0x21
+ 903 00f5 00       		.byte	0x0
+ 904 00f6 49       		.uleb128 0x49
+ 905 00f7 13       		.uleb128 0x13
+ 906 00f8 2F       		.uleb128 0x2f
+ 907 00f9 0B       		.uleb128 0xb
+ 908 00fa 00       		.byte	0x0
+ 909 00fb 00       		.byte	0x0
+ 910 00fc 00       		.byte	0x0
+ 911              		.section	.debug_pubnames,"",%progbits
+ 912 0000 37000000 		.4byte	0x37
+ 913 0004 0200     		.2byte	0x2
+ 914 0006 00000000 		.4byte	.Ldebug_info0
+ 915 000a 3B010000 		.4byte	0x13b
+ 916 000e 99000000 		.4byte	0x99
+ 917 0012 74657374 		.ascii	"testLEDMatrix\000"
+ 917      4C45444D 
+ 917      61747269 
+ 917      7800
+ 918 0020 01010000 		.4byte	0x101
+ 919 0024 65615465 		.ascii	"eaText\000"
+ 919      787400
+ 920 002b 28010000 		.4byte	0x128
+ 921 002f 70617474 		.ascii	"pattern\000"
+ 921      65726E00 
+ 922 0037 00000000 		.4byte	0x0
+ 923              		.section	.debug_aranges,"",%progbits
+ 924 0000 1C000000 		.4byte	0x1c
+ 925 0004 0200     		.2byte	0x2
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 20
+
+
+ 926 0006 00000000 		.4byte	.Ldebug_info0
+ 927 000a 04       		.byte	0x4
+ 928 000b 00       		.byte	0x0
+ 929 000c 0000     		.2byte	0x0
+ 930 000e 0000     		.2byte	0x0
+ 931 0010 00000000 		.4byte	.Ltext0
+ 932 0014 C8000000 		.4byte	.Letext0-.Ltext0
+ 933 0018 00000000 		.4byte	0x0
+ 934 001c 00000000 		.4byte	0x0
+ 935              		.section	.debug_str,"MS",%progbits,1
+ 936              	.LASF11:
+ 937 0000 474E5520 		.ascii	"GNU C 4.2.2\000"
+ 937      4320342E 
+ 937      322E3200 
+ 938              	.LASF15:
+ 939 000c 64656C61 		.ascii	"delayInMs\000"
+ 939      79496E4D 
+ 939      7300
+ 940              	.LASF12:
+ 941 0016 74657374 		.ascii	"testLEDMatrix.c\000"
+ 941      4C45444D 
+ 941      61747269 
+ 941      782E6300 
+ 942              	.LASF1:
+ 943 0026 756E7369 		.ascii	"unsigned char\000"
+ 943      676E6564 
+ 943      20636861 
+ 943      7200
+ 944              	.LASF18:
+ 945 0034 636E7441 		.ascii	"cntA\000"
+ 945      00
+ 946              	.LASF8:
+ 947 0039 6C6F6E67 		.ascii	"long unsigned int\000"
+ 947      20756E73 
+ 947      69676E65 
+ 947      6420696E 
+ 947      7400
+ 948              	.LASF2:
+ 949 004b 73686F72 		.ascii	"short unsigned int\000"
+ 949      7420756E 
+ 949      7369676E 
+ 949      65642069 
+ 949      6E7400
+ 950              	.LASF10:
+ 951 005e 70617474 		.ascii	"pattern\000"
+ 951      65726E00 
+ 952              	.LASF16:
+ 953 0066 74657374 		.ascii	"testLEDMatrix\000"
+ 953      4C45444D 
+ 953      61747269 
+ 953      7800
+ 954              	.LASF14:
+ 955 0074 73746172 		.ascii	"startTimer1\000"
+ 955      7454696D 
+ 955      65723100 
+ 956              	.LASF4:
+ 957 0080 756E7369 		.ascii	"unsigned int\000"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 21
+
+
+ 957      676E6564 
+ 957      20696E74 
+ 957      00
+ 958              	.LASF0:
+ 959 008d 74553136 		.ascii	"tU16\000"
+ 959      00
+ 960              	.LASF3:
+ 961 0092 74553332 		.ascii	"tU32\000"
+ 961      00
+ 962              	.LASF9:
+ 963 0097 65615465 		.ascii	"eaText\000"
+ 963      787400
+ 964              	.LASF17:
+ 965 009e 70765061 		.ascii	"pvParameters\000"
+ 965      72616D65 
+ 965      74657273 
+ 965      00
+ 966              	.LASF6:
+ 967 00ab 73686F72 		.ascii	"short int\000"
+ 967      7420696E 
+ 967      7400
+ 968              	.LASF13:
+ 969 00b5 2F637967 		.ascii	"/cygdrive/c/Downloads/EDU\000"
+ 969      64726976 
+ 969      652F632F 
+ 969      446F776E 
+ 969      6C6F6164 
+ 970              	.LASF7:
+ 971 00cf 6C6F6E67 		.ascii	"long int\000"
+ 971      20696E74 
+ 971      00
+ 972              	.LASF5:
+ 973 00d8 7369676E 		.ascii	"signed char\000"
+ 973      65642063 
+ 973      68617200 
+ 974              		.ident	"GCC: (GNU) 4.2.2"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s 			page 22
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 testLEDMatrix.c
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s:1      .text:00000000 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s:16     .text:00000000 testLEDMatrix
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s:130    .text:00000094 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s:442    .data:00000000 pattern
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s:149    .rodata:00000000 eaText
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s:150    .rodata:00000000 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccVxWgmh.s:443    .data:00000000 $d
+
+UNDEFINED SYMBOLS
+vTaskDelay
+ledMatrix

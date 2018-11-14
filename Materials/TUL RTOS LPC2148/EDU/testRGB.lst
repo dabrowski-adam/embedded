@@ -1,0 +1,802 @@
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s 			page 1
+
+
+   1              		.code	16
+   2              		.file	"testRGB.c"
+   3              		.section	.debug_abbrev,"",%progbits
+   4              	.Ldebug_abbrev0:
+   5              		.section	.debug_info,"",%progbits
+   6              	.Ldebug_info0:
+   7              		.section	.debug_line,"",%progbits
+   8              	.Ldebug_line0:
+   9 0000 75000000 		.text
+   9      02003400 
+   9      00000201 
+   9      FB0E0D00 
+   9      01010101 
+  10              	.Ltext0:
+  11              		.align	2
+  12              		.global	testRGB
+  13              		.code 16
+  14              		.thumb_func
+  15              		.type	testRGB, %function
+  16              	testRGB:
+  17              	.LFB2:
+  18              		.file 1 "testRGB.c"
+   1:testRGB.c     **** #include "testRGB.h"
+   2:testRGB.c     **** /*****************************************************************************
+   3:testRGB.c     ****  *
+   4:testRGB.c     ****  * Description:
+   5:testRGB.c     ****  *    A process entry function.
+   6:testRGB.c     ****  *
+   7:testRGB.c     ****  ****************************************************************************/
+   8:testRGB.c     **** void testRGB(void *pvParameters)
+   9:testRGB.c     **** {
+  19              		.loc 1 9 0
+  20 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  21              	.LCFI0:
+  22              	.LVL0:
+  23 0002 89B0     		sub	sp, sp, #36
+  24              	.LCFI1:
+  10:testRGB.c     **** 	typedef struct {
+  11:testRGB.c     **** 		tBool Rozjasnia_Sie;
+  12:testRGB.c     **** 		tU32  Jasnosc;   // w zakresie 0 - 0x1000
+  13:testRGB.c     **** 		tU32  O_ile;
+  14:testRGB.c     **** 	} Dioda;
+  15:testRGB.c     **** 	Dioda Diody[3] = {{TRUE, 0, 0x49},{TRUE,0, 0x53},{TRUE,0,0x5b}};
+  25              		.loc 1 15 0
+  26 0004 2E4A     		ldr	r2, .L17
+  27 0006 6B46     		mov	r3, sp
+  28 0008 13CA     		ldmia	r2!, {r0, r1, r4}
+  29 000a 13C3     		stmia	r3!, {r0, r1, r4}
+  30              	.LVL1:
+  31 000c 13CA     		ldmia	r2!, {r0, r1, r4}
+  32 000e 13C3     		stmia	r3!, {r0, r1, r4}
+  33 0010 13CA     		ldmia	r2!, {r0, r1, r4}
+  34 0012 13C3     		stmia	r3!, {r0, r1, r4}
+  16:testRGB.c     **** 	tU8 led;
+  17:testRGB.c     **** 	#define MAX_WART 0x1000
+  18:testRGB.c     **** 
+  19:testRGB.c     ****   	PINSEL0 &= 0xfff03fff;  //Enable PWM2 on P0.7, PWM4 on P0.8, and PWM6 on P0.9
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s 			page 2
+
+
+  35              		.loc 1 19 0
+  36 0014 2B49     		ldr	r1, .L17+4
+  37 0016 2C4A     		ldr	r2, .L17+8
+  38 0018 0B68     		ldr	r3, [r1]
+  39 001a 1340     		and	r3, r3, r2
+  40 001c 0B60     		str	r3, [r1]
+  20:testRGB.c     ****   	PINSEL0 |= 0x000a8000;  //Enable PWM2 on P0.7, PWM4 on P0.8, and PWM6 on P0.9
+  41              		.loc 1 20 0
+  42 001e A823     		mov	r3, #168
+  43 0020 0A68     		ldr	r2, [r1]
+  44 0022 1B03     		lsl	r3, r3, #12
+  45 0024 1A43     		orr	r2, r2, r3
+  21:testRGB.c     **** 
+  22:testRGB.c     ****   	//PULSE WIDTH MODULATION INIT*********************************************
+  23:testRGB.c     ****   	PWM_PR  = 0x00;    // Prescale Register
+  46              		.loc 1 23 0
+  47 0026 294B     		ldr	r3, .L17+12
+  48              		.loc 1 20 0
+  49 0028 0A60     		str	r2, [r1]
+  50              		.loc 1 23 0
+  51 002a 0021     		mov	r1, #0
+  52 002c 1960     		str	r1, [r3]
+  24:testRGB.c     ****   	PWM_MCR = 0x02;    // Match Control Register
+  53              		.loc 1 24 0
+  54 002e 0222     		mov	r2, #2
+  55 0030 0833     		add	r3, r3, #8
+  56 0032 1A60     		str	r2, [r3]
+  25:testRGB.c     ****   	PWM_MR0 = 0x1000;    // TOTAL PERIODTID   T
+  57              		.loc 1 25 0
+  58 0034 264A     		ldr	r2, .L17+16
+  59 0036 8023     		mov	r3, #128
+  60 0038 5B01     		lsl	r3, r3, #5
+  61 003a 1360     		str	r3, [r2]
+  26:testRGB.c     ****   	PWM_MR2 = 0x0000;    // HÖG SIGNAL        t
+  62              		.loc 1 26 0
+  63 003c 254B     		ldr	r3, .L17+20
+  64 003e 1960     		str	r1, [r3]
+  27:testRGB.c     ****   	PWM_MR4 = 0x0000;    // HÖG SIGNAL        t
+  65              		.loc 1 27 0
+  66 0040 2033     		add	r3, r3, #32
+  67 0042 1960     		str	r1, [r3]
+  28:testRGB.c     ****   	PWM_MR6 = 0x0000;    // HÖG SIGNAL        t
+  68              		.loc 1 28 0
+  69 0044 0833     		add	r3, r3, #8
+  70 0046 1960     		str	r1, [r3]
+  29:testRGB.c     ****   	PWM_LER = 0x55;    // Latch Enable Register
+  71              		.loc 1 29 0
+  72 0048 2349     		ldr	r1, .L17+24
+  73 004a 5523     		mov	r3, #85
+  74 004c 0B60     		str	r3, [r1]
+  30:testRGB.c     ****   	PWM_PCR = 0x5400;  // Prescale Counter Register PWMENA2, PWMENA4, PWMENA6
+  75              		.loc 1 30 0
+  76 004e A823     		mov	r3, #168
+  77 0050 DB01     		lsl	r3, r3, #7
+  78 0052 3432     		add	r2, r2, #52
+  79 0054 1360     		str	r3, [r2]
+  31:testRGB.c     ****   	PWM_TCR = 0x09;    // Counter Enable och PWM Enable
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s 			page 3
+
+
+  80              		.loc 1 31 0
+  81 0056 214B     		ldr	r3, .L17+28
+  82 0058 0922     		mov	r2, #9
+  83 005a 1A60     		str	r2, [r3]
+  32:testRGB.c     ****   	//************************************************************************
+  33:testRGB.c     **** 
+  34:testRGB.c     **** 	for (;;)
+  35:testRGB.c     ****   	{
+  36:testRGB.c     **** 		for (led=0; led<3; led++)
+  37:testRGB.c     **** 		{
+  38:testRGB.c     **** 			if ( Diody[led].Rozjasnia_Sie)
+  39:testRGB.c     **** 			{
+  40:testRGB.c     **** 				if ( Diody[led].Jasnosc <= MAX_WART - Diody[led].O_ile)
+  41:testRGB.c     **** 					Diody[led].Jasnosc += Diody[led].O_ile;
+  42:testRGB.c     **** 				else
+  43:testRGB.c     **** 				{
+  44:testRGB.c     **** 					Diody[led].Jasnosc -= Diody[led].O_ile;
+  45:testRGB.c     **** 					Diody[led].Rozjasnia_Sie = FALSE;
+  46:testRGB.c     **** 				}
+  47:testRGB.c     **** 			}
+  48:testRGB.c     **** 			else
+  49:testRGB.c     **** 			{
+  50:testRGB.c     **** 				if ( Diody[led].Jasnosc >= Diody[led].O_ile)
+  51:testRGB.c     **** 					Diody[led].Jasnosc -= Diody[led].O_ile;
+  52:testRGB.c     **** 				else
+  53:testRGB.c     **** 				{
+  54:testRGB.c     **** 					Diody[led].Jasnosc += Diody[led].O_ile;
+  55:testRGB.c     **** 					Diody[led].Rozjasnia_Sie = TRUE;
+  56:testRGB.c     **** 				}
+  57:testRGB.c     **** 			}
+  58:testRGB.c     **** 		}
+  59:testRGB.c     **** 
+  60:testRGB.c     **** 		PWM_MR2 = Diody[0].Jasnosc;
+  61:testRGB.c     **** 		PWM_MR4 = Diody[1].Jasnosc;
+  62:testRGB.c     **** 		PWM_MR6 = Diody[2].Jasnosc;
+  63:testRGB.c     **** 		PWM_LER = (0x40|0x10|0x4); // zastosuj;
+  84              		.loc 1 63 0
+  85 005c 0F1C     		mov	r7, r1
+  86 005e 5426     		mov	r6, #84
+  87              	.L2:
+  88              		.loc 1 31 0
+  89 0060 6C46     		mov	r4, sp
+  90 0062 01A8     		add	r0, sp, #4
+  91 0064 02AD     		add	r5, sp, #8
+  92              	.L3:
+  93              		.loc 1 38 0
+  94 0066 2378     		ldrb	r3, [r4]
+  95 0068 0168     		ldr	r1, [r0]
+  96 006a 2A68     		ldr	r2, [r5]
+  97 006c 002B     		cmp	r3, #0
+  98 006e 0AD0     		beq	.L4
+  99              		.loc 1 40 0
+ 100 0070 8023     		mov	r3, #128
+ 101 0072 5B01     		lsl	r3, r3, #5
+ 102 0074 9B1A     		sub	r3, r3, r2
+ 103 0076 9942     		cmp	r1, r3
+ 104 0078 01D8     		bhi	.L6
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s 			page 4
+
+
+ 105              		.loc 1 41 0
+ 106 007a 5318     		add	r3, r2, r1
+ 107 007c 06E0     		b	.L15
+ 108              	.L6:
+ 109              		.loc 1 44 0
+ 110 007e 8B1A     		sub	r3, r1, r2
+ 111 0080 0360     		str	r3, [r0]
+ 112              		.loc 1 45 0
+ 113 0082 0023     		mov	r3, #0
+ 114 0084 07E0     		b	.L16
+ 115              	.L4:
+ 116              		.loc 1 50 0
+ 117 0086 9142     		cmp	r1, r2
+ 118 0088 02D3     		bcc	.L9
+ 119              		.loc 1 51 0
+ 120 008a 8B1A     		sub	r3, r1, r2
+ 121              	.L15:
+ 122 008c 0360     		str	r3, [r0]
+ 123 008e 03E0     		b	.L8
+ 124              	.L9:
+ 125              		.loc 1 54 0
+ 126 0090 5318     		add	r3, r2, r1
+ 127 0092 0360     		str	r3, [r0]
+ 128              		.loc 1 55 0
+ 129 0094 0123     		mov	r3, #1
+ 130              	.L16:
+ 131 0096 2370     		strb	r3, [r4]
+ 132              	.L8:
+ 133 0098 0C34     		add	r4, r4, #12
+ 134              		.loc 1 36 0
+ 135 009a 09A9     		add	r1, sp, #36
+ 136              		.loc 1 55 0
+ 137 009c 0C30     		add	r0, r0, #12
+ 138 009e 0C35     		add	r5, r5, #12
+ 139              		.loc 1 36 0
+ 140 00a0 8C42     		cmp	r4, r1
+ 141 00a2 E0D1     		bne	.L3
+ 142              		.loc 1 60 0
+ 143 00a4 019A     		ldr	r2, [sp, #4]
+ 144 00a6 0B4B     		ldr	r3, .L17+20
+ 145 00a8 1A60     		str	r2, [r3]
+ 146              		.loc 1 61 0
+ 147 00aa 049A     		ldr	r2, [sp, #16]
+ 148 00ac 2033     		add	r3, r3, #32
+ 149 00ae 1A60     		str	r2, [r3]
+ 150              		.loc 1 62 0
+ 151 00b0 079A     		ldr	r2, [sp, #28]
+ 152 00b2 0833     		add	r3, r3, #8
+ 153 00b4 1A60     		str	r2, [r3]
+  64:testRGB.c     ****     	vTaskDelay(30);
+ 154              		.loc 1 64 0
+ 155 00b6 1E20     		mov	r0, #30
+ 156              		.loc 1 63 0
+ 157 00b8 3E60     		str	r6, [r7]
+ 158              		.loc 1 64 0
+ 159 00ba FFF7FEFF 		bl	vTaskDelay
+ 160 00be CFE7     		b	.L2
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s 			page 5
+
+
+ 161              	.L18:
+ 162              		.align	2
+ 163              	.L17:
+ 164 00c0 00000000 		.word	C.0.1484
+ 165 00c4 00C002E0 		.word	-536690688
+ 166 00c8 FF3FF0FF 		.word	-1032193
+ 167 00cc 0C4001E0 		.word	-536788980
+ 168 00d0 184001E0 		.word	-536788968
+ 169 00d4 204001E0 		.word	-536788960
+ 170 00d8 504001E0 		.word	-536788912
+ 171 00dc 044001E0 		.word	-536788988
+ 172              	.LFE2:
+ 173              		.size	testRGB, .-testRGB
+ 174              		.section	.rodata
+ 175              		.align	2
+ 176              		.type	C.0.1484, %object
+ 177              		.size	C.0.1484, 36
+ 178              	C.0.1484:
+ 179 0000 01       		.byte	1
+ 180 0001 000000   		.space	3
+ 181 0004 00000000 		.word	0
+ 182 0008 49000000 		.word	73
+ 183 000c 01       		.byte	1
+ 184 000d 000000   		.space	3
+ 185 0010 00000000 		.word	0
+ 186 0014 53000000 		.word	83
+ 187 0018 01       		.byte	1
+ 188 0019 000000   		.space	3
+ 189 001c 00000000 		.word	0
+ 190 0020 5B000000 		.word	91
+ 191              		.section	.debug_frame,"",%progbits
+ 192              	.Lframe0:
+ 193 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ 194              	.LSCIE0:
+ 195 0004 FFFFFFFF 		.4byte	0xffffffff
+ 196 0008 01       		.byte	0x1
+ 197 0009 00       		.ascii	"\000"
+ 198 000a 01       		.uleb128 0x1
+ 199 000b 7C       		.sleb128 -4
+ 200 000c 0E       		.byte	0xe
+ 201 000d 0C       		.byte	0xc
+ 202 000e 0D       		.uleb128 0xd
+ 203 000f 00       		.uleb128 0x0
+ 204              		.align	2
+ 205              	.LECIE0:
+ 206              	.LSFDE0:
+ 207 0010 1C000000 		.4byte	.LEFDE0-.LASFDE0
+ 208              	.LASFDE0:
+ 209 0014 00000000 		.4byte	.Lframe0
+ 210 0018 00000000 		.4byte	.LFB2
+ 211 001c E0000000 		.4byte	.LFE2-.LFB2
+ 212 0020 42       		.byte	0x4
+ 213              		.4byte	.LCFI0-.LFB2
+ 214 0021 0E       		.byte	0xe
+ 215 0022 14       		.uleb128 0x14
+ 216 0023 84       		.byte	0x84
+ 217 0024 05       		.uleb128 0x5
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s 			page 6
+
+
+ 218 0025 85       		.byte	0x85
+ 219 0026 04       		.uleb128 0x4
+ 220 0027 86       		.byte	0x86
+ 221 0028 03       		.uleb128 0x3
+ 222 0029 87       		.byte	0x87
+ 223 002a 02       		.uleb128 0x2
+ 224 002b 8E       		.byte	0x8e
+ 225 002c 01       		.uleb128 0x1
+ 226 002d 42       		.byte	0x4
+ 227              		.4byte	.LCFI1-.LCFI0
+ 228 002e 0E       		.byte	0xe
+ 229 002f 38       		.uleb128 0x38
+ 230              		.align	2
+ 231              	.LEFDE0:
+ 232              		.text
+ 233              	.Letext0:
+ 234              		.section	.debug_loc,"",%progbits
+ 235              	.Ldebug_loc0:
+ 236              	.LLST0:
+ 237 0000 00000000 		.4byte	.LFB2-.Ltext0
+ 238 0004 02000000 		.4byte	.LCFI0-.Ltext0
+ 239 0008 0100     		.2byte	0x1
+ 240 000a 5D       		.byte	0x5d
+ 241 000b 02000000 		.4byte	.LCFI0-.Ltext0
+ 242 000f 04000000 		.4byte	.LCFI1-.Ltext0
+ 243 0013 0200     		.2byte	0x2
+ 244 0015 7D       		.byte	0x7d
+ 245 0016 14       		.sleb128 20
+ 246 0017 04000000 		.4byte	.LCFI1-.Ltext0
+ 247 001b E0000000 		.4byte	.LFE2-.Ltext0
+ 248 001f 0200     		.2byte	0x2
+ 249 0021 7D       		.byte	0x7d
+ 250 0022 38       		.sleb128 56
+ 251 0023 00000000 		.4byte	0x0
+ 252 0027 00000000 		.4byte	0x0
+ 253              	.LLST1:
+ 254 002b 02000000 		.4byte	.LVL0-.Ltext0
+ 255 002f 0C000000 		.4byte	.LVL1-.Ltext0
+ 256 0033 0100     		.2byte	0x1
+ 257 0035 50       		.byte	0x50
+ 258 0036 00000000 		.4byte	0x0
+ 259 003a 00000000 		.4byte	0x0
+ 260              		.file 2 "FreeRTOSConfig.h"
+ 261              		.section	.debug_info
+ 262 0000 02010000 		.4byte	0x102
+ 263 0004 0200     		.2byte	0x2
+ 264 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 265 000a 04       		.byte	0x4
+ 266 000b 01       		.uleb128 0x1
+ 267 000c 21000000 		.4byte	.LASF11
+ 268 0010 01       		.byte	0x1
+ 269 0011 2D000000 		.4byte	.LASF12
+ 270 0015 5B000000 		.4byte	.LASF13
+ 271 0019 00000000 		.4byte	.Ltext0
+ 272 001d E0000000 		.4byte	.Letext0
+ 273 0021 00000000 		.4byte	.Ldebug_line0
+ 274 0025 02       		.uleb128 0x2
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s 			page 7
+
+
+ 275 0026 74553800 		.ascii	"tU8\000"
+ 276 002a 02       		.byte	0x2
+ 277 002b A0       		.byte	0xa0
+ 278 002c 30000000 		.4byte	0x30
+ 279 0030 03       		.uleb128 0x3
+ 280 0031 01       		.byte	0x1
+ 281 0032 08       		.byte	0x8
+ 282 0033 3D000000 		.4byte	.LASF0
+ 283 0037 03       		.uleb128 0x3
+ 284 0038 02       		.byte	0x2
+ 285 0039 07       		.byte	0x7
+ 286 003a 75000000 		.4byte	.LASF1
+ 287 003e 04       		.uleb128 0x4
+ 288 003f B7000000 		.4byte	.LASF2
+ 289 0043 02       		.byte	0x2
+ 290 0044 A2       		.byte	0xa2
+ 291 0045 49000000 		.4byte	0x49
+ 292 0049 03       		.uleb128 0x3
+ 293 004a 04       		.byte	0x4
+ 294 004b 07       		.byte	0x7
+ 295 004c 0E000000 		.4byte	.LASF3
+ 296 0050 03       		.uleb128 0x3
+ 297 0051 01       		.byte	0x1
+ 298 0052 06       		.byte	0x6
+ 299 0053 88000000 		.4byte	.LASF4
+ 300 0057 03       		.uleb128 0x3
+ 301 0058 02       		.byte	0x2
+ 302 0059 05       		.byte	0x5
+ 303 005a AD000000 		.4byte	.LASF5
+ 304 005e 05       		.uleb128 0x5
+ 305 005f 04       		.byte	0x4
+ 306 0060 05       		.byte	0x5
+ 307 0061 696E7400 		.ascii	"int\000"
+ 308 0065 04       		.uleb128 0x4
+ 309 0066 A7000000 		.4byte	.LASF6
+ 310 006a 02       		.byte	0x2
+ 311 006b A6       		.byte	0xa6
+ 312 006c 30000000 		.4byte	0x30
+ 313 0070 06       		.uleb128 0x6
+ 314 0071 01       		.byte	0x1
+ 315 0072 4B000000 		.4byte	.LASF14
+ 316 0076 01       		.byte	0x1
+ 317 0077 09       		.byte	0x9
+ 318 0078 01       		.byte	0x1
+ 319 0079 00000000 		.4byte	.LFB2
+ 320 007d E0000000 		.4byte	.LFE2
+ 321 0081 00000000 		.4byte	.LLST0
+ 322 0085 F0000000 		.4byte	0xf0
+ 323 0089 07       		.uleb128 0x7
+ 324 008a 94000000 		.4byte	.LASF15
+ 325 008e 01       		.byte	0x1
+ 326 008f 08       		.byte	0x8
+ 327 0090 F0000000 		.4byte	0xf0
+ 328 0094 2B000000 		.4byte	.LLST1
+ 329 0098 08       		.uleb128 0x8
+ 330 0099 0C       		.byte	0xc
+ 331 009a 01       		.byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s 			page 8
+
+
+ 332 009b 0A       		.byte	0xa
+ 333 009c CB000000 		.4byte	0xcb
+ 334 00a0 09       		.uleb128 0x9
+ 335 00a1 00000000 		.4byte	.LASF7
+ 336 00a5 01       		.byte	0x1
+ 337 00a6 0B       		.byte	0xb
+ 338 00a7 65000000 		.4byte	0x65
+ 339 00ab 02       		.byte	0x2
+ 340 00ac 23       		.byte	0x23
+ 341 00ad 00       		.uleb128 0x0
+ 342 00ae 09       		.uleb128 0x9
+ 343 00af 53000000 		.4byte	.LASF8
+ 344 00b3 01       		.byte	0x1
+ 345 00b4 0C       		.byte	0xc
+ 346 00b5 3E000000 		.4byte	0x3e
+ 347 00b9 02       		.byte	0x2
+ 348 00ba 23       		.byte	0x23
+ 349 00bb 04       		.uleb128 0x4
+ 350 00bc 09       		.uleb128 0x9
+ 351 00bd 37000000 		.4byte	.LASF9
+ 352 00c1 01       		.byte	0x1
+ 353 00c2 0D       		.byte	0xd
+ 354 00c3 3E000000 		.4byte	0x3e
+ 355 00c7 02       		.byte	0x2
+ 356 00c8 23       		.byte	0x23
+ 357 00c9 08       		.uleb128 0x8
+ 358 00ca 00       		.byte	0x0
+ 359 00cb 04       		.uleb128 0x4
+ 360 00cc A1000000 		.4byte	.LASF10
+ 361 00d0 01       		.byte	0x1
+ 362 00d1 0E       		.byte	0xe
+ 363 00d2 98000000 		.4byte	0x98
+ 364 00d6 0A       		.uleb128 0xa
+ 365 00d7 1B000000 		.4byte	.LASF16
+ 366 00db 01       		.byte	0x1
+ 367 00dc 0F       		.byte	0xf
+ 368 00dd F2000000 		.4byte	0xf2
+ 369 00e1 02       		.byte	0x2
+ 370 00e2 91       		.byte	0x91
+ 371 00e3 48       		.sleb128 -56
+ 372 00e4 0B       		.uleb128 0xb
+ 373 00e5 6C656400 		.ascii	"led\000"
+ 374 00e9 01       		.byte	0x1
+ 375 00ea 10       		.byte	0x10
+ 376 00eb 25000000 		.4byte	0x25
+ 377 00ef 00       		.byte	0x0
+ 378 00f0 0C       		.uleb128 0xc
+ 379 00f1 04       		.byte	0x4
+ 380 00f2 0D       		.uleb128 0xd
+ 381 00f3 CB000000 		.4byte	0xcb
+ 382 00f7 02010000 		.4byte	0x102
+ 383 00fb 0E       		.uleb128 0xe
+ 384 00fc 02010000 		.4byte	0x102
+ 385 0100 02       		.byte	0x2
+ 386 0101 00       		.byte	0x0
+ 387 0102 0F       		.uleb128 0xf
+ 388 0103 04       		.byte	0x4
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s 			page 9
+
+
+ 389 0104 07       		.byte	0x7
+ 390 0105 00       		.byte	0x0
+ 391              		.section	.debug_abbrev
+ 392 0000 01       		.uleb128 0x1
+ 393 0001 11       		.uleb128 0x11
+ 394 0002 01       		.byte	0x1
+ 395 0003 25       		.uleb128 0x25
+ 396 0004 0E       		.uleb128 0xe
+ 397 0005 13       		.uleb128 0x13
+ 398 0006 0B       		.uleb128 0xb
+ 399 0007 03       		.uleb128 0x3
+ 400 0008 0E       		.uleb128 0xe
+ 401 0009 1B       		.uleb128 0x1b
+ 402 000a 0E       		.uleb128 0xe
+ 403 000b 11       		.uleb128 0x11
+ 404 000c 01       		.uleb128 0x1
+ 405 000d 12       		.uleb128 0x12
+ 406 000e 01       		.uleb128 0x1
+ 407 000f 10       		.uleb128 0x10
+ 408 0010 06       		.uleb128 0x6
+ 409 0011 00       		.byte	0x0
+ 410 0012 00       		.byte	0x0
+ 411 0013 02       		.uleb128 0x2
+ 412 0014 16       		.uleb128 0x16
+ 413 0015 00       		.byte	0x0
+ 414 0016 03       		.uleb128 0x3
+ 415 0017 08       		.uleb128 0x8
+ 416 0018 3A       		.uleb128 0x3a
+ 417 0019 0B       		.uleb128 0xb
+ 418 001a 3B       		.uleb128 0x3b
+ 419 001b 0B       		.uleb128 0xb
+ 420 001c 49       		.uleb128 0x49
+ 421 001d 13       		.uleb128 0x13
+ 422 001e 00       		.byte	0x0
+ 423 001f 00       		.byte	0x0
+ 424 0020 03       		.uleb128 0x3
+ 425 0021 24       		.uleb128 0x24
+ 426 0022 00       		.byte	0x0
+ 427 0023 0B       		.uleb128 0xb
+ 428 0024 0B       		.uleb128 0xb
+ 429 0025 3E       		.uleb128 0x3e
+ 430 0026 0B       		.uleb128 0xb
+ 431 0027 03       		.uleb128 0x3
+ 432 0028 0E       		.uleb128 0xe
+ 433 0029 00       		.byte	0x0
+ 434 002a 00       		.byte	0x0
+ 435 002b 04       		.uleb128 0x4
+ 436 002c 16       		.uleb128 0x16
+ 437 002d 00       		.byte	0x0
+ 438 002e 03       		.uleb128 0x3
+ 439 002f 0E       		.uleb128 0xe
+ 440 0030 3A       		.uleb128 0x3a
+ 441 0031 0B       		.uleb128 0xb
+ 442 0032 3B       		.uleb128 0x3b
+ 443 0033 0B       		.uleb128 0xb
+ 444 0034 49       		.uleb128 0x49
+ 445 0035 13       		.uleb128 0x13
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s 			page 10
+
+
+ 446 0036 00       		.byte	0x0
+ 447 0037 00       		.byte	0x0
+ 448 0038 05       		.uleb128 0x5
+ 449 0039 24       		.uleb128 0x24
+ 450 003a 00       		.byte	0x0
+ 451 003b 0B       		.uleb128 0xb
+ 452 003c 0B       		.uleb128 0xb
+ 453 003d 3E       		.uleb128 0x3e
+ 454 003e 0B       		.uleb128 0xb
+ 455 003f 03       		.uleb128 0x3
+ 456 0040 08       		.uleb128 0x8
+ 457 0041 00       		.byte	0x0
+ 458 0042 00       		.byte	0x0
+ 459 0043 06       		.uleb128 0x6
+ 460 0044 2E       		.uleb128 0x2e
+ 461 0045 01       		.byte	0x1
+ 462 0046 3F       		.uleb128 0x3f
+ 463 0047 0C       		.uleb128 0xc
+ 464 0048 03       		.uleb128 0x3
+ 465 0049 0E       		.uleb128 0xe
+ 466 004a 3A       		.uleb128 0x3a
+ 467 004b 0B       		.uleb128 0xb
+ 468 004c 3B       		.uleb128 0x3b
+ 469 004d 0B       		.uleb128 0xb
+ 470 004e 27       		.uleb128 0x27
+ 471 004f 0C       		.uleb128 0xc
+ 472 0050 11       		.uleb128 0x11
+ 473 0051 01       		.uleb128 0x1
+ 474 0052 12       		.uleb128 0x12
+ 475 0053 01       		.uleb128 0x1
+ 476 0054 40       		.uleb128 0x40
+ 477 0055 06       		.uleb128 0x6
+ 478 0056 01       		.uleb128 0x1
+ 479 0057 13       		.uleb128 0x13
+ 480 0058 00       		.byte	0x0
+ 481 0059 00       		.byte	0x0
+ 482 005a 07       		.uleb128 0x7
+ 483 005b 05       		.uleb128 0x5
+ 484 005c 00       		.byte	0x0
+ 485 005d 03       		.uleb128 0x3
+ 486 005e 0E       		.uleb128 0xe
+ 487 005f 3A       		.uleb128 0x3a
+ 488 0060 0B       		.uleb128 0xb
+ 489 0061 3B       		.uleb128 0x3b
+ 490 0062 0B       		.uleb128 0xb
+ 491 0063 49       		.uleb128 0x49
+ 492 0064 13       		.uleb128 0x13
+ 493 0065 02       		.uleb128 0x2
+ 494 0066 06       		.uleb128 0x6
+ 495 0067 00       		.byte	0x0
+ 496 0068 00       		.byte	0x0
+ 497 0069 08       		.uleb128 0x8
+ 498 006a 13       		.uleb128 0x13
+ 499 006b 01       		.byte	0x1
+ 500 006c 0B       		.uleb128 0xb
+ 501 006d 0B       		.uleb128 0xb
+ 502 006e 3A       		.uleb128 0x3a
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s 			page 11
+
+
+ 503 006f 0B       		.uleb128 0xb
+ 504 0070 3B       		.uleb128 0x3b
+ 505 0071 0B       		.uleb128 0xb
+ 506 0072 01       		.uleb128 0x1
+ 507 0073 13       		.uleb128 0x13
+ 508 0074 00       		.byte	0x0
+ 509 0075 00       		.byte	0x0
+ 510 0076 09       		.uleb128 0x9
+ 511 0077 0D       		.uleb128 0xd
+ 512 0078 00       		.byte	0x0
+ 513 0079 03       		.uleb128 0x3
+ 514 007a 0E       		.uleb128 0xe
+ 515 007b 3A       		.uleb128 0x3a
+ 516 007c 0B       		.uleb128 0xb
+ 517 007d 3B       		.uleb128 0x3b
+ 518 007e 0B       		.uleb128 0xb
+ 519 007f 49       		.uleb128 0x49
+ 520 0080 13       		.uleb128 0x13
+ 521 0081 38       		.uleb128 0x38
+ 522 0082 0A       		.uleb128 0xa
+ 523 0083 00       		.byte	0x0
+ 524 0084 00       		.byte	0x0
+ 525 0085 0A       		.uleb128 0xa
+ 526 0086 34       		.uleb128 0x34
+ 527 0087 00       		.byte	0x0
+ 528 0088 03       		.uleb128 0x3
+ 529 0089 0E       		.uleb128 0xe
+ 530 008a 3A       		.uleb128 0x3a
+ 531 008b 0B       		.uleb128 0xb
+ 532 008c 3B       		.uleb128 0x3b
+ 533 008d 0B       		.uleb128 0xb
+ 534 008e 49       		.uleb128 0x49
+ 535 008f 13       		.uleb128 0x13
+ 536 0090 02       		.uleb128 0x2
+ 537 0091 0A       		.uleb128 0xa
+ 538 0092 00       		.byte	0x0
+ 539 0093 00       		.byte	0x0
+ 540 0094 0B       		.uleb128 0xb
+ 541 0095 34       		.uleb128 0x34
+ 542 0096 00       		.byte	0x0
+ 543 0097 03       		.uleb128 0x3
+ 544 0098 08       		.uleb128 0x8
+ 545 0099 3A       		.uleb128 0x3a
+ 546 009a 0B       		.uleb128 0xb
+ 547 009b 3B       		.uleb128 0x3b
+ 548 009c 0B       		.uleb128 0xb
+ 549 009d 49       		.uleb128 0x49
+ 550 009e 13       		.uleb128 0x13
+ 551 009f 00       		.byte	0x0
+ 552 00a0 00       		.byte	0x0
+ 553 00a1 0C       		.uleb128 0xc
+ 554 00a2 0F       		.uleb128 0xf
+ 555 00a3 00       		.byte	0x0
+ 556 00a4 0B       		.uleb128 0xb
+ 557 00a5 0B       		.uleb128 0xb
+ 558 00a6 00       		.byte	0x0
+ 559 00a7 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s 			page 12
+
+
+ 560 00a8 0D       		.uleb128 0xd
+ 561 00a9 01       		.uleb128 0x1
+ 562 00aa 01       		.byte	0x1
+ 563 00ab 49       		.uleb128 0x49
+ 564 00ac 13       		.uleb128 0x13
+ 565 00ad 01       		.uleb128 0x1
+ 566 00ae 13       		.uleb128 0x13
+ 567 00af 00       		.byte	0x0
+ 568 00b0 00       		.byte	0x0
+ 569 00b1 0E       		.uleb128 0xe
+ 570 00b2 21       		.uleb128 0x21
+ 571 00b3 00       		.byte	0x0
+ 572 00b4 49       		.uleb128 0x49
+ 573 00b5 13       		.uleb128 0x13
+ 574 00b6 2F       		.uleb128 0x2f
+ 575 00b7 0B       		.uleb128 0xb
+ 576 00b8 00       		.byte	0x0
+ 577 00b9 00       		.byte	0x0
+ 578 00ba 0F       		.uleb128 0xf
+ 579 00bb 24       		.uleb128 0x24
+ 580 00bc 00       		.byte	0x0
+ 581 00bd 0B       		.uleb128 0xb
+ 582 00be 0B       		.uleb128 0xb
+ 583 00bf 3E       		.uleb128 0x3e
+ 584 00c0 0B       		.uleb128 0xb
+ 585 00c1 00       		.byte	0x0
+ 586 00c2 00       		.byte	0x0
+ 587 00c3 00       		.byte	0x0
+ 588              		.section	.debug_pubnames,"",%progbits
+ 589 0000 1A000000 		.4byte	0x1a
+ 590 0004 0200     		.2byte	0x2
+ 591 0006 00000000 		.4byte	.Ldebug_info0
+ 592 000a 06010000 		.4byte	0x106
+ 593 000e 70000000 		.4byte	0x70
+ 594 0012 74657374 		.ascii	"testRGB\000"
+ 594      52474200 
+ 595 001a 00000000 		.4byte	0x0
+ 596              		.section	.debug_aranges,"",%progbits
+ 597 0000 1C000000 		.4byte	0x1c
+ 598 0004 0200     		.2byte	0x2
+ 599 0006 00000000 		.4byte	.Ldebug_info0
+ 600 000a 04       		.byte	0x4
+ 601 000b 00       		.byte	0x0
+ 602 000c 0000     		.2byte	0x0
+ 603 000e 0000     		.2byte	0x0
+ 604 0010 00000000 		.4byte	.Ltext0
+ 605 0014 E0000000 		.4byte	.Letext0-.Ltext0
+ 606 0018 00000000 		.4byte	0x0
+ 607 001c 00000000 		.4byte	0x0
+ 608              		.section	.debug_str,"MS",%progbits,1
+ 609              	.LASF7:
+ 610 0000 526F7A6A 		.ascii	"Rozjasnia_Sie\000"
+ 610      61736E69 
+ 610      615F5369 
+ 610      6500
+ 611              	.LASF3:
+ 612 000e 756E7369 		.ascii	"unsigned int\000"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s 			page 13
+
+
+ 612      676E6564 
+ 612      20696E74 
+ 612      00
+ 613              	.LASF16:
+ 614 001b 44696F64 		.ascii	"Diody\000"
+ 614      7900
+ 615              	.LASF11:
+ 616 0021 474E5520 		.ascii	"GNU C 4.2.2\000"
+ 616      4320342E 
+ 616      322E3200 
+ 617              	.LASF12:
+ 618 002d 74657374 		.ascii	"testRGB.c\000"
+ 618      5247422E 
+ 618      6300
+ 619              	.LASF9:
+ 620 0037 4F5F696C 		.ascii	"O_ile\000"
+ 620      6500
+ 621              	.LASF0:
+ 622 003d 756E7369 		.ascii	"unsigned char\000"
+ 622      676E6564 
+ 622      20636861 
+ 622      7200
+ 623              	.LASF14:
+ 624 004b 74657374 		.ascii	"testRGB\000"
+ 624      52474200 
+ 625              	.LASF8:
+ 626 0053 4A61736E 		.ascii	"Jasnosc\000"
+ 626      6F736300 
+ 627              	.LASF13:
+ 628 005b 2F637967 		.ascii	"/cygdrive/c/Downloads/EDU\000"
+ 628      64726976 
+ 628      652F632F 
+ 628      446F776E 
+ 628      6C6F6164 
+ 629              	.LASF1:
+ 630 0075 73686F72 		.ascii	"short unsigned int\000"
+ 630      7420756E 
+ 630      7369676E 
+ 630      65642069 
+ 630      6E7400
+ 631              	.LASF4:
+ 632 0088 7369676E 		.ascii	"signed char\000"
+ 632      65642063 
+ 632      68617200 
+ 633              	.LASF15:
+ 634 0094 70765061 		.ascii	"pvParameters\000"
+ 634      72616D65 
+ 634      74657273 
+ 634      00
+ 635              	.LASF10:
+ 636 00a1 44696F64 		.ascii	"Dioda\000"
+ 636      6100
+ 637              	.LASF6:
+ 638 00a7 74426F6F 		.ascii	"tBool\000"
+ 638      6C00
+ 639              	.LASF5:
+ 640 00ad 73686F72 		.ascii	"short int\000"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s 			page 14
+
+
+ 640      7420696E 
+ 640      7400
+ 641              	.LASF2:
+ 642 00b7 74553332 		.ascii	"tU32\000"
+ 642      00
+ 643              		.ident	"GCC: (GNU) 4.2.2"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s 			page 15
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 testRGB.c
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s:1      .text:00000000 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s:16     .text:00000000 testRGB
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s:164    .text:000000c0 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s:178    .rodata:00000000 C.0.1484
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/cckGMyzf.s:179    .rodata:00000000 $d
+
+UNDEFINED SYMBOLS
+vTaskDelay

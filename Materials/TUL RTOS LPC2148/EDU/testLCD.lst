@@ -1,0 +1,1724 @@
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 1
+
+
+   1              		.code	16
+   2              		.file	"testLCD.c"
+   3              		.section	.debug_abbrev,"",%progbits
+   4              	.Ldebug_abbrev0:
+   5              		.section	.debug_info,"",%progbits
+   6              	.Ldebug_info0:
+   7              		.section	.debug_line,"",%progbits
+   8              	.Ldebug_line0:
+   9 0000 B8000000 		.text
+   9      02003400 
+   9      00000201 
+   9      FB0E0D00 
+   9      01010101 
+  10              	.Ltext0:
+  11              		.align	2
+  12              		.global	initLCD
+  13              		.code 16
+  14              		.thumb_func
+  15              		.type	initLCD, %function
+  16              	initLCD:
+  17              	.LFB2:
+  18              		.file 1 "testLCD.c"
+   1:testLCD.c     **** #include "testLCD.h"
+   2:testLCD.c     **** #include "FreeRTOS.h"
+   3:testLCD.c     **** #include "task.h"
+   4:testLCD.c     **** 
+   5:testLCD.c     **** #define LCD_DATA      0x00ff0000  //P1.16-P1.23
+   6:testLCD.c     **** #define LCD_E         0x02000000  //P1.25
+   7:testLCD.c     **** #define LCD_RW        0x00400000  //P0.22
+   8:testLCD.c     **** #define LCD_RS        0x01000000  //P1.24
+   9:testLCD.c     **** #define LCD_BACKLIGHT 0x40000000  //P0.30
+  10:testLCD.c     **** 
+  11:testLCD.c     **** 
+  12:testLCD.c     **** 
+  13:testLCD.c     **** 
+  14:testLCD.c     **** 
+  15:testLCD.c     **** 
+  16:testLCD.c     **** 
+  17:testLCD.c     **** void initLCD (void);
+  18:testLCD.c     **** void delay37us(void);
+  19:testLCD.c     **** void writeLCD(tU8 reg, tU8 data);
+  20:testLCD.c     **** void lcdBacklight(tU8 onOff);
+  21:testLCD.c     **** void WriteString (char *str);
+  22:testLCD.c     **** 
+  23:testLCD.c     **** 
+  24:testLCD.c     **** 
+  25:testLCD.c     **** void initLCD (void)
+  26:testLCD.c     **** {
+  19              		.loc 1 26 0
+  27:testLCD.c     **** 	IODIR1 |= (LCD_DATA | LCD_E | LCD_RS);
+  20              		.loc 1 27 0
+  21 0000 0A4A     		ldr	r2, .L3
+  22 0002 0B49     		ldr	r1, .L3+4
+  23 0004 1368     		ldr	r3, [r2]
+  24 0006 0B43     		orr	r3, r3, r1
+  25 0008 1360     		str	r3, [r2]
+  28:testLCD.c     **** 	IOCLR1  = (LCD_DATA | LCD_E | LCD_RS);
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 2
+
+
+  26              		.loc 1 28 0
+  27 000a 0A4B     		ldr	r3, .L3+8
+  28 000c 1960     		str	r1, [r3]
+  29:testLCD.c     **** 
+  30:testLCD.c     **** 	IODIR0 |= LCD_RW;
+  29              		.loc 1 30 0
+  30 000e 0A49     		ldr	r1, .L3+12
+  31 0010 8022     		mov	r2, #128
+  32 0012 0B68     		ldr	r3, [r1]
+  33 0014 D203     		lsl	r2, r2, #15
+  31:testLCD.c     **** 	IOCLR0  = LCD_RW;
+  34              		.loc 1 31 0
+  35 0016 0948     		ldr	r0, .L3+16
+  36              		.loc 1 30 0
+  37 0018 1343     		orr	r3, r3, r2
+  38 001a 0B60     		str	r3, [r1]
+  39              		.loc 1 31 0
+  40 001c 0260     		str	r2, [r0]
+  32:testLCD.c     **** 
+  33:testLCD.c     ****   	IODIR0 |= LCD_BACKLIGHT;
+  41              		.loc 1 33 0
+  42 001e 8023     		mov	r3, #128
+  43 0020 0A68     		ldr	r2, [r1]
+  44 0022 DB05     		lsl	r3, r3, #23
+  45 0024 1A43     		orr	r2, r2, r3
+  46 0026 0A60     		str	r2, [r1]
+  47              		.loc 1 26 0
+  48              		@ lr needed for prologue
+  34:testLCD.c     ****   	IOCLR0  = LCD_BACKLIGHT;
+  49              		.loc 1 34 0
+  50 0028 0360     		str	r3, [r0]
+  35:testLCD.c     **** }
+  51              		.loc 1 35 0
+  52              		@ sp needed for prologue
+  53 002a 7047     		bx	lr
+  54              	.L4:
+  55              		.align	2
+  56              	.L3:
+  57 002c 188002E0 		.word	-536707048
+  58 0030 0000FF03 		.word	67043328
+  59 0034 1C8002E0 		.word	-536707044
+  60 0038 088002E0 		.word	-536707064
+  61 003c 0C8002E0 		.word	-536707060
+  62              	.LFE2:
+  63              		.size	initLCD, .-initLCD
+  64              		.align	2
+  65              		.global	writeLCD
+  66              		.code 16
+  67              		.thumb_func
+  68              		.type	writeLCD, %function
+  69              	writeLCD:
+  70              	.LFB4:
+  36:testLCD.c     **** 
+  37:testLCD.c     **** void delay37us(void)
+  38:testLCD.c     **** {
+  39:testLCD.c     **** 	vTaskDelay(1);
+  40:testLCD.c     **** //	volatile tU32 i;
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 3
+
+
+  41:testLCD.c     **** 
+  42:testLCD.c     **** //Temp test for 140 uS delay
+  43:testLCD.c     **** //	for(i=0; i<6*2500; i++)
+  44:testLCD.c     **** //    asm volatile (" nop"); //delay 15 ns x 2500 = about 37 us delay
+  45:testLCD.c     **** 
+  46:testLCD.c     **** }
+  47:testLCD.c     **** 
+  48:testLCD.c     **** void writeLCD(tU8 reg, tU8 data)
+  49:testLCD.c     **** {
+  71              		.loc 1 49 0
+  72              	.LVL0:
+  73 0040 0906     		lsl	r1, r1, #24
+  74              	.LVL1:
+  75 0042 0006     		lsl	r0, r0, #24
+  76              	.LVL2:
+  77 0044 81B0     		sub	sp, sp, #4
+  78              	.LCFI0:
+  79              		@ lr needed for prologue
+  80              		.loc 1 49 0
+  81 0046 090E     		lsr	r1, r1, #24
+  82              	.LVL3:
+  50:testLCD.c     **** 	volatile tU8 i;
+  51:testLCD.c     **** 
+  52:testLCD.c     **** 	if (reg == 0)
+  83              		.loc 1 52 0
+  84 0048 0028     		cmp	r0, #0
+  85 004a 03D1     		bne	.L6
+  53:testLCD.c     **** 	  IOCLR1 = LCD_RS;
+  86              		.loc 1 53 0
+  87 004c 8023     		mov	r3, #128
+  88 004e 1D4A     		ldr	r2, .L17
+  89 0050 5B04     		lsl	r3, r3, #17
+  90 0052 02E0     		b	.L16
+  91              	.L6:
+  54:testLCD.c     **** 	else
+  55:testLCD.c     **** 	  IOSET1 = LCD_RS;
+  92              		.loc 1 55 0
+  93 0054 8023     		mov	r3, #128
+  94 0056 1C4A     		ldr	r2, .L17+4
+  95 0058 5B04     		lsl	r3, r3, #17
+  96              	.L16:
+  97 005a 1360     		str	r3, [r2]
+  56:testLCD.c     **** 
+  57:testLCD.c     ****   	IOCLR0 = LCD_RW;
+  98              		.loc 1 57 0
+  99 005c 1B4A     		ldr	r2, .L17+8
+ 100 005e 8023     		mov	r3, #128
+ 101 0060 DB03     		lsl	r3, r3, #15
+ 102 0062 1360     		str	r3, [r2]
+  58:testLCD.c     **** 	IOCLR1 = LCD_DATA;
+ 103              		.loc 1 58 0
+ 104 0064 174B     		ldr	r3, .L17
+ 105 0066 FF22     		mov	r2, #255
+ 106 0068 1204     		lsl	r2, r2, #16
+ 107 006a 1A60     		str	r2, [r3]
+  59:testLCD.c     **** 	IOSET1 = ((tU32)data << 16) & LCD_DATA;
+ 108              		.loc 1 59 0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 4
+
+
+ 109 006c 0B04     		lsl	r3, r1, #16
+ 110 006e 1340     		and	r3, r3, r2
+ 111 0070 154A     		ldr	r2, .L17+4
+ 112 0072 1360     		str	r3, [r2]
+  60:testLCD.c     **** //printf("\nwrite: %x", data);
+  61:testLCD.c     **** 
+  62:testLCD.c     **** 	IOSET1 = LCD_E;
+ 113              		.loc 1 62 0
+ 114 0074 8023     		mov	r3, #128
+ 115 0076 9B04     		lsl	r3, r3, #18
+ 116 0078 1360     		str	r3, [r2]
+  63:testLCD.c     **** //	osSleep(1);
+  64:testLCD.c     **** 	for(i=0; i<16; i++)
+ 117              		.loc 1 64 0
+ 118 007a 6B46     		mov	r3, sp
+ 119 007c 0022     		mov	r2, #0
+ 120 007e 0333     		add	r3, r3, #3
+ 121 0080 1A70     		strb	r2, [r3]
+ 122              	.LVL4:
+ 123 0082 05E0     		b	.L9
+ 124              	.LVL5:
+ 125              	.L10:
+  65:testLCD.c     ****     	asm volatile (" nop"); //delay 15 ns x 16 = about 250 ns delay
+ 126              		.loc 1 65 0
+ 127 0084 C046     		 nop
+ 128              		.loc 1 64 0
+ 129              		.code	16
+ 130 0086 0B78     		ldrb	r3, [r1]
+ 131              	.LVL6:
+ 132 0088 0133     		add	r3, r3, #1
+ 133              	.LVL7:
+ 134 008a 1B06     		lsl	r3, r3, #24
+ 135 008c 1B0E     		lsr	r3, r3, #24
+ 136 008e 0B70     		strb	r3, [r1]
+ 137              	.LVL8:
+ 138              	.L9:
+ 139 0090 6946     		mov	r1, sp
+ 140              	.LVL9:
+ 141 0092 0331     		add	r1, r1, #3
+ 142 0094 0B78     		ldrb	r3, [r1]
+ 143              	.LVL10:
+ 144 0096 0F2B     		cmp	r3, #15
+ 145 0098 F4D9     		bls	.L10
+  66:testLCD.c     **** 	IOCLR1 = LCD_E;
+ 146              		.loc 1 66 0
+ 147 009a 8023     		mov	r3, #128
+ 148              	.LVL11:
+ 149 009c 094A     		ldr	r2, .L17
+ 150 009e 9B04     		lsl	r3, r3, #18
+ 151 00a0 1360     		str	r3, [r2]
+  67:testLCD.c     **** //	osSleep(1);
+  68:testLCD.c     **** 	for(i=0; i<16; i++)
+ 152              		.loc 1 68 0
+ 153 00a2 0023     		mov	r3, #0
+ 154 00a4 0B70     		strb	r3, [r1]
+ 155              	.LVL12:
+ 156 00a6 05E0     		b	.L12
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 5
+
+
+ 157              	.LVL13:
+ 158              	.L13:
+  69:testLCD.c     ****     asm volatile (" nop"); //delay 15 ns x 16 = about 250 ns delay
+ 159              		.loc 1 69 0
+ 160 00a8 C046     		 nop
+ 161              		.loc 1 68 0
+ 162              		.code	16
+ 163 00aa 1378     		ldrb	r3, [r2]
+ 164              	.LVL14:
+ 165 00ac 0133     		add	r3, r3, #1
+ 166              	.LVL15:
+ 167 00ae 1B06     		lsl	r3, r3, #24
+ 168 00b0 1B0E     		lsr	r3, r3, #24
+ 169 00b2 1370     		strb	r3, [r2]
+ 170              	.LVL16:
+ 171              	.L12:
+ 172 00b4 6A46     		mov	r2, sp
+ 173 00b6 0332     		add	r2, r2, #3
+ 174 00b8 1378     		ldrb	r3, [r2]
+ 175              	.LVL17:
+ 176 00ba 0F2B     		cmp	r3, #15
+ 177 00bc F4D9     		bls	.L13
+  70:testLCD.c     **** }
+ 178              		.loc 1 70 0
+ 179 00be 01B0     		add	sp, sp, #4
+ 180              		@ sp needed for prologue
+ 181 00c0 7047     		bx	lr
+ 182              	.L18:
+ 183 00c2 C046     		.align	2
+ 184              	.L17:
+ 185 00c4 1C8002E0 		.word	-536707044
+ 186 00c8 148002E0 		.word	-536707052
+ 187 00cc 0C8002E0 		.word	-536707060
+ 188              	.LFE4:
+ 189              		.size	writeLCD, .-writeLCD
+ 190              		.align	2
+ 191              		.global	lcdBacklight
+ 192              		.code 16
+ 193              		.thumb_func
+ 194              		.type	lcdBacklight, %function
+ 195              	lcdBacklight:
+ 196              	.LFB5:
+  71:testLCD.c     **** 
+  72:testLCD.c     **** 
+  73:testLCD.c     **** 
+  74:testLCD.c     **** void lcdBacklight(tU8 onOff)
+  75:testLCD.c     **** {
+ 197              		.loc 1 75 0
+ 198              	.LVL18:
+ 199 00d0 0006     		lsl	r0, r0, #24
+ 200              	.LVL19:
+ 201 00d2 000E     		lsr	r0, r0, #24
+ 202              	.LVL20:
+ 203              		@ lr needed for prologue
+  76:testLCD.c     **** 	if (onOff == TRUE)
+ 204              		.loc 1 76 0
+ 205 00d4 0128     		cmp	r0, #1
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 6
+
+
+ 206 00d6 03D1     		bne	.L20
+  77:testLCD.c     **** 	  IOSET0 = LCD_BACKLIGHT;
+ 207              		.loc 1 77 0
+ 208 00d8 8023     		mov	r3, #128
+ 209 00da 044A     		ldr	r2, .L25
+ 210 00dc DB05     		lsl	r3, r3, #23
+ 211 00de 02E0     		b	.L24
+ 212              	.L20:
+  78:testLCD.c     **** 	else
+  79:testLCD.c     **** 	  IOCLR0 = LCD_BACKLIGHT;
+ 213              		.loc 1 79 0
+ 214 00e0 8023     		mov	r3, #128
+ 215 00e2 034A     		ldr	r2, .L25+4
+ 216 00e4 DB05     		lsl	r3, r3, #23
+ 217              	.L24:
+ 218 00e6 1360     		str	r3, [r2]
+  80:testLCD.c     **** }
+ 219              		.loc 1 80 0
+ 220              		@ sp needed for prologue
+ 221 00e8 7047     		bx	lr
+ 222              	.L26:
+ 223 00ea C046     		.align	2
+ 224              	.L25:
+ 225 00ec 048002E0 		.word	-536707068
+ 226 00f0 0C8002E0 		.word	-536707060
+ 227              	.LFE5:
+ 228              		.size	lcdBacklight, .-lcdBacklight
+ 229              		.align	2
+ 230              		.global	delay37us
+ 231              		.code 16
+ 232              		.thumb_func
+ 233              		.type	delay37us, %function
+ 234              	delay37us:
+ 235              	.LFB3:
+ 236              		.loc 1 38 0
+ 237 00f4 00B5     		push	{lr}
+ 238              	.LCFI1:
+ 239              		.loc 1 39 0
+ 240 00f6 0120     		mov	r0, #1
+ 241 00f8 FFF7FEFF 		bl	vTaskDelay
+ 242              		.loc 1 46 0
+ 243              		@ sp needed for prologue
+ 244 00fc 01BC     		pop	{r0}
+ 245 00fe 0047     		bx	r0
+ 246              	.LFE3:
+ 247              		.size	delay37us, .-delay37us
+ 248              		.align	2
+ 249              		.global	WriteString
+ 250              		.code 16
+ 251              		.thumb_func
+ 252              		.type	WriteString, %function
+ 253              	WriteString:
+ 254              	.LFB6:
+  81:testLCD.c     **** 
+  82:testLCD.c     **** 
+  83:testLCD.c     **** 
+  84:testLCD.c     **** void WriteString (char *str)
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 7
+
+
+  85:testLCD.c     **** {
+ 255              		.loc 1 85 0
+ 256 0100 10B5     		push	{r4, lr}
+ 257              	.LCFI2:
+ 258              	.LVL21:
+ 259              		.loc 1 85 0
+ 260 0102 041C     		mov	r4, r0
+ 261 0104 05E0     		b	.L30
+ 262              	.LVL22:
+ 263              	.L31:
+  86:testLCD.c     **** 	while ( *str )
+  87:testLCD.c     **** 	{
+  88:testLCD.c     **** 	    writeLCD(1, *str++);
+ 264              		.loc 1 88 0
+ 265 0106 0120     		mov	r0, #1
+ 266 0108 0134     		add	r4, r4, #1
+ 267 010a FFF7FEFF 		bl	writeLCD
+  89:testLCD.c     ****     	delay37us();
+ 268              		.loc 1 89 0
+ 269 010e FFF7FEFF 		bl	delay37us
+ 270              	.LVL23:
+ 271              	.L30:
+ 272              		.loc 1 86 0
+ 273 0112 2178     		ldrb	r1, [r4]
+ 274 0114 0029     		cmp	r1, #0
+ 275 0116 F6D1     		bne	.L31
+  90:testLCD.c     **** 	}
+  91:testLCD.c     **** }
+ 276              		.loc 1 91 0
+ 277              		@ sp needed for prologue
+ 278              	.LVL24:
+ 279 0118 10BC     		pop	{r4}
+ 280 011a 01BC     		pop	{r0}
+ 281 011c 0047     		bx	r0
+ 282              	.LFE6:
+ 283              		.size	WriteString, .-WriteString
+ 284 011e C046     		.align	2
+ 285              		.global	testLCD
+ 286              		.code 16
+ 287              		.thumb_func
+ 288              		.type	testLCD, %function
+ 289              	testLCD:
+ 290              	.LFB7:
+  92:testLCD.c     **** 
+  93:testLCD.c     **** 
+  94:testLCD.c     **** char* Gorny_Wiersz = "Malgosia-Bambosia wsciekla zona jest!";
+  95:testLCD.c     **** char* Dolny_Wiersz = "Potwor Basia i Dementror straszliwy Zosia";
+  96:testLCD.c     **** 
+  97:testLCD.c     **** void testLCD(void *pvParameters)
+  98:testLCD.c     **** {
+ 291              		.loc 1 98 0
+ 292 0120 F0B5     		push	{r4, r5, r6, r7, lr}
+ 293              	.LCFI3:
+ 294              	.LVL25:
+  99:testLCD.c     **** 	char *gw = Gorny_Wiersz;
+ 295              		.loc 1 99 0
+ 296 0122 3F4B     		ldr	r3, .L44
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 8
+
+
+ 297 0124 1D68     		ldr	r5, [r3]
+ 298              	.LVL26:
+ 100:testLCD.c     **** 	char *dw = Dolny_Wiersz;
+ 299              		.loc 1 100 0
+ 300 0126 3F4B     		ldr	r3, .L44+4
+ 301 0128 1C68     		ldr	r4, [r3]
+ 302              	.LVL27:
+ 101:testLCD.c     **** 
+ 102:testLCD.c     ****   	initLCD();
+ 303              		.loc 1 102 0
+ 304 012a FFF7FEFF 		bl	initLCD
+ 305              	.LVL28:
+ 306              	.LBB8:
+ 307              	.LBB9:
+ 308              		.loc 1 79 0
+ 309 012e 3E4A     		ldr	r2, .L44+8
+ 310 0130 8023     		mov	r3, #128
+ 311 0132 DB05     		lsl	r3, r3, #23
+ 312 0134 1360     		str	r3, [r2]
+ 313              	.LBE9:
+ 314              	.LBE8:
+ 103:testLCD.c     **** 	lcdBacklight(FALSE);
+ 104:testLCD.c     ****   	vTaskDelay(10);
+ 315              		.loc 1 104 0
+ 316 0136 0A20     		mov	r0, #10
+ 317 0138 FFF7FEFF 		bl	vTaskDelay
+ 318 013c 9627     		mov	r7, #150
+ 319 013e 7F00     		lsl	r7, r7, #1
+ 320              	.L35:
+ 321              	.LBB10:
+ 322              	.LBB11:
+ 323              		.loc 1 77 0
+ 324 0140 3A4B     		ldr	r3, .L44+12
+ 325 0142 8026     		mov	r6, #128
+ 326 0144 F605     		lsl	r6, r6, #23
+ 327 0146 1E60     		str	r6, [r3]
+ 328              	.LBE11:
+ 329              	.LBE10:
+ 105:testLCD.c     **** 
+ 106:testLCD.c     ****   	for(;;)
+ 107:testLCD.c     ****   	{
+ 108:testLCD.c     ****  		lcdBacklight(TRUE);
+ 109:testLCD.c     ****     	vTaskDelay(50);
+ 330              		.loc 1 109 0
+ 331 0148 3220     		mov	r0, #50
+ 332 014a FFF7FEFF 		bl	vTaskDelay
+ 110:testLCD.c     **** 
+ 111:testLCD.c     ****     	//function set
+ 112:testLCD.c     ****     	writeLCD(0, 0x30);
+ 333              		.loc 1 112 0
+ 334 014e 3021     		mov	r1, #48
+ 335 0150 0020     		mov	r0, #0
+ 336 0152 FFF7FEFF 		bl	writeLCD
+ 113:testLCD.c     ****     	vTaskDelay(1);
+ 337              		.loc 1 113 0
+ 338 0156 0120     		mov	r0, #1
+ 339 0158 FFF7FEFF 		bl	vTaskDelay
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 9
+
+
+ 114:testLCD.c     ****     	writeLCD(0, 0x30);
+ 340              		.loc 1 114 0
+ 341 015c 0020     		mov	r0, #0
+ 342 015e 3021     		mov	r1, #48
+ 343 0160 FFF7FEFF 		bl	writeLCD
+ 115:testLCD.c     ****     	delay37us();
+ 344              		.loc 1 115 0
+ 345 0164 FFF7FEFF 		bl	delay37us
+ 116:testLCD.c     ****     	writeLCD(0, 0x30);
+ 346              		.loc 1 116 0
+ 347 0168 0020     		mov	r0, #0
+ 348 016a 3021     		mov	r1, #48
+ 349 016c FFF7FEFF 		bl	writeLCD
+ 117:testLCD.c     ****     	delay37us();
+ 350              		.loc 1 117 0
+ 351 0170 FFF7FEFF 		bl	delay37us
+ 118:testLCD.c     **** 
+ 119:testLCD.c     ****     	//function set
+ 120:testLCD.c     ****     	writeLCD(0, 0x38);
+ 352              		.loc 1 120 0
+ 353 0174 0020     		mov	r0, #0
+ 354 0176 3821     		mov	r1, #56
+ 355 0178 FFF7FEFF 		bl	writeLCD
+ 121:testLCD.c     ****     	delay37us();
+ 356              		.loc 1 121 0
+ 357 017c FFF7FEFF 		bl	delay37us
+ 122:testLCD.c     **** 
+ 123:testLCD.c     ****     	//display off
+ 124:testLCD.c     ****     	writeLCD(0, 0x08);
+ 358              		.loc 1 124 0
+ 359 0180 0020     		mov	r0, #0
+ 360 0182 0821     		mov	r1, #8
+ 361 0184 FFF7FEFF 		bl	writeLCD
+ 125:testLCD.c     ****     	delay37us();
+ 362              		.loc 1 125 0
+ 363 0188 FFF7FEFF 		bl	delay37us
+ 126:testLCD.c     **** 
+ 127:testLCD.c     ****     	//display clear
+ 128:testLCD.c     ****     	writeLCD(0, 0x01);
+ 364              		.loc 1 128 0
+ 365 018c 0121     		mov	r1, #1
+ 366 018e 0020     		mov	r0, #0
+ 367 0190 FFF7FEFF 		bl	writeLCD
+ 129:testLCD.c     ****     	vTaskDelay(1); //actually only 1.52 mS needed
+ 368              		.loc 1 129 0
+ 369 0194 0120     		mov	r0, #1
+ 370 0196 FFF7FEFF 		bl	vTaskDelay
+ 130:testLCD.c     **** 
+ 131:testLCD.c     ****     	//display control set
+ 132:testLCD.c     ****     	writeLCD(0, 0x06);
+ 371              		.loc 1 132 0
+ 372 019a 0621     		mov	r1, #6
+ 373 019c 0020     		mov	r0, #0
+ 374 019e FFF7FEFF 		bl	writeLCD
+ 133:testLCD.c     ****     	vTaskDelay(1);
+ 375              		.loc 1 133 0
+ 376 01a2 0120     		mov	r0, #1
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 10
+
+
+ 377 01a4 FFF7FEFF 		bl	vTaskDelay
+ 134:testLCD.c     **** 
+ 135:testLCD.c     ****     	//display control set
+ 136:testLCD.c     ****     	writeLCD(0, 0x0c);
+ 378              		.loc 1 136 0
+ 379 01a8 0020     		mov	r0, #0
+ 380 01aa 0C21     		mov	r1, #12
+ 381 01ac FFF7FEFF 		bl	writeLCD
+ 137:testLCD.c     ****     	delay37us();
+ 382              		.loc 1 137 0
+ 383 01b0 FFF7FEFF 		bl	delay37us
+ 138:testLCD.c     **** 
+ 139:testLCD.c     ****     	//cursor home
+ 140:testLCD.c     ****     	writeLCD(0, 0x02);
+ 384              		.loc 1 140 0
+ 385 01b4 0221     		mov	r1, #2
+ 386 01b6 0020     		mov	r0, #0
+ 387 01b8 FFF7FEFF 		bl	writeLCD
+ 141:testLCD.c     **** 		vTaskDelay(1);
+ 388              		.loc 1 141 0
+ 389 01bc 0120     		mov	r0, #1
+ 390 01be FFF7FEFF 		bl	vTaskDelay
+ 142:testLCD.c     **** 
+ 143:testLCD.c     **** 		WriteString(gw);
+ 391              		.loc 1 143 0
+ 392 01c2 281C     		mov	r0, r5
+ 393 01c4 FFF7FEFF 		bl	WriteString
+ 144:testLCD.c     **** 
+ 145:testLCD.c     ****     	//move curstor to second row
+ 146:testLCD.c     ****     	writeLCD(0, 0x80 | 0x40);
+ 394              		.loc 1 146 0
+ 395 01c8 0020     		mov	r0, #0
+ 396 01ca C021     		mov	r1, #192
+ 397 01cc FFF7FEFF 		bl	writeLCD
+ 147:testLCD.c     ****     	delay37us();
+ 398              		.loc 1 147 0
+ 399 01d0 FFF7FEFF 		bl	delay37us
+ 148:testLCD.c     **** 
+ 149:testLCD.c     **** //		vTaskDelay(20);
+ 150:testLCD.c     **** 		WriteString(dw);
+ 400              		.loc 1 150 0
+ 401 01d4 201C     		mov	r0, r4
+ 402 01d6 FFF7FEFF 		bl	WriteString
+ 151:testLCD.c     **** 		if ( *gw != 0)
+ 403              		.loc 1 151 0
+ 404 01da 2B78     		ldrb	r3, [r5]
+ 405 01dc 002B     		cmp	r3, #0
+ 406 01de 00D0     		beq	.L36
+ 152:testLCD.c     **** 			gw++;
+ 407              		.loc 1 152 0
+ 408 01e0 0135     		add	r5, r5, #1
+ 409              	.L36:
+ 153:testLCD.c     **** 		if ( *dw != 0)
+ 410              		.loc 1 153 0
+ 411 01e2 2378     		ldrb	r3, [r4]
+ 412 01e4 002B     		cmp	r3, #0
+ 413 01e6 00D0     		beq	.L38
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 11
+
+
+ 154:testLCD.c     **** 			dw++;
+ 414              		.loc 1 154 0
+ 415 01e8 0134     		add	r4, r4, #1
+ 416              	.L38:
+ 155:testLCD.c     **** 		if ( *dw==0 && *gw==0)
+ 417              		.loc 1 155 0
+ 418 01ea 2378     		ldrb	r3, [r4]
+ 419 01ec 002B     		cmp	r3, #0
+ 420 01ee 12D1     		bne	.L40
+ 421 01f0 2B78     		ldrb	r3, [r5]
+ 422 01f2 002B     		cmp	r3, #0
+ 423 01f4 0FD1     		bne	.L40
+ 156:testLCD.c     **** 		{
+ 157:testLCD.c     **** 			gw = Gorny_Wiersz;
+ 424              		.loc 1 157 0
+ 425 01f6 0A4B     		ldr	r3, .L44
+ 426 01f8 1D68     		ldr	r5, [r3]
+ 158:testLCD.c     **** 			dw = Dolny_Wiersz;
+ 427              		.loc 1 158 0
+ 428 01fa 0A4B     		ldr	r3, .L44+4
+ 159:testLCD.c     **** 
+ 160:testLCD.c     **** 	    	//display clear
+ 161:testLCD.c     ****     		writeLCD(0, 0x01);
+ 429              		.loc 1 161 0
+ 430 01fc 0020     		mov	r0, #0
+ 431 01fe 0121     		mov	r1, #1
+ 432              		.loc 1 158 0
+ 433 0200 1C68     		ldr	r4, [r3]
+ 434              		.loc 1 161 0
+ 435 0202 FFF7FEFF 		bl	writeLCD
+ 162:testLCD.c     ****     		vTaskDelay(1); //actually only 1.52 mS needed
+ 436              		.loc 1 162 0
+ 437 0206 0120     		mov	r0, #1
+ 438 0208 FFF7FEFF 		bl	vTaskDelay
+ 439              	.LBB12:
+ 440              	.LBB13:
+ 441              		.loc 1 79 0
+ 442 020c 064B     		ldr	r3, .L44+8
+ 443              	.LBE13:
+ 444              	.LBE12:
+ 163:testLCD.c     **** 
+ 164:testLCD.c     **** 			lcdBacklight(FALSE);
+ 165:testLCD.c     **** 			vTaskDelay(5000);
+ 445              		.loc 1 165 0
+ 446 020e 0848     		ldr	r0, .L44+16
+ 447              	.LBB15:
+ 448              	.LBB14:
+ 449              		.loc 1 79 0
+ 450 0210 1E60     		str	r6, [r3]
+ 451              	.LBE14:
+ 452              	.LBE15:
+ 453              		.loc 1 165 0
+ 454 0212 FFF7FEFF 		bl	vTaskDelay
+ 455              	.L40:
+ 166:testLCD.c     **** 		}
+ 167:testLCD.c     **** 
+ 168:testLCD.c     ****     	vTaskDelay(300);
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 12
+
+
+ 456              		.loc 1 168 0
+ 457 0216 381C     		mov	r0, r7
+ 458 0218 FFF7FEFF 		bl	vTaskDelay
+ 459 021c 90E7     		b	.L35
+ 460              	.L45:
+ 461 021e C046     		.align	2
+ 462              	.L44:
+ 463 0220 00000000 		.word	Gorny_Wiersz
+ 464 0224 00000000 		.word	Dolny_Wiersz
+ 465 0228 0C8002E0 		.word	-536707060
+ 466 022c 048002E0 		.word	-536707068
+ 467 0230 88130000 		.word	5000
+ 468              	.LFE7:
+ 469              		.size	testLCD, .-testLCD
+ 470              		.global	Gorny_Wiersz
+ 471              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 472              		.align	2
+ 473              	.LC4:
+ 474 0000 4D616C67 		.ascii	"Malgosia-Bambosia wsciekla zona jest!\000"
+ 474      6F736961 
+ 474      2D42616D 
+ 474      626F7369 
+ 474      61207773 
+ 475              		.data
+ 476              		.align	2
+ 477              		.type	Gorny_Wiersz, %object
+ 478              		.size	Gorny_Wiersz, 4
+ 479              	Gorny_Wiersz:
+ 480 0000 00000000 		.word	.LC4
+ 481              		.global	Dolny_Wiersz
+ 482              		.section	.rodata.str1.4
+ 483 0026 0000     		.align	2
+ 484              	.LC5:
+ 485 0028 506F7477 		.ascii	"Potwor Basia i Dementror straszliwy Zosia\000"
+ 485      6F722042 
+ 485      61736961 
+ 485      20692044 
+ 485      656D656E 
+ 486 0052 0000     		.data
+ 487              		.align	2
+ 488              		.type	Dolny_Wiersz, %object
+ 489              		.size	Dolny_Wiersz, 4
+ 490              	Dolny_Wiersz:
+ 491 0004 28000000 		.word	.LC5
+ 492              		.section	.debug_frame,"",%progbits
+ 493              	.Lframe0:
+ 494 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ 495              	.LSCIE0:
+ 496 0004 FFFFFFFF 		.4byte	0xffffffff
+ 497 0008 01       		.byte	0x1
+ 498 0009 00       		.ascii	"\000"
+ 499 000a 01       		.uleb128 0x1
+ 500 000b 7C       		.sleb128 -4
+ 501 000c 0E       		.byte	0xe
+ 502 000d 0C       		.byte	0xc
+ 503 000e 0D       		.uleb128 0xd
+ 504 000f 00       		.uleb128 0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 13
+
+
+ 505              		.align	2
+ 506              	.LECIE0:
+ 507              	.LSFDE0:
+ 508 0010 0C000000 		.4byte	.LEFDE0-.LASFDE0
+ 509              	.LASFDE0:
+ 510 0014 00000000 		.4byte	.Lframe0
+ 511 0018 00000000 		.4byte	.LFB2
+ 512 001c 40000000 		.4byte	.LFE2-.LFB2
+ 513              		.align	2
+ 514              	.LEFDE0:
+ 515              	.LSFDE2:
+ 516 0020 10000000 		.4byte	.LEFDE2-.LASFDE2
+ 517              	.LASFDE2:
+ 518 0024 00000000 		.4byte	.Lframe0
+ 519 0028 40000000 		.4byte	.LFB4
+ 520 002c 90000000 		.4byte	.LFE4-.LFB4
+ 521 0030 46       		.byte	0x4
+ 522              		.4byte	.LCFI0-.LFB4
+ 523 0031 0E       		.byte	0xe
+ 524 0032 04       		.uleb128 0x4
+ 525 0033 00       		.align	2
+ 526              	.LEFDE2:
+ 527              	.LSFDE4:
+ 528 0034 0C000000 		.4byte	.LEFDE4-.LASFDE4
+ 529              	.LASFDE4:
+ 530 0038 00000000 		.4byte	.Lframe0
+ 531 003c D0000000 		.4byte	.LFB5
+ 532 0040 24000000 		.4byte	.LFE5-.LFB5
+ 533              		.align	2
+ 534              	.LEFDE4:
+ 535              	.LSFDE6:
+ 536 0044 14000000 		.4byte	.LEFDE6-.LASFDE6
+ 537              	.LASFDE6:
+ 538 0048 00000000 		.4byte	.Lframe0
+ 539 004c F4000000 		.4byte	.LFB3
+ 540 0050 0C000000 		.4byte	.LFE3-.LFB3
+ 541 0054 42       		.byte	0x4
+ 542              		.4byte	.LCFI1-.LFB3
+ 543 0055 0E       		.byte	0xe
+ 544 0056 04       		.uleb128 0x4
+ 545 0057 8E       		.byte	0x8e
+ 546 0058 01       		.uleb128 0x1
+ 547 0059 000000   		.align	2
+ 548              	.LEFDE6:
+ 549              	.LSFDE8:
+ 550 005c 14000000 		.4byte	.LEFDE8-.LASFDE8
+ 551              	.LASFDE8:
+ 552 0060 00000000 		.4byte	.Lframe0
+ 553 0064 00010000 		.4byte	.LFB6
+ 554 0068 1E000000 		.4byte	.LFE6-.LFB6
+ 555 006c 42       		.byte	0x4
+ 556              		.4byte	.LCFI2-.LFB6
+ 557 006d 0E       		.byte	0xe
+ 558 006e 08       		.uleb128 0x8
+ 559 006f 84       		.byte	0x84
+ 560 0070 02       		.uleb128 0x2
+ 561 0071 8E       		.byte	0x8e
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 14
+
+
+ 562 0072 01       		.uleb128 0x1
+ 563 0073 00       		.align	2
+ 564              	.LEFDE8:
+ 565              	.LSFDE10:
+ 566 0074 1C000000 		.4byte	.LEFDE10-.LASFDE10
+ 567              	.LASFDE10:
+ 568 0078 00000000 		.4byte	.Lframe0
+ 569 007c 20010000 		.4byte	.LFB7
+ 570 0080 14010000 		.4byte	.LFE7-.LFB7
+ 571 0084 42       		.byte	0x4
+ 572              		.4byte	.LCFI3-.LFB7
+ 573 0085 0E       		.byte	0xe
+ 574 0086 14       		.uleb128 0x14
+ 575 0087 84       		.byte	0x84
+ 576 0088 05       		.uleb128 0x5
+ 577 0089 85       		.byte	0x85
+ 578 008a 04       		.uleb128 0x4
+ 579 008b 86       		.byte	0x86
+ 580 008c 03       		.uleb128 0x3
+ 581 008d 87       		.byte	0x87
+ 582 008e 02       		.uleb128 0x2
+ 583 008f 8E       		.byte	0x8e
+ 584 0090 01       		.uleb128 0x1
+ 585 0091 000000   		.align	2
+ 586              	.LEFDE10:
+ 587              		.text
+ 588              	.Letext0:
+ 589              		.section	.debug_loc,"",%progbits
+ 590              	.Ldebug_loc0:
+ 591              	.LLST1:
+ 592 0000 40000000 		.4byte	.LFB4-.Ltext0
+ 593 0004 46000000 		.4byte	.LCFI0-.Ltext0
+ 594 0008 0100     		.2byte	0x1
+ 595 000a 5D       		.byte	0x5d
+ 596 000b 46000000 		.4byte	.LCFI0-.Ltext0
+ 597 000f D0000000 		.4byte	.LFE4-.Ltext0
+ 598 0013 0200     		.2byte	0x2
+ 599 0015 7D       		.byte	0x7d
+ 600 0016 04       		.sleb128 4
+ 601 0017 00000000 		.4byte	0x0
+ 602 001b 00000000 		.4byte	0x0
+ 603              	.LLST2:
+ 604 001f 40000000 		.4byte	.LVL0-.Ltext0
+ 605 0023 44000000 		.4byte	.LVL2-.Ltext0
+ 606 0027 0100     		.2byte	0x1
+ 607 0029 50       		.byte	0x50
+ 608 002a 00000000 		.4byte	0x0
+ 609 002e 00000000 		.4byte	0x0
+ 610              	.LLST3:
+ 611 0032 40000000 		.4byte	.LVL0-.Ltext0
+ 612 0036 42000000 		.4byte	.LVL1-.Ltext0
+ 613 003a 0100     		.2byte	0x1
+ 614 003c 51       		.byte	0x51
+ 615 003d 48000000 		.4byte	.LVL3-.Ltext0
+ 616 0041 84000000 		.4byte	.LVL5-.Ltext0
+ 617 0045 0100     		.2byte	0x1
+ 618 0047 51       		.byte	0x51
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 15
+
+
+ 619 0048 90000000 		.4byte	.LVL8-.Ltext0
+ 620 004c 92000000 		.4byte	.LVL9-.Ltext0
+ 621 0050 0100     		.2byte	0x1
+ 622 0052 51       		.byte	0x51
+ 623 0053 00000000 		.4byte	0x0
+ 624 0057 00000000 		.4byte	0x0
+ 625              	.LLST4:
+ 626 005b 82000000 		.4byte	.LVL4-.Ltext0
+ 627 005f 84000000 		.4byte	.LVL5-.Ltext0
+ 628 0063 0200     		.2byte	0x2
+ 629 0065 73       		.byte	0x73
+ 630 0066 00       		.sleb128 0
+ 631 0067 84000000 		.4byte	.LVL5-.Ltext0
+ 632 006b 8A000000 		.4byte	.LVL7-.Ltext0
+ 633 006f 0100     		.2byte	0x1
+ 634 0071 53       		.byte	0x53
+ 635 0072 90000000 		.4byte	.LVL8-.Ltext0
+ 636 0076 96000000 		.4byte	.LVL10-.Ltext0
+ 637 007a 0200     		.2byte	0x2
+ 638 007c 71       		.byte	0x71
+ 639 007d 00       		.sleb128 0
+ 640 007e 96000000 		.4byte	.LVL10-.Ltext0
+ 641 0082 9C000000 		.4byte	.LVL11-.Ltext0
+ 642 0086 0100     		.2byte	0x1
+ 643 0088 53       		.byte	0x53
+ 644 0089 A6000000 		.4byte	.LVL12-.Ltext0
+ 645 008d A8000000 		.4byte	.LVL13-.Ltext0
+ 646 0091 0200     		.2byte	0x2
+ 647 0093 71       		.byte	0x71
+ 648 0094 00       		.sleb128 0
+ 649 0095 A8000000 		.4byte	.LVL13-.Ltext0
+ 650 0099 AE000000 		.4byte	.LVL15-.Ltext0
+ 651 009d 0100     		.2byte	0x1
+ 652 009f 53       		.byte	0x53
+ 653 00a0 B4000000 		.4byte	.LVL16-.Ltext0
+ 654 00a4 BA000000 		.4byte	.LVL17-.Ltext0
+ 655 00a8 0200     		.2byte	0x2
+ 656 00aa 72       		.byte	0x72
+ 657 00ab 00       		.sleb128 0
+ 658 00ac BA000000 		.4byte	.LVL17-.Ltext0
+ 659 00b0 D0000000 		.4byte	.LFE4-.Ltext0
+ 660 00b4 0100     		.2byte	0x1
+ 661 00b6 53       		.byte	0x53
+ 662 00b7 00000000 		.4byte	0x0
+ 663 00bb 00000000 		.4byte	0x0
+ 664              	.LLST6:
+ 665 00bf D0000000 		.4byte	.LVL18-.Ltext0
+ 666 00c3 D2000000 		.4byte	.LVL19-.Ltext0
+ 667 00c7 0100     		.2byte	0x1
+ 668 00c9 50       		.byte	0x50
+ 669 00ca D4000000 		.4byte	.LVL20-.Ltext0
+ 670 00ce F4000000 		.4byte	.LFE5-.Ltext0
+ 671 00d2 0100     		.2byte	0x1
+ 672 00d4 50       		.byte	0x50
+ 673 00d5 00000000 		.4byte	0x0
+ 674 00d9 00000000 		.4byte	0x0
+ 675              	.LLST7:
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 16
+
+
+ 676 00dd F4000000 		.4byte	.LFB3-.Ltext0
+ 677 00e1 F6000000 		.4byte	.LCFI1-.Ltext0
+ 678 00e5 0100     		.2byte	0x1
+ 679 00e7 5D       		.byte	0x5d
+ 680 00e8 F6000000 		.4byte	.LCFI1-.Ltext0
+ 681 00ec 00010000 		.4byte	.LFE3-.Ltext0
+ 682 00f0 0200     		.2byte	0x2
+ 683 00f2 7D       		.byte	0x7d
+ 684 00f3 04       		.sleb128 4
+ 685 00f4 00000000 		.4byte	0x0
+ 686 00f8 00000000 		.4byte	0x0
+ 687              	.LLST8:
+ 688 00fc 00010000 		.4byte	.LFB6-.Ltext0
+ 689 0100 02010000 		.4byte	.LCFI2-.Ltext0
+ 690 0104 0100     		.2byte	0x1
+ 691 0106 5D       		.byte	0x5d
+ 692 0107 02010000 		.4byte	.LCFI2-.Ltext0
+ 693 010b 1E010000 		.4byte	.LFE6-.Ltext0
+ 694 010f 0200     		.2byte	0x2
+ 695 0111 7D       		.byte	0x7d
+ 696 0112 08       		.sleb128 8
+ 697 0113 00000000 		.4byte	0x0
+ 698 0117 00000000 		.4byte	0x0
+ 699              	.LLST9:
+ 700 011b 02010000 		.4byte	.LVL21-.Ltext0
+ 701 011f 06010000 		.4byte	.LVL22-.Ltext0
+ 702 0123 0100     		.2byte	0x1
+ 703 0125 50       		.byte	0x50
+ 704 0126 06010000 		.4byte	.LVL22-.Ltext0
+ 705 012a 18010000 		.4byte	.LVL24-.Ltext0
+ 706 012e 0100     		.2byte	0x1
+ 707 0130 54       		.byte	0x54
+ 708 0131 18010000 		.4byte	.LVL24-.Ltext0
+ 709 0135 1E010000 		.4byte	.LFE6-.Ltext0
+ 710 0139 0100     		.2byte	0x1
+ 711 013b 50       		.byte	0x50
+ 712 013c 00000000 		.4byte	0x0
+ 713 0140 00000000 		.4byte	0x0
+ 714              	.LLST10:
+ 715 0144 20010000 		.4byte	.LFB7-.Ltext0
+ 716 0148 22010000 		.4byte	.LCFI3-.Ltext0
+ 717 014c 0100     		.2byte	0x1
+ 718 014e 5D       		.byte	0x5d
+ 719 014f 22010000 		.4byte	.LCFI3-.Ltext0
+ 720 0153 34020000 		.4byte	.LFE7-.Ltext0
+ 721 0157 0200     		.2byte	0x2
+ 722 0159 7D       		.byte	0x7d
+ 723 015a 14       		.sleb128 20
+ 724 015b 00000000 		.4byte	0x0
+ 725 015f 00000000 		.4byte	0x0
+ 726              	.LLST11:
+ 727 0163 22010000 		.4byte	.LVL25-.Ltext0
+ 728 0167 2E010000 		.4byte	.LVL28-.Ltext0
+ 729 016b 0100     		.2byte	0x1
+ 730 016d 50       		.byte	0x50
+ 731 016e 00000000 		.4byte	0x0
+ 732 0172 00000000 		.4byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 17
+
+
+ 733              		.file 2 "FreeRTOSConfig.h"
+ 734              		.section	.debug_info
+ 735 0000 EE010000 		.4byte	0x1ee
+ 736 0004 0200     		.2byte	0x2
+ 737 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 738 000a 04       		.byte	0x4
+ 739 000b 01       		.uleb128 0x1
+ 740 000c 0D000000 		.4byte	.LASF17
+ 741 0010 01       		.byte	0x1
+ 742 0011 B7000000 		.4byte	.LASF18
+ 743 0015 D3000000 		.4byte	.LASF19
+ 744 0019 00000000 		.4byte	.Ltext0
+ 745 001d 34020000 		.4byte	.Letext0
+ 746 0021 00000000 		.4byte	.Ldebug_line0
+ 747 0025 02       		.uleb128 0x2
+ 748 0026 74553800 		.ascii	"tU8\000"
+ 749 002a 02       		.byte	0x2
+ 750 002b A0       		.byte	0xa0
+ 751 002c 30000000 		.4byte	0x30
+ 752 0030 03       		.uleb128 0x3
+ 753 0031 01       		.byte	0x1
+ 754 0032 08       		.byte	0x8
+ 755 0033 33000000 		.4byte	.LASF0
+ 756 0037 03       		.uleb128 0x3
+ 757 0038 02       		.byte	0x2
+ 758 0039 07       		.byte	0x7
+ 759 003a 59000000 		.4byte	.LASF1
+ 760 003e 03       		.uleb128 0x3
+ 761 003f 04       		.byte	0x4
+ 762 0040 07       		.byte	0x7
+ 763 0041 86000000 		.4byte	.LASF2
+ 764 0045 03       		.uleb128 0x3
+ 765 0046 01       		.byte	0x1
+ 766 0047 06       		.byte	0x6
+ 767 0048 F6000000 		.4byte	.LASF3
+ 768 004c 03       		.uleb128 0x3
+ 769 004d 02       		.byte	0x2
+ 770 004e 05       		.byte	0x5
+ 771 004f C9000000 		.4byte	.LASF4
+ 772 0053 04       		.uleb128 0x4
+ 773 0054 04       		.byte	0x4
+ 774 0055 05       		.byte	0x5
+ 775 0056 696E7400 		.ascii	"int\000"
+ 776 005a 03       		.uleb128 0x3
+ 777 005b 04       		.byte	0x4
+ 778 005c 05       		.byte	0x5
+ 779 005d ED000000 		.4byte	.LASF5
+ 780 0061 03       		.uleb128 0x3
+ 781 0062 04       		.byte	0x4
+ 782 0063 07       		.byte	0x7
+ 783 0064 47000000 		.4byte	.LASF6
+ 784 0068 05       		.uleb128 0x5
+ 785 0069 04       		.byte	0x4
+ 786 006a 06       		.uleb128 0x6
+ 787 006b 01       		.byte	0x1
+ 788 006c A2000000 		.4byte	.LASF8
+ 789 0070 01       		.byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 18
+
+
+ 790 0071 1A       		.byte	0x1a
+ 791 0072 01       		.byte	0x1
+ 792 0073 00000000 		.4byte	.LFB2
+ 793 0077 40000000 		.4byte	.LFE2
+ 794 007b 01       		.byte	0x1
+ 795 007c 5D       		.byte	0x5d
+ 796 007d 07       		.uleb128 0x7
+ 797 007e 01       		.byte	0x1
+ 798 007f 19000000 		.4byte	.LASF10
+ 799 0083 01       		.byte	0x1
+ 800 0084 31       		.byte	0x31
+ 801 0085 01       		.byte	0x1
+ 802 0086 40000000 		.4byte	.LFB4
+ 803 008a D0000000 		.4byte	.LFE4
+ 804 008e 00000000 		.4byte	.LLST1
+ 805 0092 C2000000 		.4byte	0xc2
+ 806 0096 08       		.uleb128 0x8
+ 807 0097 72656700 		.ascii	"reg\000"
+ 808 009b 01       		.byte	0x1
+ 809 009c 30       		.byte	0x30
+ 810 009d 25000000 		.4byte	0x25
+ 811 00a1 1F000000 		.4byte	.LLST2
+ 812 00a5 09       		.uleb128 0x9
+ 813 00a6 2E000000 		.4byte	.LASF7
+ 814 00aa 01       		.byte	0x1
+ 815 00ab 30       		.byte	0x30
+ 816 00ac 25000000 		.4byte	0x25
+ 817 00b0 32000000 		.4byte	.LLST3
+ 818 00b4 0A       		.uleb128 0xa
+ 819 00b5 6900     		.ascii	"i\000"
+ 820 00b7 01       		.byte	0x1
+ 821 00b8 32       		.byte	0x32
+ 822 00b9 C2000000 		.4byte	0xc2
+ 823 00bd 5B000000 		.4byte	.LLST4
+ 824 00c1 00       		.byte	0x0
+ 825 00c2 0B       		.uleb128 0xb
+ 826 00c3 25000000 		.4byte	0x25
+ 827 00c7 0C       		.uleb128 0xc
+ 828 00c8 01       		.byte	0x1
+ 829 00c9 6C000000 		.4byte	.LASF20
+ 830 00cd 01       		.byte	0x1
+ 831 00ce 4B       		.byte	0x4b
+ 832 00cf 01       		.byte	0x1
+ 833 00d0 01       		.byte	0x1
+ 834 00d1 E1000000 		.4byte	0xe1
+ 835 00d5 0D       		.uleb128 0xd
+ 836 00d6 41000000 		.4byte	.LASF21
+ 837 00da 01       		.byte	0x1
+ 838 00db 4A       		.byte	0x4a
+ 839 00dc 25000000 		.4byte	0x25
+ 840 00e0 00       		.byte	0x0
+ 841 00e1 0E       		.uleb128 0xe
+ 842 00e2 C7000000 		.4byte	0xc7
+ 843 00e6 D0000000 		.4byte	.LFB5
+ 844 00ea F4000000 		.4byte	.LFE5
+ 845 00ee 01       		.byte	0x1
+ 846 00ef 5D       		.byte	0x5d
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 19
+
+
+ 847 00f0 FE000000 		.4byte	0xfe
+ 848 00f4 0F       		.uleb128 0xf
+ 849 00f5 D5000000 		.4byte	0xd5
+ 850 00f9 BF000000 		.4byte	.LLST6
+ 851 00fd 00       		.byte	0x0
+ 852 00fe 10       		.uleb128 0x10
+ 853 00ff 01       		.byte	0x1
+ 854 0100 98000000 		.4byte	.LASF9
+ 855 0104 01       		.byte	0x1
+ 856 0105 26       		.byte	0x26
+ 857 0106 01       		.byte	0x1
+ 858 0107 F4000000 		.4byte	.LFB3
+ 859 010b 00010000 		.4byte	.LFE3
+ 860 010f DD000000 		.4byte	.LLST7
+ 861 0113 07       		.uleb128 0x7
+ 862 0114 01       		.byte	0x1
+ 863 0115 22000000 		.4byte	.LASF11
+ 864 0119 01       		.byte	0x1
+ 865 011a 55       		.byte	0x55
+ 866 011b 01       		.byte	0x1
+ 867 011c 00010000 		.4byte	.LFB6
+ 868 0120 1E010000 		.4byte	.LFE6
+ 869 0124 FC000000 		.4byte	.LLST8
+ 870 0128 3C010000 		.4byte	0x13c
+ 871 012c 08       		.uleb128 0x8
+ 872 012d 73747200 		.ascii	"str\000"
+ 873 0131 01       		.byte	0x1
+ 874 0132 54       		.byte	0x54
+ 875 0133 3C010000 		.4byte	0x13c
+ 876 0137 1B010000 		.4byte	.LLST9
+ 877 013b 00       		.byte	0x0
+ 878 013c 11       		.uleb128 0x11
+ 879 013d 04       		.byte	0x4
+ 880 013e 42010000 		.4byte	0x142
+ 881 0142 03       		.uleb128 0x3
+ 882 0143 01       		.byte	0x1
+ 883 0144 08       		.byte	0x8
+ 884 0145 93000000 		.4byte	.LASF12
+ 885 0149 07       		.uleb128 0x7
+ 886 014a 01       		.byte	0x1
+ 887 014b C1000000 		.4byte	.LASF13
+ 888 014f 01       		.byte	0x1
+ 889 0150 62       		.byte	0x62
+ 890 0151 01       		.byte	0x1
+ 891 0152 20010000 		.4byte	.LFB7
+ 892 0156 34020000 		.4byte	.LFE7
+ 893 015a 44010000 		.4byte	.LLST10
+ 894 015e CD010000 		.4byte	0x1cd
+ 895 0162 09       		.uleb128 0x9
+ 896 0163 AA000000 		.4byte	.LASF14
+ 897 0167 01       		.byte	0x1
+ 898 0168 61       		.byte	0x61
+ 899 0169 68000000 		.4byte	0x68
+ 900 016d 63010000 		.4byte	.LLST11
+ 901 0171 12       		.uleb128 0x12
+ 902 0172 677700   		.ascii	"gw\000"
+ 903 0175 01       		.byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 20
+
+
+ 904 0176 63       		.byte	0x63
+ 905 0177 3C010000 		.4byte	0x13c
+ 906 017b 01       		.byte	0x1
+ 907 017c 55       		.byte	0x55
+ 908 017d 12       		.uleb128 0x12
+ 909 017e 647700   		.ascii	"dw\000"
+ 910 0181 01       		.byte	0x1
+ 911 0182 64       		.byte	0x64
+ 912 0183 3C010000 		.4byte	0x13c
+ 913 0187 01       		.byte	0x1
+ 914 0188 54       		.byte	0x54
+ 915 0189 13       		.uleb128 0x13
+ 916 018a C7000000 		.4byte	0xc7
+ 917 018e 2E010000 		.4byte	.LBB8
+ 918 0192 36010000 		.4byte	.LBE8
+ 919 0196 01       		.byte	0x1
+ 920 0197 67       		.byte	0x67
+ 921 0198 A2010000 		.4byte	0x1a2
+ 922 019c 14       		.uleb128 0x14
+ 923 019d F4000000 		.4byte	0xf4
+ 924 01a1 00       		.byte	0x0
+ 925 01a2 13       		.uleb128 0x13
+ 926 01a3 C7000000 		.4byte	0xc7
+ 927 01a7 40010000 		.4byte	.LBB10
+ 928 01ab 48010000 		.4byte	.LBE10
+ 929 01af 01       		.byte	0x1
+ 930 01b0 6C       		.byte	0x6c
+ 931 01b1 BB010000 		.4byte	0x1bb
+ 932 01b5 14       		.uleb128 0x14
+ 933 01b6 F4000000 		.4byte	0xf4
+ 934 01ba 00       		.byte	0x0
+ 935 01bb 15       		.uleb128 0x15
+ 936 01bc C7000000 		.4byte	0xc7
+ 937 01c0 00000000 		.4byte	.Ldebug_ranges0+0x0
+ 938 01c4 01       		.byte	0x1
+ 939 01c5 A4       		.byte	0xa4
+ 940 01c6 14       		.uleb128 0x14
+ 941 01c7 F4000000 		.4byte	0xf4
+ 942 01cb 00       		.byte	0x0
+ 943 01cc 00       		.byte	0x0
+ 944 01cd 16       		.uleb128 0x16
+ 945 01ce 79000000 		.4byte	.LASF15
+ 946 01d2 01       		.byte	0x1
+ 947 01d3 5E       		.byte	0x5e
+ 948 01d4 3C010000 		.4byte	0x13c
+ 949 01d8 01       		.byte	0x1
+ 950 01d9 05       		.byte	0x5
+ 951 01da 03       		.byte	0x3
+ 952 01db 00000000 		.4byte	Gorny_Wiersz
+ 953 01df 16       		.uleb128 0x16
+ 954 01e0 00000000 		.4byte	.LASF16
+ 955 01e4 01       		.byte	0x1
+ 956 01e5 5F       		.byte	0x5f
+ 957 01e6 3C010000 		.4byte	0x13c
+ 958 01ea 01       		.byte	0x1
+ 959 01eb 05       		.byte	0x5
+ 960 01ec 03       		.byte	0x3
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 21
+
+
+ 961 01ed 00000000 		.4byte	Dolny_Wiersz
+ 962 01f1 00       		.byte	0x0
+ 963              		.section	.debug_abbrev
+ 964 0000 01       		.uleb128 0x1
+ 965 0001 11       		.uleb128 0x11
+ 966 0002 01       		.byte	0x1
+ 967 0003 25       		.uleb128 0x25
+ 968 0004 0E       		.uleb128 0xe
+ 969 0005 13       		.uleb128 0x13
+ 970 0006 0B       		.uleb128 0xb
+ 971 0007 03       		.uleb128 0x3
+ 972 0008 0E       		.uleb128 0xe
+ 973 0009 1B       		.uleb128 0x1b
+ 974 000a 0E       		.uleb128 0xe
+ 975 000b 11       		.uleb128 0x11
+ 976 000c 01       		.uleb128 0x1
+ 977 000d 12       		.uleb128 0x12
+ 978 000e 01       		.uleb128 0x1
+ 979 000f 10       		.uleb128 0x10
+ 980 0010 06       		.uleb128 0x6
+ 981 0011 00       		.byte	0x0
+ 982 0012 00       		.byte	0x0
+ 983 0013 02       		.uleb128 0x2
+ 984 0014 16       		.uleb128 0x16
+ 985 0015 00       		.byte	0x0
+ 986 0016 03       		.uleb128 0x3
+ 987 0017 08       		.uleb128 0x8
+ 988 0018 3A       		.uleb128 0x3a
+ 989 0019 0B       		.uleb128 0xb
+ 990 001a 3B       		.uleb128 0x3b
+ 991 001b 0B       		.uleb128 0xb
+ 992 001c 49       		.uleb128 0x49
+ 993 001d 13       		.uleb128 0x13
+ 994 001e 00       		.byte	0x0
+ 995 001f 00       		.byte	0x0
+ 996 0020 03       		.uleb128 0x3
+ 997 0021 24       		.uleb128 0x24
+ 998 0022 00       		.byte	0x0
+ 999 0023 0B       		.uleb128 0xb
+ 1000 0024 0B       		.uleb128 0xb
+ 1001 0025 3E       		.uleb128 0x3e
+ 1002 0026 0B       		.uleb128 0xb
+ 1003 0027 03       		.uleb128 0x3
+ 1004 0028 0E       		.uleb128 0xe
+ 1005 0029 00       		.byte	0x0
+ 1006 002a 00       		.byte	0x0
+ 1007 002b 04       		.uleb128 0x4
+ 1008 002c 24       		.uleb128 0x24
+ 1009 002d 00       		.byte	0x0
+ 1010 002e 0B       		.uleb128 0xb
+ 1011 002f 0B       		.uleb128 0xb
+ 1012 0030 3E       		.uleb128 0x3e
+ 1013 0031 0B       		.uleb128 0xb
+ 1014 0032 03       		.uleb128 0x3
+ 1015 0033 08       		.uleb128 0x8
+ 1016 0034 00       		.byte	0x0
+ 1017 0035 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 22
+
+
+ 1018 0036 05       		.uleb128 0x5
+ 1019 0037 0F       		.uleb128 0xf
+ 1020 0038 00       		.byte	0x0
+ 1021 0039 0B       		.uleb128 0xb
+ 1022 003a 0B       		.uleb128 0xb
+ 1023 003b 00       		.byte	0x0
+ 1024 003c 00       		.byte	0x0
+ 1025 003d 06       		.uleb128 0x6
+ 1026 003e 2E       		.uleb128 0x2e
+ 1027 003f 00       		.byte	0x0
+ 1028 0040 3F       		.uleb128 0x3f
+ 1029 0041 0C       		.uleb128 0xc
+ 1030 0042 03       		.uleb128 0x3
+ 1031 0043 0E       		.uleb128 0xe
+ 1032 0044 3A       		.uleb128 0x3a
+ 1033 0045 0B       		.uleb128 0xb
+ 1034 0046 3B       		.uleb128 0x3b
+ 1035 0047 0B       		.uleb128 0xb
+ 1036 0048 27       		.uleb128 0x27
+ 1037 0049 0C       		.uleb128 0xc
+ 1038 004a 11       		.uleb128 0x11
+ 1039 004b 01       		.uleb128 0x1
+ 1040 004c 12       		.uleb128 0x12
+ 1041 004d 01       		.uleb128 0x1
+ 1042 004e 40       		.uleb128 0x40
+ 1043 004f 0A       		.uleb128 0xa
+ 1044 0050 00       		.byte	0x0
+ 1045 0051 00       		.byte	0x0
+ 1046 0052 07       		.uleb128 0x7
+ 1047 0053 2E       		.uleb128 0x2e
+ 1048 0054 01       		.byte	0x1
+ 1049 0055 3F       		.uleb128 0x3f
+ 1050 0056 0C       		.uleb128 0xc
+ 1051 0057 03       		.uleb128 0x3
+ 1052 0058 0E       		.uleb128 0xe
+ 1053 0059 3A       		.uleb128 0x3a
+ 1054 005a 0B       		.uleb128 0xb
+ 1055 005b 3B       		.uleb128 0x3b
+ 1056 005c 0B       		.uleb128 0xb
+ 1057 005d 27       		.uleb128 0x27
+ 1058 005e 0C       		.uleb128 0xc
+ 1059 005f 11       		.uleb128 0x11
+ 1060 0060 01       		.uleb128 0x1
+ 1061 0061 12       		.uleb128 0x12
+ 1062 0062 01       		.uleb128 0x1
+ 1063 0063 40       		.uleb128 0x40
+ 1064 0064 06       		.uleb128 0x6
+ 1065 0065 01       		.uleb128 0x1
+ 1066 0066 13       		.uleb128 0x13
+ 1067 0067 00       		.byte	0x0
+ 1068 0068 00       		.byte	0x0
+ 1069 0069 08       		.uleb128 0x8
+ 1070 006a 05       		.uleb128 0x5
+ 1071 006b 00       		.byte	0x0
+ 1072 006c 03       		.uleb128 0x3
+ 1073 006d 08       		.uleb128 0x8
+ 1074 006e 3A       		.uleb128 0x3a
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 23
+
+
+ 1075 006f 0B       		.uleb128 0xb
+ 1076 0070 3B       		.uleb128 0x3b
+ 1077 0071 0B       		.uleb128 0xb
+ 1078 0072 49       		.uleb128 0x49
+ 1079 0073 13       		.uleb128 0x13
+ 1080 0074 02       		.uleb128 0x2
+ 1081 0075 06       		.uleb128 0x6
+ 1082 0076 00       		.byte	0x0
+ 1083 0077 00       		.byte	0x0
+ 1084 0078 09       		.uleb128 0x9
+ 1085 0079 05       		.uleb128 0x5
+ 1086 007a 00       		.byte	0x0
+ 1087 007b 03       		.uleb128 0x3
+ 1088 007c 0E       		.uleb128 0xe
+ 1089 007d 3A       		.uleb128 0x3a
+ 1090 007e 0B       		.uleb128 0xb
+ 1091 007f 3B       		.uleb128 0x3b
+ 1092 0080 0B       		.uleb128 0xb
+ 1093 0081 49       		.uleb128 0x49
+ 1094 0082 13       		.uleb128 0x13
+ 1095 0083 02       		.uleb128 0x2
+ 1096 0084 06       		.uleb128 0x6
+ 1097 0085 00       		.byte	0x0
+ 1098 0086 00       		.byte	0x0
+ 1099 0087 0A       		.uleb128 0xa
+ 1100 0088 34       		.uleb128 0x34
+ 1101 0089 00       		.byte	0x0
+ 1102 008a 03       		.uleb128 0x3
+ 1103 008b 08       		.uleb128 0x8
+ 1104 008c 3A       		.uleb128 0x3a
+ 1105 008d 0B       		.uleb128 0xb
+ 1106 008e 3B       		.uleb128 0x3b
+ 1107 008f 0B       		.uleb128 0xb
+ 1108 0090 49       		.uleb128 0x49
+ 1109 0091 13       		.uleb128 0x13
+ 1110 0092 02       		.uleb128 0x2
+ 1111 0093 06       		.uleb128 0x6
+ 1112 0094 00       		.byte	0x0
+ 1113 0095 00       		.byte	0x0
+ 1114 0096 0B       		.uleb128 0xb
+ 1115 0097 35       		.uleb128 0x35
+ 1116 0098 00       		.byte	0x0
+ 1117 0099 49       		.uleb128 0x49
+ 1118 009a 13       		.uleb128 0x13
+ 1119 009b 00       		.byte	0x0
+ 1120 009c 00       		.byte	0x0
+ 1121 009d 0C       		.uleb128 0xc
+ 1122 009e 2E       		.uleb128 0x2e
+ 1123 009f 01       		.byte	0x1
+ 1124 00a0 3F       		.uleb128 0x3f
+ 1125 00a1 0C       		.uleb128 0xc
+ 1126 00a2 03       		.uleb128 0x3
+ 1127 00a3 0E       		.uleb128 0xe
+ 1128 00a4 3A       		.uleb128 0x3a
+ 1129 00a5 0B       		.uleb128 0xb
+ 1130 00a6 3B       		.uleb128 0x3b
+ 1131 00a7 0B       		.uleb128 0xb
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 24
+
+
+ 1132 00a8 27       		.uleb128 0x27
+ 1133 00a9 0C       		.uleb128 0xc
+ 1134 00aa 20       		.uleb128 0x20
+ 1135 00ab 0B       		.uleb128 0xb
+ 1136 00ac 01       		.uleb128 0x1
+ 1137 00ad 13       		.uleb128 0x13
+ 1138 00ae 00       		.byte	0x0
+ 1139 00af 00       		.byte	0x0
+ 1140 00b0 0D       		.uleb128 0xd
+ 1141 00b1 05       		.uleb128 0x5
+ 1142 00b2 00       		.byte	0x0
+ 1143 00b3 03       		.uleb128 0x3
+ 1144 00b4 0E       		.uleb128 0xe
+ 1145 00b5 3A       		.uleb128 0x3a
+ 1146 00b6 0B       		.uleb128 0xb
+ 1147 00b7 3B       		.uleb128 0x3b
+ 1148 00b8 0B       		.uleb128 0xb
+ 1149 00b9 49       		.uleb128 0x49
+ 1150 00ba 13       		.uleb128 0x13
+ 1151 00bb 00       		.byte	0x0
+ 1152 00bc 00       		.byte	0x0
+ 1153 00bd 0E       		.uleb128 0xe
+ 1154 00be 2E       		.uleb128 0x2e
+ 1155 00bf 01       		.byte	0x1
+ 1156 00c0 31       		.uleb128 0x31
+ 1157 00c1 13       		.uleb128 0x13
+ 1158 00c2 11       		.uleb128 0x11
+ 1159 00c3 01       		.uleb128 0x1
+ 1160 00c4 12       		.uleb128 0x12
+ 1161 00c5 01       		.uleb128 0x1
+ 1162 00c6 40       		.uleb128 0x40
+ 1163 00c7 0A       		.uleb128 0xa
+ 1164 00c8 01       		.uleb128 0x1
+ 1165 00c9 13       		.uleb128 0x13
+ 1166 00ca 00       		.byte	0x0
+ 1167 00cb 00       		.byte	0x0
+ 1168 00cc 0F       		.uleb128 0xf
+ 1169 00cd 05       		.uleb128 0x5
+ 1170 00ce 00       		.byte	0x0
+ 1171 00cf 31       		.uleb128 0x31
+ 1172 00d0 13       		.uleb128 0x13
+ 1173 00d1 02       		.uleb128 0x2
+ 1174 00d2 06       		.uleb128 0x6
+ 1175 00d3 00       		.byte	0x0
+ 1176 00d4 00       		.byte	0x0
+ 1177 00d5 10       		.uleb128 0x10
+ 1178 00d6 2E       		.uleb128 0x2e
+ 1179 00d7 00       		.byte	0x0
+ 1180 00d8 3F       		.uleb128 0x3f
+ 1181 00d9 0C       		.uleb128 0xc
+ 1182 00da 03       		.uleb128 0x3
+ 1183 00db 0E       		.uleb128 0xe
+ 1184 00dc 3A       		.uleb128 0x3a
+ 1185 00dd 0B       		.uleb128 0xb
+ 1186 00de 3B       		.uleb128 0x3b
+ 1187 00df 0B       		.uleb128 0xb
+ 1188 00e0 27       		.uleb128 0x27
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 25
+
+
+ 1189 00e1 0C       		.uleb128 0xc
+ 1190 00e2 11       		.uleb128 0x11
+ 1191 00e3 01       		.uleb128 0x1
+ 1192 00e4 12       		.uleb128 0x12
+ 1193 00e5 01       		.uleb128 0x1
+ 1194 00e6 40       		.uleb128 0x40
+ 1195 00e7 06       		.uleb128 0x6
+ 1196 00e8 00       		.byte	0x0
+ 1197 00e9 00       		.byte	0x0
+ 1198 00ea 11       		.uleb128 0x11
+ 1199 00eb 0F       		.uleb128 0xf
+ 1200 00ec 00       		.byte	0x0
+ 1201 00ed 0B       		.uleb128 0xb
+ 1202 00ee 0B       		.uleb128 0xb
+ 1203 00ef 49       		.uleb128 0x49
+ 1204 00f0 13       		.uleb128 0x13
+ 1205 00f1 00       		.byte	0x0
+ 1206 00f2 00       		.byte	0x0
+ 1207 00f3 12       		.uleb128 0x12
+ 1208 00f4 34       		.uleb128 0x34
+ 1209 00f5 00       		.byte	0x0
+ 1210 00f6 03       		.uleb128 0x3
+ 1211 00f7 08       		.uleb128 0x8
+ 1212 00f8 3A       		.uleb128 0x3a
+ 1213 00f9 0B       		.uleb128 0xb
+ 1214 00fa 3B       		.uleb128 0x3b
+ 1215 00fb 0B       		.uleb128 0xb
+ 1216 00fc 49       		.uleb128 0x49
+ 1217 00fd 13       		.uleb128 0x13
+ 1218 00fe 02       		.uleb128 0x2
+ 1219 00ff 0A       		.uleb128 0xa
+ 1220 0100 00       		.byte	0x0
+ 1221 0101 00       		.byte	0x0
+ 1222 0102 13       		.uleb128 0x13
+ 1223 0103 1D       		.uleb128 0x1d
+ 1224 0104 01       		.byte	0x1
+ 1225 0105 31       		.uleb128 0x31
+ 1226 0106 13       		.uleb128 0x13
+ 1227 0107 11       		.uleb128 0x11
+ 1228 0108 01       		.uleb128 0x1
+ 1229 0109 12       		.uleb128 0x12
+ 1230 010a 01       		.uleb128 0x1
+ 1231 010b 58       		.uleb128 0x58
+ 1232 010c 0B       		.uleb128 0xb
+ 1233 010d 59       		.uleb128 0x59
+ 1234 010e 0B       		.uleb128 0xb
+ 1235 010f 01       		.uleb128 0x1
+ 1236 0110 13       		.uleb128 0x13
+ 1237 0111 00       		.byte	0x0
+ 1238 0112 00       		.byte	0x0
+ 1239 0113 14       		.uleb128 0x14
+ 1240 0114 05       		.uleb128 0x5
+ 1241 0115 00       		.byte	0x0
+ 1242 0116 31       		.uleb128 0x31
+ 1243 0117 13       		.uleb128 0x13
+ 1244 0118 00       		.byte	0x0
+ 1245 0119 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 26
+
+
+ 1246 011a 15       		.uleb128 0x15
+ 1247 011b 1D       		.uleb128 0x1d
+ 1248 011c 01       		.byte	0x1
+ 1249 011d 31       		.uleb128 0x31
+ 1250 011e 13       		.uleb128 0x13
+ 1251 011f 55       		.uleb128 0x55
+ 1252 0120 06       		.uleb128 0x6
+ 1253 0121 58       		.uleb128 0x58
+ 1254 0122 0B       		.uleb128 0xb
+ 1255 0123 59       		.uleb128 0x59
+ 1256 0124 0B       		.uleb128 0xb
+ 1257 0125 00       		.byte	0x0
+ 1258 0126 00       		.byte	0x0
+ 1259 0127 16       		.uleb128 0x16
+ 1260 0128 34       		.uleb128 0x34
+ 1261 0129 00       		.byte	0x0
+ 1262 012a 03       		.uleb128 0x3
+ 1263 012b 0E       		.uleb128 0xe
+ 1264 012c 3A       		.uleb128 0x3a
+ 1265 012d 0B       		.uleb128 0xb
+ 1266 012e 3B       		.uleb128 0x3b
+ 1267 012f 0B       		.uleb128 0xb
+ 1268 0130 49       		.uleb128 0x49
+ 1269 0131 13       		.uleb128 0x13
+ 1270 0132 3F       		.uleb128 0x3f
+ 1271 0133 0C       		.uleb128 0xc
+ 1272 0134 02       		.uleb128 0x2
+ 1273 0135 0A       		.uleb128 0xa
+ 1274 0136 00       		.byte	0x0
+ 1275 0137 00       		.byte	0x0
+ 1276 0138 00       		.byte	0x0
+ 1277              		.section	.debug_pubnames,"",%progbits
+ 1278 0000 84000000 		.4byte	0x84
+ 1279 0004 0200     		.2byte	0x2
+ 1280 0006 00000000 		.4byte	.Ldebug_info0
+ 1281 000a F2010000 		.4byte	0x1f2
+ 1282 000e 6A000000 		.4byte	0x6a
+ 1283 0012 696E6974 		.ascii	"initLCD\000"
+ 1283      4C434400 
+ 1284 001a 7D000000 		.4byte	0x7d
+ 1285 001e 77726974 		.ascii	"writeLCD\000"
+ 1285      654C4344 
+ 1285      00
+ 1286 0027 E1000000 		.4byte	0xe1
+ 1287 002b 6C636442 		.ascii	"lcdBacklight\000"
+ 1287      61636B6C 
+ 1287      69676874 
+ 1287      00
+ 1288 0038 FE000000 		.4byte	0xfe
+ 1289 003c 64656C61 		.ascii	"delay37us\000"
+ 1289      79333775 
+ 1289      7300
+ 1290 0046 13010000 		.4byte	0x113
+ 1291 004a 57726974 		.ascii	"WriteString\000"
+ 1291      65537472 
+ 1291      696E6700 
+ 1292 0056 49010000 		.4byte	0x149
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 27
+
+
+ 1293 005a 74657374 		.ascii	"testLCD\000"
+ 1293      4C434400 
+ 1294 0062 CD010000 		.4byte	0x1cd
+ 1295 0066 476F726E 		.ascii	"Gorny_Wiersz\000"
+ 1295      795F5769 
+ 1295      6572737A 
+ 1295      00
+ 1296 0073 DF010000 		.4byte	0x1df
+ 1297 0077 446F6C6E 		.ascii	"Dolny_Wiersz\000"
+ 1297      795F5769 
+ 1297      6572737A 
+ 1297      00
+ 1298 0084 00000000 		.4byte	0x0
+ 1299              		.section	.debug_aranges,"",%progbits
+ 1300 0000 1C000000 		.4byte	0x1c
+ 1301 0004 0200     		.2byte	0x2
+ 1302 0006 00000000 		.4byte	.Ldebug_info0
+ 1303 000a 04       		.byte	0x4
+ 1304 000b 00       		.byte	0x0
+ 1305 000c 0000     		.2byte	0x0
+ 1306 000e 0000     		.2byte	0x0
+ 1307 0010 00000000 		.4byte	.Ltext0
+ 1308 0014 34020000 		.4byte	.Letext0-.Ltext0
+ 1309 0018 00000000 		.4byte	0x0
+ 1310 001c 00000000 		.4byte	0x0
+ 1311              		.section	.debug_ranges,"",%progbits
+ 1312              	.Ldebug_ranges0:
+ 1313 0000 0C020000 		.4byte	.LBB12-.Ltext0
+ 1314 0004 0E020000 		.4byte	.LBE12-.Ltext0
+ 1315 0008 10020000 		.4byte	.LBB15-.Ltext0
+ 1316 000c 12020000 		.4byte	.LBE15-.Ltext0
+ 1317 0010 00000000 		.4byte	0x0
+ 1318 0014 00000000 		.4byte	0x0
+ 1319              		.section	.debug_str,"MS",%progbits,1
+ 1320              	.LASF16:
+ 1321 0000 446F6C6E 		.ascii	"Dolny_Wiersz\000"
+ 1321      795F5769 
+ 1321      6572737A 
+ 1321      00
+ 1322              	.LASF17:
+ 1323 000d 474E5520 		.ascii	"GNU C 4.2.2\000"
+ 1323      4320342E 
+ 1323      322E3200 
+ 1324              	.LASF10:
+ 1325 0019 77726974 		.ascii	"writeLCD\000"
+ 1325      654C4344 
+ 1325      00
+ 1326              	.LASF11:
+ 1327 0022 57726974 		.ascii	"WriteString\000"
+ 1327      65537472 
+ 1327      696E6700 
+ 1328              	.LASF7:
+ 1329 002e 64617461 		.ascii	"data\000"
+ 1329      00
+ 1330              	.LASF0:
+ 1331 0033 756E7369 		.ascii	"unsigned char\000"
+ 1331      676E6564 
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 28
+
+
+ 1331      20636861 
+ 1331      7200
+ 1332              	.LASF21:
+ 1333 0041 6F6E4F66 		.ascii	"onOff\000"
+ 1333      6600
+ 1334              	.LASF6:
+ 1335 0047 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1335      20756E73 
+ 1335      69676E65 
+ 1335      6420696E 
+ 1335      7400
+ 1336              	.LASF1:
+ 1337 0059 73686F72 		.ascii	"short unsigned int\000"
+ 1337      7420756E 
+ 1337      7369676E 
+ 1337      65642069 
+ 1337      6E7400
+ 1338              	.LASF20:
+ 1339 006c 6C636442 		.ascii	"lcdBacklight\000"
+ 1339      61636B6C 
+ 1339      69676874 
+ 1339      00
+ 1340              	.LASF15:
+ 1341 0079 476F726E 		.ascii	"Gorny_Wiersz\000"
+ 1341      795F5769 
+ 1341      6572737A 
+ 1341      00
+ 1342              	.LASF2:
+ 1343 0086 756E7369 		.ascii	"unsigned int\000"
+ 1343      676E6564 
+ 1343      20696E74 
+ 1343      00
+ 1344              	.LASF12:
+ 1345 0093 63686172 		.ascii	"char\000"
+ 1345      00
+ 1346              	.LASF9:
+ 1347 0098 64656C61 		.ascii	"delay37us\000"
+ 1347      79333775 
+ 1347      7300
+ 1348              	.LASF8:
+ 1349 00a2 696E6974 		.ascii	"initLCD\000"
+ 1349      4C434400 
+ 1350              	.LASF14:
+ 1351 00aa 70765061 		.ascii	"pvParameters\000"
+ 1351      72616D65 
+ 1351      74657273 
+ 1351      00
+ 1352              	.LASF18:
+ 1353 00b7 74657374 		.ascii	"testLCD.c\000"
+ 1353      4C43442E 
+ 1353      6300
+ 1354              	.LASF13:
+ 1355 00c1 74657374 		.ascii	"testLCD\000"
+ 1355      4C434400 
+ 1356              	.LASF4:
+ 1357 00c9 73686F72 		.ascii	"short int\000"
+ 1357      7420696E 
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 29
+
+
+ 1357      7400
+ 1358              	.LASF19:
+ 1359 00d3 2F637967 		.ascii	"/cygdrive/c/Downloads/EDU\000"
+ 1359      64726976 
+ 1359      652F632F 
+ 1359      446F776E 
+ 1359      6C6F6164 
+ 1360              	.LASF5:
+ 1361 00ed 6C6F6E67 		.ascii	"long int\000"
+ 1361      20696E74 
+ 1361      00
+ 1362              	.LASF3:
+ 1363 00f6 7369676E 		.ascii	"signed char\000"
+ 1363      65642063 
+ 1363      68617200 
+ 1364              		.ident	"GCC: (GNU) 4.2.2"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s 			page 30
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 testLCD.c
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s:1      .text:00000000 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s:16     .text:00000000 initLCD
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s:57     .text:0000002c $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s:69     .text:00000040 writeLCD
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s:66     .text:00000040 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s:185    .text:000000c4 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s:195    .text:000000d0 lcdBacklight
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s:192    .text:000000d0 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s:225    .text:000000ec $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s:234    .text:000000f4 delay37us
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s:231    .text:000000f4 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s:253    .text:00000100 WriteString
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s:289    .text:00000120 testLCD
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s:463    .text:00000220 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s:479    .data:00000000 Gorny_Wiersz
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s:490    .data:00000004 Dolny_Wiersz
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccwiACes.s:480    .data:00000000 $d
+
+UNDEFINED SYMBOLS
+vTaskDelay

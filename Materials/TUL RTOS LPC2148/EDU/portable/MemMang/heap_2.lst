@@ -1,0 +1,1645 @@
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 1
+
+
+   1              		.code	16
+   2              		.file	"heap_2.c"
+   3              		.section	.debug_abbrev,"",%progbits
+   4              	.Ldebug_abbrev0:
+   5              		.section	.debug_info,"",%progbits
+   6              	.Ldebug_info0:
+   7              		.section	.debug_line,"",%progbits
+   8              	.Ldebug_line0:
+   9 0000 B0000000 		.text
+   9      02007400 
+   9      00000201 
+   9      FB0E0D00 
+   9      01010101 
+  10              	.Ltext0:
+  11              		.align	2
+  12              		.global	vPortFree
+  13              		.code 16
+  14              		.thumb_func
+  15              		.type	vPortFree, %function
+  16              	vPortFree:
+  17              	.LFB3:
+  18              		.file 1 "portable/MemMang/heap_2.c"
+   1:portable/MemMang/heap_2.c **** /*
+   2:portable/MemMang/heap_2.c **** 	FreeRTOS.org V5.1.1 - Copyright (C) 2003-2008 Richard Barry.
+   3:portable/MemMang/heap_2.c **** 
+   4:portable/MemMang/heap_2.c **** 	This file is part of the FreeRTOS.org distribution.
+   5:portable/MemMang/heap_2.c **** 
+   6:portable/MemMang/heap_2.c **** 	FreeRTOS.org is free software; you can redistribute it and/or modify
+   7:portable/MemMang/heap_2.c **** 	it under the terms of the GNU General Public License as published by
+   8:portable/MemMang/heap_2.c **** 	the Free Software Foundation; either version 2 of the License, or
+   9:portable/MemMang/heap_2.c **** 	(at your option) any later version.
+  10:portable/MemMang/heap_2.c **** 
+  11:portable/MemMang/heap_2.c **** 	FreeRTOS.org is distributed in the hope that it will be useful,
+  12:portable/MemMang/heap_2.c **** 	but WITHOUT ANY WARRANTY; without even the implied warranty of
+  13:portable/MemMang/heap_2.c **** 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  14:portable/MemMang/heap_2.c **** 	GNU General Public License for more details.
+  15:portable/MemMang/heap_2.c **** 
+  16:portable/MemMang/heap_2.c **** 	You should have received a copy of the GNU General Public License
+  17:portable/MemMang/heap_2.c **** 	along with FreeRTOS.org; if not, write to the Free Software
+  18:portable/MemMang/heap_2.c **** 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  19:portable/MemMang/heap_2.c **** 
+  20:portable/MemMang/heap_2.c **** 	A special exception to the GPL can be applied should you wish to distribute
+  21:portable/MemMang/heap_2.c **** 	a combined work that includes FreeRTOS.org, without being obliged to provide
+  22:portable/MemMang/heap_2.c **** 	the source code for any proprietary components.  See the licensing section
+  23:portable/MemMang/heap_2.c **** 	of http://www.FreeRTOS.org for full details of how and when the exception
+  24:portable/MemMang/heap_2.c **** 	can be applied.
+  25:portable/MemMang/heap_2.c **** 
+  26:portable/MemMang/heap_2.c ****     ***************************************************************************
+  27:portable/MemMang/heap_2.c ****     ***************************************************************************
+  28:portable/MemMang/heap_2.c ****     *                                                                         *
+  29:portable/MemMang/heap_2.c ****     * SAVE TIME AND MONEY!  We can port FreeRTOS.org to your own hardware,    *
+  30:portable/MemMang/heap_2.c ****     * and even write all or part of your application on your behalf.          *
+  31:portable/MemMang/heap_2.c ****     * See http://www.OpenRTOS.com for details of the services we provide to   *
+  32:portable/MemMang/heap_2.c ****     * expedite your project.                                                  *
+  33:portable/MemMang/heap_2.c ****     *                                                                         *
+  34:portable/MemMang/heap_2.c ****     ***************************************************************************
+  35:portable/MemMang/heap_2.c ****     ***************************************************************************
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 2
+
+
+  36:portable/MemMang/heap_2.c **** 
+  37:portable/MemMang/heap_2.c **** 	Please ensure to read the configuration and relevant port sections of the
+  38:portable/MemMang/heap_2.c **** 	online documentation.
+  39:portable/MemMang/heap_2.c **** 
+  40:portable/MemMang/heap_2.c **** 	http://www.FreeRTOS.org - Documentation, latest information, license and 
+  41:portable/MemMang/heap_2.c **** 	contact details.
+  42:portable/MemMang/heap_2.c **** 
+  43:portable/MemMang/heap_2.c **** 	http://www.SafeRTOS.com - A version that is certified for use in safety 
+  44:portable/MemMang/heap_2.c **** 	critical systems.
+  45:portable/MemMang/heap_2.c **** 
+  46:portable/MemMang/heap_2.c **** 	http://www.OpenRTOS.com - Commercial support, development, porting, 
+  47:portable/MemMang/heap_2.c **** 	licensing and training services.
+  48:portable/MemMang/heap_2.c **** */
+  49:portable/MemMang/heap_2.c **** 
+  50:portable/MemMang/heap_2.c **** /*
+  51:portable/MemMang/heap_2.c ****  * A sample implementation of pvPortMalloc() and vPortFree() that permits
+  52:portable/MemMang/heap_2.c ****  * allocated blocks to be freed, but does not combine adjacent free blocks
+  53:portable/MemMang/heap_2.c ****  * into a single larger block.
+  54:portable/MemMang/heap_2.c ****  *
+  55:portable/MemMang/heap_2.c ****  * See heap_1.c and heap_3.c for alternative implementations, and the memory
+  56:portable/MemMang/heap_2.c ****  * management pages of http://www.FreeRTOS.org for more information.
+  57:portable/MemMang/heap_2.c ****  */
+  58:portable/MemMang/heap_2.c **** #include <stdlib.h>
+  59:portable/MemMang/heap_2.c **** 
+  60:portable/MemMang/heap_2.c **** #include "FreeRTOS.h"
+  61:portable/MemMang/heap_2.c **** #include "task.h"
+  62:portable/MemMang/heap_2.c **** 
+  63:portable/MemMang/heap_2.c **** /* Setup the correct byte alignment mask for the defined byte alignment. */
+  64:portable/MemMang/heap_2.c **** 
+  65:portable/MemMang/heap_2.c **** #if portBYTE_ALIGNMENT == 8
+  66:portable/MemMang/heap_2.c **** 	#define heapBYTE_ALIGNMENT_MASK ( ( size_t ) 0x0007 )
+  67:portable/MemMang/heap_2.c **** #endif
+  68:portable/MemMang/heap_2.c **** 
+  69:portable/MemMang/heap_2.c **** #if portBYTE_ALIGNMENT == 4
+  70:portable/MemMang/heap_2.c **** 	#define heapBYTE_ALIGNMENT_MASK	( ( size_t ) 0x0003 )
+  71:portable/MemMang/heap_2.c **** #endif
+  72:portable/MemMang/heap_2.c **** 
+  73:portable/MemMang/heap_2.c **** #if portBYTE_ALIGNMENT == 2
+  74:portable/MemMang/heap_2.c **** 	#define heapBYTE_ALIGNMENT_MASK	( ( size_t ) 0x0001 )
+  75:portable/MemMang/heap_2.c **** #endif
+  76:portable/MemMang/heap_2.c **** 
+  77:portable/MemMang/heap_2.c **** #if portBYTE_ALIGNMENT == 1
+  78:portable/MemMang/heap_2.c **** 	#define heapBYTE_ALIGNMENT_MASK	( ( size_t ) 0x0000 )
+  79:portable/MemMang/heap_2.c **** #endif
+  80:portable/MemMang/heap_2.c **** 
+  81:portable/MemMang/heap_2.c **** #ifndef heapBYTE_ALIGNMENT_MASK
+  82:portable/MemMang/heap_2.c **** 	#error "Invalid portBYTE_ALIGNMENT definition"
+  83:portable/MemMang/heap_2.c **** #endif
+  84:portable/MemMang/heap_2.c **** 
+  85:portable/MemMang/heap_2.c **** /* Allocate the memory for the heap.  The struct is used to force byte
+  86:portable/MemMang/heap_2.c **** alignment without using any non-portable code. */
+  87:portable/MemMang/heap_2.c **** static struct xRTOS_HEAP
+  88:portable/MemMang/heap_2.c **** {
+  89:portable/MemMang/heap_2.c **** 	unsigned portLONG ulDummy;
+  90:portable/MemMang/heap_2.c **** 	unsigned portCHAR ucHeap[ configTOTAL_HEAP_SIZE ];
+  91:portable/MemMang/heap_2.c **** } xHeap;
+  92:portable/MemMang/heap_2.c **** 
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 3
+
+
+  93:portable/MemMang/heap_2.c **** /* Define the linked list structure.  This is used to link free blocks in order
+  94:portable/MemMang/heap_2.c **** of their size. */
+  95:portable/MemMang/heap_2.c **** typedef struct A_BLOCK_LINK
+  96:portable/MemMang/heap_2.c **** {
+  97:portable/MemMang/heap_2.c **** 	struct A_BLOCK_LINK *pxNextFreeBlock;	/*<< The next free block in the list. */
+  98:portable/MemMang/heap_2.c **** 	size_t xBlockSize;						/*<< The size of the free block. */
+  99:portable/MemMang/heap_2.c **** } xBlockLink;
+ 100:portable/MemMang/heap_2.c **** 
+ 101:portable/MemMang/heap_2.c **** 
+ 102:portable/MemMang/heap_2.c **** static const unsigned portSHORT  heapSTRUCT_SIZE	= ( sizeof( xBlockLink ) + ( sizeof( xBlockLink ) 
+ 103:portable/MemMang/heap_2.c **** #define heapMINIMUM_BLOCK_SIZE	( ( size_t ) ( heapSTRUCT_SIZE * 2 ) )
+ 104:portable/MemMang/heap_2.c **** 
+ 105:portable/MemMang/heap_2.c **** /* Create a couple of list links to mark the start and end of the list. */
+ 106:portable/MemMang/heap_2.c **** static xBlockLink xStart, xEnd;
+ 107:portable/MemMang/heap_2.c **** 
+ 108:portable/MemMang/heap_2.c **** /* STATIC FUNCTIONS ARE DEFINED AS MACROS TO MINIMIZE THE FUNCTION CALL DEPTH. */
+ 109:portable/MemMang/heap_2.c **** 
+ 110:portable/MemMang/heap_2.c **** /*
+ 111:portable/MemMang/heap_2.c ****  * Insert a block into the list of free blocks - which is ordered by size of
+ 112:portable/MemMang/heap_2.c ****  * the block.  Small blocks at the start of the list and large blocks at the end
+ 113:portable/MemMang/heap_2.c ****  * of the list.
+ 114:portable/MemMang/heap_2.c ****  */
+ 115:portable/MemMang/heap_2.c **** #define prvInsertBlockIntoFreeList( pxBlockToInsert )								\
+ 116:portable/MemMang/heap_2.c **** {																					\
+ 117:portable/MemMang/heap_2.c **** xBlockLink *pxIterator;																\
+ 118:portable/MemMang/heap_2.c **** size_t xBlockSize;																	\
+ 119:portable/MemMang/heap_2.c **** 																					\
+ 120:portable/MemMang/heap_2.c **** 	xBlockSize = pxBlockToInsert->xBlockSize;										\
+ 121:portable/MemMang/heap_2.c **** 																					\
+ 122:portable/MemMang/heap_2.c **** 	/* Iterate through the list until a block is found that has a larger size */	\
+ 123:portable/MemMang/heap_2.c **** 	/* than the block we are inserting. */											\
+ 124:portable/MemMang/heap_2.c **** 	for( pxIterator = &xStart; pxIterator->pxNextFreeBlock->xBlockSize < xBlockSize; pxIterator = pxIt
+ 125:portable/MemMang/heap_2.c **** 	{																				\
+ 126:portable/MemMang/heap_2.c **** 		/* There is nothing to do here - just iterate to the correct position. */	\
+ 127:portable/MemMang/heap_2.c **** 	}																				\
+ 128:portable/MemMang/heap_2.c **** 																					\
+ 129:portable/MemMang/heap_2.c **** 	/* Update the list to include the block being inserted in the correct */		\
+ 130:portable/MemMang/heap_2.c **** 	/* position. */																	\
+ 131:portable/MemMang/heap_2.c **** 	pxBlockToInsert->pxNextFreeBlock = pxIterator->pxNextFreeBlock;					\
+ 132:portable/MemMang/heap_2.c **** 	pxIterator->pxNextFreeBlock = pxBlockToInsert;									\
+ 133:portable/MemMang/heap_2.c **** }
+ 134:portable/MemMang/heap_2.c **** /*-----------------------------------------------------------*/
+ 135:portable/MemMang/heap_2.c **** 
+ 136:portable/MemMang/heap_2.c **** #define prvHeapInit()																\
+ 137:portable/MemMang/heap_2.c **** {																					\
+ 138:portable/MemMang/heap_2.c **** xBlockLink *pxFirstFreeBlock;														\
+ 139:portable/MemMang/heap_2.c **** 																					\
+ 140:portable/MemMang/heap_2.c **** 	/* xStart is used to hold a pointer to the first item in the list of free */	\
+ 141:portable/MemMang/heap_2.c **** 	/* blocks.  The void cast is used to prevent compiler warnings. */				\
+ 142:portable/MemMang/heap_2.c **** 	xStart.pxNextFreeBlock = ( void * ) xHeap.ucHeap;								\
+ 143:portable/MemMang/heap_2.c **** 	xStart.xBlockSize = ( size_t ) 0;												\
+ 144:portable/MemMang/heap_2.c **** 																					\
+ 145:portable/MemMang/heap_2.c **** 	/* xEnd is used to mark the end of the list of free blocks. */					\
+ 146:portable/MemMang/heap_2.c **** 	xEnd.xBlockSize = configTOTAL_HEAP_SIZE;										\
+ 147:portable/MemMang/heap_2.c **** 	xEnd.pxNextFreeBlock = NULL;													\
+ 148:portable/MemMang/heap_2.c **** 																					\
+ 149:portable/MemMang/heap_2.c **** 	/* To start with there is a single free block that is sized to take up the		\
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 4
+
+
+ 150:portable/MemMang/heap_2.c **** 	entire heap space. */															\
+ 151:portable/MemMang/heap_2.c **** 	pxFirstFreeBlock = ( void * ) xHeap.ucHeap;										\
+ 152:portable/MemMang/heap_2.c **** 	pxFirstFreeBlock->xBlockSize = configTOTAL_HEAP_SIZE;							\
+ 153:portable/MemMang/heap_2.c **** 	pxFirstFreeBlock->pxNextFreeBlock = &xEnd;										\
+ 154:portable/MemMang/heap_2.c **** }
+ 155:portable/MemMang/heap_2.c **** /*-----------------------------------------------------------*/
+ 156:portable/MemMang/heap_2.c **** 
+ 157:portable/MemMang/heap_2.c **** void *pvPortMalloc( size_t xWantedSize )
+ 158:portable/MemMang/heap_2.c **** {
+ 159:portable/MemMang/heap_2.c **** xBlockLink *pxBlock, *pxPreviousBlock, *pxNewBlockLink;
+ 160:portable/MemMang/heap_2.c **** static portBASE_TYPE xHeapHasBeenInitialised = pdFALSE;
+ 161:portable/MemMang/heap_2.c **** void *pvReturn = NULL;
+ 162:portable/MemMang/heap_2.c **** 
+ 163:portable/MemMang/heap_2.c **** 	vTaskSuspendAll();
+ 164:portable/MemMang/heap_2.c **** 	{
+ 165:portable/MemMang/heap_2.c **** 		/* If this is the first call to malloc then the heap will require
+ 166:portable/MemMang/heap_2.c **** 		initialisation to setup the list of free blocks. */
+ 167:portable/MemMang/heap_2.c **** 		if( xHeapHasBeenInitialised == pdFALSE )
+ 168:portable/MemMang/heap_2.c **** 		{
+ 169:portable/MemMang/heap_2.c **** 			prvHeapInit();
+ 170:portable/MemMang/heap_2.c **** 			xHeapHasBeenInitialised = pdTRUE;
+ 171:portable/MemMang/heap_2.c **** 		}
+ 172:portable/MemMang/heap_2.c **** 
+ 173:portable/MemMang/heap_2.c **** 		/* The wanted size is increased so it can contain a xBlockLink
+ 174:portable/MemMang/heap_2.c **** 		structure in addition to the requested amount of bytes. */
+ 175:portable/MemMang/heap_2.c **** 		if( xWantedSize > 0 )
+ 176:portable/MemMang/heap_2.c **** 		{
+ 177:portable/MemMang/heap_2.c **** 			xWantedSize += heapSTRUCT_SIZE;
+ 178:portable/MemMang/heap_2.c **** 
+ 179:portable/MemMang/heap_2.c **** 			/* Ensure that blocks are always aligned to the required number of bytes. */
+ 180:portable/MemMang/heap_2.c **** 			if( xWantedSize & heapBYTE_ALIGNMENT_MASK )
+ 181:portable/MemMang/heap_2.c **** 			{
+ 182:portable/MemMang/heap_2.c **** 				/* Byte alignment required. */
+ 183:portable/MemMang/heap_2.c **** 				xWantedSize += ( portBYTE_ALIGNMENT - ( xWantedSize & heapBYTE_ALIGNMENT_MASK ) );
+ 184:portable/MemMang/heap_2.c **** 			}
+ 185:portable/MemMang/heap_2.c **** 		}
+ 186:portable/MemMang/heap_2.c **** 
+ 187:portable/MemMang/heap_2.c **** 		if( ( xWantedSize > 0 ) && ( xWantedSize < configTOTAL_HEAP_SIZE ) )
+ 188:portable/MemMang/heap_2.c **** 		{
+ 189:portable/MemMang/heap_2.c **** 			/* Blocks are stored in byte order - traverse the list from the start
+ 190:portable/MemMang/heap_2.c **** 			(smallest) block until one of adequate size is found. */
+ 191:portable/MemMang/heap_2.c **** 			pxPreviousBlock = &xStart;
+ 192:portable/MemMang/heap_2.c **** 			pxBlock = xStart.pxNextFreeBlock;
+ 193:portable/MemMang/heap_2.c **** 			while( ( pxBlock->xBlockSize < xWantedSize ) && ( pxBlock->pxNextFreeBlock ) )
+ 194:portable/MemMang/heap_2.c **** 			{
+ 195:portable/MemMang/heap_2.c **** 				pxPreviousBlock = pxBlock;
+ 196:portable/MemMang/heap_2.c **** 				pxBlock = pxBlock->pxNextFreeBlock;
+ 197:portable/MemMang/heap_2.c **** 			}
+ 198:portable/MemMang/heap_2.c **** 
+ 199:portable/MemMang/heap_2.c **** 			/* If we found the end marker then a block of adequate size was not found. */
+ 200:portable/MemMang/heap_2.c **** 			if( pxBlock != &xEnd )
+ 201:portable/MemMang/heap_2.c **** 			{
+ 202:portable/MemMang/heap_2.c **** 				/* Return the memory space - jumping over the xBlockLink structure
+ 203:portable/MemMang/heap_2.c **** 				at its start. */
+ 204:portable/MemMang/heap_2.c **** 				pvReturn = ( void * ) ( ( ( unsigned portCHAR * ) pxPreviousBlock->pxNextFreeBlock ) + heapSTRU
+ 205:portable/MemMang/heap_2.c **** 
+ 206:portable/MemMang/heap_2.c **** 				/* This block is being returned for use so must be taken our of the
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 5
+
+
+ 207:portable/MemMang/heap_2.c **** 				list of free blocks. */
+ 208:portable/MemMang/heap_2.c **** 				pxPreviousBlock->pxNextFreeBlock = pxBlock->pxNextFreeBlock;
+ 209:portable/MemMang/heap_2.c **** 
+ 210:portable/MemMang/heap_2.c **** 				/* If the block is larger than required it can be split into two. */
+ 211:portable/MemMang/heap_2.c **** 				if( ( pxBlock->xBlockSize - xWantedSize ) > heapMINIMUM_BLOCK_SIZE )
+ 212:portable/MemMang/heap_2.c **** 				{
+ 213:portable/MemMang/heap_2.c **** 					/* This block is to be split into two.  Create a new block
+ 214:portable/MemMang/heap_2.c **** 					following the number of bytes requested. The void cast is
+ 215:portable/MemMang/heap_2.c **** 					used to prevent byte alignment warnings from the compiler. */
+ 216:portable/MemMang/heap_2.c **** 					pxNewBlockLink = ( void * ) ( ( ( unsigned portCHAR * ) pxBlock ) + xWantedSize );
+ 217:portable/MemMang/heap_2.c **** 					
+ 218:portable/MemMang/heap_2.c **** 					/* Calculate the sizes of two blocks split from the single
+ 219:portable/MemMang/heap_2.c **** 					block. */
+ 220:portable/MemMang/heap_2.c **** 					pxNewBlockLink->xBlockSize = pxBlock->xBlockSize - xWantedSize;	
+ 221:portable/MemMang/heap_2.c **** 					pxBlock->xBlockSize = xWantedSize;			
+ 222:portable/MemMang/heap_2.c **** 					
+ 223:portable/MemMang/heap_2.c **** 					/* Insert the new block into the list of free blocks. */
+ 224:portable/MemMang/heap_2.c **** 					prvInsertBlockIntoFreeList( ( pxNewBlockLink ) );
+ 225:portable/MemMang/heap_2.c **** 				}
+ 226:portable/MemMang/heap_2.c **** 			}
+ 227:portable/MemMang/heap_2.c **** 		}
+ 228:portable/MemMang/heap_2.c **** 	}
+ 229:portable/MemMang/heap_2.c **** 	xTaskResumeAll();
+ 230:portable/MemMang/heap_2.c **** 
+ 231:portable/MemMang/heap_2.c **** 	return pvReturn;
+ 232:portable/MemMang/heap_2.c **** }
+ 233:portable/MemMang/heap_2.c **** /*-----------------------------------------------------------*/
+ 234:portable/MemMang/heap_2.c **** 
+ 235:portable/MemMang/heap_2.c **** void vPortFree( void *pv )
+ 236:portable/MemMang/heap_2.c **** {
+  19              		.loc 1 236 0
+  20 0000 10B5     		push	{r4, lr}
+  21              	.LCFI0:
+  22              	.LVL0:
+ 237:portable/MemMang/heap_2.c **** unsigned portCHAR *puc = ( unsigned portCHAR * ) pv;
+ 238:portable/MemMang/heap_2.c **** xBlockLink *pxLink;
+ 239:portable/MemMang/heap_2.c **** 
+ 240:portable/MemMang/heap_2.c **** 	if( pv )
+  23              		.loc 1 240 0
+  24 0002 0028     		cmp	r0, #0
+  25 0004 0FD0     		beq	.L7
+ 241:portable/MemMang/heap_2.c **** 	{
+ 242:portable/MemMang/heap_2.c **** 		/* The memory being freed will have an xBlockLink structure immediately
+ 243:portable/MemMang/heap_2.c **** 		before it. */
+ 244:portable/MemMang/heap_2.c **** 		puc -= heapSTRUCT_SIZE;
+ 245:portable/MemMang/heap_2.c **** 
+ 246:portable/MemMang/heap_2.c **** 		/* This casting is to keep the compiler from issuing warnings. */
+ 247:portable/MemMang/heap_2.c **** 		pxLink = ( void * ) puc;
+  26              		.loc 1 247 0
+  27 0006 041C     		mov	r4, r0
+  28              	.LVL1:
+  29 0008 083C     		sub	r4, r4, #8
+ 248:portable/MemMang/heap_2.c **** 
+ 249:portable/MemMang/heap_2.c **** 		vTaskSuspendAll();
+  30              		.loc 1 249 0
+  31 000a FFF7FEFF 		bl	vTaskSuspendAll
+  32              	.LVL2:
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 6
+
+
+  33              	.LBB2:
+ 250:portable/MemMang/heap_2.c **** 		{				
+ 251:portable/MemMang/heap_2.c **** 			/* Add this block to the list of free blocks. */
+ 252:portable/MemMang/heap_2.c **** 			prvInsertBlockIntoFreeList( ( ( xBlockLink * ) pxLink ) );
+  34              		.loc 1 252 0
+  35 000e 6068     		ldr	r0, [r4, #4]
+  36              	.LVL3:
+  37 0010 0649     		ldr	r1, .L8
+  38              	.LVL4:
+  39              	.L4:
+  40 0012 0A68     		ldr	r2, [r1]
+  41              	.LVL5:
+  42 0014 5368     		ldr	r3, [r2, #4]
+  43 0016 8342     		cmp	r3, r0
+  44 0018 01D2     		bcs	.L5
+  45 001a 111C     		mov	r1, r2
+  46 001c F9E7     		b	.L4
+  47              	.LVL6:
+  48              	.L5:
+  49 001e 2260     		str	r2, [r4]
+  50 0020 0C60     		str	r4, [r1]
+  51              	.LBE2:
+ 253:portable/MemMang/heap_2.c **** 		}
+ 254:portable/MemMang/heap_2.c **** 		xTaskResumeAll();
+  52              		.loc 1 254 0
+  53 0022 FFF7FEFF 		bl	xTaskResumeAll
+  54              	.LVL7:
+  55              	.LVL8:
+  56              	.L7:
+ 255:portable/MemMang/heap_2.c **** 	}
+ 256:portable/MemMang/heap_2.c **** }
+  57              		.loc 1 256 0
+  58              		@ sp needed for prologue
+  59              	.LVL9:
+  60 0026 10BC     		pop	{r4}
+  61 0028 01BC     		pop	{r0}
+  62 002a 0047     		bx	r0
+  63              	.L9:
+  64              		.align	2
+  65              	.L8:
+  66 002c 08600000 		.word	xStart
+  67              	.LFE3:
+  68              		.size	vPortFree, .-vPortFree
+  69              		.align	2
+  70              		.global	pvPortMalloc
+  71              		.code 16
+  72              		.thumb_func
+  73              		.type	pvPortMalloc, %function
+  74              	pvPortMalloc:
+  75              	.LFB2:
+  76              		.loc 1 158 0
+  77 0030 30B5     		push	{r4, r5, lr}
+  78              	.LCFI1:
+  79              	.LVL10:
+  80              		.loc 1 158 0
+  81 0032 041C     		mov	r4, r0
+  82              		.loc 1 163 0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 7
+
+
+  83 0034 FFF7FEFF 		bl	vTaskSuspendAll
+  84              	.LVL11:
+  85              		.loc 1 167 0
+  86 0038 254D     		ldr	r5, .L29
+  87 003a 2868     		ldr	r0, [r5]
+  88 003c 0028     		cmp	r0, #0
+  89 003e 0CD1     		bne	.L11
+  90              	.LBB3:
+  91              		.loc 1 169 0
+  92 0040 2449     		ldr	r1, .L29+4
+  93 0042 254B     		ldr	r3, .L29+8
+  94 0044 254A     		ldr	r2, .L29+12
+  95 0046 1960     		str	r1, [r3]
+  96 0048 5860     		str	r0, [r3, #4]
+  97 004a C023     		mov	r3, #192
+  98 004c DB01     		lsl	r3, r3, #7
+  99 004e 5360     		str	r3, [r2, #4]
+ 100 0050 4B60     		str	r3, [r1, #4]
+ 101              	.LBE3:
+ 102              		.loc 1 170 0
+ 103 0052 0123     		mov	r3, #1
+ 104              	.LBB4:
+ 105              		.loc 1 169 0
+ 106 0054 1060     		str	r0, [r2]
+ 107 0056 0A60     		str	r2, [r1]
+ 108              	.LBE4:
+ 109              		.loc 1 170 0
+ 110 0058 2B60     		str	r3, [r5]
+ 111              	.L11:
+ 112              		.loc 1 175 0
+ 113 005a 002C     		cmp	r4, #0
+ 114 005c 05D0     		beq	.L13
+ 115              		.loc 1 177 0
+ 116 005e 0834     		add	r4, r4, #8
+ 117              		.loc 1 180 0
+ 118 0060 0323     		mov	r3, #3
+ 119 0062 1C42     		tst	r4, r3
+ 120 0064 01D0     		beq	.L13
+ 121              		.loc 1 183 0
+ 122 0066 9C43     		bic	r4, r4, r3
+ 123 0068 0434     		add	r4, r4, #4
+ 124              	.LVL12:
+ 125              	.L13:
+ 126              		.loc 1 187 0
+ 127 006a 1D4B     		ldr	r3, .L29+16
+ 128 006c 621E     		sub	r2, r4, #1
+ 129 006e 9A42     		cmp	r2, r3
+ 130 0070 26D8     		bhi	.L16
+ 131              		.loc 1 192 0
+ 132 0072 194B     		ldr	r3, .L29+8
+ 133 0074 1A68     		ldr	r2, [r3]
+ 134              	.LVL13:
+ 135 0076 191C     		mov	r1, r3
+ 136              	.LVL14:
+ 137              	.L18:
+ 138              		.loc 1 193 0
+ 139 0078 5368     		ldr	r3, [r2, #4]
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 8
+
+
+ 140 007a A342     		cmp	r3, r4
+ 141 007c 06D2     		bcs	.L19
+ 142 007e 1368     		ldr	r3, [r2]
+ 143              	.LVL15:
+ 144 0080 9446     		mov	ip, r2
+ 145              	.LVL16:
+ 146 0082 002B     		cmp	r3, #0
+ 147 0084 02D0     		beq	.L19
+ 148 0086 1A1C     		mov	r2, r3
+ 149 0088 6146     		mov	r1, ip
+ 150 008a F5E7     		b	.L18
+ 151              	.LVL17:
+ 152              	.L19:
+ 153              		.loc 1 200 0
+ 154 008c 134B     		ldr	r3, .L29+12
+ 155 008e 9A42     		cmp	r2, r3
+ 156 0090 16D0     		beq	.L16
+ 157              	.LVL18:
+ 158              		.loc 1 204 0
+ 159 0092 0B68     		ldr	r3, [r1]
+ 160 0094 1D1C     		mov	r5, r3
+ 161              	.LVL19:
+ 162              		.loc 1 208 0
+ 163 0096 1368     		ldr	r3, [r2]
+ 164 0098 0B60     		str	r3, [r1]
+ 165              		.loc 1 211 0
+ 166 009a 5368     		ldr	r3, [r2, #4]
+ 167 009c 1B1B     		sub	r3, r3, r4
+ 168              		.loc 1 204 0
+ 169 009e 0835     		add	r5, r5, #8
+ 170              		.loc 1 211 0
+ 171 00a0 102B     		cmp	r3, #16
+ 172 00a2 0ED9     		bls	.L23
+ 173              		.loc 1 216 0
+ 174 00a4 1019     		add	r0, r2, r4
+ 175              	.LVL20:
+ 176              		.loc 1 220 0
+ 177 00a6 4360     		str	r3, [r0, #4]
+ 178              		.loc 1 221 0
+ 179 00a8 5460     		str	r4, [r2, #4]
+ 180              	.LBB5:
+ 181              		.loc 1 224 0
+ 182 00aa 0B49     		ldr	r1, .L29+8
+ 183              	.LVL21:
+ 184 00ac 4468     		ldr	r4, [r0, #4]
+ 185              	.LVL22:
+ 186              	.L25:
+ 187 00ae 0A68     		ldr	r2, [r1]
+ 188              	.LVL23:
+ 189 00b0 5368     		ldr	r3, [r2, #4]
+ 190 00b2 A342     		cmp	r3, r4
+ 191 00b4 01D2     		bcs	.L26
+ 192 00b6 111C     		mov	r1, r2
+ 193 00b8 F9E7     		b	.L25
+ 194              	.LVL24:
+ 195              	.L26:
+ 196 00ba 0260     		str	r2, [r0]
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 9
+
+
+ 197 00bc 0860     		str	r0, [r1]
+ 198 00be 00E0     		b	.L23
+ 199              	.LVL25:
+ 200              	.L16:
+ 201 00c0 0025     		mov	r5, #0
+ 202              	.LVL26:
+ 203              	.L23:
+ 204              	.LBE5:
+ 205              		.loc 1 229 0
+ 206 00c2 FFF7FEFF 		bl	xTaskResumeAll
+ 207              	.LVL27:
+ 208              		.loc 1 232 0
+ 209 00c6 281C     		mov	r0, r5
+ 210              		@ sp needed for prologue
+ 211              	.LVL28:
+ 212              	.LVL29:
+ 213 00c8 30BC     		pop	{r4, r5}
+ 214 00ca 02BC     		pop	{r1}
+ 215 00cc 0847     		bx	r1
+ 216              	.L30:
+ 217 00ce C046     		.align	2
+ 218              	.L29:
+ 219 00d0 00000000 		.word	xHeapHasBeenInitialised.2124
+ 220 00d4 08000000 		.word	xHeap+4
+ 221 00d8 08600000 		.word	xStart
+ 222 00dc 10600000 		.word	xEnd
+ 223 00e0 FE5F0000 		.word	24574
+ 224              	.LFE2:
+ 225              		.size	pvPortMalloc, .-pvPortMalloc
+ 226              		.bss
+ 227              		.align	2
+ 228              	xHeapHasBeenInitialised.2124:
+ 229 0000 00000000 		.space	4
+ 230              		.align	2
+ 231              	xHeap:
+ 232 0004 00000000 		.space	24580
+ 232      00000000 
+ 232      00000000 
+ 232      00000000 
+ 232      00000000 
+ 233              		.align	2
+ 234              	xStart:
+ 235 6008 00000000 		.space	8
+ 235      00000000 
+ 236              		.align	2
+ 237              	xEnd:
+ 238 6010 00000000 		.space	8
+ 238      00000000 
+ 239              		.section	.debug_frame,"",%progbits
+ 240              	.Lframe0:
+ 241 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ 242              	.LSCIE0:
+ 243 0004 FFFFFFFF 		.4byte	0xffffffff
+ 244 0008 01       		.byte	0x1
+ 245 0009 00       		.ascii	"\000"
+ 246 000a 01       		.uleb128 0x1
+ 247 000b 7C       		.sleb128 -4
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 10
+
+
+ 248 000c 0E       		.byte	0xe
+ 249 000d 0C       		.byte	0xc
+ 250 000e 0D       		.uleb128 0xd
+ 251 000f 00       		.uleb128 0x0
+ 252              		.align	2
+ 253              	.LECIE0:
+ 254              	.LSFDE0:
+ 255 0010 14000000 		.4byte	.LEFDE0-.LASFDE0
+ 256              	.LASFDE0:
+ 257 0014 00000000 		.4byte	.Lframe0
+ 258 0018 00000000 		.4byte	.LFB3
+ 259 001c 30000000 		.4byte	.LFE3-.LFB3
+ 260 0020 42       		.byte	0x4
+ 261              		.4byte	.LCFI0-.LFB3
+ 262 0021 0E       		.byte	0xe
+ 263 0022 08       		.uleb128 0x8
+ 264 0023 84       		.byte	0x84
+ 265 0024 02       		.uleb128 0x2
+ 266 0025 8E       		.byte	0x8e
+ 267 0026 01       		.uleb128 0x1
+ 268 0027 00       		.align	2
+ 269              	.LEFDE0:
+ 270              	.LSFDE2:
+ 271 0028 18000000 		.4byte	.LEFDE2-.LASFDE2
+ 272              	.LASFDE2:
+ 273 002c 00000000 		.4byte	.Lframe0
+ 274 0030 30000000 		.4byte	.LFB2
+ 275 0034 B4000000 		.4byte	.LFE2-.LFB2
+ 276 0038 42       		.byte	0x4
+ 277              		.4byte	.LCFI1-.LFB2
+ 278 0039 0E       		.byte	0xe
+ 279 003a 0C       		.uleb128 0xc
+ 280 003b 84       		.byte	0x84
+ 281 003c 03       		.uleb128 0x3
+ 282 003d 85       		.byte	0x85
+ 283 003e 02       		.uleb128 0x2
+ 284 003f 8E       		.byte	0x8e
+ 285 0040 01       		.uleb128 0x1
+ 286 0041 000000   		.align	2
+ 287              	.LEFDE2:
+ 288              		.text
+ 289              	.Letext0:
+ 290              		.section	.debug_loc,"",%progbits
+ 291              	.Ldebug_loc0:
+ 292              	.LLST0:
+ 293 0000 00000000 		.4byte	.LFB3-.Ltext0
+ 294 0004 02000000 		.4byte	.LCFI0-.Ltext0
+ 295 0008 0100     		.2byte	0x1
+ 296 000a 5D       		.byte	0x5d
+ 297 000b 02000000 		.4byte	.LCFI0-.Ltext0
+ 298 000f 30000000 		.4byte	.LFE3-.Ltext0
+ 299 0013 0200     		.2byte	0x2
+ 300 0015 7D       		.byte	0x7d
+ 301 0016 08       		.sleb128 8
+ 302 0017 00000000 		.4byte	0x0
+ 303 001b 00000000 		.4byte	0x0
+ 304              	.LLST1:
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 11
+
+
+ 305 001f 02000000 		.4byte	.LVL0-.Ltext0
+ 306 0023 0E000000 		.4byte	.LVL2-.Ltext0
+ 307 0027 0100     		.2byte	0x1
+ 308 0029 50       		.byte	0x50
+ 309 002a 26000000 		.4byte	.LVL8-.Ltext0
+ 310 002e 30000000 		.4byte	.LFE3-.Ltext0
+ 311 0032 0100     		.2byte	0x1
+ 312 0034 50       		.byte	0x50
+ 313 0035 00000000 		.4byte	0x0
+ 314 0039 00000000 		.4byte	0x0
+ 315              	.LLST2:
+ 316 003d 08000000 		.4byte	.LVL1-.Ltext0
+ 317 0041 26000000 		.4byte	.LVL9-.Ltext0
+ 318 0045 0100     		.2byte	0x1
+ 319 0047 54       		.byte	0x54
+ 320 0048 00000000 		.4byte	0x0
+ 321 004c 00000000 		.4byte	0x0
+ 322              	.LLST3:
+ 323 0050 12000000 		.4byte	.LVL4-.Ltext0
+ 324 0054 14000000 		.4byte	.LVL5-.Ltext0
+ 325 0058 0100     		.2byte	0x1
+ 326 005a 51       		.byte	0x51
+ 327 005b 14000000 		.4byte	.LVL5-.Ltext0
+ 328 005f 26000000 		.4byte	.LVL7-.Ltext0
+ 329 0063 0100     		.2byte	0x1
+ 330 0065 52       		.byte	0x52
+ 331 0066 00000000 		.4byte	0x0
+ 332 006a 00000000 		.4byte	0x0
+ 333              	.LLST4:
+ 334 006e 10000000 		.4byte	.LVL3-.Ltext0
+ 335 0072 26000000 		.4byte	.LVL7-.Ltext0
+ 336 0076 0100     		.2byte	0x1
+ 337 0078 50       		.byte	0x50
+ 338 0079 00000000 		.4byte	0x0
+ 339 007d 00000000 		.4byte	0x0
+ 340              	.LLST5:
+ 341 0081 30000000 		.4byte	.LFB2-.Ltext0
+ 342 0085 32000000 		.4byte	.LCFI1-.Ltext0
+ 343 0089 0100     		.2byte	0x1
+ 344 008b 5D       		.byte	0x5d
+ 345 008c 32000000 		.4byte	.LCFI1-.Ltext0
+ 346 0090 E4000000 		.4byte	.LFE2-.Ltext0
+ 347 0094 0200     		.2byte	0x2
+ 348 0096 7D       		.byte	0x7d
+ 349 0097 0C       		.sleb128 12
+ 350 0098 00000000 		.4byte	0x0
+ 351 009c 00000000 		.4byte	0x0
+ 352              	.LLST6:
+ 353 00a0 32000000 		.4byte	.LVL10-.Ltext0
+ 354 00a4 38000000 		.4byte	.LVL11-.Ltext0
+ 355 00a8 0100     		.2byte	0x1
+ 356 00aa 50       		.byte	0x50
+ 357 00ab 38000000 		.4byte	.LVL11-.Ltext0
+ 358 00af 6A000000 		.4byte	.LVL12-.Ltext0
+ 359 00b3 0100     		.2byte	0x1
+ 360 00b5 54       		.byte	0x54
+ 361 00b6 6A000000 		.4byte	.LVL12-.Ltext0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 12
+
+
+ 362 00ba AE000000 		.4byte	.LVL22-.Ltext0
+ 363 00be 0100     		.2byte	0x1
+ 364 00c0 54       		.byte	0x54
+ 365 00c1 C0000000 		.4byte	.LVL25-.Ltext0
+ 366 00c5 C8000000 		.4byte	.LVL28-.Ltext0
+ 367 00c9 0100     		.2byte	0x1
+ 368 00cb 54       		.byte	0x54
+ 369 00cc 00000000 		.4byte	0x0
+ 370 00d0 00000000 		.4byte	0x0
+ 371              	.LLST7:
+ 372 00d4 76000000 		.4byte	.LVL13-.Ltext0
+ 373 00d8 80000000 		.4byte	.LVL15-.Ltext0
+ 374 00dc 0100     		.2byte	0x1
+ 375 00de 52       		.byte	0x52
+ 376 00df 80000000 		.4byte	.LVL15-.Ltext0
+ 377 00e3 8C000000 		.4byte	.LVL17-.Ltext0
+ 378 00e7 0100     		.2byte	0x1
+ 379 00e9 53       		.byte	0x53
+ 380 00ea 8C000000 		.4byte	.LVL17-.Ltext0
+ 381 00ee B0000000 		.4byte	.LVL23-.Ltext0
+ 382 00f2 0100     		.2byte	0x1
+ 383 00f4 52       		.byte	0x52
+ 384 00f5 C0000000 		.4byte	.LVL25-.Ltext0
+ 385 00f9 C6000000 		.4byte	.LVL27-.Ltext0
+ 386 00fd 0100     		.2byte	0x1
+ 387 00ff 52       		.byte	0x52
+ 388 0100 00000000 		.4byte	0x0
+ 389 0104 00000000 		.4byte	0x0
+ 390              	.LLST8:
+ 391 0108 78000000 		.4byte	.LVL14-.Ltext0
+ 392 010c 82000000 		.4byte	.LVL16-.Ltext0
+ 393 0110 0100     		.2byte	0x1
+ 394 0112 51       		.byte	0x51
+ 395 0113 82000000 		.4byte	.LVL16-.Ltext0
+ 396 0117 92000000 		.4byte	.LVL18-.Ltext0
+ 397 011b 0100     		.2byte	0x1
+ 398 011d 5C       		.byte	0x5c
+ 399 011e 92000000 		.4byte	.LVL18-.Ltext0
+ 400 0122 AC000000 		.4byte	.LVL21-.Ltext0
+ 401 0126 0100     		.2byte	0x1
+ 402 0128 51       		.byte	0x51
+ 403 0129 AC000000 		.4byte	.LVL21-.Ltext0
+ 404 012d C0000000 		.4byte	.LVL25-.Ltext0
+ 405 0131 0100     		.2byte	0x1
+ 406 0133 5C       		.byte	0x5c
+ 407 0134 C0000000 		.4byte	.LVL25-.Ltext0
+ 408 0138 C2000000 		.4byte	.LVL26-.Ltext0
+ 409 013c 0100     		.2byte	0x1
+ 410 013e 51       		.byte	0x51
+ 411 013f C2000000 		.4byte	.LVL26-.Ltext0
+ 412 0143 C6000000 		.4byte	.LVL27-.Ltext0
+ 413 0147 0100     		.2byte	0x1
+ 414 0149 5C       		.byte	0x5c
+ 415 014a 00000000 		.4byte	0x0
+ 416 014e 00000000 		.4byte	0x0
+ 417              	.LLST9:
+ 418 0152 A6000000 		.4byte	.LVL20-.Ltext0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 13
+
+
+ 419 0156 C0000000 		.4byte	.LVL25-.Ltext0
+ 420 015a 0100     		.2byte	0x1
+ 421 015c 50       		.byte	0x50
+ 422 015d C2000000 		.4byte	.LVL26-.Ltext0
+ 423 0161 C6000000 		.4byte	.LVL27-.Ltext0
+ 424 0165 0100     		.2byte	0x1
+ 425 0167 50       		.byte	0x50
+ 426 0168 00000000 		.4byte	0x0
+ 427 016c 00000000 		.4byte	0x0
+ 428              	.LLST10:
+ 429 0170 96000000 		.4byte	.LVL19-.Ltext0
+ 430 0174 C0000000 		.4byte	.LVL25-.Ltext0
+ 431 0178 0100     		.2byte	0x1
+ 432 017a 55       		.byte	0x55
+ 433 017b C2000000 		.4byte	.LVL26-.Ltext0
+ 434 017f C8000000 		.4byte	.LVL29-.Ltext0
+ 435 0183 0100     		.2byte	0x1
+ 436 0185 55       		.byte	0x55
+ 437 0186 00000000 		.4byte	0x0
+ 438 018a 00000000 		.4byte	0x0
+ 439              	.LLST11:
+ 440 018e AC000000 		.4byte	.LVL21-.Ltext0
+ 441 0192 B0000000 		.4byte	.LVL23-.Ltext0
+ 442 0196 0100     		.2byte	0x1
+ 443 0198 51       		.byte	0x51
+ 444 0199 B0000000 		.4byte	.LVL23-.Ltext0
+ 445 019d C0000000 		.4byte	.LVL25-.Ltext0
+ 446 01a1 0100     		.2byte	0x1
+ 447 01a3 52       		.byte	0x52
+ 448 01a4 C2000000 		.4byte	.LVL26-.Ltext0
+ 449 01a8 C6000000 		.4byte	.LVL27-.Ltext0
+ 450 01ac 0100     		.2byte	0x1
+ 451 01ae 51       		.byte	0x51
+ 452 01af 00000000 		.4byte	0x0
+ 453 01b3 00000000 		.4byte	0x0
+ 454              	.LLST12:
+ 455 01b7 AE000000 		.4byte	.LVL22-.Ltext0
+ 456 01bb C0000000 		.4byte	.LVL25-.Ltext0
+ 457 01bf 0100     		.2byte	0x1
+ 458 01c1 54       		.byte	0x54
+ 459 01c2 C2000000 		.4byte	.LVL26-.Ltext0
+ 460 01c6 C8000000 		.4byte	.LVL28-.Ltext0
+ 461 01ca 0100     		.2byte	0x1
+ 462 01cc 54       		.byte	0x54
+ 463 01cd 00000000 		.4byte	0x0
+ 464 01d1 00000000 		.4byte	0x0
+ 465              		.file 2 "/cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/include/stddef.h"
+ 466              		.section	.debug_info
+ 467 0000 69020000 		.4byte	0x269
+ 468 0004 0200     		.2byte	0x2
+ 469 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 470 000a 04       		.byte	0x4
+ 471 000b 01       		.uleb128 0x1
+ 472 000c 00000000 		.4byte	.LASF31
+ 473 0010 01       		.byte	0x1
+ 474 0011 36010000 		.4byte	.LASF32
+ 475 0015 84010000 		.4byte	.LASF33
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 14
+
+
+ 476 0019 00000000 		.4byte	.Ltext0
+ 477 001d E4000000 		.4byte	.Letext0
+ 478 0021 00000000 		.4byte	.Ldebug_line0
+ 479 0025 02       		.uleb128 0x2
+ 480 0026 0C000000 		.4byte	.LASF16
+ 481 002a 02       		.byte	0x2
+ 482 002b D6       		.byte	0xd6
+ 483 002c 30000000 		.4byte	0x30
+ 484 0030 03       		.uleb128 0x3
+ 485 0031 04       		.byte	0x4
+ 486 0032 07       		.byte	0x7
+ 487 0033 8F000000 		.4byte	.LASF0
+ 488 0037 04       		.uleb128 0x4
+ 489 0038 04       		.byte	0x4
+ 490 0039 05       		.byte	0x5
+ 491 003a 696E7400 		.ascii	"int\000"
+ 492 003e 03       		.uleb128 0x3
+ 493 003f 04       		.byte	0x4
+ 494 0040 05       		.byte	0x5
+ 495 0041 A8010000 		.4byte	.LASF1
+ 496 0045 03       		.uleb128 0x3
+ 497 0046 08       		.byte	0x8
+ 498 0047 05       		.byte	0x5
+ 499 0048 50010000 		.4byte	.LASF2
+ 500 004c 03       		.uleb128 0x3
+ 501 004d 04       		.byte	0x4
+ 502 004e 07       		.byte	0x7
+ 503 004f 12010000 		.4byte	.LASF3
+ 504 0053 05       		.uleb128 0x5
+ 505 0054 04       		.byte	0x4
+ 506 0055 07       		.byte	0x7
+ 507 0056 03       		.uleb128 0x3
+ 508 0057 01       		.byte	0x1
+ 509 0058 08       		.byte	0x8
+ 510 0059 76000000 		.4byte	.LASF4
+ 511 005d 06       		.uleb128 0x6
+ 512 005e 04       		.byte	0x4
+ 513 005f 07       		.uleb128 0x7
+ 514 0060 04       		.byte	0x4
+ 515 0061 56000000 		.4byte	0x56
+ 516 0065 03       		.uleb128 0x3
+ 517 0066 02       		.byte	0x2
+ 518 0067 05       		.byte	0x5
+ 519 0068 7A010000 		.4byte	.LASF5
+ 520 006c 03       		.uleb128 0x3
+ 521 006d 01       		.byte	0x1
+ 522 006e 08       		.byte	0x8
+ 523 006f 6A010000 		.4byte	.LASF6
+ 524 0073 03       		.uleb128 0x3
+ 525 0074 02       		.byte	0x2
+ 526 0075 07       		.byte	0x7
+ 527 0076 A1000000 		.4byte	.LASF7
+ 528 007a 03       		.uleb128 0x3
+ 529 007b 08       		.byte	0x8
+ 530 007c 07       		.byte	0x7
+ 531 007d 1F010000 		.4byte	.LASF8
+ 532 0081 03       		.uleb128 0x3
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 15
+
+
+ 533 0082 01       		.byte	0x1
+ 534 0083 06       		.byte	0x6
+ 535 0084 B1010000 		.4byte	.LASF9
+ 536 0088 08       		.uleb128 0x8
+ 537 0089 5C000000 		.4byte	.LASF12
+ 538 008d 0460     		.2byte	0x6004
+ 539 008f 01       		.byte	0x1
+ 540 0090 58       		.byte	0x58
+ 541 0091 B2000000 		.4byte	0xb2
+ 542 0095 09       		.uleb128 0x9
+ 543 0096 6E000000 		.4byte	.LASF10
+ 544 009a 01       		.byte	0x1
+ 545 009b 59       		.byte	0x59
+ 546 009c 30000000 		.4byte	0x30
+ 547 00a0 02       		.byte	0x2
+ 548 00a1 23       		.byte	0x23
+ 549 00a2 00       		.uleb128 0x0
+ 550 00a3 09       		.uleb128 0x9
+ 551 00a4 67000000 		.4byte	.LASF11
+ 552 00a8 01       		.byte	0x1
+ 553 00a9 5A       		.byte	0x5a
+ 554 00aa B2000000 		.4byte	0xb2
+ 555 00ae 02       		.byte	0x2
+ 556 00af 23       		.byte	0x23
+ 557 00b0 04       		.uleb128 0x4
+ 558 00b1 00       		.byte	0x0
+ 559 00b2 0A       		.uleb128 0xa
+ 560 00b3 56000000 		.4byte	0x56
+ 561 00b7 C3000000 		.4byte	0xc3
+ 562 00bb 0B       		.uleb128 0xb
+ 563 00bc 53000000 		.4byte	0x53
+ 564 00c0 FF5F     		.2byte	0x5fff
+ 565 00c2 00       		.byte	0x0
+ 566 00c3 0C       		.uleb128 0xc
+ 567 00c4 22000000 		.4byte	.LASF13
+ 568 00c8 08       		.byte	0x8
+ 569 00c9 01       		.byte	0x1
+ 570 00ca 60       		.byte	0x60
+ 571 00cb EC000000 		.4byte	0xec
+ 572 00cf 09       		.uleb128 0x9
+ 573 00d0 BD010000 		.4byte	.LASF14
+ 574 00d4 01       		.byte	0x1
+ 575 00d5 61       		.byte	0x61
+ 576 00d6 EC000000 		.4byte	0xec
+ 577 00da 02       		.byte	0x2
+ 578 00db 23       		.byte	0x23
+ 579 00dc 00       		.uleb128 0x0
+ 580 00dd 09       		.uleb128 0x9
+ 581 00de 84000000 		.4byte	.LASF15
+ 582 00e2 01       		.byte	0x1
+ 583 00e3 62       		.byte	0x62
+ 584 00e4 25000000 		.4byte	0x25
+ 585 00e8 02       		.byte	0x2
+ 586 00e9 23       		.byte	0x23
+ 587 00ea 04       		.uleb128 0x4
+ 588 00eb 00       		.byte	0x0
+ 589 00ec 07       		.uleb128 0x7
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 16
+
+
+ 590 00ed 04       		.byte	0x4
+ 591 00ee C3000000 		.4byte	0xc3
+ 592 00f2 02       		.uleb128 0x2
+ 593 00f3 07010000 		.4byte	.LASF17
+ 594 00f7 01       		.byte	0x1
+ 595 00f8 63       		.byte	0x63
+ 596 00f9 C3000000 		.4byte	0xc3
+ 597 00fd 0D       		.uleb128 0xd
+ 598 00fe 01       		.byte	0x1
+ 599 00ff 9E010000 		.4byte	.LASF34
+ 600 0103 01       		.byte	0x1
+ 601 0104 EC       		.byte	0xec
+ 602 0105 01       		.byte	0x1
+ 603 0106 00000000 		.4byte	.LFB3
+ 604 010a 30000000 		.4byte	.LFE3
+ 605 010e 00000000 		.4byte	.LLST0
+ 606 0112 67010000 		.4byte	0x167
+ 607 0116 0E       		.uleb128 0xe
+ 608 0117 707600   		.ascii	"pv\000"
+ 609 011a 01       		.byte	0x1
+ 610 011b EB       		.byte	0xeb
+ 611 011c 5D000000 		.4byte	0x5d
+ 612 0120 1F000000 		.4byte	.LLST1
+ 613 0124 0F       		.uleb128 0xf
+ 614 0125 70756300 		.ascii	"puc\000"
+ 615 0129 01       		.byte	0x1
+ 616 012a ED       		.byte	0xed
+ 617 012b 5F000000 		.4byte	0x5f
+ 618 012f 10       		.uleb128 0x10
+ 619 0130 37000000 		.4byte	.LASF18
+ 620 0134 01       		.byte	0x1
+ 621 0135 EE       		.byte	0xee
+ 622 0136 67010000 		.4byte	0x167
+ 623 013a 3D000000 		.4byte	.LLST2
+ 624 013e 11       		.uleb128 0x11
+ 625 013f 0E000000 		.4byte	.LBB2
+ 626 0143 22000000 		.4byte	.LBE2
+ 627 0147 10       		.uleb128 0x10
+ 628 0148 6F010000 		.4byte	.LASF19
+ 629 014c 01       		.byte	0x1
+ 630 014d FC       		.byte	0xfc
+ 631 014e 67010000 		.4byte	0x167
+ 632 0152 50000000 		.4byte	.LLST3
+ 633 0156 10       		.uleb128 0x10
+ 634 0157 84000000 		.4byte	.LASF15
+ 635 015b 01       		.byte	0x1
+ 636 015c FC       		.byte	0xfc
+ 637 015d 25000000 		.4byte	0x25
+ 638 0161 6E000000 		.4byte	.LLST4
+ 639 0165 00       		.byte	0x0
+ 640 0166 00       		.byte	0x0
+ 641 0167 07       		.uleb128 0x7
+ 642 0168 04       		.byte	0x4
+ 643 0169 F2000000 		.4byte	0xf2
+ 644 016d 12       		.uleb128 0x12
+ 645 016e 01       		.byte	0x1
+ 646 016f 3E000000 		.4byte	.LASF35
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 17
+
+
+ 647 0173 01       		.byte	0x1
+ 648 0174 9E       		.byte	0x9e
+ 649 0175 01       		.byte	0x1
+ 650 0176 5D000000 		.4byte	0x5d
+ 651 017a 30000000 		.4byte	.LFB2
+ 652 017e E4000000 		.4byte	.LFE2
+ 653 0182 81000000 		.4byte	.LLST5
+ 654 0186 28020000 		.4byte	0x228
+ 655 018a 13       		.uleb128 0x13
+ 656 018b 5E010000 		.4byte	.LASF20
+ 657 018f 01       		.byte	0x1
+ 658 0190 9D       		.byte	0x9d
+ 659 0191 25000000 		.4byte	0x25
+ 660 0195 A0000000 		.4byte	.LLST6
+ 661 0199 10       		.uleb128 0x10
+ 662 019a 2F000000 		.4byte	.LASF21
+ 663 019e 01       		.byte	0x1
+ 664 019f 9F       		.byte	0x9f
+ 665 01a0 67010000 		.4byte	0x167
+ 666 01a4 D4000000 		.4byte	.LLST7
+ 667 01a8 10       		.uleb128 0x10
+ 668 01a9 D7000000 		.4byte	.LASF22
+ 669 01ad 01       		.byte	0x1
+ 670 01ae 9F       		.byte	0x9f
+ 671 01af 67010000 		.4byte	0x167
+ 672 01b3 08010000 		.4byte	.LLST8
+ 673 01b7 10       		.uleb128 0x10
+ 674 01b8 13000000 		.4byte	.LASF23
+ 675 01bc 01       		.byte	0x1
+ 676 01bd 9F       		.byte	0x9f
+ 677 01be 67010000 		.4byte	0x167
+ 678 01c2 52010000 		.4byte	.LLST9
+ 679 01c6 10       		.uleb128 0x10
+ 680 01c7 E7000000 		.4byte	.LASF24
+ 681 01cb 01       		.byte	0x1
+ 682 01cc A1       		.byte	0xa1
+ 683 01cd 5D000000 		.4byte	0x5d
+ 684 01d1 70010000 		.4byte	.LLST10
+ 685 01d5 14       		.uleb128 0x14
+ 686 01d6 00000000 		.4byte	.Ldebug_ranges0+0x0
+ 687 01da EA010000 		.4byte	0x1ea
+ 688 01de 15       		.uleb128 0x15
+ 689 01df 4B000000 		.4byte	.LASF25
+ 690 01e3 01       		.byte	0x1
+ 691 01e4 A9       		.byte	0xa9
+ 692 01e5 67010000 		.4byte	0x167
+ 693 01e9 00       		.byte	0x0
+ 694 01ea 16       		.uleb128 0x16
+ 695 01eb AA000000 		.4byte	.LBB5
+ 696 01ef C2000000 		.4byte	.LBE5
+ 697 01f3 16020000 		.4byte	0x216
+ 698 01f7 10       		.uleb128 0x10
+ 699 01f8 6F010000 		.4byte	.LASF19
+ 700 01fc 01       		.byte	0x1
+ 701 01fd E0       		.byte	0xe0
+ 702 01fe 67010000 		.4byte	0x167
+ 703 0202 8E010000 		.4byte	.LLST11
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 18
+
+
+ 704 0206 10       		.uleb128 0x10
+ 705 0207 84000000 		.4byte	.LASF15
+ 706 020b 01       		.byte	0x1
+ 707 020c E0       		.byte	0xe0
+ 708 020d 25000000 		.4byte	0x25
+ 709 0211 B7010000 		.4byte	.LLST12
+ 710 0215 00       		.byte	0x0
+ 711 0216 17       		.uleb128 0x17
+ 712 0217 B4000000 		.4byte	.LASF26
+ 713 021b 01       		.byte	0x1
+ 714 021c A0       		.byte	0xa0
+ 715 021d 3E000000 		.4byte	0x3e
+ 716 0221 05       		.byte	0x5
+ 717 0222 03       		.byte	0x3
+ 718 0223 00000000 		.4byte	xHeapHasBeenInitialised.2124
+ 719 0227 00       		.byte	0x0
+ 720 0228 17       		.uleb128 0x17
+ 721 0229 CC000000 		.4byte	.LASF27
+ 722 022d 01       		.byte	0x1
+ 723 022e 5B       		.byte	0x5b
+ 724 022f 88000000 		.4byte	0x88
+ 725 0233 05       		.byte	0x5
+ 726 0234 03       		.byte	0x3
+ 727 0235 04000000 		.4byte	xHeap
+ 728 0239 18       		.uleb128 0x18
+ 729 023a F0000000 		.4byte	.LASF28
+ 730 023e 01       		.byte	0x1
+ 731 023f 66       		.byte	0x66
+ 732 0240 45020000 		.4byte	0x245
+ 733 0244 08       		.byte	0x8
+ 734 0245 19       		.uleb128 0x19
+ 735 0246 73000000 		.4byte	0x73
+ 736 024a 17       		.uleb128 0x17
+ 737 024b 00010000 		.4byte	.LASF29
+ 738 024f 01       		.byte	0x1
+ 739 0250 6A       		.byte	0x6a
+ 740 0251 F2000000 		.4byte	0xf2
+ 741 0255 05       		.byte	0x5
+ 742 0256 03       		.byte	0x3
+ 743 0257 08600000 		.4byte	xStart
+ 744 025b 17       		.uleb128 0x17
+ 745 025c D2000000 		.4byte	.LASF30
+ 746 0260 01       		.byte	0x1
+ 747 0261 6A       		.byte	0x6a
+ 748 0262 F2000000 		.4byte	0xf2
+ 749 0266 05       		.byte	0x5
+ 750 0267 03       		.byte	0x3
+ 751 0268 10600000 		.4byte	xEnd
+ 752 026c 00       		.byte	0x0
+ 753              		.section	.debug_abbrev
+ 754 0000 01       		.uleb128 0x1
+ 755 0001 11       		.uleb128 0x11
+ 756 0002 01       		.byte	0x1
+ 757 0003 25       		.uleb128 0x25
+ 758 0004 0E       		.uleb128 0xe
+ 759 0005 13       		.uleb128 0x13
+ 760 0006 0B       		.uleb128 0xb
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 19
+
+
+ 761 0007 03       		.uleb128 0x3
+ 762 0008 0E       		.uleb128 0xe
+ 763 0009 1B       		.uleb128 0x1b
+ 764 000a 0E       		.uleb128 0xe
+ 765 000b 11       		.uleb128 0x11
+ 766 000c 01       		.uleb128 0x1
+ 767 000d 12       		.uleb128 0x12
+ 768 000e 01       		.uleb128 0x1
+ 769 000f 10       		.uleb128 0x10
+ 770 0010 06       		.uleb128 0x6
+ 771 0011 00       		.byte	0x0
+ 772 0012 00       		.byte	0x0
+ 773 0013 02       		.uleb128 0x2
+ 774 0014 16       		.uleb128 0x16
+ 775 0015 00       		.byte	0x0
+ 776 0016 03       		.uleb128 0x3
+ 777 0017 0E       		.uleb128 0xe
+ 778 0018 3A       		.uleb128 0x3a
+ 779 0019 0B       		.uleb128 0xb
+ 780 001a 3B       		.uleb128 0x3b
+ 781 001b 0B       		.uleb128 0xb
+ 782 001c 49       		.uleb128 0x49
+ 783 001d 13       		.uleb128 0x13
+ 784 001e 00       		.byte	0x0
+ 785 001f 00       		.byte	0x0
+ 786 0020 03       		.uleb128 0x3
+ 787 0021 24       		.uleb128 0x24
+ 788 0022 00       		.byte	0x0
+ 789 0023 0B       		.uleb128 0xb
+ 790 0024 0B       		.uleb128 0xb
+ 791 0025 3E       		.uleb128 0x3e
+ 792 0026 0B       		.uleb128 0xb
+ 793 0027 03       		.uleb128 0x3
+ 794 0028 0E       		.uleb128 0xe
+ 795 0029 00       		.byte	0x0
+ 796 002a 00       		.byte	0x0
+ 797 002b 04       		.uleb128 0x4
+ 798 002c 24       		.uleb128 0x24
+ 799 002d 00       		.byte	0x0
+ 800 002e 0B       		.uleb128 0xb
+ 801 002f 0B       		.uleb128 0xb
+ 802 0030 3E       		.uleb128 0x3e
+ 803 0031 0B       		.uleb128 0xb
+ 804 0032 03       		.uleb128 0x3
+ 805 0033 08       		.uleb128 0x8
+ 806 0034 00       		.byte	0x0
+ 807 0035 00       		.byte	0x0
+ 808 0036 05       		.uleb128 0x5
+ 809 0037 24       		.uleb128 0x24
+ 810 0038 00       		.byte	0x0
+ 811 0039 0B       		.uleb128 0xb
+ 812 003a 0B       		.uleb128 0xb
+ 813 003b 3E       		.uleb128 0x3e
+ 814 003c 0B       		.uleb128 0xb
+ 815 003d 00       		.byte	0x0
+ 816 003e 00       		.byte	0x0
+ 817 003f 06       		.uleb128 0x6
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 20
+
+
+ 818 0040 0F       		.uleb128 0xf
+ 819 0041 00       		.byte	0x0
+ 820 0042 0B       		.uleb128 0xb
+ 821 0043 0B       		.uleb128 0xb
+ 822 0044 00       		.byte	0x0
+ 823 0045 00       		.byte	0x0
+ 824 0046 07       		.uleb128 0x7
+ 825 0047 0F       		.uleb128 0xf
+ 826 0048 00       		.byte	0x0
+ 827 0049 0B       		.uleb128 0xb
+ 828 004a 0B       		.uleb128 0xb
+ 829 004b 49       		.uleb128 0x49
+ 830 004c 13       		.uleb128 0x13
+ 831 004d 00       		.byte	0x0
+ 832 004e 00       		.byte	0x0
+ 833 004f 08       		.uleb128 0x8
+ 834 0050 13       		.uleb128 0x13
+ 835 0051 01       		.byte	0x1
+ 836 0052 03       		.uleb128 0x3
+ 837 0053 0E       		.uleb128 0xe
+ 838 0054 0B       		.uleb128 0xb
+ 839 0055 05       		.uleb128 0x5
+ 840 0056 3A       		.uleb128 0x3a
+ 841 0057 0B       		.uleb128 0xb
+ 842 0058 3B       		.uleb128 0x3b
+ 843 0059 0B       		.uleb128 0xb
+ 844 005a 01       		.uleb128 0x1
+ 845 005b 13       		.uleb128 0x13
+ 846 005c 00       		.byte	0x0
+ 847 005d 00       		.byte	0x0
+ 848 005e 09       		.uleb128 0x9
+ 849 005f 0D       		.uleb128 0xd
+ 850 0060 00       		.byte	0x0
+ 851 0061 03       		.uleb128 0x3
+ 852 0062 0E       		.uleb128 0xe
+ 853 0063 3A       		.uleb128 0x3a
+ 854 0064 0B       		.uleb128 0xb
+ 855 0065 3B       		.uleb128 0x3b
+ 856 0066 0B       		.uleb128 0xb
+ 857 0067 49       		.uleb128 0x49
+ 858 0068 13       		.uleb128 0x13
+ 859 0069 38       		.uleb128 0x38
+ 860 006a 0A       		.uleb128 0xa
+ 861 006b 00       		.byte	0x0
+ 862 006c 00       		.byte	0x0
+ 863 006d 0A       		.uleb128 0xa
+ 864 006e 01       		.uleb128 0x1
+ 865 006f 01       		.byte	0x1
+ 866 0070 49       		.uleb128 0x49
+ 867 0071 13       		.uleb128 0x13
+ 868 0072 01       		.uleb128 0x1
+ 869 0073 13       		.uleb128 0x13
+ 870 0074 00       		.byte	0x0
+ 871 0075 00       		.byte	0x0
+ 872 0076 0B       		.uleb128 0xb
+ 873 0077 21       		.uleb128 0x21
+ 874 0078 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 21
+
+
+ 875 0079 49       		.uleb128 0x49
+ 876 007a 13       		.uleb128 0x13
+ 877 007b 2F       		.uleb128 0x2f
+ 878 007c 05       		.uleb128 0x5
+ 879 007d 00       		.byte	0x0
+ 880 007e 00       		.byte	0x0
+ 881 007f 0C       		.uleb128 0xc
+ 882 0080 13       		.uleb128 0x13
+ 883 0081 01       		.byte	0x1
+ 884 0082 03       		.uleb128 0x3
+ 885 0083 0E       		.uleb128 0xe
+ 886 0084 0B       		.uleb128 0xb
+ 887 0085 0B       		.uleb128 0xb
+ 888 0086 3A       		.uleb128 0x3a
+ 889 0087 0B       		.uleb128 0xb
+ 890 0088 3B       		.uleb128 0x3b
+ 891 0089 0B       		.uleb128 0xb
+ 892 008a 01       		.uleb128 0x1
+ 893 008b 13       		.uleb128 0x13
+ 894 008c 00       		.byte	0x0
+ 895 008d 00       		.byte	0x0
+ 896 008e 0D       		.uleb128 0xd
+ 897 008f 2E       		.uleb128 0x2e
+ 898 0090 01       		.byte	0x1
+ 899 0091 3F       		.uleb128 0x3f
+ 900 0092 0C       		.uleb128 0xc
+ 901 0093 03       		.uleb128 0x3
+ 902 0094 0E       		.uleb128 0xe
+ 903 0095 3A       		.uleb128 0x3a
+ 904 0096 0B       		.uleb128 0xb
+ 905 0097 3B       		.uleb128 0x3b
+ 906 0098 0B       		.uleb128 0xb
+ 907 0099 27       		.uleb128 0x27
+ 908 009a 0C       		.uleb128 0xc
+ 909 009b 11       		.uleb128 0x11
+ 910 009c 01       		.uleb128 0x1
+ 911 009d 12       		.uleb128 0x12
+ 912 009e 01       		.uleb128 0x1
+ 913 009f 40       		.uleb128 0x40
+ 914 00a0 06       		.uleb128 0x6
+ 915 00a1 01       		.uleb128 0x1
+ 916 00a2 13       		.uleb128 0x13
+ 917 00a3 00       		.byte	0x0
+ 918 00a4 00       		.byte	0x0
+ 919 00a5 0E       		.uleb128 0xe
+ 920 00a6 05       		.uleb128 0x5
+ 921 00a7 00       		.byte	0x0
+ 922 00a8 03       		.uleb128 0x3
+ 923 00a9 08       		.uleb128 0x8
+ 924 00aa 3A       		.uleb128 0x3a
+ 925 00ab 0B       		.uleb128 0xb
+ 926 00ac 3B       		.uleb128 0x3b
+ 927 00ad 0B       		.uleb128 0xb
+ 928 00ae 49       		.uleb128 0x49
+ 929 00af 13       		.uleb128 0x13
+ 930 00b0 02       		.uleb128 0x2
+ 931 00b1 06       		.uleb128 0x6
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 22
+
+
+ 932 00b2 00       		.byte	0x0
+ 933 00b3 00       		.byte	0x0
+ 934 00b4 0F       		.uleb128 0xf
+ 935 00b5 34       		.uleb128 0x34
+ 936 00b6 00       		.byte	0x0
+ 937 00b7 03       		.uleb128 0x3
+ 938 00b8 08       		.uleb128 0x8
+ 939 00b9 3A       		.uleb128 0x3a
+ 940 00ba 0B       		.uleb128 0xb
+ 941 00bb 3B       		.uleb128 0x3b
+ 942 00bc 0B       		.uleb128 0xb
+ 943 00bd 49       		.uleb128 0x49
+ 944 00be 13       		.uleb128 0x13
+ 945 00bf 00       		.byte	0x0
+ 946 00c0 00       		.byte	0x0
+ 947 00c1 10       		.uleb128 0x10
+ 948 00c2 34       		.uleb128 0x34
+ 949 00c3 00       		.byte	0x0
+ 950 00c4 03       		.uleb128 0x3
+ 951 00c5 0E       		.uleb128 0xe
+ 952 00c6 3A       		.uleb128 0x3a
+ 953 00c7 0B       		.uleb128 0xb
+ 954 00c8 3B       		.uleb128 0x3b
+ 955 00c9 0B       		.uleb128 0xb
+ 956 00ca 49       		.uleb128 0x49
+ 957 00cb 13       		.uleb128 0x13
+ 958 00cc 02       		.uleb128 0x2
+ 959 00cd 06       		.uleb128 0x6
+ 960 00ce 00       		.byte	0x0
+ 961 00cf 00       		.byte	0x0
+ 962 00d0 11       		.uleb128 0x11
+ 963 00d1 0B       		.uleb128 0xb
+ 964 00d2 01       		.byte	0x1
+ 965 00d3 11       		.uleb128 0x11
+ 966 00d4 01       		.uleb128 0x1
+ 967 00d5 12       		.uleb128 0x12
+ 968 00d6 01       		.uleb128 0x1
+ 969 00d7 00       		.byte	0x0
+ 970 00d8 00       		.byte	0x0
+ 971 00d9 12       		.uleb128 0x12
+ 972 00da 2E       		.uleb128 0x2e
+ 973 00db 01       		.byte	0x1
+ 974 00dc 3F       		.uleb128 0x3f
+ 975 00dd 0C       		.uleb128 0xc
+ 976 00de 03       		.uleb128 0x3
+ 977 00df 0E       		.uleb128 0xe
+ 978 00e0 3A       		.uleb128 0x3a
+ 979 00e1 0B       		.uleb128 0xb
+ 980 00e2 3B       		.uleb128 0x3b
+ 981 00e3 0B       		.uleb128 0xb
+ 982 00e4 27       		.uleb128 0x27
+ 983 00e5 0C       		.uleb128 0xc
+ 984 00e6 49       		.uleb128 0x49
+ 985 00e7 13       		.uleb128 0x13
+ 986 00e8 11       		.uleb128 0x11
+ 987 00e9 01       		.uleb128 0x1
+ 988 00ea 12       		.uleb128 0x12
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 23
+
+
+ 989 00eb 01       		.uleb128 0x1
+ 990 00ec 40       		.uleb128 0x40
+ 991 00ed 06       		.uleb128 0x6
+ 992 00ee 01       		.uleb128 0x1
+ 993 00ef 13       		.uleb128 0x13
+ 994 00f0 00       		.byte	0x0
+ 995 00f1 00       		.byte	0x0
+ 996 00f2 13       		.uleb128 0x13
+ 997 00f3 05       		.uleb128 0x5
+ 998 00f4 00       		.byte	0x0
+ 999 00f5 03       		.uleb128 0x3
+ 1000 00f6 0E       		.uleb128 0xe
+ 1001 00f7 3A       		.uleb128 0x3a
+ 1002 00f8 0B       		.uleb128 0xb
+ 1003 00f9 3B       		.uleb128 0x3b
+ 1004 00fa 0B       		.uleb128 0xb
+ 1005 00fb 49       		.uleb128 0x49
+ 1006 00fc 13       		.uleb128 0x13
+ 1007 00fd 02       		.uleb128 0x2
+ 1008 00fe 06       		.uleb128 0x6
+ 1009 00ff 00       		.byte	0x0
+ 1010 0100 00       		.byte	0x0
+ 1011 0101 14       		.uleb128 0x14
+ 1012 0102 0B       		.uleb128 0xb
+ 1013 0103 01       		.byte	0x1
+ 1014 0104 55       		.uleb128 0x55
+ 1015 0105 06       		.uleb128 0x6
+ 1016 0106 01       		.uleb128 0x1
+ 1017 0107 13       		.uleb128 0x13
+ 1018 0108 00       		.byte	0x0
+ 1019 0109 00       		.byte	0x0
+ 1020 010a 15       		.uleb128 0x15
+ 1021 010b 34       		.uleb128 0x34
+ 1022 010c 00       		.byte	0x0
+ 1023 010d 03       		.uleb128 0x3
+ 1024 010e 0E       		.uleb128 0xe
+ 1025 010f 3A       		.uleb128 0x3a
+ 1026 0110 0B       		.uleb128 0xb
+ 1027 0111 3B       		.uleb128 0x3b
+ 1028 0112 0B       		.uleb128 0xb
+ 1029 0113 49       		.uleb128 0x49
+ 1030 0114 13       		.uleb128 0x13
+ 1031 0115 00       		.byte	0x0
+ 1032 0116 00       		.byte	0x0
+ 1033 0117 16       		.uleb128 0x16
+ 1034 0118 0B       		.uleb128 0xb
+ 1035 0119 01       		.byte	0x1
+ 1036 011a 11       		.uleb128 0x11
+ 1037 011b 01       		.uleb128 0x1
+ 1038 011c 12       		.uleb128 0x12
+ 1039 011d 01       		.uleb128 0x1
+ 1040 011e 01       		.uleb128 0x1
+ 1041 011f 13       		.uleb128 0x13
+ 1042 0120 00       		.byte	0x0
+ 1043 0121 00       		.byte	0x0
+ 1044 0122 17       		.uleb128 0x17
+ 1045 0123 34       		.uleb128 0x34
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 24
+
+
+ 1046 0124 00       		.byte	0x0
+ 1047 0125 03       		.uleb128 0x3
+ 1048 0126 0E       		.uleb128 0xe
+ 1049 0127 3A       		.uleb128 0x3a
+ 1050 0128 0B       		.uleb128 0xb
+ 1051 0129 3B       		.uleb128 0x3b
+ 1052 012a 0B       		.uleb128 0xb
+ 1053 012b 49       		.uleb128 0x49
+ 1054 012c 13       		.uleb128 0x13
+ 1055 012d 02       		.uleb128 0x2
+ 1056 012e 0A       		.uleb128 0xa
+ 1057 012f 00       		.byte	0x0
+ 1058 0130 00       		.byte	0x0
+ 1059 0131 18       		.uleb128 0x18
+ 1060 0132 34       		.uleb128 0x34
+ 1061 0133 00       		.byte	0x0
+ 1062 0134 03       		.uleb128 0x3
+ 1063 0135 0E       		.uleb128 0xe
+ 1064 0136 3A       		.uleb128 0x3a
+ 1065 0137 0B       		.uleb128 0xb
+ 1066 0138 3B       		.uleb128 0x3b
+ 1067 0139 0B       		.uleb128 0xb
+ 1068 013a 49       		.uleb128 0x49
+ 1069 013b 13       		.uleb128 0x13
+ 1070 013c 1C       		.uleb128 0x1c
+ 1071 013d 0B       		.uleb128 0xb
+ 1072 013e 00       		.byte	0x0
+ 1073 013f 00       		.byte	0x0
+ 1074 0140 19       		.uleb128 0x19
+ 1075 0141 26       		.uleb128 0x26
+ 1076 0142 00       		.byte	0x0
+ 1077 0143 49       		.uleb128 0x49
+ 1078 0144 13       		.uleb128 0x13
+ 1079 0145 00       		.byte	0x0
+ 1080 0146 00       		.byte	0x0
+ 1081 0147 00       		.byte	0x0
+ 1082              		.section	.debug_pubnames,"",%progbits
+ 1083 0000 2D000000 		.4byte	0x2d
+ 1084 0004 0200     		.2byte	0x2
+ 1085 0006 00000000 		.4byte	.Ldebug_info0
+ 1086 000a 6D020000 		.4byte	0x26d
+ 1087 000e FD000000 		.4byte	0xfd
+ 1088 0012 76506F72 		.ascii	"vPortFree\000"
+ 1088      74467265 
+ 1088      6500
+ 1089 001c 6D010000 		.4byte	0x16d
+ 1090 0020 7076506F 		.ascii	"pvPortMalloc\000"
+ 1090      72744D61 
+ 1090      6C6C6F63 
+ 1090      00
+ 1091 002d 00000000 		.4byte	0x0
+ 1092              		.section	.debug_aranges,"",%progbits
+ 1093 0000 1C000000 		.4byte	0x1c
+ 1094 0004 0200     		.2byte	0x2
+ 1095 0006 00000000 		.4byte	.Ldebug_info0
+ 1096 000a 04       		.byte	0x4
+ 1097 000b 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 25
+
+
+ 1098 000c 0000     		.2byte	0x0
+ 1099 000e 0000     		.2byte	0x0
+ 1100 0010 00000000 		.4byte	.Ltext0
+ 1101 0014 E4000000 		.4byte	.Letext0-.Ltext0
+ 1102 0018 00000000 		.4byte	0x0
+ 1103 001c 00000000 		.4byte	0x0
+ 1104              		.section	.debug_ranges,"",%progbits
+ 1105              	.Ldebug_ranges0:
+ 1106 0000 40000000 		.4byte	.LBB3-.Ltext0
+ 1107 0004 52000000 		.4byte	.LBE3-.Ltext0
+ 1108 0008 54000000 		.4byte	.LBB4-.Ltext0
+ 1109 000c 58000000 		.4byte	.LBE4-.Ltext0
+ 1110 0010 00000000 		.4byte	0x0
+ 1111 0014 00000000 		.4byte	0x0
+ 1112              		.section	.debug_str,"MS",%progbits,1
+ 1113              	.LASF31:
+ 1114 0000 474E5520 		.ascii	"GNU C 4.2.2\000"
+ 1114      4320342E 
+ 1114      322E3200 
+ 1115              	.LASF16:
+ 1116 000c 73697A65 		.ascii	"size_t\000"
+ 1116      5F7400
+ 1117              	.LASF23:
+ 1118 0013 70784E65 		.ascii	"pxNewBlockLink\000"
+ 1118      77426C6F 
+ 1118      636B4C69 
+ 1118      6E6B00
+ 1119              	.LASF13:
+ 1120 0022 415F424C 		.ascii	"A_BLOCK_LINK\000"
+ 1120      4F434B5F 
+ 1120      4C494E4B 
+ 1120      00
+ 1121              	.LASF21:
+ 1122 002f 7078426C 		.ascii	"pxBlock\000"
+ 1122      6F636B00 
+ 1123              	.LASF18:
+ 1124 0037 70784C69 		.ascii	"pxLink\000"
+ 1124      6E6B00
+ 1125              	.LASF35:
+ 1126 003e 7076506F 		.ascii	"pvPortMalloc\000"
+ 1126      72744D61 
+ 1126      6C6C6F63 
+ 1126      00
+ 1127              	.LASF25:
+ 1128 004b 70784669 		.ascii	"pxFirstFreeBlock\000"
+ 1128      72737446 
+ 1128      72656542 
+ 1128      6C6F636B 
+ 1128      00
+ 1129              	.LASF12:
+ 1130 005c 7852544F 		.ascii	"xRTOS_HEAP\000"
+ 1130      535F4845 
+ 1130      415000
+ 1131              	.LASF11:
+ 1132 0067 75634865 		.ascii	"ucHeap\000"
+ 1132      617000
+ 1133              	.LASF10:
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 26
+
+
+ 1134 006e 756C4475 		.ascii	"ulDummy\000"
+ 1134      6D6D7900 
+ 1135              	.LASF4:
+ 1136 0076 756E7369 		.ascii	"unsigned char\000"
+ 1136      676E6564 
+ 1136      20636861 
+ 1136      7200
+ 1137              	.LASF15:
+ 1138 0084 78426C6F 		.ascii	"xBlockSize\000"
+ 1138      636B5369 
+ 1138      7A6500
+ 1139              	.LASF0:
+ 1140 008f 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1140      20756E73 
+ 1140      69676E65 
+ 1140      6420696E 
+ 1140      7400
+ 1141              	.LASF7:
+ 1142 00a1 73686F72 		.ascii	"short unsigned int\000"
+ 1142      7420756E 
+ 1142      7369676E 
+ 1142      65642069 
+ 1142      6E7400
+ 1143              	.LASF26:
+ 1144 00b4 78486561 		.ascii	"xHeapHasBeenInitialised\000"
+ 1144      70486173 
+ 1144      4265656E 
+ 1144      496E6974 
+ 1144      69616C69 
+ 1145              	.LASF27:
+ 1146 00cc 78486561 		.ascii	"xHeap\000"
+ 1146      7000
+ 1147              	.LASF30:
+ 1148 00d2 78456E64 		.ascii	"xEnd\000"
+ 1148      00
+ 1149              	.LASF22:
+ 1150 00d7 70785072 		.ascii	"pxPreviousBlock\000"
+ 1150      6576696F 
+ 1150      7573426C 
+ 1150      6F636B00 
+ 1151              	.LASF24:
+ 1152 00e7 70765265 		.ascii	"pvReturn\000"
+ 1152      7475726E 
+ 1152      00
+ 1153              	.LASF28:
+ 1154 00f0 68656170 		.ascii	"heapSTRUCT_SIZE\000"
+ 1154      53545255 
+ 1154      43545F53 
+ 1154      495A4500 
+ 1155              	.LASF29:
+ 1156 0100 78537461 		.ascii	"xStart\000"
+ 1156      727400
+ 1157              	.LASF17:
+ 1158 0107 78426C6F 		.ascii	"xBlockLink\000"
+ 1158      636B4C69 
+ 1158      6E6B00
+ 1159              	.LASF3:
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 27
+
+
+ 1160 0112 756E7369 		.ascii	"unsigned int\000"
+ 1160      676E6564 
+ 1160      20696E74 
+ 1160      00
+ 1161              	.LASF8:
+ 1162 011f 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1162      206C6F6E 
+ 1162      6720756E 
+ 1162      7369676E 
+ 1162      65642069 
+ 1163              	.LASF32:
+ 1164 0136 706F7274 		.ascii	"portable/MemMang/heap_2.c\000"
+ 1164      61626C65 
+ 1164      2F4D656D 
+ 1164      4D616E67 
+ 1164      2F686561 
+ 1165              	.LASF2:
+ 1166 0150 6C6F6E67 		.ascii	"long long int\000"
+ 1166      206C6F6E 
+ 1166      6720696E 
+ 1166      7400
+ 1167              	.LASF20:
+ 1168 015e 7857616E 		.ascii	"xWantedSize\000"
+ 1168      74656453 
+ 1168      697A6500 
+ 1169              	.LASF6:
+ 1170 016a 63686172 		.ascii	"char\000"
+ 1170      00
+ 1171              	.LASF19:
+ 1172 016f 70784974 		.ascii	"pxIterator\000"
+ 1172      65726174 
+ 1172      6F7200
+ 1173              	.LASF5:
+ 1174 017a 73686F72 		.ascii	"short int\000"
+ 1174      7420696E 
+ 1174      7400
+ 1175              	.LASF33:
+ 1176 0184 2F637967 		.ascii	"/cygdrive/c/Downloads/EDU\000"
+ 1176      64726976 
+ 1176      652F632F 
+ 1176      446F776E 
+ 1176      6C6F6164 
+ 1177              	.LASF34:
+ 1178 019e 76506F72 		.ascii	"vPortFree\000"
+ 1178      74467265 
+ 1178      6500
+ 1179              	.LASF1:
+ 1180 01a8 6C6F6E67 		.ascii	"long int\000"
+ 1180      20696E74 
+ 1180      00
+ 1181              	.LASF9:
+ 1182 01b1 7369676E 		.ascii	"signed char\000"
+ 1182      65642063 
+ 1182      68617200 
+ 1183              	.LASF14:
+ 1184 01bd 70784E65 		.ascii	"pxNextFreeBlock\000"
+ 1184      78744672 
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 28
+
+
+ 1184      6565426C 
+ 1184      6F636B00 
+ 1185              		.ident	"GCC: (GNU) 4.2.2"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s 			page 29
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 heap_2.c
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s:1      .text:00000000 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s:16     .text:00000000 vPortFree
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s:66     .text:0000002c $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s:234    .bss:00006008 xStart
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s:74     .text:00000030 pvPortMalloc
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s:71     .text:00000030 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s:219    .text:000000d0 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s:228    .bss:00000000 xHeapHasBeenInitialised.2124
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s:231    .bss:00000004 xHeap
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccpSRebd.s:237    .bss:00006010 xEnd
+
+UNDEFINED SYMBOLS
+vTaskSuspendAll
+xTaskResumeAll

@@ -1,0 +1,173 @@
+#	FreeRTOS.org V5.1.1 - Copyright (C) 2003-2008 Richard Barry.
+#
+#	This file is part of the FreeRTOS.org distribution.
+#
+#	FreeRTOS.org is free software; you can redistribute it and/or modify
+#	it under the terms of the GNU General Public License as published by
+#	the Free Software Foundation; either version 2 of the License, or
+#	(at your option) any later version.
+#
+#	FreeRTOS.org is distributed in the hope that it will be useful,
+#	but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#	GNU General Public License for more details.
+#
+#	You should have received a copy of the GNU General Public License
+#	along with FreeRTOS.org; if not, write to the Free Software
+#	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#	A special exception to the GPL can be applied should you wish to distribute
+#	a combined work that includes FreeRTOS.org, without being obliged to provide
+#	the source code for any proprietary components.  See the licensing section
+#	of http://www.FreeRTOS.org for full details of how and when the exception
+#	can be applied.
+#
+#	***************************************************************************
+#	See http://www.FreeRTOS.org for documentation, latest information, license
+#	and contact details.  Please ensure to read the configuration and relevant
+#	port sections of the online documentation.
+#	***************************************************************************
+
+# Changes from V2.4.2
+#
+#	+ Replaced source/portable/gcc/arm7/portheap.c with source/portable/memmang/heap_2.c.
+
+
+###########################################################################################
+EXECNAME=eduboard
+###########################################################################################
+
+
+CC=arm-elf-gcc
+OBJCOPY=arm-elf-objcopy
+ARCH=arm-elf-ar
+CRT0=boot.s
+WARNINGS=-Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wsign-compare \
+		-Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wunused
+AWK=gawk
+SIZE            = arm-elf-size
+STRIP           = arm-elf-strip
+
+#
+# CFLAGS common to both the THUMB and ARM mode builds
+#
+RTOS_SOURCE_DIR=./FreeRTOS
+
+CFLAGS=$(WARNINGS) -D $(RUN_MODE) -D GCC_ARM7 -I. -I$(RTOS_SOURCE_DIR)/include \
+		   $(DEBUG) -mcpu=arm7tdmi -T$(LDSCRIPT) \
+		   $(OPTIM) -fomit-frame-pointer -fno-strict-aliasing  \
+#		  -Wa,-ahlms=$(<:.c=.lst)
+
+ifeq ($(USE_THUMB_MODE),YES)
+	CFLAGS += -mthumb-interwork -D THUMB_INTERWORK
+	THUMB_FLAGS=-mthumb
+endif
+
+
+LINKER_FLAGS=-Xlinker -o$(EXECNAME).elf -Xlinker -M -Xlinker -Map=$(EXECNAME).map
+
+#
+# Source files that can be built to THUMB mode.
+#
+THUMB_CPP_SRC =
+#service.cc main.cc
+
+THUMB_SRC = \
+main.c \
+serial/serial.c \
+testLEDMatrix.c \
+testRGB.c \
+testLCD.c \
+testUART.c \
+testMotor.c \
+testADC.c \
+$(RTOS_SOURCE_DIR)/tasks.c \
+$(RTOS_SOURCE_DIR)/queue.c \
+$(RTOS_SOURCE_DIR)/list.c \
+portable/MemMang/heap_2.c \
+portable/port.c
+
+#
+# Source files that must be built to ARM mode.
+#
+ARM_SRC = \
+portable/portISR.c \
+spi_write.c \
+serial/serialISR.c
+
+
+#
+# Define all object files.
+#
+ARM_OBJ = $(ARM_SRC:.c=.o)
+#ARM_CPP_OBJ = $(ARM_SRC:.cc=.o)
+THUMB_OBJ = $(THUMB_SRC:.c=.o)
+#THUMB_CPP_OBJ = $(THUMB_CPP_SRC:.cc=.o)
+ASM_OBJ = $(CRT0:.s=.o)
+
+$(EXECNAME).hex : $(EXECNAME).elf
+	$(OBJCOPY) $(EXECNAME).elf -O ihex $(EXECNAME).hex
+	@echo ""
+	@echo "=== Result ==============================================="
+	@echo ""
+	@echo " TEXT: Code size"
+	@echo " DATA: Initialized data"
+	@echo " BSS:  Uninitialized data"
+	@echo " ROM:  Size in non-volatile program memory (TEXT + DATA)"
+	@echo " RAM:  Size in volatile data memory (DATA + BSS)"
+	@echo "=== Total size (including external libraries) ============"
+	@echo ""
+	@echo "   Code compiled with optimization switch: " $(CFLAGS)
+	@echo "   (other settings may produce different sizes)"
+	@echo "   (external libraries may be compiled with different settings)"
+	@echo ""
+	@echo "   TEXT    DATA     BSS     ROM     RAM FILENAME"
+	@echo "   ====    ====     ===     ===     === ========"
+	@$(SIZE) $(EXECNAME).elf \
+	| $(AWK) 'NR > 1 { printf "%7d %7d %7d %7d %7d %s\n", \
+			   $$1,$$2,$$3,$$1+$$2,$$2+$$3,"$(EXECNAME).elf" }'
+	@echo ""
+ifeq ($(RUN_MODE), $(RUN_FROM_RAM))
+	@echo "                          |===========|"
+	@echo "                               ^^^"
+	@echo "   Everything placed in RAM since LD_RAMROM = RAM"
+	@echo ""
+endif
+#
+	@$(SIZE) $(EXECNAME).hex \
+	| $(AWK) 'NR > 1 { t+=$$1; d+=$$2; b+=$$3; } \
+		  END { ro=t+d; ra=d+b; printf "%7d %7d %7d %7d %7d %s\n", \
+					t,d,b,ro,ra,"$(EXECNAME).hex" }'
+
+
+eduboard.elf : $(ARM_OBJ) $(THUMB_OBJ) $(CRT0) Makefile
+	$(CC) $(CFLAGS) $(ARM_OBJ) $(ARM_CPP_OBJ) $(THUMB_OBJ) $(THUMB_CPP_OBJ) -nostartfiles $(CRT0) $(LINKER_FLAGS)
+
+$(THUMB_OBJ) : %.o : %.c $(LDSCRIPT) Makefile
+	$(CC) -c $(THUMB_FLAGS) $(CFLAGS) $< -o $@
+
+#$(THUMB_CPP_OBJ) : %.o : %.cc $(LDSCRIPT) Makefile
+#	$(CC) -c $(THUMB_FLAGS) $(CFLAGS) $< -o $@
+
+$(ARM_OBJ) : %.o : %.c $(LDSCRIPT) Makefile
+	$(CC) -c $(CFLAGS) $< -o $@
+
+#$(ARM_CPP_OBJ) : %.o : %.cc $(LDSCRIPT) Makefile
+#	$(CC) -c $(CFLAGS) $< -o $@
+
+#$(ASM_OBJ) : %.o : %.s $(LDSCRIPT) Makefile
+#	$(CC) -c $(CFLAGS) $< -o $@
+
+clean :
+	touch Makefile
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,1243 @@
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 1
+
+
+   1              		.code	16
+   2              		.file	"main.c"
+   3              		.section	.debug_abbrev,"",%progbits
+   4              	.Ldebug_abbrev0:
+   5              		.section	.debug_info,"",%progbits
+   6              	.Ldebug_info0:
+   7              		.section	.debug_line,"",%progbits
+   8              	.Ldebug_line0:
+   9 0000 B2000000 		.text
+   9      02003300 
+   9      00000201 
+   9      FB0E0D00 
+   9      01010101 
+  10              	.Ltext0:
+  11              		.section	.rodata.str1.4,"aMS",%progbits,1
+  12              		.align	2
+  13              	.LC0:
+  14 0000 4C454400 		.ascii	"LED\000"
+  15              		.align	2
+  16              	.LC3:
+  17 0004 4C434400 		.ascii	"LCD\000"
+  18              		.align	2
+  19              	.LC6:
+  20 0008 4D6F746F 		.ascii	"Motor\000"
+  20      7200
+  21 000e 0000     		.align	2
+  22              	.LC9:
+  23 0010 41444300 		.ascii	"ADC\000"
+  24              		.text
+  25              		.align	2
+  26              		.global	main
+  27              		.code 16
+  28              		.thumb_func
+  29              		.type	main, %function
+  30              	main:
+  31              	.LFB3:
+  32              		.file 1 "main.c"
+   1:main.c        **** /*
+   2:main.c        **** 	FreeRTOS.org V5.1.1 - Copyright (C) 2003-2008 Richard Barry.
+   3:main.c        **** 
+   4:main.c        **** 	This file is part of the FreeRTOS.org distribution.
+   5:main.c        **** 
+   6:main.c        **** 	FreeRTOS.org is free software; you can redistribute it and/or modify
+   7:main.c        **** 	it under the terms of the GNU General Public License as published by
+   8:main.c        **** 	the Free Software Foundation; either version 2 of the License, or
+   9:main.c        **** 	(at your option) any later version.
+  10:main.c        **** 
+  11:main.c        **** 	FreeRTOS.org is distributed in the hope that it will be useful,
+  12:main.c        **** 	but WITHOUT ANY WARRANTY; without even the implied warranty of
+  13:main.c        **** 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  14:main.c        **** 	GNU General Public License for more details.
+  15:main.c        **** 
+  16:main.c        **** 	You should have received a copy of the GNU General Public License
+  17:main.c        **** 	along with FreeRTOS.org; if not, write to the Free Software
+  18:main.c        **** 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  19:main.c        **** 
+  20:main.c        **** 	A special exception to the GPL can be applied should you wish to distribute
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 2
+
+
+  21:main.c        **** 	a combined work that includes FreeRTOS.org, without being obliged to provide
+  22:main.c        **** 	the source code for any proprietary components.  See the licensing section
+  23:main.c        **** 	of http://www.FreeRTOS.org for full details of how and when the exception
+  24:main.c        **** 	can be applied.
+  25:main.c        **** 
+  26:main.c        ****     ***************************************************************************
+  27:main.c        ****     ***************************************************************************
+  28:main.c        ****     *                                                                         *
+  29:main.c        ****     * SAVE TIME AND MONEY!  We can port FreeRTOS.org to your own hardware,    *
+  30:main.c        ****     * and even write all or part of your application on your behalf.          *
+  31:main.c        ****     * See http://www.OpenRTOS.com for details of the services we provide to   *
+  32:main.c        ****     * expedite your project.                                                  *
+  33:main.c        ****     *                                                                         *
+  34:main.c        ****     ***************************************************************************
+  35:main.c        ****     ***************************************************************************
+  36:main.c        **** 
+  37:main.c        **** 	Please ensure to read the configuration and relevant port sections of the
+  38:main.c        **** 	online documentation.
+  39:main.c        **** 
+  40:main.c        **** 	http://www.FreeRTOS.org - Documentation, latest information, license and
+  41:main.c        **** 	contact details.
+  42:main.c        **** 
+  43:main.c        **** 	http://www.SafeRTOS.com - A version that is certified for use in safety
+  44:main.c        **** 	critical systems.
+  45:main.c        **** 
+  46:main.c        **** 	http://www.OpenRTOS.com - Commercial support, development, porting,
+  47:main.c        **** 	licensing and training services.
+  48:main.c        **** */
+  49:main.c        **** 
+  50:main.c        **** /*
+  51:main.c        **** 	NOTE : Tasks run in system mode and the scheduler runs in Supervisor mode.
+  52:main.c        **** 	The processor MUST be in supervisor mode when vTaskStartScheduler is
+  53:main.c        **** 	called.  The demo applications included in the FreeRTOS.org download switch
+  54:main.c        **** 	to supervisor mode prior to main being called.  If you are not using one of
+  55:main.c        **** 	these demo application projects then ensure Supervisor mode is used.
+  56:main.c        **** */
+  57:main.c        **** 
+  58:main.c        **** 
+  59:main.c        **** /*
+  60:main.c        ****  * Creates all the demo application tasks, then starts the scheduler.  The WEB
+  61:main.c        ****  * documentation provides more details of the demo application tasks.
+  62:main.c        ****  *
+  63:main.c        ****  * Main.c also creates a task called "Check".  This only executes every three
+  64:main.c        ****  * seconds but has the highest priority so is guaranteed to get processor time.
+  65:main.c        ****  * Its main function is to check that all the other tasks are still operational.
+  66:main.c        ****  * Each task (other than the "flash" tasks) maintains a unique count that is
+  67:main.c        ****  * incremented each time the task successfully completes its function.  Should
+  68:main.c        ****  * any error occur within such a task the count is permanently halted.  The
+  69:main.c        ****  * check task inspects the count of each task to ensure it has changed since
+  70:main.c        ****  * the last time the check task executed.  If all the count variables have
+  71:main.c        ****  * changed all the tasks are still executing error free, and the check task
+  72:main.c        ****  * toggles the onboard LED.  Should any task contain an error at any time
+  73:main.c        ****  * the LED toggle rate will change from 3 seconds to 500ms.
+  74:main.c        ****  *
+  75:main.c        ****  * To check the operation of the memory allocator the check task also
+  76:main.c        ****  * dynamically creates a task before delaying, and deletes it again when it
+  77:main.c        ****  * wakes.  If memory cannot be allocated for the new task the call to xTaskCreate
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 3
+
+
+  78:main.c        ****  * will fail and an error is signalled.  The dynamically created task itself
+  79:main.c        ****  * allocates and frees memory just to give the allocator a bit more exercise.
+  80:main.c        ****  *
+  81:main.c        ****  */
+  82:main.c        **** 
+  83:main.c        **** /*
+  84:main.c        **** 	Changes from V2.4.2
+  85:main.c        **** 
+  86:main.c        **** 	+ The vErrorChecks() task now dynamically creates then deletes a task each
+  87:main.c        **** 	  cycle.  This tests the operation of the memory allocator.
+  88:main.c        **** 
+  89:main.c        **** 	Changes from V2.5.2
+  90:main.c        **** 
+  91:main.c        **** 	+ vParTestInitialise() is called during initialisation to ensure all the
+  92:main.c        **** 	  LED's start off.
+  93:main.c        **** */
+  94:main.c        **** 
+  95:main.c        **** 
+  96:main.c        **** /* Standard includes. */
+  97:main.c        **** #include <stdlib.h>
+  98:main.c        **** #include <string.h>
+  99:main.c        **** 
+ 100:main.c        **** /* Scheduler includes. */
+ 101:main.c        **** #include "FreeRTOS.h"
+ 102:main.c        **** #include "task.h"
+ 103:main.c        **** 
+ 104:main.c        **** /* Demo application includes. */
+ 105:main.c        **** #include "testLEDMatrix.h"
+ 106:main.c        **** #include "TestRGB.h"
+ 107:main.c        **** #include "testLCD.h"
+ 108:main.c        **** #include "testMotor.h"
+ 109:main.c        **** #include "serial.h"
+ 110:main.c        **** #include "testUART.h"
+ 111:main.c        **** #include "testADC.h"
+ 112:main.c        **** 
+ 113:main.c        **** /*-----------------------------------------------------------*/
+ 114:main.c        **** 
+ 115:main.c        **** /* Constants to setup I/O. */
+ 116:main.c        **** #define UART0_TX_ENABLE	( ( unsigned portLONG ) 0x0001 )
+ 117:main.c        **** #define UART0_RX_ENABLE	( ( unsigned portLONG ) 0x0004 )
+ 118:main.c        **** #define IO_P0_14		( ( unsigned portLONG ) 0x4000 )
+ 119:main.c        **** #define JTAG_PORT	    ( ( unsigned portLONG ) 0x3E0000UL )
+ 120:main.c        **** 
+ 121:main.c        **** 
+ 122:main.c        **** /* Constants to setup the peripheral bus. */
+ 123:main.c        **** //#define mainBUS_CLK_FULL	( ( unsigned portCHAR ) 0x01 )
+ 124:main.c        **** 
+ 125:main.c        **** 
+ 126:main.c        **** /* Priorities for the demo application tasks. */
+ 127:main.c        **** #define mainLED_TASK_PRIORITY		( tskIDLE_PRIORITY + 0 )
+ 128:main.c        **** #define mainRGB_TASK_PRIORITY		( tskIDLE_PRIORITY + 0 )
+ 129:main.c        **** #define mainLCD_TASK_PRIORITY		( tskIDLE_PRIORITY + 0 )
+ 130:main.c        **** #define mainMotor_TASK_PRIORITY		( tskIDLE_PRIORITY + 0 )
+ 131:main.c        **** #define mainADC_TASK_PRIORITY		( tskIDLE_PRIORITY + 0 )
+ 132:main.c        **** #define mainUART_TASK_PRIORITY		( tskIDLE_PRIORITY + 2 )
+ 133:main.c        **** //#define mainQUEUE_POLL_PRIORITY		( tskIDLE_PRIORITY + 0 )
+ 134:main.c        **** //#define mainCHECK_TASK_PRIORITY		( tskIDLE_PRIORITY + 4 )
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 4
+
+
+ 135:main.c        **** //#define mainSEM_TEST_PRIORITY		( tskIDLE_PRIORITY + 0 )
+ 136:main.c        **** //#define mainBLOCK_Q_PRIORITY		( tskIDLE_PRIORITY + 2 )
+ 137:main.c        **** 
+ 138:main.c        **** /* The rate at which the on board LED will toggle when there is/is not an
+ 139:main.c        **** error. */
+ 140:main.c        **** //#define mainNO_ERROR_FLASH_PERIOD	( ( portTickType ) 3000 / portTICK_RATE_MS  )
+ 141:main.c        **** //#define mainERROR_FLASH_PERIOD		( ( portTickType ) 500 / portTICK_RATE_MS  )
+ 142:main.c        **** //#define mainON_BOARD_LED_BIT		( ( unsigned portLONG ) 0x80 )
+ 143:main.c        **** 
+ 144:main.c        **** /* Constants used by the vMemCheckTask() task. */
+ 145:main.c        **** //#define mainCOUNT_INITIAL_VALUE		( ( unsigned portLONG ) 0 )
+ 146:main.c        **** //#define mainNO_TASK					( 0 )
+ 147:main.c        **** 
+ 148:main.c        **** /* The size of the memory blocks allocated by the vMemCheckTask() task. */
+ 149:main.c        **** //#define mainMEM_CHECK_SIZE_1		( ( size_t ) 51 )
+ 150:main.c        **** //#define mainMEM_CHECK_SIZE_2		( ( size_t ) 52 )
+ 151:main.c        **** //#define mainMEM_CHECK_SIZE_3		( ( size_t ) 151 )
+ 152:main.c        **** 
+ 153:main.c        **** /*-----------------------------------------------------------*/
+ 154:main.c        **** 
+ 155:main.c        **** 
+ 156:main.c        **** /*
+ 157:main.c        ****  * Configure the processor for use with the Olimex demo board.  This includes
+ 158:main.c        ****  * setup for the I/O, system clock, and access timings.
+ 159:main.c        ****  */
+ 160:main.c        **** static void prvSetupHardware( void );
+ 161:main.c        **** 
+ 162:main.c        **** /*-----------------------------------------------------------*/
+ 163:main.c        **** 
+ 164:main.c        **** /*
+ 165:main.c        ****  * Starts all the other tasks, then starts the scheduler.
+ 166:main.c        ****  */
+ 167:main.c        **** void TestLED(void);
+ 168:main.c        **** 
+ 169:main.c        **** void TestLED(void)
+ 170:main.c        **** {
+ 171:main.c        **** 	int 	i;
+ 172:main.c        **** 	tU32    pattern;
+ 173:main.c        **** 
+ 174:main.c        **** 	PINSEL0 &= 0x0000ffff;
+ 175:main.c        ****     IODIR0  |= 0x0000ff00;
+ 176:main.c        ****     IOSET0   = 0x0000fb00;
+ 177:main.c        ****     IOCLR0   = 0x00000400;
+ 178:main.c        **** 
+ 179:main.c        ****     for(i=0; i<4; i++)
+ 180:main.c        ****     {
+ 181:main.c        ****       	pattern = 0x00000100;
+ 182:main.c        ****       	while(pattern <= 0x00008000)
+ 183:main.c        ****       	{
+ 184:main.c        ****       		IOCLR = pattern;
+ 185:main.c        ****       		vTaskDelay(100);
+ 186:main.c        ****       		IOSET0 = pattern;
+ 187:main.c        ****         	IOCLR0 = 0x00000400; //P0.10 must always be low = LED on since motor control else will be 
+ 188:main.c        **** 
+ 189:main.c        ****       		pattern <<= 1;
+ 190:main.c        ****       	}
+ 191:main.c        ****     }
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 5
+
+
+ 192:main.c        ****     //flash with P0.10 (with P0.8 and P0.9 low)
+ 193:main.c        ****     IOCLR0 = 0x00000700;
+ 194:main.c        ****     vTaskDelay(100);
+ 195:main.c        ****     IOSET0 = 0x00000400;
+ 196:main.c        ****    	vTaskDelay(100);
+ 197:main.c        ****     IOCLR0 = 0x00000400;
+ 198:main.c        ****     vTaskDelay(100);
+ 199:main.c        ****     IOSET0 = 0x00000400;
+ 200:main.c        ****    	vTaskDelay(100);
+ 201:main.c        ****     IOCLR0 = 0x00000400;
+ 202:main.c        ****     vTaskDelay(100);
+ 203:main.c        ****     IOSET0 = 0x00000400;
+ 204:main.c        **** 
+ 205:main.c        **** }
+ 206:main.c        **** 
+ 207:main.c        **** int main( void )
+ 208:main.c        **** {
+  33              		.loc 1 208 0
+  34 0000 10B5     		push	{r4, lr}
+  35              	.LCFI0:
+  36              	.LBB4:
+  37              	.LBB5:
+ 209:main.c        **** 	prvSetupHardware();
+ 210:main.c        **** 
+ 211:main.c        ****     //immediately turn off buzzer (if connected)
+ 212:main.c        **** 	IODIR0 |= 0x00000080;
+ 213:main.c        ****     IOSET0  = 0x00000080;
+ 214:main.c        **** /*
+ 215:main.c        **** 	printf("\n\n\n\n\n*******************************************************\n");
+ 216:main.c        ****     printf("*                                                     *\n");
+ 217:main.c        ****     printf("* This is the test program for Embedded Artists'      *\n");
+ 218:main.c        ****     printf("* LPC2148 Education Board...                          *\n");
+ 219:main.c        ****     printf("*                                                     *\n");
+ 220:main.c        ****     printf("* Version: 1.1 (special version without MMC test)     *\n");
+ 221:main.c        ****     printf("* Date:    26 Nov 2005                                *\n");
+ 222:main.c        ****     printf("* (C) Embedded Artists 2005                           *\n");
+ 223:main.c        ****     printf("*                                                     *\n");
+ 224:main.c        ****     printf("*******************************************************\n");
+ 225:main.c        **** */
+ 226:main.c        **** 
+ 227:main.c        **** 
+ 228:main.c        **** 
+ 229:main.c        **** 	/* Start the check task - which is defined in this file. */
+ 230:main.c        **** 	xTaskCreate( testLEDMatrix,
+ 231:main.c        **** 	            ( signed portCHAR * ) "LED",
+ 232:main.c        **** 				configMINIMAL_STACK_SIZE,
+ 233:main.c        **** 				NULL,
+ 234:main.c        **** 				mainLED_TASK_PRIORITY,
+ 235:main.c        **** 				NULL);
+ 236:main.c        **** /*
+ 237:main.c        **** 	xTaskCreate( testRGB,
+ 238:main.c        **** 	            ( signed portCHAR * ) "RGB",
+ 239:main.c        **** 				configMINIMAL_STACK_SIZE,
+ 240:main.c        **** 				NULL,
+ 241:main.c        **** 				mainRGB_TASK_PRIORITY,
+ 242:main.c        **** 				NULL);
+ 243:main.c        ****  */
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 6
+
+
+ 244:main.c        **** 	xTaskCreate( testLCD,
+ 245:main.c        **** 	            ( signed portCHAR * ) "LCD",
+ 246:main.c        **** 				configMINIMAL_STACK_SIZE,
+ 247:main.c        **** 				NULL,
+ 248:main.c        **** 				mainLCD_TASK_PRIORITY,
+ 249:main.c        **** 				NULL);
+ 250:main.c        **** 	xTaskCreate( testMotor,
+ 251:main.c        **** 	            ( signed portCHAR * ) "Motor",
+ 252:main.c        **** 				configMINIMAL_STACK_SIZE,
+ 253:main.c        **** 				NULL,
+ 254:main.c        **** 				mainMotor_TASK_PRIORITY,
+ 255:main.c        **** 				NULL);
+ 256:main.c        **** 	xTaskCreate( testADC,
+ 257:main.c        **** 	            ( signed portCHAR * ) "ADC",
+ 258:main.c        **** 				configMINIMAL_STACK_SIZE,
+ 259:main.c        **** 				NULL,
+ 260:main.c        **** 				mainADC_TASK_PRIORITY,
+ 261:main.c        **** 				NULL);
+ 262:main.c        **** 
+ 263:main.c        **** 	/* Now all the tasks have been started - start the scheduler.
+ 264:main.c        **** 
+ 265:main.c        **** 	NOTE : Tasks run in system mode and the scheduler runs in Supervisor mode.
+ 266:main.c        **** 	The processor MUST be in supervisor mode when vTaskStartScheduler is
+ 267:main.c        **** 	called.  The demo applications included in the FreeRTOS.org download switch
+ 268:main.c        **** 	to supervisor mode prior to main being called.  If you are not using one of
+ 269:main.c        **** 	these demo application projects then ensure Supervisor mode is used here. */
+ 270:main.c        **** 	vTaskStartScheduler();
+ 271:main.c        **** 
+ 272:main.c        **** 	/* Should never reach here! */
+ 273:main.c        **** 	return 0;
+ 274:main.c        **** }
+ 275:main.c        **** /*-----------------------------------------------------------*/
+ 276:main.c        **** 
+ 277:main.c        **** /*-----------------------------------------------------------*/
+ 278:main.c        **** 
+ 279:main.c        **** static void prvSetupHardware( void )
+ 280:main.c        **** {
+ 281:main.c        **** 	/* Configure the RS2332 pins.  All other pins remain at their default of 0. */
+ 282:main.c        **** 	PINSEL0 |= UART0_TX_ENABLE;
+  38              		.loc 1 282 0
+  39 0002 2D49     		ldr	r1, .L7
+  40 0004 0B68     		ldr	r3, [r1]
+  41 0006 0120     		mov	r0, #1
+  42 0008 0343     		orr	r3, r3, r0
+  43 000a 0B60     		str	r3, [r1]
+ 283:main.c        **** 	PINSEL0 |= UART0_RX_ENABLE;
+  44              		.loc 1 283 0
+  45 000c 0B68     		ldr	r3, [r1]
+  46 000e 0422     		mov	r2, #4
+  47 0010 1343     		orr	r3, r3, r2
+  48 0012 0B60     		str	r3, [r1]
+ 284:main.c        **** 
+ 285:main.c        **** 	/* Set all GPIO to output other than the P0.14 (BSL), and the JTAG pins.
+ 286:main.c        **** 	The JTAG pins are left as input as I'm not sure what will happen if the
+ 287:main.c        **** 	Wiggler is connected after powerup - not that it would be a good idea to
+ 288:main.c        **** 	do that anyway. */
+ 289:main.c        **** 	IODIR = ~( IO_P0_14 + JTAG_PORT );
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 7
+
+
+  49              		.loc 1 289 0
+  50 0014 294A     		ldr	r2, .L7+4
+  51 0016 2A4B     		ldr	r3, .L7+8
+  52 0018 1A60     		str	r2, [r3]
+ 290:main.c        **** 
+ 291:main.c        **** 
+ 292:main.c        **** 	//PLL factor jest na 5 m³odszych bitach, podzielnik na starszych
+ 293:main.c        **** 	PLLCFG = (configPLL_FACTOR-1) | ((configPLL_DIV-1)<<5);
+  53              		.loc 1 293 0
+  54 001a 2A4B     		ldr	r3, .L7+12
+  55 001c 2422     		mov	r2, #36
+  56 001e 1A60     		str	r2, [r3]
+ 294:main.c        **** //	PLLCFG = 0x24;
+ 295:main.c        **** 
+ 296:main.c        **** 
+ 297:main.c        **** #define PLL_CONNECT		 0x0003
+ 298:main.c        **** #define PLL_FEED_BYTE1	   0xaa
+ 299:main.c        **** #define PLL_FEED_BYTE2	   0x55
+ 300:main.c        **** #define PLL_LOCK		 0x0400
+ 301:main.c        **** 
+ 302:main.c        **** 	/* Activate the PLL by turning it on then feeding the correct sequence of
+ 303:main.c        **** 	bytes. */
+ 304:main.c        **** 	PLLCON  = configUSE_PLL;
+  57              		.loc 1 304 0
+  58 0020 043B     		sub	r3, r3, #4
+ 305:main.c        **** 	PLLFEED = PLL_FEED_BYTE1;
+  59              		.loc 1 305 0
+  60 0022 294A     		ldr	r2, .L7+16
+  61              		.loc 1 304 0
+  62 0024 1860     		str	r0, [r3]
+  63              		.loc 1 305 0
+  64 0026 AA23     		mov	r3, #170
+  65 0028 1360     		str	r3, [r2]
+ 306:main.c        **** 	PLLFEED = PLL_FEED_BYTE2;
+  66              		.loc 1 306 0
+  67 002a 5523     		mov	r3, #85
+  68 002c 1360     		str	r3, [r2]
+  69              	.LBE5:
+  70              	.LBE4:
+  71              		.loc 1 208 0
+  72 002e 82B0     		sub	sp, sp, #8
+  73              	.LCFI1:
+  74              	.L2:
+  75              	.LBB7:
+  76              	.LBB6:
+ 307:main.c        **** 
+ 308:main.c        **** 	/* Wait for the PLL to lock... */
+ 309:main.c        **** 	while( !( PLLSTAT & PLL_LOCK ) );
+  77              		.loc 1 309 0
+  78 0030 264B     		ldr	r3, .L7+20
+  79 0032 1B68     		ldr	r3, [r3]
+  80 0034 5A05     		lsl	r2, r3, #21
+  81 0036 FBD5     		bpl	.L2
+ 310:main.c        **** 
+ 311:main.c        **** 	/* ...before connecting it using the feed sequence again. */
+ 312:main.c        **** 	PLLCON  = PLL_CONNECT;
+  82              		.loc 1 312 0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 8
+
+
+  83 0038 254B     		ldr	r3, .L7+24
+  84 003a 0321     		mov	r1, #3
+ 313:main.c        **** 	PLLFEED = PLL_FEED_BYTE1;
+  85              		.loc 1 313 0
+  86 003c 224A     		ldr	r2, .L7+16
+  87              		.loc 1 312 0
+  88 003e 1960     		str	r1, [r3]
+  89              		.loc 1 313 0
+  90 0040 AA23     		mov	r3, #170
+  91 0042 1360     		str	r3, [r2]
+ 314:main.c        **** 	PLLFEED = PLL_FEED_BYTE2;
+  92              		.loc 1 314 0
+  93 0044 5523     		mov	r3, #85
+  94 0046 1360     		str	r3, [r2]
+ 315:main.c        **** 
+ 316:main.c        **** 
+ 317:main.c        **** 	/* Setup and turn on the MAM.  Three cycle access is used due to the fast
+ 318:main.c        **** 	PLL used.  It is possible faster overall performance could be obtained by
+ 319:main.c        **** 	tuning the MAM and PLL settings. */
+ 320:main.c        **** 	MAMTIM = MAM_TIMING;
+  95              		.loc 1 320 0
+  96 0048 224B     		ldr	r3, .L7+28
+ 321:main.c        **** 	MAMCR = MAM_MAP;
+  97              		.loc 1 321 0
+  98 004a 0122     		mov	r2, #1
+  99              		.loc 1 320 0
+ 100 004c 1960     		str	r1, [r3]
+ 101              		.loc 1 321 0
+ 102 004e 043B     		sub	r3, r3, #4
+ 103 0050 1A60     		str	r2, [r3]
+ 322:main.c        **** 
+ 323:main.c        **** 	/* Setup the peripheral bus to be the same as the PLL output. */
+ 324:main.c        **** 	VPBDIV = configVPBDIV_FACTOR;
+ 104              		.loc 1 324 0
+ 105 0052 214B     		ldr	r3, .L7+32
+ 106 0054 1A60     		str	r2, [r3]
+ 325:main.c        **** 
+ 326:main.c        **** 	InitSerial0();
+ 107              		.loc 1 326 0
+ 108 0056 FFF7FEFF 		bl	InitSerial0
+ 109              	.LBE6:
+ 110              	.LBE7:
+ 111              		.loc 1 212 0
+ 112 005a 194A     		ldr	r2, .L7+8
+ 113 005c 1368     		ldr	r3, [r2]
+ 114 005e 8021     		mov	r1, #128
+ 115 0060 0B43     		orr	r3, r3, r1
+ 116 0062 1360     		str	r3, [r2]
+ 117              		.loc 1 213 0
+ 118 0064 1D4B     		ldr	r3, .L7+36
+ 119              		.loc 1 230 0
+ 120 0066 0024     		mov	r4, #0
+ 121              		.loc 1 213 0
+ 122 0068 1960     		str	r1, [r3]
+ 123              		.loc 1 230 0
+ 124 006a 8022     		mov	r2, #128
+ 125 006c 1C49     		ldr	r1, .L7+40
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 9
+
+
+ 126 006e 0023     		mov	r3, #0
+ 127 0070 1C48     		ldr	r0, .L7+44
+ 128 0072 0094     		str	r4, [sp]
+ 129 0074 0194     		str	r4, [sp, #4]
+ 130 0076 FFF7FEFF 		bl	xTaskCreate
+ 131              		.loc 1 244 0
+ 132 007a 1B49     		ldr	r1, .L7+48
+ 133 007c 8022     		mov	r2, #128
+ 134 007e 0023     		mov	r3, #0
+ 135 0080 1A48     		ldr	r0, .L7+52
+ 136 0082 0094     		str	r4, [sp]
+ 137 0084 0194     		str	r4, [sp, #4]
+ 138 0086 FFF7FEFF 		bl	xTaskCreate
+ 139              		.loc 1 250 0
+ 140 008a 1949     		ldr	r1, .L7+56
+ 141 008c 8022     		mov	r2, #128
+ 142 008e 0023     		mov	r3, #0
+ 143 0090 1848     		ldr	r0, .L7+60
+ 144 0092 0094     		str	r4, [sp]
+ 145 0094 0194     		str	r4, [sp, #4]
+ 146 0096 FFF7FEFF 		bl	xTaskCreate
+ 147              		.loc 1 256 0
+ 148 009a 1749     		ldr	r1, .L7+64
+ 149 009c 8022     		mov	r2, #128
+ 150 009e 0023     		mov	r3, #0
+ 151 00a0 1648     		ldr	r0, .L7+68
+ 152 00a2 0094     		str	r4, [sp]
+ 153 00a4 0194     		str	r4, [sp, #4]
+ 154 00a6 FFF7FEFF 		bl	xTaskCreate
+ 155              		.loc 1 270 0
+ 156 00aa FFF7FEFF 		bl	vTaskStartScheduler
+ 157              		.loc 1 274 0
+ 158 00ae 0020     		mov	r0, #0
+ 159 00b0 02B0     		add	sp, sp, #8
+ 160              		@ sp needed for prologue
+ 161 00b2 10BC     		pop	{r4}
+ 162 00b4 02BC     		pop	{r1}
+ 163 00b6 0847     		bx	r1
+ 164              	.L8:
+ 165              		.align	2
+ 166              	.L7:
+ 167 00b8 00C002E0 		.word	-536690688
+ 168 00bc FFBFC1FF 		.word	-4079617
+ 169 00c0 088002E0 		.word	-536707064
+ 170 00c4 84C01FE0 		.word	-534790012
+ 171 00c8 8CC01FE0 		.word	-534790004
+ 172 00cc 88C01FE0 		.word	-534790008
+ 173 00d0 80C01FE0 		.word	-534790016
+ 174 00d4 04C01FE0 		.word	-534790140
+ 175 00d8 00C11FE0 		.word	-534789888
+ 176 00dc 048002E0 		.word	-536707068
+ 177 00e0 00000000 		.word	.LC0
+ 178 00e4 00000000 		.word	testLEDMatrix
+ 179 00e8 04000000 		.word	.LC3
+ 180 00ec 00000000 		.word	testLCD
+ 181 00f0 08000000 		.word	.LC6
+ 182 00f4 00000000 		.word	testMotor
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 10
+
+
+ 183 00f8 10000000 		.word	.LC9
+ 184 00fc 00000000 		.word	testADC
+ 185              	.LFE3:
+ 186              		.size	main, .-main
+ 187              		.align	2
+ 188              		.global	TestLED
+ 189              		.code 16
+ 190              		.thumb_func
+ 191              		.type	TestLED, %function
+ 192              	TestLED:
+ 193              	.LFB2:
+ 194              		.loc 1 170 0
+ 195 0100 F0B5     		push	{r4, r5, r6, r7, lr}
+ 196              	.LCFI2:
+ 197              		.loc 1 174 0
+ 198 0102 2649     		ldr	r1, .L19
+ 199 0104 264A     		ldr	r2, .L19+4
+ 200 0106 0B68     		ldr	r3, [r1]
+ 201 0108 1340     		and	r3, r3, r2
+ 202 010a 0B60     		str	r3, [r1]
+ 203              		.loc 1 175 0
+ 204 010c 2549     		ldr	r1, .L19+8
+ 205 010e FF23     		mov	r3, #255
+ 206 0110 0A68     		ldr	r2, [r1]
+ 207 0112 1B02     		lsl	r3, r3, #8
+ 208 0114 1A43     		orr	r2, r2, r3
+ 209 0116 0A60     		str	r2, [r1]
+ 210              		.loc 1 176 0
+ 211 0118 FB23     		mov	r3, #251
+ 212 011a 234A     		ldr	r2, .L19+12
+ 213 011c 1B02     		lsl	r3, r3, #8
+ 214 011e 1360     		str	r3, [r2]
+ 215              		.loc 1 177 0
+ 216 0120 8023     		mov	r3, #128
+ 217 0122 DB00     		lsl	r3, r3, #3
+ 218 0124 0832     		add	r2, r2, #8
+ 219 0126 1360     		str	r3, [r2]
+ 220              		.loc 1 170 0
+ 221 0128 81B0     		sub	sp, sp, #4
+ 222              	.LCFI3:
+ 223              		.loc 1 177 0
+ 224 012a 0023     		mov	r3, #0
+ 225 012c 0093     		str	r3, [sp]
+ 226              	.LVL0:
+ 227 012e 30E0     		b	.L10
+ 228              	.LVL1:
+ 229              	.L11:
+ 230              		.loc 1 184 0
+ 231 0130 1E4F     		ldr	r7, .L19+16
+ 232              		.loc 1 185 0
+ 233 0132 6420     		mov	r0, #100
+ 234              		.loc 1 184 0
+ 235 0134 3C60     		str	r4, [r7]
+ 236              		.loc 1 185 0
+ 237 0136 FFF7FEFF 		bl	vTaskDelay
+ 238              		.loc 1 187 0
+ 239 013a 8026     		mov	r6, #128
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 11
+
+
+ 240              		.loc 1 186 0
+ 241 013c 1A4B     		ldr	r3, .L19+12
+ 242              		.loc 1 187 0
+ 243 013e F600     		lsl	r6, r6, #3
+ 244              		.loc 1 189 0
+ 245 0140 0135     		add	r5, r5, #1
+ 246              		.loc 1 186 0
+ 247 0142 1C60     		str	r4, [r3]
+ 248              		.loc 1 187 0
+ 249 0144 3E60     		str	r6, [r7]
+ 250              		.loc 1 189 0
+ 251 0146 6400     		lsl	r4, r4, #1
+ 252              		.loc 1 182 0
+ 253 0148 082D     		cmp	r5, #8
+ 254 014a F1D1     		bne	.L11
+ 255              		.loc 1 179 0
+ 256 014c 009B     		ldr	r3, [sp]
+ 257 014e 0133     		add	r3, r3, #1
+ 258 0150 0093     		str	r3, [sp]
+ 259              	.LVL2:
+ 260 0152 042B     		cmp	r3, #4
+ 261 0154 1DD1     		bne	.L10
+ 262              		.loc 1 193 0
+ 263 0156 E023     		mov	r3, #224
+ 264 0158 DB00     		lsl	r3, r3, #3
+ 265 015a 3B60     		str	r3, [r7]
+ 266              		.loc 1 194 0
+ 267 015c 6420     		mov	r0, #100
+ 268 015e FFF7FEFF 		bl	vTaskDelay
+ 269              		.loc 1 195 0
+ 270 0162 114B     		ldr	r3, .L19+12
+ 271              		.loc 1 196 0
+ 272 0164 6420     		mov	r0, #100
+ 273              		.loc 1 195 0
+ 274 0166 1E60     		str	r6, [r3]
+ 275              		.loc 1 196 0
+ 276 0168 FFF7FEFF 		bl	vTaskDelay
+ 277              		.loc 1 197 0
+ 278 016c 3E60     		str	r6, [r7]
+ 279              		.loc 1 198 0
+ 280 016e 6420     		mov	r0, #100
+ 281 0170 FFF7FEFF 		bl	vTaskDelay
+ 282              		.loc 1 199 0
+ 283 0174 0C4B     		ldr	r3, .L19+12
+ 284              		.loc 1 200 0
+ 285 0176 6420     		mov	r0, #100
+ 286              		.loc 1 199 0
+ 287 0178 1E60     		str	r6, [r3]
+ 288              		.loc 1 200 0
+ 289 017a FFF7FEFF 		bl	vTaskDelay
+ 290              		.loc 1 201 0
+ 291 017e 3E60     		str	r6, [r7]
+ 292              		.loc 1 202 0
+ 293 0180 6420     		mov	r0, #100
+ 294 0182 FFF7FEFF 		bl	vTaskDelay
+ 295              		.loc 1 203 0
+ 296 0186 084B     		ldr	r3, .L19+12
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 12
+
+
+ 297              		.loc 1 205 0
+ 298 0188 01B0     		add	sp, sp, #4
+ 299              		.loc 1 203 0
+ 300 018a 1E60     		str	r6, [r3]
+ 301              		.loc 1 205 0
+ 302              		@ sp needed for prologue
+ 303              	.LVL3:
+ 304 018c F0BC     		pop	{r4, r5, r6, r7}
+ 305 018e 01BC     		pop	{r0}
+ 306 0190 0047     		bx	r0
+ 307              	.LVL4:
+ 308              	.L10:
+ 309 0192 8024     		mov	r4, #128
+ 310 0194 6400     		lsl	r4, r4, #1
+ 311 0196 0025     		mov	r5, #0
+ 312 0198 CAE7     		b	.L11
+ 313              	.L20:
+ 314 019a C046     		.align	2
+ 315              	.L19:
+ 316 019c 00C002E0 		.word	-536690688
+ 317 01a0 FFFF0000 		.word	65535
+ 318 01a4 088002E0 		.word	-536707064
+ 319 01a8 048002E0 		.word	-536707068
+ 320 01ac 0C8002E0 		.word	-536707060
+ 321              	.LFE2:
+ 322              		.size	TestLED, .-TestLED
+ 323              		.section	.debug_frame,"",%progbits
+ 324              	.Lframe0:
+ 325 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ 326              	.LSCIE0:
+ 327 0004 FFFFFFFF 		.4byte	0xffffffff
+ 328 0008 01       		.byte	0x1
+ 329 0009 00       		.ascii	"\000"
+ 330 000a 01       		.uleb128 0x1
+ 331 000b 7C       		.sleb128 -4
+ 332 000c 0E       		.byte	0xe
+ 333 000d 0C       		.byte	0xc
+ 334 000e 0D       		.uleb128 0xd
+ 335 000f 00       		.uleb128 0x0
+ 336              		.align	2
+ 337              	.LECIE0:
+ 338              	.LSFDE0:
+ 339 0010 18000000 		.4byte	.LEFDE0-.LASFDE0
+ 340              	.LASFDE0:
+ 341 0014 00000000 		.4byte	.Lframe0
+ 342 0018 00000000 		.4byte	.LFB3
+ 343 001c 00010000 		.4byte	.LFE3-.LFB3
+ 344 0020 42       		.byte	0x4
+ 345              		.4byte	.LCFI0-.LFB3
+ 346 0021 0E       		.byte	0xe
+ 347 0022 08       		.uleb128 0x8
+ 348 0023 84       		.byte	0x84
+ 349 0024 02       		.uleb128 0x2
+ 350 0025 8E       		.byte	0x8e
+ 351 0026 01       		.uleb128 0x1
+ 352 0027 6E       		.byte	0x4
+ 353              		.4byte	.LCFI1-.LCFI0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 13
+
+
+ 354 0028 0E       		.byte	0xe
+ 355 0029 10       		.uleb128 0x10
+ 356 002a 0000     		.align	2
+ 357              	.LEFDE0:
+ 358              	.LSFDE2:
+ 359 002c 1C000000 		.4byte	.LEFDE2-.LASFDE2
+ 360              	.LASFDE2:
+ 361 0030 00000000 		.4byte	.Lframe0
+ 362 0034 00010000 		.4byte	.LFB2
+ 363 0038 B0000000 		.4byte	.LFE2-.LFB2
+ 364 003c 42       		.byte	0x4
+ 365              		.4byte	.LCFI2-.LFB2
+ 366 003d 0E       		.byte	0xe
+ 367 003e 14       		.uleb128 0x14
+ 368 003f 84       		.byte	0x84
+ 369 0040 05       		.uleb128 0x5
+ 370 0041 85       		.byte	0x85
+ 371 0042 04       		.uleb128 0x4
+ 372 0043 86       		.byte	0x86
+ 373 0044 03       		.uleb128 0x3
+ 374 0045 87       		.byte	0x87
+ 375 0046 02       		.uleb128 0x2
+ 376 0047 8E       		.byte	0x8e
+ 377 0048 01       		.uleb128 0x1
+ 378 0049 68       		.byte	0x4
+ 379              		.4byte	.LCFI3-.LCFI2
+ 380 004a 0E       		.byte	0xe
+ 381 004b 18       		.uleb128 0x18
+ 382              		.align	2
+ 383              	.LEFDE2:
+ 384              		.text
+ 385              	.Letext0:
+ 386              		.section	.debug_loc,"",%progbits
+ 387              	.Ldebug_loc0:
+ 388              	.LLST0:
+ 389 0000 00000000 		.4byte	.LFB3-.Ltext0
+ 390 0004 02000000 		.4byte	.LCFI0-.Ltext0
+ 391 0008 0100     		.2byte	0x1
+ 392 000a 5D       		.byte	0x5d
+ 393 000b 02000000 		.4byte	.LCFI0-.Ltext0
+ 394 000f 30000000 		.4byte	.LCFI1-.Ltext0
+ 395 0013 0200     		.2byte	0x2
+ 396 0015 7D       		.byte	0x7d
+ 397 0016 08       		.sleb128 8
+ 398 0017 30000000 		.4byte	.LCFI1-.Ltext0
+ 399 001b 00010000 		.4byte	.LFE3-.Ltext0
+ 400 001f 0200     		.2byte	0x2
+ 401 0021 7D       		.byte	0x7d
+ 402 0022 10       		.sleb128 16
+ 403 0023 00000000 		.4byte	0x0
+ 404 0027 00000000 		.4byte	0x0
+ 405              	.LLST1:
+ 406 002b 00010000 		.4byte	.LFB2-.Ltext0
+ 407 002f 02010000 		.4byte	.LCFI2-.Ltext0
+ 408 0033 0100     		.2byte	0x1
+ 409 0035 5D       		.byte	0x5d
+ 410 0036 02010000 		.4byte	.LCFI2-.Ltext0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 14
+
+
+ 411 003a 2A010000 		.4byte	.LCFI3-.Ltext0
+ 412 003e 0200     		.2byte	0x2
+ 413 0040 7D       		.byte	0x7d
+ 414 0041 14       		.sleb128 20
+ 415 0042 2A010000 		.4byte	.LCFI3-.Ltext0
+ 416 0046 B0010000 		.4byte	.LFE2-.Ltext0
+ 417 004a 0200     		.2byte	0x2
+ 418 004c 7D       		.byte	0x7d
+ 419 004d 18       		.sleb128 24
+ 420 004e 00000000 		.4byte	0x0
+ 421 0052 00000000 		.4byte	0x0
+ 422              	.LLST2:
+ 423 0056 30010000 		.4byte	.LVL1-.Ltext0
+ 424 005a 8C010000 		.4byte	.LVL3-.Ltext0
+ 425 005e 0100     		.2byte	0x1
+ 426 0060 54       		.byte	0x54
+ 427 0061 92010000 		.4byte	.LVL4-.Ltext0
+ 428 0065 B0010000 		.4byte	.LFE2-.Ltext0
+ 429 0069 0100     		.2byte	0x1
+ 430 006b 54       		.byte	0x54
+ 431 006c 00000000 		.4byte	0x0
+ 432 0070 00000000 		.4byte	0x0
+ 433              		.file 2 "./FreeRTOSConfig.h"
+ 434              		.section	.debug_info
+ 435 0000 E1000000 		.4byte	0xe1
+ 436 0004 0200     		.2byte	0x2
+ 437 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 438 000a 04       		.byte	0x4
+ 439 000b 01       		.uleb128 0x1
+ 440 000c 58000000 		.4byte	.LASF11
+ 441 0010 01       		.byte	0x1
+ 442 0011 23000000 		.4byte	.LASF12
+ 443 0015 8B000000 		.4byte	.LASF13
+ 444 0019 00000000 		.4byte	.Ltext0
+ 445 001d B0010000 		.4byte	.Letext0
+ 446 0021 00000000 		.4byte	.Ldebug_line0
+ 447 0025 02       		.uleb128 0x2
+ 448 0026 04       		.byte	0x4
+ 449 0027 07       		.byte	0x7
+ 450 0028 2F000000 		.4byte	.LASF0
+ 451 002c 03       		.uleb128 0x3
+ 452 002d 04       		.byte	0x4
+ 453 002e 05       		.byte	0x5
+ 454 002f 696E7400 		.ascii	"int\000"
+ 455 0033 02       		.uleb128 0x2
+ 456 0034 04       		.byte	0x4
+ 457 0035 05       		.byte	0x5
+ 458 0036 82000000 		.4byte	.LASF1
+ 459 003a 02       		.uleb128 0x2
+ 460 003b 08       		.byte	0x8
+ 461 003c 05       		.byte	0x5
+ 462 003d 00000000 		.4byte	.LASF2
+ 463 0041 02       		.uleb128 0x2
+ 464 0042 04       		.byte	0x4
+ 465 0043 07       		.byte	0x7
+ 466 0044 0E000000 		.4byte	.LASF3
+ 467 0048 04       		.uleb128 0x4
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 15
+
+
+ 468 0049 04       		.byte	0x4
+ 469 004a 07       		.byte	0x7
+ 470 004b 02       		.uleb128 0x2
+ 471 004c 01       		.byte	0x1
+ 472 004d 08       		.byte	0x8
+ 473 004e C4000000 		.4byte	.LASF4
+ 474 0052 02       		.uleb128 0x2
+ 475 0053 02       		.byte	0x2
+ 476 0054 05       		.byte	0x5
+ 477 0055 D2000000 		.4byte	.LASF5
+ 478 0059 02       		.uleb128 0x2
+ 479 005a 01       		.byte	0x1
+ 480 005b 08       		.byte	0x8
+ 481 005c 7D000000 		.4byte	.LASF6
+ 482 0060 02       		.uleb128 0x2
+ 483 0061 02       		.byte	0x2
+ 484 0062 07       		.byte	0x7
+ 485 0063 A5000000 		.4byte	.LASF7
+ 486 0067 02       		.uleb128 0x2
+ 487 0068 08       		.byte	0x8
+ 488 0069 07       		.byte	0x7
+ 489 006a 41000000 		.4byte	.LASF8
+ 490 006e 05       		.uleb128 0x5
+ 491 006f DC000000 		.4byte	.LASF14
+ 492 0073 02       		.byte	0x2
+ 493 0074 A2       		.byte	0xa2
+ 494 0075 41000000 		.4byte	0x41
+ 495 0079 02       		.uleb128 0x2
+ 496 007a 01       		.byte	0x1
+ 497 007b 06       		.byte	0x6
+ 498 007c B8000000 		.4byte	.LASF9
+ 499 0080 06       		.uleb128 0x6
+ 500 0081 64000000 		.4byte	.LASF15
+ 501 0085 01       		.byte	0x1
+ 502 0086 1801     		.2byte	0x118
+ 503 0088 01       		.byte	0x1
+ 504 0089 01       		.byte	0x1
+ 505 008a 07       		.uleb128 0x7
+ 506 008b 01       		.byte	0x1
+ 507 008c 2A000000 		.4byte	.LASF16
+ 508 0090 01       		.byte	0x1
+ 509 0091 D0       		.byte	0xd0
+ 510 0092 01       		.byte	0x1
+ 511 0093 2C000000 		.4byte	0x2c
+ 512 0097 00000000 		.4byte	.LFB3
+ 513 009b 00010000 		.4byte	.LFE3
+ 514 009f 00000000 		.4byte	.LLST0
+ 515 00a3 B3000000 		.4byte	0xb3
+ 516 00a7 08       		.uleb128 0x8
+ 517 00a8 80000000 		.4byte	0x80
+ 518 00ac 00000000 		.4byte	.Ldebug_ranges0+0x0
+ 519 00b0 01       		.byte	0x1
+ 520 00b1 D1       		.byte	0xd1
+ 521 00b2 00       		.byte	0x0
+ 522 00b3 09       		.uleb128 0x9
+ 523 00b4 01       		.byte	0x1
+ 524 00b5 75000000 		.4byte	.LASF17
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 16
+
+
+ 525 00b9 01       		.byte	0x1
+ 526 00ba AA       		.byte	0xaa
+ 527 00bb 01       		.byte	0x1
+ 528 00bc 00010000 		.4byte	.LFB2
+ 529 00c0 B0010000 		.4byte	.LFE2
+ 530 00c4 2B000000 		.4byte	.LLST1
+ 531 00c8 0A       		.uleb128 0xa
+ 532 00c9 6900     		.ascii	"i\000"
+ 533 00cb 01       		.byte	0x1
+ 534 00cc AB       		.byte	0xab
+ 535 00cd 2C000000 		.4byte	0x2c
+ 536 00d1 02       		.byte	0x2
+ 537 00d2 91       		.byte	0x91
+ 538 00d3 7C       		.sleb128 -4
+ 539 00d4 0B       		.uleb128 0xb
+ 540 00d5 1B000000 		.4byte	.LASF10
+ 541 00d9 01       		.byte	0x1
+ 542 00da AC       		.byte	0xac
+ 543 00db 6E000000 		.4byte	0x6e
+ 544 00df 56000000 		.4byte	.LLST2
+ 545 00e3 00       		.byte	0x0
+ 546 00e4 00       		.byte	0x0
+ 547              		.section	.debug_abbrev
+ 548 0000 01       		.uleb128 0x1
+ 549 0001 11       		.uleb128 0x11
+ 550 0002 01       		.byte	0x1
+ 551 0003 25       		.uleb128 0x25
+ 552 0004 0E       		.uleb128 0xe
+ 553 0005 13       		.uleb128 0x13
+ 554 0006 0B       		.uleb128 0xb
+ 555 0007 03       		.uleb128 0x3
+ 556 0008 0E       		.uleb128 0xe
+ 557 0009 1B       		.uleb128 0x1b
+ 558 000a 0E       		.uleb128 0xe
+ 559 000b 11       		.uleb128 0x11
+ 560 000c 01       		.uleb128 0x1
+ 561 000d 12       		.uleb128 0x12
+ 562 000e 01       		.uleb128 0x1
+ 563 000f 10       		.uleb128 0x10
+ 564 0010 06       		.uleb128 0x6
+ 565 0011 00       		.byte	0x0
+ 566 0012 00       		.byte	0x0
+ 567 0013 02       		.uleb128 0x2
+ 568 0014 24       		.uleb128 0x24
+ 569 0015 00       		.byte	0x0
+ 570 0016 0B       		.uleb128 0xb
+ 571 0017 0B       		.uleb128 0xb
+ 572 0018 3E       		.uleb128 0x3e
+ 573 0019 0B       		.uleb128 0xb
+ 574 001a 03       		.uleb128 0x3
+ 575 001b 0E       		.uleb128 0xe
+ 576 001c 00       		.byte	0x0
+ 577 001d 00       		.byte	0x0
+ 578 001e 03       		.uleb128 0x3
+ 579 001f 24       		.uleb128 0x24
+ 580 0020 00       		.byte	0x0
+ 581 0021 0B       		.uleb128 0xb
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 17
+
+
+ 582 0022 0B       		.uleb128 0xb
+ 583 0023 3E       		.uleb128 0x3e
+ 584 0024 0B       		.uleb128 0xb
+ 585 0025 03       		.uleb128 0x3
+ 586 0026 08       		.uleb128 0x8
+ 587 0027 00       		.byte	0x0
+ 588 0028 00       		.byte	0x0
+ 589 0029 04       		.uleb128 0x4
+ 590 002a 24       		.uleb128 0x24
+ 591 002b 00       		.byte	0x0
+ 592 002c 0B       		.uleb128 0xb
+ 593 002d 0B       		.uleb128 0xb
+ 594 002e 3E       		.uleb128 0x3e
+ 595 002f 0B       		.uleb128 0xb
+ 596 0030 00       		.byte	0x0
+ 597 0031 00       		.byte	0x0
+ 598 0032 05       		.uleb128 0x5
+ 599 0033 16       		.uleb128 0x16
+ 600 0034 00       		.byte	0x0
+ 601 0035 03       		.uleb128 0x3
+ 602 0036 0E       		.uleb128 0xe
+ 603 0037 3A       		.uleb128 0x3a
+ 604 0038 0B       		.uleb128 0xb
+ 605 0039 3B       		.uleb128 0x3b
+ 606 003a 0B       		.uleb128 0xb
+ 607 003b 49       		.uleb128 0x49
+ 608 003c 13       		.uleb128 0x13
+ 609 003d 00       		.byte	0x0
+ 610 003e 00       		.byte	0x0
+ 611 003f 06       		.uleb128 0x6
+ 612 0040 2E       		.uleb128 0x2e
+ 613 0041 00       		.byte	0x0
+ 614 0042 03       		.uleb128 0x3
+ 615 0043 0E       		.uleb128 0xe
+ 616 0044 3A       		.uleb128 0x3a
+ 617 0045 0B       		.uleb128 0xb
+ 618 0046 3B       		.uleb128 0x3b
+ 619 0047 05       		.uleb128 0x5
+ 620 0048 27       		.uleb128 0x27
+ 621 0049 0C       		.uleb128 0xc
+ 622 004a 20       		.uleb128 0x20
+ 623 004b 0B       		.uleb128 0xb
+ 624 004c 00       		.byte	0x0
+ 625 004d 00       		.byte	0x0
+ 626 004e 07       		.uleb128 0x7
+ 627 004f 2E       		.uleb128 0x2e
+ 628 0050 01       		.byte	0x1
+ 629 0051 3F       		.uleb128 0x3f
+ 630 0052 0C       		.uleb128 0xc
+ 631 0053 03       		.uleb128 0x3
+ 632 0054 0E       		.uleb128 0xe
+ 633 0055 3A       		.uleb128 0x3a
+ 634 0056 0B       		.uleb128 0xb
+ 635 0057 3B       		.uleb128 0x3b
+ 636 0058 0B       		.uleb128 0xb
+ 637 0059 27       		.uleb128 0x27
+ 638 005a 0C       		.uleb128 0xc
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 18
+
+
+ 639 005b 49       		.uleb128 0x49
+ 640 005c 13       		.uleb128 0x13
+ 641 005d 11       		.uleb128 0x11
+ 642 005e 01       		.uleb128 0x1
+ 643 005f 12       		.uleb128 0x12
+ 644 0060 01       		.uleb128 0x1
+ 645 0061 40       		.uleb128 0x40
+ 646 0062 06       		.uleb128 0x6
+ 647 0063 01       		.uleb128 0x1
+ 648 0064 13       		.uleb128 0x13
+ 649 0065 00       		.byte	0x0
+ 650 0066 00       		.byte	0x0
+ 651 0067 08       		.uleb128 0x8
+ 652 0068 1D       		.uleb128 0x1d
+ 653 0069 00       		.byte	0x0
+ 654 006a 31       		.uleb128 0x31
+ 655 006b 13       		.uleb128 0x13
+ 656 006c 55       		.uleb128 0x55
+ 657 006d 06       		.uleb128 0x6
+ 658 006e 58       		.uleb128 0x58
+ 659 006f 0B       		.uleb128 0xb
+ 660 0070 59       		.uleb128 0x59
+ 661 0071 0B       		.uleb128 0xb
+ 662 0072 00       		.byte	0x0
+ 663 0073 00       		.byte	0x0
+ 664 0074 09       		.uleb128 0x9
+ 665 0075 2E       		.uleb128 0x2e
+ 666 0076 01       		.byte	0x1
+ 667 0077 3F       		.uleb128 0x3f
+ 668 0078 0C       		.uleb128 0xc
+ 669 0079 03       		.uleb128 0x3
+ 670 007a 0E       		.uleb128 0xe
+ 671 007b 3A       		.uleb128 0x3a
+ 672 007c 0B       		.uleb128 0xb
+ 673 007d 3B       		.uleb128 0x3b
+ 674 007e 0B       		.uleb128 0xb
+ 675 007f 27       		.uleb128 0x27
+ 676 0080 0C       		.uleb128 0xc
+ 677 0081 11       		.uleb128 0x11
+ 678 0082 01       		.uleb128 0x1
+ 679 0083 12       		.uleb128 0x12
+ 680 0084 01       		.uleb128 0x1
+ 681 0085 40       		.uleb128 0x40
+ 682 0086 06       		.uleb128 0x6
+ 683 0087 00       		.byte	0x0
+ 684 0088 00       		.byte	0x0
+ 685 0089 0A       		.uleb128 0xa
+ 686 008a 34       		.uleb128 0x34
+ 687 008b 00       		.byte	0x0
+ 688 008c 03       		.uleb128 0x3
+ 689 008d 08       		.uleb128 0x8
+ 690 008e 3A       		.uleb128 0x3a
+ 691 008f 0B       		.uleb128 0xb
+ 692 0090 3B       		.uleb128 0x3b
+ 693 0091 0B       		.uleb128 0xb
+ 694 0092 49       		.uleb128 0x49
+ 695 0093 13       		.uleb128 0x13
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 19
+
+
+ 696 0094 02       		.uleb128 0x2
+ 697 0095 0A       		.uleb128 0xa
+ 698 0096 00       		.byte	0x0
+ 699 0097 00       		.byte	0x0
+ 700 0098 0B       		.uleb128 0xb
+ 701 0099 34       		.uleb128 0x34
+ 702 009a 00       		.byte	0x0
+ 703 009b 03       		.uleb128 0x3
+ 704 009c 0E       		.uleb128 0xe
+ 705 009d 3A       		.uleb128 0x3a
+ 706 009e 0B       		.uleb128 0xb
+ 707 009f 3B       		.uleb128 0x3b
+ 708 00a0 0B       		.uleb128 0xb
+ 709 00a1 49       		.uleb128 0x49
+ 710 00a2 13       		.uleb128 0x13
+ 711 00a3 02       		.uleb128 0x2
+ 712 00a4 06       		.uleb128 0x6
+ 713 00a5 00       		.byte	0x0
+ 714 00a6 00       		.byte	0x0
+ 715 00a7 00       		.byte	0x0
+ 716              		.section	.debug_pubnames,"",%progbits
+ 717 0000 23000000 		.4byte	0x23
+ 718 0004 0200     		.2byte	0x2
+ 719 0006 00000000 		.4byte	.Ldebug_info0
+ 720 000a E5000000 		.4byte	0xe5
+ 721 000e 8A000000 		.4byte	0x8a
+ 722 0012 6D61696E 		.ascii	"main\000"
+ 722      00
+ 723 0017 B3000000 		.4byte	0xb3
+ 724 001b 54657374 		.ascii	"TestLED\000"
+ 724      4C454400 
+ 725 0023 00000000 		.4byte	0x0
+ 726              		.section	.debug_aranges,"",%progbits
+ 727 0000 1C000000 		.4byte	0x1c
+ 728 0004 0200     		.2byte	0x2
+ 729 0006 00000000 		.4byte	.Ldebug_info0
+ 730 000a 04       		.byte	0x4
+ 731 000b 00       		.byte	0x0
+ 732 000c 0000     		.2byte	0x0
+ 733 000e 0000     		.2byte	0x0
+ 734 0010 00000000 		.4byte	.Ltext0
+ 735 0014 B0010000 		.4byte	.Letext0-.Ltext0
+ 736 0018 00000000 		.4byte	0x0
+ 737 001c 00000000 		.4byte	0x0
+ 738              		.section	.debug_ranges,"",%progbits
+ 739              	.Ldebug_ranges0:
+ 740 0000 02000000 		.4byte	.LBB4-.Ltext0
+ 741 0004 2E000000 		.4byte	.LBE4-.Ltext0
+ 742 0008 30000000 		.4byte	.LBB7-.Ltext0
+ 743 000c 5A000000 		.4byte	.LBE7-.Ltext0
+ 744 0010 00000000 		.4byte	0x0
+ 745 0014 00000000 		.4byte	0x0
+ 746              		.section	.debug_str,"MS",%progbits,1
+ 747              	.LASF2:
+ 748 0000 6C6F6E67 		.ascii	"long long int\000"
+ 748      206C6F6E 
+ 748      6720696E 
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 20
+
+
+ 748      7400
+ 749              	.LASF3:
+ 750 000e 756E7369 		.ascii	"unsigned int\000"
+ 750      676E6564 
+ 750      20696E74 
+ 750      00
+ 751              	.LASF10:
+ 752 001b 70617474 		.ascii	"pattern\000"
+ 752      65726E00 
+ 753              	.LASF12:
+ 754 0023 6D61696E 		.ascii	"main.c\000"
+ 754      2E6300
+ 755              	.LASF16:
+ 756 002a 6D61696E 		.ascii	"main\000"
+ 756      00
+ 757              	.LASF0:
+ 758 002f 6C6F6E67 		.ascii	"long unsigned int\000"
+ 758      20756E73 
+ 758      69676E65 
+ 758      6420696E 
+ 758      7400
+ 759              	.LASF8:
+ 760 0041 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 760      206C6F6E 
+ 760      6720756E 
+ 760      7369676E 
+ 760      65642069 
+ 761              	.LASF11:
+ 762 0058 474E5520 		.ascii	"GNU C 4.2.2\000"
+ 762      4320342E 
+ 762      322E3200 
+ 763              	.LASF15:
+ 764 0064 70727653 		.ascii	"prvSetupHardware\000"
+ 764      65747570 
+ 764      48617264 
+ 764      77617265 
+ 764      00
+ 765              	.LASF17:
+ 766 0075 54657374 		.ascii	"TestLED\000"
+ 766      4C454400 
+ 767              	.LASF6:
+ 768 007d 63686172 		.ascii	"char\000"
+ 768      00
+ 769              	.LASF1:
+ 770 0082 6C6F6E67 		.ascii	"long int\000"
+ 770      20696E74 
+ 770      00
+ 771              	.LASF13:
+ 772 008b 2F637967 		.ascii	"/cygdrive/c/Downloads/EDU\000"
+ 772      64726976 
+ 772      652F632F 
+ 772      446F776E 
+ 772      6C6F6164 
+ 773              	.LASF7:
+ 774 00a5 73686F72 		.ascii	"short unsigned int\000"
+ 774      7420756E 
+ 774      7369676E 
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 21
+
+
+ 774      65642069 
+ 774      6E7400
+ 775              	.LASF9:
+ 776 00b8 7369676E 		.ascii	"signed char\000"
+ 776      65642063 
+ 776      68617200 
+ 777              	.LASF4:
+ 778 00c4 756E7369 		.ascii	"unsigned char\000"
+ 778      676E6564 
+ 778      20636861 
+ 778      7200
+ 779              	.LASF5:
+ 780 00d2 73686F72 		.ascii	"short int\000"
+ 780      7420696E 
+ 780      7400
+ 781              	.LASF14:
+ 782 00dc 74553332 		.ascii	"tU32\000"
+ 782      00
+ 783              		.ident	"GCC: (GNU) 4.2.2"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s 			page 22
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s:1      .text:00000000 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s:30     .text:00000000 main
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s:167    .text:000000b8 $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s:192    .text:00000100 TestLED
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s:189    .text:00000100 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccTCBEDR.s:316    .text:0000019c $d
+
+UNDEFINED SYMBOLS
+InitSerial0
+xTaskCreate
+vTaskStartScheduler
+testLEDMatrix
+testLCD
+testMotor
+testADC
+vTaskDelay

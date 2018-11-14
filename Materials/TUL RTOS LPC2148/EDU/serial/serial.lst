@@ -1,0 +1,1774 @@
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 1
+
+
+   1              		.code	16
+   2              		.file	"serial.c"
+   3              		.section	.debug_abbrev,"",%progbits
+   4              	.Ldebug_abbrev0:
+   5              		.section	.debug_info,"",%progbits
+   6              	.Ldebug_info0:
+   7              		.section	.debug_line,"",%progbits
+   8              	.Ldebug_line0:
+   9 0000 C8000000 		.text
+   9      02006A00 
+   9      00000201 
+   9      FB0E0D00 
+   9      01010101 
+  10              	.Ltext0:
+  11              		.align	2
+  12              		.global	vSerialClose
+  13              		.code 16
+  14              		.thumb_func
+  15              		.type	vSerialClose, %function
+  16              	vSerialClose:
+  17              	.LFB6:
+  18              		.file 1 "serial/serial.c"
+   1:serial/serial.c **** /*
+   2:serial/serial.c **** 	FreeRTOS.org V5.1.1 - Copyright (C) 2003-2008 Richard Barry.
+   3:serial/serial.c **** 
+   4:serial/serial.c **** 	This file is part of the FreeRTOS.org distribution.
+   5:serial/serial.c **** 
+   6:serial/serial.c **** 	FreeRTOS.org is free software; you can redistribute it and/or modify
+   7:serial/serial.c **** 	it under the terms of the GNU General Public License as published by
+   8:serial/serial.c **** 	the Free Software Foundation; either version 2 of the License, or
+   9:serial/serial.c **** 	(at your option) any later version.
+  10:serial/serial.c **** 
+  11:serial/serial.c **** 	FreeRTOS.org is distributed in the hope that it will be useful,
+  12:serial/serial.c **** 	but WITHOUT ANY WARRANTY; without even the implied warranty of
+  13:serial/serial.c **** 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  14:serial/serial.c **** 	GNU General Public License for more details.
+  15:serial/serial.c **** 
+  16:serial/serial.c **** 	You should have received a copy of the GNU General Public License
+  17:serial/serial.c **** 	along with FreeRTOS.org; if not, write to the Free Software
+  18:serial/serial.c **** 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  19:serial/serial.c **** 
+  20:serial/serial.c **** 	A special exception to the GPL can be applied should you wish to distribute
+  21:serial/serial.c **** 	a combined work that includes FreeRTOS.org, without being obliged to provide
+  22:serial/serial.c **** 	the source code for any proprietary components.  See the licensing section 
+  23:serial/serial.c **** 	of http://www.FreeRTOS.org for full details of how and when the exception
+  24:serial/serial.c **** 	can be applied.
+  25:serial/serial.c **** 
+  26:serial/serial.c ****     ***************************************************************************
+  27:serial/serial.c ****     ***************************************************************************
+  28:serial/serial.c ****     *                                                                         *
+  29:serial/serial.c ****     * SAVE TIME AND MONEY!  We can port FreeRTOS.org to your own hardware,    *
+  30:serial/serial.c ****     * and even write all or part of your application on your behalf.          *
+  31:serial/serial.c ****     * See http://www.OpenRTOS.com for details of the services we provide to   *
+  32:serial/serial.c ****     * expedite your project.                                                  *
+  33:serial/serial.c ****     *                                                                         *
+  34:serial/serial.c ****     ***************************************************************************
+  35:serial/serial.c ****     ***************************************************************************
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 2
+
+
+  36:serial/serial.c **** 
+  37:serial/serial.c **** 	Please ensure to read the configuration and relevant port sections of the
+  38:serial/serial.c **** 	online documentation.
+  39:serial/serial.c **** 
+  40:serial/serial.c **** 	http://www.FreeRTOS.org - Documentation, latest information, license and 
+  41:serial/serial.c **** 	contact details.
+  42:serial/serial.c **** 
+  43:serial/serial.c **** 	http://www.SafeRTOS.com - A version that is certified for use in safety 
+  44:serial/serial.c **** 	critical systems.
+  45:serial/serial.c **** 
+  46:serial/serial.c **** 	http://www.OpenRTOS.com - Commercial support, development, porting, 
+  47:serial/serial.c **** 	licensing and training services.
+  48:serial/serial.c **** */
+  49:serial/serial.c **** 
+  50:serial/serial.c **** /*
+  51:serial/serial.c **** 	Changes from V2.4.0
+  52:serial/serial.c **** 
+  53:serial/serial.c **** 		+ Made serial ISR handling more complete and robust.
+  54:serial/serial.c **** 
+  55:serial/serial.c **** 	Changes from V2.4.1
+  56:serial/serial.c **** 
+  57:serial/serial.c **** 		+ Split serial.c into serial.c and serialISR.c.  serial.c can be 
+  58:serial/serial.c **** 		  compiled using ARM or THUMB modes.  serialISR.c must always be
+  59:serial/serial.c **** 		  compiled in ARM mode.
+  60:serial/serial.c **** 		+ Another small change to cSerialPutChar().
+  61:serial/serial.c **** 
+  62:serial/serial.c **** 	Changed from V2.5.1
+  63:serial/serial.c **** 
+  64:serial/serial.c **** 		+ In cSerialPutChar() an extra check is made to ensure the post to
+  65:serial/serial.c **** 		  the queue was successful if then attempting to retrieve the posted
+  66:serial/serial.c **** 		  character.
+  67:serial/serial.c **** 
+  68:serial/serial.c **** */
+  69:serial/serial.c **** 
+  70:serial/serial.c **** /* 
+  71:serial/serial.c **** 	BASIC INTERRUPT DRIVEN SERIAL PORT DRIVER FOR UART0. 
+  72:serial/serial.c **** 
+  73:serial/serial.c **** 	This file contains all the serial port components that can be compiled to
+  74:serial/serial.c **** 	either ARM or THUMB mode.  Components that must be compiled to ARM mode are
+  75:serial/serial.c **** 	contained in serialISR.c.
+  76:serial/serial.c **** */
+  77:serial/serial.c **** 
+  78:serial/serial.c **** /* Standard includes. */
+  79:serial/serial.c **** #include <stdlib.h>
+  80:serial/serial.c **** 
+  81:serial/serial.c **** /* Scheduler includes. */
+  82:serial/serial.c **** #include "FreeRTOS.h"
+  83:serial/serial.c **** #include "queue.h"
+  84:serial/serial.c **** #include "task.h"
+  85:serial/serial.c **** 
+  86:serial/serial.c **** /* Demo application includes. */
+  87:serial/serial.c **** #include "serial.h"
+  88:serial/serial.c **** 
+  89:serial/serial.c **** /*-----------------------------------------------------------*/
+  90:serial/serial.c **** 
+  91:serial/serial.c **** /* Constants to setup and access the UART. */
+  92:serial/serial.c **** #define serDLAB							( ( unsigned portCHAR ) 0x80 )
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 3
+
+
+  93:serial/serial.c **** #define serENABLE_INTERRUPTS			( ( unsigned portCHAR ) 0x03 )
+  94:serial/serial.c **** #define serNO_PARITY					( ( unsigned portCHAR ) 0x00 )
+  95:serial/serial.c **** #define ser1_STOP_BIT					( ( unsigned portCHAR ) 0x00 )
+  96:serial/serial.c **** #define ser8_BIT_CHARS					( ( unsigned portCHAR ) 0x03 )
+  97:serial/serial.c **** #define serFIFO_ON						( ( unsigned portCHAR ) 0x01 )
+  98:serial/serial.c **** #define serCLEAR_FIFO					( ( unsigned portCHAR ) 0x06 )
+  99:serial/serial.c **** #define serWANTED_CLOCK_SCALING			( ( unsigned portLONG ) 16 )
+ 100:serial/serial.c **** 
+ 101:serial/serial.c **** /* Constants to setup and access the VIC. */
+ 102:serial/serial.c **** #define serUART0_VIC_CHANNEL			( ( unsigned portLONG ) 0x0006 )
+ 103:serial/serial.c **** #define serUART0_VIC_CHANNEL_BIT		( ( unsigned portLONG ) 0x0040 )
+ 104:serial/serial.c **** #define serUART0_VIC_ENABLE				( ( unsigned portLONG ) 0x0020 )
+ 105:serial/serial.c **** #define serCLEAR_VIC_INTERRUPT			( ( unsigned portLONG ) 0 )
+ 106:serial/serial.c **** 
+ 107:serial/serial.c **** #define serINVALID_QUEUE				( ( xQueueHandle ) 0 )
+ 108:serial/serial.c **** #define serHANDLE						( ( xComPortHandle ) 1 )
+ 109:serial/serial.c **** #define serNO_BLOCK						( ( portTickType ) 0 )
+ 110:serial/serial.c **** 
+ 111:serial/serial.c **** /*-----------------------------------------------------------*/
+ 112:serial/serial.c **** 
+ 113:serial/serial.c **** /* Queues used to hold received characters, and characters waiting to be
+ 114:serial/serial.c **** transmitted. */
+ 115:serial/serial.c **** static xQueueHandle xRxedChars; 
+ 116:serial/serial.c **** static xQueueHandle xCharsForTx; 
+ 117:serial/serial.c **** 
+ 118:serial/serial.c **** /*-----------------------------------------------------------*/
+ 119:serial/serial.c **** 
+ 120:serial/serial.c **** /* Communication flag between the interrupt service routine and serial API. */
+ 121:serial/serial.c **** static volatile portLONG *plTHREEmpty;
+ 122:serial/serial.c **** 
+ 123:serial/serial.c **** /* 
+ 124:serial/serial.c ****  * The queues are created in serialISR.c as they are used from the ISR.
+ 125:serial/serial.c ****  * Obtain references to the queues and THRE Empty flag. 
+ 126:serial/serial.c ****  */
+ 127:serial/serial.c **** extern void vSerialISRCreateQueues(	unsigned portBASE_TYPE uxQueueLength, xQueueHandle *pxRxedChars
+ 128:serial/serial.c **** 
+ 129:serial/serial.c **** /*-----------------------------------------------------------*/
+ 130:serial/serial.c **** 
+ 131:serial/serial.c **** xComPortHandle xSerialPortInitMinimal( unsigned portLONG ulWantedBaud, unsigned portBASE_TYPE uxQue
+ 132:serial/serial.c **** {
+ 133:serial/serial.c **** unsigned portLONG ulDivisor, ulWantedClock;
+ 134:serial/serial.c **** xComPortHandle xReturn = serHANDLE;
+ 135:serial/serial.c **** extern void ( vUART_ISR_Wrapper )( void );
+ 136:serial/serial.c **** 
+ 137:serial/serial.c **** 	/* The queues are used in the serial ISR routine, so are created from
+ 138:serial/serial.c **** 	serialISR.c (which is always compiled to ARM mode. */
+ 139:serial/serial.c **** 	vSerialISRCreateQueues( uxQueueLength, &xRxedChars, &xCharsForTx, &plTHREEmpty );
+ 140:serial/serial.c **** 
+ 141:serial/serial.c **** 	if( 
+ 142:serial/serial.c **** 		( xRxedChars != serINVALID_QUEUE ) && 
+ 143:serial/serial.c **** 		( xCharsForTx != serINVALID_QUEUE ) && 
+ 144:serial/serial.c **** 		( ulWantedBaud != ( unsigned portLONG ) 0 ) 
+ 145:serial/serial.c **** 	  )
+ 146:serial/serial.c **** 	{
+ 147:serial/serial.c **** 		portENTER_CRITICAL();
+ 148:serial/serial.c **** 		{
+ 149:serial/serial.c **** 			/* Setup the baud rate:  Calculate the divisor value. */
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 4
+
+
+ 150:serial/serial.c **** 			ulWantedClock = ulWantedBaud * serWANTED_CLOCK_SCALING;
+ 151:serial/serial.c **** 			ulDivisor = configCPU_CLOCK_HZ / ulWantedClock;
+ 152:serial/serial.c **** 
+ 153:serial/serial.c **** 			/* Set the DLAB bit so we can access the divisor. */
+ 154:serial/serial.c **** 			UART0_LCR |= serDLAB;
+ 155:serial/serial.c **** 
+ 156:serial/serial.c **** 			/* Setup the divisor. */
+ 157:serial/serial.c **** 			UART0_DLL = ( unsigned portCHAR ) ( ulDivisor & ( unsigned portLONG ) 0xff );
+ 158:serial/serial.c **** 			ulDivisor >>= 8;
+ 159:serial/serial.c **** 			UART0_DLM = ( unsigned portCHAR ) ( ulDivisor & ( unsigned portLONG ) 0xff );
+ 160:serial/serial.c **** 
+ 161:serial/serial.c **** 			/* Turn on the FIFO's and clear the buffers. */
+ 162:serial/serial.c **** 			UART0_FCR = ( serFIFO_ON | serCLEAR_FIFO );
+ 163:serial/serial.c **** 
+ 164:serial/serial.c **** 			/* Setup transmission format. */
+ 165:serial/serial.c **** 			UART0_LCR = serNO_PARITY | ser1_STOP_BIT | ser8_BIT_CHARS;
+ 166:serial/serial.c **** 
+ 167:serial/serial.c **** 			/* Setup the VIC for the UART. */
+ 168:serial/serial.c **** 			VICIntSelect &= ~( serUART0_VIC_CHANNEL_BIT );
+ 169:serial/serial.c **** 			VICIntEnable |= serUART0_VIC_CHANNEL_BIT;
+ 170:serial/serial.c **** 			VICVectAddr1 = ( portLONG ) vUART_ISR_Wrapper;
+ 171:serial/serial.c **** 			VICVectCntl1 = serUART0_VIC_CHANNEL | serUART0_VIC_ENABLE;
+ 172:serial/serial.c **** 
+ 173:serial/serial.c **** 			/* Enable UART0 interrupts. */
+ 174:serial/serial.c **** 			UART0_IER |= serENABLE_INTERRUPTS;
+ 175:serial/serial.c **** 		}
+ 176:serial/serial.c **** 		portEXIT_CRITICAL();
+ 177:serial/serial.c **** 	}
+ 178:serial/serial.c **** 	else
+ 179:serial/serial.c **** 	{
+ 180:serial/serial.c **** 		xReturn = ( xComPortHandle ) 0;
+ 181:serial/serial.c **** 	}
+ 182:serial/serial.c **** 
+ 183:serial/serial.c **** 	return xReturn;
+ 184:serial/serial.c **** }
+ 185:serial/serial.c **** /*-----------------------------------------------------------*/
+ 186:serial/serial.c **** 
+ 187:serial/serial.c **** signed portBASE_TYPE xSerialGetChar( xComPortHandle pxPort, signed portCHAR *pcRxedChar, portTickTy
+ 188:serial/serial.c **** {
+ 189:serial/serial.c **** 	/* The port handle is not required as this driver only supports UART0. */
+ 190:serial/serial.c **** 	( void ) pxPort;
+ 191:serial/serial.c **** 
+ 192:serial/serial.c **** 	/* Get the next character from the buffer.  Return false if no characters
+ 193:serial/serial.c **** 	are available, or arrive before xBlockTime expires. */
+ 194:serial/serial.c **** 	if( xQueueReceive( xRxedChars, pcRxedChar, xBlockTime ) )
+ 195:serial/serial.c **** 	{
+ 196:serial/serial.c **** 		return pdTRUE;
+ 197:serial/serial.c **** 	}
+ 198:serial/serial.c **** 	else
+ 199:serial/serial.c **** 	{
+ 200:serial/serial.c **** 		return pdFALSE;
+ 201:serial/serial.c **** 	}
+ 202:serial/serial.c **** }
+ 203:serial/serial.c **** /*-----------------------------------------------------------*/
+ 204:serial/serial.c **** 
+ 205:serial/serial.c **** void vSerialPutString( xComPortHandle pxPort, const signed portCHAR * const pcString, unsigned port
+ 206:serial/serial.c **** {
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 5
+
+
+ 207:serial/serial.c **** signed portCHAR *pxNext;
+ 208:serial/serial.c **** 
+ 209:serial/serial.c **** 	/* NOTE: This implementation does not handle the queue being full as no
+ 210:serial/serial.c **** 	block time is used! */
+ 211:serial/serial.c **** 
+ 212:serial/serial.c **** 	/* The port handle is not required as this driver only supports UART0. */
+ 213:serial/serial.c **** 	( void ) pxPort;
+ 214:serial/serial.c **** 	( void ) usStringLength;
+ 215:serial/serial.c **** 
+ 216:serial/serial.c **** 	/* Send each character in the string, one at a time. */
+ 217:serial/serial.c **** 	pxNext = ( signed portCHAR * ) pcString;
+ 218:serial/serial.c **** 	while( *pxNext )
+ 219:serial/serial.c **** 	{
+ 220:serial/serial.c **** 		xSerialPutChar( pxPort, *pxNext, serNO_BLOCK );
+ 221:serial/serial.c **** 		pxNext++;
+ 222:serial/serial.c **** 	}
+ 223:serial/serial.c **** }
+ 224:serial/serial.c **** /*-----------------------------------------------------------*/
+ 225:serial/serial.c **** 
+ 226:serial/serial.c **** signed portBASE_TYPE xSerialPutChar( xComPortHandle pxPort, signed portCHAR cOutChar, portTickType 
+ 227:serial/serial.c **** {
+ 228:serial/serial.c **** signed portBASE_TYPE xReturn;
+ 229:serial/serial.c **** 
+ 230:serial/serial.c **** 	/* This demo driver only supports one port so the parameter is not used. */
+ 231:serial/serial.c **** 	( void ) pxPort;
+ 232:serial/serial.c **** 
+ 233:serial/serial.c **** 	portENTER_CRITICAL();
+ 234:serial/serial.c **** 	{
+ 235:serial/serial.c **** 		/* Is there space to write directly to the UART? */
+ 236:serial/serial.c **** 		if( *plTHREEmpty == ( portLONG ) pdTRUE )
+ 237:serial/serial.c **** 		{
+ 238:serial/serial.c **** 			/* We wrote the character directly to the UART, so was 
+ 239:serial/serial.c **** 			successful. */
+ 240:serial/serial.c **** 			*plTHREEmpty = pdFALSE;
+ 241:serial/serial.c **** 			UART0_THR = cOutChar;
+ 242:serial/serial.c **** 			xReturn = pdPASS;
+ 243:serial/serial.c **** 		}
+ 244:serial/serial.c **** 		else 
+ 245:serial/serial.c **** 		{
+ 246:serial/serial.c **** 			/* We cannot write directly to the UART, so queue the character.
+ 247:serial/serial.c **** 			Block for a maximum of xBlockTime if there is no space in the
+ 248:serial/serial.c **** 			queue. */
+ 249:serial/serial.c **** 			xReturn = xQueueSend( xCharsForTx, &cOutChar, xBlockTime );
+ 250:serial/serial.c **** 
+ 251:serial/serial.c **** 			/* Depending on queue sizing and task prioritisation:  While we 
+ 252:serial/serial.c **** 			were blocked waiting to post interrupts were not disabled.  It is 
+ 253:serial/serial.c **** 			possible that the serial ISR has emptied the Tx queue, in which
+ 254:serial/serial.c **** 			case we need to start the Tx off again. */
+ 255:serial/serial.c **** 			if( ( *plTHREEmpty == ( portLONG ) pdTRUE ) && ( xReturn == pdPASS ) )
+ 256:serial/serial.c **** 			{
+ 257:serial/serial.c **** 				xQueueReceive( xCharsForTx, &cOutChar, serNO_BLOCK );
+ 258:serial/serial.c **** 				*plTHREEmpty = pdFALSE;
+ 259:serial/serial.c **** 				UART0_THR = cOutChar;
+ 260:serial/serial.c **** 			}
+ 261:serial/serial.c **** 		}
+ 262:serial/serial.c **** 	}
+ 263:serial/serial.c **** 	portEXIT_CRITICAL();
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 6
+
+
+ 264:serial/serial.c **** 
+ 265:serial/serial.c **** 	return xReturn;
+ 266:serial/serial.c **** }
+ 267:serial/serial.c **** /*-----------------------------------------------------------*/
+ 268:serial/serial.c **** 
+ 269:serial/serial.c **** void vSerialClose( xComPortHandle xPort )
+ 270:serial/serial.c **** {
+  19              		.loc 1 270 0
+  20              	.LVL0:
+  21              		@ lr needed for prologue
+ 271:serial/serial.c **** 	/* Not supported as not required by the demo application. */
+ 272:serial/serial.c **** 	( void ) xPort;
+ 273:serial/serial.c **** }
+  22              		.loc 1 273 0
+  23              		@ sp needed for prologue
+  24 0000 7047     		bx	lr
+  25              	.LFE6:
+  26              		.size	vSerialClose, .-vSerialClose
+  27 0002 C046     		.align	2
+  28              		.global	xSerialGetChar
+  29              		.code 16
+  30              		.thumb_func
+  31              		.type	xSerialGetChar, %function
+  32              	xSerialGetChar:
+  33              	.LFB3:
+  34              		.loc 1 188 0
+  35 0004 00B5     		push	{lr}
+  36              	.LCFI0:
+  37              	.LVL1:
+  38              		.loc 1 194 0
+  39 0006 054B     		ldr	r3, .L6
+  40 0008 1868     		ldr	r0, [r3]
+  41              	.LVL2:
+  42 000a 0023     		mov	r3, #0
+  43 000c FFF7FEFF 		bl	xQueueGenericReceive
+  44              	.LVL3:
+  45 0010 031C     		mov	r3, r0
+  46 0012 4042     		neg	r0, r0
+  47 0014 1843     		orr	r0, r0, r3
+  48 0016 C00F     		lsr	r0, r0, #31
+  49              		.loc 1 202 0
+  50              		@ sp needed for prologue
+  51 0018 02BC     		pop	{r1}
+  52 001a 0847     		bx	r1
+  53              	.L7:
+  54              		.align	2
+  55              	.L6:
+  56 001c 00000000 		.word	xRxedChars
+  57              	.LFE3:
+  58              		.size	xSerialGetChar, .-xSerialGetChar
+  59              		.align	2
+  60              		.global	xSerialPutChar
+  61              		.code 16
+  62              		.thumb_func
+  63              		.type	xSerialPutChar, %function
+  64              	xSerialPutChar:
+  65              	.LFB5:
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 7
+
+
+  66              		.loc 1 227 0
+  67 0020 F0B5     		push	{r4, r5, r6, r7, lr}
+  68              	.LCFI1:
+  69              	.LVL4:
+  70 0022 81B0     		sub	sp, sp, #4
+  71              	.LCFI2:
+  72              		.loc 1 227 0
+  73 0024 6F46     		mov	r7, sp
+  74 0026 3970     		strb	r1, [r7]
+  75 0028 161C     		mov	r6, r2
+  76              		.loc 1 233 0
+  77 002a FFF7FEFF 		bl	vPortEnterCritical
+  78              	.LVL5:
+  79              		.loc 1 236 0
+  80 002e 174C     		ldr	r4, .L15
+  81 0030 2268     		ldr	r2, [r4]
+  82 0032 1368     		ldr	r3, [r2]
+  83 0034 012B     		cmp	r3, #1
+  84 0036 07D1     		bne	.L9
+  85              		.loc 1 240 0
+  86 0038 0023     		mov	r3, #0
+  87 003a 1360     		str	r3, [r2]
+  88              		.loc 1 241 0
+  89 003c 144B     		ldr	r3, .L15+4
+  90 003e 0022     		mov	r2, #0
+  91 0040 BA56     		ldrsb	r2, [r7, r2]
+  92 0042 0126     		mov	r6, #1
+  93              	.LVL6:
+  94 0044 1A60     		str	r2, [r3]
+  95 0046 1AE0     		b	.L11
+  96              	.LVL7:
+  97              	.L9:
+  98              		.loc 1 249 0
+  99 0048 124D     		ldr	r5, .L15+8
+ 100 004a 321C     		mov	r2, r6
+ 101 004c 0023     		mov	r3, #0
+ 102 004e 2868     		ldr	r0, [r5]
+ 103 0050 6946     		mov	r1, sp
+ 104 0052 FFF7FEFF 		bl	xQueueGenericSend
+ 105              		.loc 1 255 0
+ 106 0056 2368     		ldr	r3, [r4]
+ 107 0058 1B68     		ldr	r3, [r3]
+ 108              		.loc 1 249 0
+ 109 005a 061C     		mov	r6, r0
+ 110              	.LVL8:
+ 111              		.loc 1 255 0
+ 112 005c 012B     		cmp	r3, #1
+ 113 005e 0ED1     		bne	.L11
+ 114 0060 0128     		cmp	r0, #1
+ 115 0062 0CD1     		bne	.L11
+ 116              	.LVL9:
+ 117              		.loc 1 257 0
+ 118 0064 0022     		mov	r2, #0
+ 119 0066 0023     		mov	r3, #0
+ 120 0068 2868     		ldr	r0, [r5]
+ 121              	.LVL10:
+ 122 006a 6946     		mov	r1, sp
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 8
+
+
+ 123 006c FFF7FEFF 		bl	xQueueGenericReceive
+ 124              		.loc 1 258 0
+ 125 0070 2268     		ldr	r2, [r4]
+ 126 0072 0023     		mov	r3, #0
+ 127 0074 1360     		str	r3, [r2]
+ 128              		.loc 1 259 0
+ 129 0076 064B     		ldr	r3, .L15+4
+ 130 0078 0022     		mov	r2, #0
+ 131 007a BA56     		ldrsb	r2, [r7, r2]
+ 132 007c 1A60     		str	r2, [r3]
+ 133              	.LVL11:
+ 134              	.L11:
+ 135              		.loc 1 263 0
+ 136 007e FFF7FEFF 		bl	vPortExitCritical
+ 137              		.loc 1 266 0
+ 138 0082 301C     		mov	r0, r6
+ 139 0084 01B0     		add	sp, sp, #4
+ 140              		@ sp needed for prologue
+ 141              	.LVL12:
+ 142 0086 F0BC     		pop	{r4, r5, r6, r7}
+ 143 0088 02BC     		pop	{r1}
+ 144 008a 0847     		bx	r1
+ 145              	.L16:
+ 146              		.align	2
+ 147              	.L15:
+ 148 008c 08000000 		.word	plTHREEmpty
+ 149 0090 00C000E0 		.word	-536821760
+ 150 0094 04000000 		.word	xCharsForTx
+ 151              	.LFE5:
+ 152              		.size	xSerialPutChar, .-xSerialPutChar
+ 153              		.align	2
+ 154              		.global	vSerialPutString
+ 155              		.code 16
+ 156              		.thumb_func
+ 157              		.type	vSerialPutString, %function
+ 158              	vSerialPutString:
+ 159              	.LFB4:
+ 160              		.loc 1 206 0
+ 161 0098 30B5     		push	{r4, r5, lr}
+ 162              	.LCFI3:
+ 163              	.LVL13:
+ 164              		.loc 1 206 0
+ 165 009a 051C     		mov	r5, r0
+ 166 009c 0C1C     		mov	r4, r1
+ 167              	.LVL14:
+ 168 009e 06E0     		b	.L18
+ 169              	.LVL15:
+ 170              	.L19:
+ 171              		.loc 1 220 0
+ 172 00a0 0906     		lsl	r1, r1, #24
+ 173 00a2 0916     		asr	r1, r1, #24
+ 174 00a4 281C     		mov	r0, r5
+ 175 00a6 0022     		mov	r2, #0
+ 176              	.LVL16:
+ 177 00a8 FFF7FEFF 		bl	xSerialPutChar
+ 178              		.loc 1 221 0
+ 179 00ac 0134     		add	r4, r4, #1
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 9
+
+
+ 180              	.LVL17:
+ 181              	.L18:
+ 182              		.loc 1 218 0
+ 183 00ae 2178     		ldrb	r1, [r4]
+ 184              	.LVL18:
+ 185 00b0 0029     		cmp	r1, #0
+ 186 00b2 F5D1     		bne	.L19
+ 187              		.loc 1 223 0
+ 188              		@ sp needed for prologue
+ 189              	.LVL19:
+ 190              	.LVL20:
+ 191 00b4 30BC     		pop	{r4, r5}
+ 192 00b6 01BC     		pop	{r0}
+ 193 00b8 0047     		bx	r0
+ 194              	.LFE4:
+ 195              		.size	vSerialPutString, .-vSerialPutString
+ 196              		.global	__udivsi3
+ 197 00ba C046     		.align	2
+ 198              		.global	xSerialPortInitMinimal
+ 199              		.code 16
+ 200              		.thumb_func
+ 201              		.type	xSerialPortInitMinimal, %function
+ 202              	xSerialPortInitMinimal:
+ 203              	.LFB2:
+ 204              		.loc 1 132 0
+ 205 00bc 70B5     		push	{r4, r5, r6, lr}
+ 206              	.LCFI4:
+ 207              	.LVL21:
+ 208              		.loc 1 139 0
+ 209 00be 214C     		ldr	r4, .L29
+ 210 00c0 214D     		ldr	r5, .L29+4
+ 211 00c2 224B     		ldr	r3, .L29+8
+ 212              		.loc 1 132 0
+ 213 00c4 061C     		mov	r6, r0
+ 214              		.loc 1 139 0
+ 215 00c6 2A1C     		mov	r2, r5
+ 216 00c8 081C     		mov	r0, r1
+ 217              	.LVL22:
+ 218 00ca 211C     		mov	r1, r4
+ 219              	.LVL23:
+ 220 00cc FFF7FEFF 		bl	vSerialISRCreateQueues
+ 221              	.LVL24:
+ 222              		.loc 1 141 0
+ 223 00d0 2368     		ldr	r3, [r4]
+ 224 00d2 002B     		cmp	r3, #0
+ 225 00d4 32D0     		beq	.L23
+ 226 00d6 2B68     		ldr	r3, [r5]
+ 227 00d8 002B     		cmp	r3, #0
+ 228 00da 2FD0     		beq	.L23
+ 229 00dc 002E     		cmp	r6, #0
+ 230 00de 2DD0     		beq	.L23
+ 231              		.loc 1 147 0
+ 232 00e0 FFF7FEFF 		bl	vPortEnterCritical
+ 233              		.loc 1 151 0
+ 234 00e4 3101     		lsl	r1, r6, #4
+ 235 00e6 1A48     		ldr	r0, .L29+12
+ 236 00e8 FFF7FEFF 		bl	__udivsi3
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 10
+
+
+ 237              		.loc 1 154 0
+ 238 00ec 1949     		ldr	r1, .L29+16
+ 239 00ee 0B68     		ldr	r3, [r1]
+ 240 00f0 8022     		mov	r2, #128
+ 241 00f2 1343     		orr	r3, r3, r2
+ 242 00f4 0B60     		str	r3, [r1]
+ 243              		.loc 1 157 0
+ 244 00f6 184A     		ldr	r2, .L29+20
+ 245 00f8 0306     		lsl	r3, r0, #24
+ 246              		.loc 1 159 0
+ 247 00fa 184C     		ldr	r4, .L29+24
+ 248              		.loc 1 157 0
+ 249 00fc 1B0E     		lsr	r3, r3, #24
+ 250              		.loc 1 159 0
+ 251 00fe 0004     		lsl	r0, r0, #16
+ 252              		.loc 1 157 0
+ 253 0100 1360     		str	r3, [r2]
+ 254              		.loc 1 159 0
+ 255 0102 000E     		lsr	r0, r0, #24
+ 256              		.loc 1 162 0
+ 257 0104 164B     		ldr	r3, .L29+28
+ 258              		.loc 1 159 0
+ 259 0106 2060     		str	r0, [r4]
+ 260              		.loc 1 162 0
+ 261 0108 0722     		mov	r2, #7
+ 262              		.loc 1 165 0
+ 263 010a 0320     		mov	r0, #3
+ 264              		.loc 1 162 0
+ 265 010c 1A60     		str	r2, [r3]
+ 266              		.loc 1 165 0
+ 267 010e 0860     		str	r0, [r1]
+ 268              		.loc 1 168 0
+ 269 0110 144A     		ldr	r2, .L29+32
+ 270 0112 1368     		ldr	r3, [r2]
+ 271 0114 4021     		mov	r1, #64
+ 272 0116 8B43     		bic	r3, r3, r1
+ 273 0118 1360     		str	r3, [r2]
+ 274              		.loc 1 169 0
+ 275 011a 0432     		add	r2, r2, #4
+ 276 011c 1368     		ldr	r3, [r2]
+ 277 011e 0B43     		orr	r3, r3, r1
+ 278 0120 1360     		str	r3, [r2]
+ 279              		.loc 1 170 0
+ 280 0122 114A     		ldr	r2, .L29+36
+ 281 0124 114B     		ldr	r3, .L29+40
+ 282 0126 1A60     		str	r2, [r3]
+ 283              		.loc 1 171 0
+ 284 0128 114B     		ldr	r3, .L29+44
+ 285 012a 2622     		mov	r2, #38
+ 286 012c 1A60     		str	r2, [r3]
+ 287              		.loc 1 174 0
+ 288 012e 2368     		ldr	r3, [r4]
+ 289 0130 0343     		orr	r3, r3, r0
+ 290 0132 2360     		str	r3, [r4]
+ 291              		.loc 1 176 0
+ 292 0134 FFF7FEFF 		bl	vPortExitCritical
+ 293 0138 0120     		mov	r0, #1
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 11
+
+
+ 294              	.LVL25:
+ 295 013a 00E0     		b	.L27
+ 296              	.LVL26:
+ 297              	.L23:
+ 298              		.loc 1 141 0
+ 299 013c 0020     		mov	r0, #0
+ 300              	.LVL27:
+ 301              	.L27:
+ 302              	.LVL28:
+ 303              		.loc 1 184 0
+ 304              		@ sp needed for prologue
+ 305              	.LVL29:
+ 306 013e 70BC     		pop	{r4, r5, r6}
+ 307 0140 02BC     		pop	{r1}
+ 308 0142 0847     		bx	r1
+ 309              	.L30:
+ 310              		.align	2
+ 311              	.L29:
+ 312 0144 00000000 		.word	xRxedChars
+ 313 0148 04000000 		.word	xCharsForTx
+ 314 014c 08000000 		.word	plTHREEmpty
+ 315 0150 00879303 		.word	60000000
+ 316 0154 0CC000E0 		.word	-536821748
+ 317 0158 00C000E0 		.word	-536821760
+ 318 015c 04C000E0 		.word	-536821756
+ 319 0160 08C000E0 		.word	-536821752
+ 320 0164 0CF0FFFF 		.word	-4084
+ 321 0168 00000000 		.word	vUART_ISR_Wrapper
+ 322 016c 04F1FFFF 		.word	-3836
+ 323 0170 04F2FFFF 		.word	-3580
+ 324              	.LFE2:
+ 325              		.size	xSerialPortInitMinimal, .-xSerialPortInitMinimal
+ 326              		.bss
+ 327              		.align	2
+ 328              	xRxedChars:
+ 329 0000 00000000 		.space	4
+ 330              		.align	2
+ 331              	xCharsForTx:
+ 332 0004 00000000 		.space	4
+ 333              		.align	2
+ 334              	plTHREEmpty:
+ 335 0008 00000000 		.space	4
+ 336              		.section	.debug_frame,"",%progbits
+ 337              	.Lframe0:
+ 338 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ 339              	.LSCIE0:
+ 340 0004 FFFFFFFF 		.4byte	0xffffffff
+ 341 0008 01       		.byte	0x1
+ 342 0009 00       		.ascii	"\000"
+ 343 000a 01       		.uleb128 0x1
+ 344 000b 7C       		.sleb128 -4
+ 345 000c 0E       		.byte	0xe
+ 346 000d 0C       		.byte	0xc
+ 347 000e 0D       		.uleb128 0xd
+ 348 000f 00       		.uleb128 0x0
+ 349              		.align	2
+ 350              	.LECIE0:
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 12
+
+
+ 351              	.LSFDE0:
+ 352 0010 0C000000 		.4byte	.LEFDE0-.LASFDE0
+ 353              	.LASFDE0:
+ 354 0014 00000000 		.4byte	.Lframe0
+ 355 0018 00000000 		.4byte	.LFB6
+ 356 001c 02000000 		.4byte	.LFE6-.LFB6
+ 357              		.align	2
+ 358              	.LEFDE0:
+ 359              	.LSFDE2:
+ 360 0020 14000000 		.4byte	.LEFDE2-.LASFDE2
+ 361              	.LASFDE2:
+ 362 0024 00000000 		.4byte	.Lframe0
+ 363 0028 04000000 		.4byte	.LFB3
+ 364 002c 1C000000 		.4byte	.LFE3-.LFB3
+ 365 0030 42       		.byte	0x4
+ 366              		.4byte	.LCFI0-.LFB3
+ 367 0031 0E       		.byte	0xe
+ 368 0032 04       		.uleb128 0x4
+ 369 0033 8E       		.byte	0x8e
+ 370 0034 01       		.uleb128 0x1
+ 371 0035 000000   		.align	2
+ 372              	.LEFDE2:
+ 373              	.LSFDE4:
+ 374 0038 1C000000 		.4byte	.LEFDE4-.LASFDE4
+ 375              	.LASFDE4:
+ 376 003c 00000000 		.4byte	.Lframe0
+ 377 0040 20000000 		.4byte	.LFB5
+ 378 0044 78000000 		.4byte	.LFE5-.LFB5
+ 379 0048 42       		.byte	0x4
+ 380              		.4byte	.LCFI1-.LFB5
+ 381 0049 0E       		.byte	0xe
+ 382 004a 14       		.uleb128 0x14
+ 383 004b 84       		.byte	0x84
+ 384 004c 05       		.uleb128 0x5
+ 385 004d 85       		.byte	0x85
+ 386 004e 04       		.uleb128 0x4
+ 387 004f 86       		.byte	0x86
+ 388 0050 03       		.uleb128 0x3
+ 389 0051 87       		.byte	0x87
+ 390 0052 02       		.uleb128 0x2
+ 391 0053 8E       		.byte	0x8e
+ 392 0054 01       		.uleb128 0x1
+ 393 0055 42       		.byte	0x4
+ 394              		.4byte	.LCFI2-.LCFI1
+ 395 0056 0E       		.byte	0xe
+ 396 0057 18       		.uleb128 0x18
+ 397              		.align	2
+ 398              	.LEFDE4:
+ 399              	.LSFDE6:
+ 400 0058 18000000 		.4byte	.LEFDE6-.LASFDE6
+ 401              	.LASFDE6:
+ 402 005c 00000000 		.4byte	.Lframe0
+ 403 0060 98000000 		.4byte	.LFB4
+ 404 0064 22000000 		.4byte	.LFE4-.LFB4
+ 405 0068 42       		.byte	0x4
+ 406              		.4byte	.LCFI3-.LFB4
+ 407 0069 0E       		.byte	0xe
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 13
+
+
+ 408 006a 0C       		.uleb128 0xc
+ 409 006b 84       		.byte	0x84
+ 410 006c 03       		.uleb128 0x3
+ 411 006d 85       		.byte	0x85
+ 412 006e 02       		.uleb128 0x2
+ 413 006f 8E       		.byte	0x8e
+ 414 0070 01       		.uleb128 0x1
+ 415 0071 000000   		.align	2
+ 416              	.LEFDE6:
+ 417              	.LSFDE8:
+ 418 0074 18000000 		.4byte	.LEFDE8-.LASFDE8
+ 419              	.LASFDE8:
+ 420 0078 00000000 		.4byte	.Lframe0
+ 421 007c BC000000 		.4byte	.LFB2
+ 422 0080 B8000000 		.4byte	.LFE2-.LFB2
+ 423 0084 42       		.byte	0x4
+ 424              		.4byte	.LCFI4-.LFB2
+ 425 0085 0E       		.byte	0xe
+ 426 0086 10       		.uleb128 0x10
+ 427 0087 84       		.byte	0x84
+ 428 0088 04       		.uleb128 0x4
+ 429 0089 85       		.byte	0x85
+ 430 008a 03       		.uleb128 0x3
+ 431 008b 86       		.byte	0x86
+ 432 008c 02       		.uleb128 0x2
+ 433 008d 8E       		.byte	0x8e
+ 434 008e 01       		.uleb128 0x1
+ 435 008f 00       		.align	2
+ 436              	.LEFDE8:
+ 437              		.text
+ 438              	.Letext0:
+ 439              		.section	.debug_loc,"",%progbits
+ 440              	.Ldebug_loc0:
+ 441              	.LLST1:
+ 442 0000 04000000 		.4byte	.LFB3-.Ltext0
+ 443 0004 06000000 		.4byte	.LCFI0-.Ltext0
+ 444 0008 0100     		.2byte	0x1
+ 445 000a 5D       		.byte	0x5d
+ 446 000b 06000000 		.4byte	.LCFI0-.Ltext0
+ 447 000f 20000000 		.4byte	.LFE3-.Ltext0
+ 448 0013 0200     		.2byte	0x2
+ 449 0015 7D       		.byte	0x7d
+ 450 0016 04       		.sleb128 4
+ 451 0017 00000000 		.4byte	0x0
+ 452 001b 00000000 		.4byte	0x0
+ 453              	.LLST2:
+ 454 001f 06000000 		.4byte	.LVL1-.Ltext0
+ 455 0023 0A000000 		.4byte	.LVL2-.Ltext0
+ 456 0027 0100     		.2byte	0x1
+ 457 0029 50       		.byte	0x50
+ 458 002a 00000000 		.4byte	0x0
+ 459 002e 00000000 		.4byte	0x0
+ 460              	.LLST3:
+ 461 0032 06000000 		.4byte	.LVL1-.Ltext0
+ 462 0036 10000000 		.4byte	.LVL3-.Ltext0
+ 463 003a 0100     		.2byte	0x1
+ 464 003c 51       		.byte	0x51
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 14
+
+
+ 465 003d 00000000 		.4byte	0x0
+ 466 0041 00000000 		.4byte	0x0
+ 467              	.LLST4:
+ 468 0045 06000000 		.4byte	.LVL1-.Ltext0
+ 469 0049 10000000 		.4byte	.LVL3-.Ltext0
+ 470 004d 0100     		.2byte	0x1
+ 471 004f 52       		.byte	0x52
+ 472 0050 00000000 		.4byte	0x0
+ 473 0054 00000000 		.4byte	0x0
+ 474              	.LLST5:
+ 475 0058 20000000 		.4byte	.LFB5-.Ltext0
+ 476 005c 22000000 		.4byte	.LCFI1-.Ltext0
+ 477 0060 0100     		.2byte	0x1
+ 478 0062 5D       		.byte	0x5d
+ 479 0063 22000000 		.4byte	.LCFI1-.Ltext0
+ 480 0067 24000000 		.4byte	.LCFI2-.Ltext0
+ 481 006b 0200     		.2byte	0x2
+ 482 006d 7D       		.byte	0x7d
+ 483 006e 14       		.sleb128 20
+ 484 006f 24000000 		.4byte	.LCFI2-.Ltext0
+ 485 0073 98000000 		.4byte	.LFE5-.Ltext0
+ 486 0077 0200     		.2byte	0x2
+ 487 0079 7D       		.byte	0x7d
+ 488 007a 18       		.sleb128 24
+ 489 007b 00000000 		.4byte	0x0
+ 490 007f 00000000 		.4byte	0x0
+ 491              	.LLST6:
+ 492 0083 22000000 		.4byte	.LVL4-.Ltext0
+ 493 0087 2E000000 		.4byte	.LVL5-.Ltext0
+ 494 008b 0100     		.2byte	0x1
+ 495 008d 50       		.byte	0x50
+ 496 008e 00000000 		.4byte	0x0
+ 497 0092 00000000 		.4byte	0x0
+ 498              	.LLST7:
+ 499 0096 22000000 		.4byte	.LVL4-.Ltext0
+ 500 009a 2E000000 		.4byte	.LVL5-.Ltext0
+ 501 009e 0100     		.2byte	0x1
+ 502 00a0 51       		.byte	0x51
+ 503 00a1 2E000000 		.4byte	.LVL5-.Ltext0
+ 504 00a5 98000000 		.4byte	.LFE5-.Ltext0
+ 505 00a9 0200     		.2byte	0x2
+ 506 00ab 77       		.byte	0x77
+ 507 00ac 00       		.sleb128 0
+ 508 00ad 00000000 		.4byte	0x0
+ 509 00b1 00000000 		.4byte	0x0
+ 510              	.LLST8:
+ 511 00b5 22000000 		.4byte	.LVL4-.Ltext0
+ 512 00b9 2E000000 		.4byte	.LVL5-.Ltext0
+ 513 00bd 0100     		.2byte	0x1
+ 514 00bf 52       		.byte	0x52
+ 515 00c0 2E000000 		.4byte	.LVL5-.Ltext0
+ 516 00c4 44000000 		.4byte	.LVL6-.Ltext0
+ 517 00c8 0100     		.2byte	0x1
+ 518 00ca 56       		.byte	0x56
+ 519 00cb 48000000 		.4byte	.LVL7-.Ltext0
+ 520 00cf 5C000000 		.4byte	.LVL8-.Ltext0
+ 521 00d3 0100     		.2byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 15
+
+
+ 522 00d5 56       		.byte	0x56
+ 523 00d6 00000000 		.4byte	0x0
+ 524 00da 00000000 		.4byte	0x0
+ 525              	.LLST9:
+ 526 00de 44000000 		.4byte	.LVL6-.Ltext0
+ 527 00e2 48000000 		.4byte	.LVL7-.Ltext0
+ 528 00e6 0100     		.2byte	0x1
+ 529 00e8 56       		.byte	0x56
+ 530 00e9 5C000000 		.4byte	.LVL8-.Ltext0
+ 531 00ed 64000000 		.4byte	.LVL9-.Ltext0
+ 532 00f1 0100     		.2byte	0x1
+ 533 00f3 56       		.byte	0x56
+ 534 00f4 64000000 		.4byte	.LVL9-.Ltext0
+ 535 00f8 6A000000 		.4byte	.LVL10-.Ltext0
+ 536 00fc 0100     		.2byte	0x1
+ 537 00fe 50       		.byte	0x50
+ 538 00ff 6A000000 		.4byte	.LVL10-.Ltext0
+ 539 0103 86000000 		.4byte	.LVL12-.Ltext0
+ 540 0107 0100     		.2byte	0x1
+ 541 0109 56       		.byte	0x56
+ 542 010a 00000000 		.4byte	0x0
+ 543 010e 00000000 		.4byte	0x0
+ 544              	.LLST10:
+ 545 0112 98000000 		.4byte	.LFB4-.Ltext0
+ 546 0116 9A000000 		.4byte	.LCFI3-.Ltext0
+ 547 011a 0100     		.2byte	0x1
+ 548 011c 5D       		.byte	0x5d
+ 549 011d 9A000000 		.4byte	.LCFI3-.Ltext0
+ 550 0121 BA000000 		.4byte	.LFE4-.Ltext0
+ 551 0125 0200     		.2byte	0x2
+ 552 0127 7D       		.byte	0x7d
+ 553 0128 0C       		.sleb128 12
+ 554 0129 00000000 		.4byte	0x0
+ 555 012d 00000000 		.4byte	0x0
+ 556              	.LLST11:
+ 557 0131 9A000000 		.4byte	.LVL13-.Ltext0
+ 558 0135 A0000000 		.4byte	.LVL15-.Ltext0
+ 559 0139 0100     		.2byte	0x1
+ 560 013b 50       		.byte	0x50
+ 561 013c A0000000 		.4byte	.LVL15-.Ltext0
+ 562 0140 B4000000 		.4byte	.LVL20-.Ltext0
+ 563 0144 0100     		.2byte	0x1
+ 564 0146 55       		.byte	0x55
+ 565 0147 B4000000 		.4byte	.LVL20-.Ltext0
+ 566 014b BA000000 		.4byte	.LFE4-.Ltext0
+ 567 014f 0100     		.2byte	0x1
+ 568 0151 50       		.byte	0x50
+ 569 0152 00000000 		.4byte	0x0
+ 570 0156 00000000 		.4byte	0x0
+ 571              	.LLST12:
+ 572 015a 9A000000 		.4byte	.LVL13-.Ltext0
+ 573 015e A0000000 		.4byte	.LVL15-.Ltext0
+ 574 0162 0100     		.2byte	0x1
+ 575 0164 51       		.byte	0x51
+ 576 0165 AE000000 		.4byte	.LVL17-.Ltext0
+ 577 0169 B0000000 		.4byte	.LVL18-.Ltext0
+ 578 016d 0100     		.2byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 16
+
+
+ 579 016f 51       		.byte	0x51
+ 580 0170 00000000 		.4byte	0x0
+ 581 0174 00000000 		.4byte	0x0
+ 582              	.LLST13:
+ 583 0178 9A000000 		.4byte	.LVL13-.Ltext0
+ 584 017c A8000000 		.4byte	.LVL16-.Ltext0
+ 585 0180 0100     		.2byte	0x1
+ 586 0182 52       		.byte	0x52
+ 587 0183 AE000000 		.4byte	.LVL17-.Ltext0
+ 588 0187 BA000000 		.4byte	.LFE4-.Ltext0
+ 589 018b 0100     		.2byte	0x1
+ 590 018d 52       		.byte	0x52
+ 591 018e 00000000 		.4byte	0x0
+ 592 0192 00000000 		.4byte	0x0
+ 593              	.LLST14:
+ 594 0196 9E000000 		.4byte	.LVL14-.Ltext0
+ 595 019a B4000000 		.4byte	.LVL19-.Ltext0
+ 596 019e 0100     		.2byte	0x1
+ 597 01a0 54       		.byte	0x54
+ 598 01a1 00000000 		.4byte	0x0
+ 599 01a5 00000000 		.4byte	0x0
+ 600              	.LLST15:
+ 601 01a9 BC000000 		.4byte	.LFB2-.Ltext0
+ 602 01ad BE000000 		.4byte	.LCFI4-.Ltext0
+ 603 01b1 0100     		.2byte	0x1
+ 604 01b3 5D       		.byte	0x5d
+ 605 01b4 BE000000 		.4byte	.LCFI4-.Ltext0
+ 606 01b8 74010000 		.4byte	.LFE2-.Ltext0
+ 607 01bc 0200     		.2byte	0x2
+ 608 01be 7D       		.byte	0x7d
+ 609 01bf 10       		.sleb128 16
+ 610 01c0 00000000 		.4byte	0x0
+ 611 01c4 00000000 		.4byte	0x0
+ 612              	.LLST16:
+ 613 01c8 BE000000 		.4byte	.LVL21-.Ltext0
+ 614 01cc CA000000 		.4byte	.LVL22-.Ltext0
+ 615 01d0 0100     		.2byte	0x1
+ 616 01d2 50       		.byte	0x50
+ 617 01d3 CA000000 		.4byte	.LVL22-.Ltext0
+ 618 01d7 3E010000 		.4byte	.LVL29-.Ltext0
+ 619 01db 0100     		.2byte	0x1
+ 620 01dd 56       		.byte	0x56
+ 621 01de 00000000 		.4byte	0x0
+ 622 01e2 00000000 		.4byte	0x0
+ 623              	.LLST17:
+ 624 01e6 BE000000 		.4byte	.LVL21-.Ltext0
+ 625 01ea CC000000 		.4byte	.LVL23-.Ltext0
+ 626 01ee 0100     		.2byte	0x1
+ 627 01f0 51       		.byte	0x51
+ 628 01f1 CC000000 		.4byte	.LVL23-.Ltext0
+ 629 01f5 D0000000 		.4byte	.LVL24-.Ltext0
+ 630 01f9 0100     		.2byte	0x1
+ 631 01fb 50       		.byte	0x50
+ 632 01fc 00000000 		.4byte	0x0
+ 633 0200 00000000 		.4byte	0x0
+ 634              	.LLST18:
+ 635 0204 3A010000 		.4byte	.LVL25-.Ltext0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 17
+
+
+ 636 0208 3C010000 		.4byte	.LVL26-.Ltext0
+ 637 020c 0100     		.2byte	0x1
+ 638 020e 50       		.byte	0x50
+ 639 020f 3E010000 		.4byte	.LVL27-.Ltext0
+ 640 0213 3E010000 		.4byte	.LVL28-.Ltext0
+ 641 0217 0100     		.2byte	0x1
+ 642 0219 50       		.byte	0x50
+ 643 021a 00000000 		.4byte	0x0
+ 644 021e 00000000 		.4byte	0x0
+ 645              		.file 2 "./portable/portmacro.h"
+ 646              		.file 3 "./FreeRTOS/include/queue.h"
+ 647              		.file 4 "./FreeRTOS/include/serial.h"
+ 648              		.section	.debug_info
+ 649 0000 6C020000 		.4byte	0x26c
+ 650 0004 0200     		.2byte	0x2
+ 651 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 652 000a 04       		.byte	0x4
+ 653 000b 01       		.uleb128 0x1
+ 654 000c 74010000 		.4byte	.LASF34
+ 655 0010 01       		.byte	0x1
+ 656 0011 7A000000 		.4byte	.LASF35
+ 657 0015 A7010000 		.4byte	.LASF36
+ 658 0019 00000000 		.4byte	.Ltext0
+ 659 001d 74010000 		.4byte	.Letext0
+ 660 0021 00000000 		.4byte	.Ldebug_line0
+ 661 0025 02       		.uleb128 0x2
+ 662 0026 04       		.byte	0x4
+ 663 0027 07       		.byte	0x7
+ 664 0028 AC000000 		.4byte	.LASF0
+ 665 002c 03       		.uleb128 0x3
+ 666 002d 04       		.byte	0x4
+ 667 002e 05       		.byte	0x5
+ 668 002f 696E7400 		.ascii	"int\000"
+ 669 0033 02       		.uleb128 0x2
+ 670 0034 04       		.byte	0x4
+ 671 0035 05       		.byte	0x5
+ 672 0036 CF010000 		.4byte	.LASF1
+ 673 003a 02       		.uleb128 0x2
+ 674 003b 08       		.byte	0x8
+ 675 003c 05       		.byte	0x5
+ 676 003d 66010000 		.4byte	.LASF2
+ 677 0041 02       		.uleb128 0x2
+ 678 0042 04       		.byte	0x4
+ 679 0043 07       		.byte	0x7
+ 680 0044 19010000 		.4byte	.LASF3
+ 681 0048 04       		.uleb128 0x4
+ 682 0049 04       		.byte	0x4
+ 683 004a 07       		.byte	0x7
+ 684 004b 02       		.uleb128 0x2
+ 685 004c 01       		.byte	0x1
+ 686 004d 08       		.byte	0x8
+ 687 004e 97000000 		.4byte	.LASF4
+ 688 0052 05       		.uleb128 0x5
+ 689 0053 04       		.byte	0x4
+ 690 0054 02       		.uleb128 0x2
+ 691 0055 02       		.byte	0x2
+ 692 0056 05       		.byte	0x5
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 18
+
+
+ 693 0057 9D010000 		.4byte	.LASF5
+ 694 005b 02       		.uleb128 0x2
+ 695 005c 01       		.byte	0x1
+ 696 005d 08       		.byte	0x8
+ 697 005e 80010000 		.4byte	.LASF6
+ 698 0062 02       		.uleb128 0x2
+ 699 0063 02       		.byte	0x2
+ 700 0064 07       		.byte	0x7
+ 701 0065 BE000000 		.4byte	.LASF7
+ 702 0069 02       		.uleb128 0x2
+ 703 006a 08       		.byte	0x8
+ 704 006b 07       		.byte	0x7
+ 705 006c 26010000 		.4byte	.LASF8
+ 706 0070 02       		.uleb128 0x2
+ 707 0071 01       		.byte	0x1
+ 708 0072 06       		.byte	0x6
+ 709 0073 D8010000 		.4byte	.LASF9
+ 710 0077 06       		.uleb128 0x6
+ 711 0078 29000000 		.4byte	.LASF10
+ 712 007c 02       		.byte	0x2
+ 713 007d 67       		.byte	0x67
+ 714 007e 25000000 		.4byte	0x25
+ 715 0082 06       		.uleb128 0x6
+ 716 0083 8A000000 		.4byte	.LASF11
+ 717 0087 03       		.byte	0x3
+ 718 0088 3F       		.byte	0x3f
+ 719 0089 52000000 		.4byte	0x52
+ 720 008d 06       		.uleb128 0x6
+ 721 008e 36000000 		.4byte	.LASF12
+ 722 0092 04       		.byte	0x4
+ 723 0093 3B       		.byte	0x3b
+ 724 0094 52000000 		.4byte	0x52
+ 725 0098 07       		.uleb128 0x7
+ 726 0099 01       		.byte	0x1
+ 727 009a 45000000 		.4byte	.LASF20
+ 728 009e 01       		.byte	0x1
+ 729 009f 0E01     		.2byte	0x10e
+ 730 00a1 01       		.byte	0x1
+ 731 00a2 00000000 		.4byte	.LFB6
+ 732 00a6 02000000 		.4byte	.LFE6
+ 733 00aa 01       		.byte	0x1
+ 734 00ab 5D       		.byte	0x5d
+ 735 00ac BF000000 		.4byte	0xbf
+ 736 00b0 08       		.uleb128 0x8
+ 737 00b1 13010000 		.4byte	.LASF13
+ 738 00b5 01       		.byte	0x1
+ 739 00b6 0D01     		.2byte	0x10d
+ 740 00b8 8D000000 		.4byte	0x8d
+ 741 00bc 01       		.byte	0x1
+ 742 00bd 50       		.byte	0x50
+ 743 00be 00       		.byte	0x0
+ 744 00bf 09       		.uleb128 0x9
+ 745 00c0 01       		.byte	0x1
+ 746 00c1 4C010000 		.4byte	.LASF17
+ 747 00c5 01       		.byte	0x1
+ 748 00c6 BC       		.byte	0xbc
+ 749 00c7 01       		.byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 19
+
+
+ 750 00c8 33000000 		.4byte	0x33
+ 751 00cc 04000000 		.4byte	.LFB3
+ 752 00d0 20000000 		.4byte	.LFE3
+ 753 00d4 00000000 		.4byte	.LLST1
+ 754 00d8 0A010000 		.4byte	0x10a
+ 755 00dc 0A       		.uleb128 0xa
+ 756 00dd A5000000 		.4byte	.LASF14
+ 757 00e1 01       		.byte	0x1
+ 758 00e2 BB       		.byte	0xbb
+ 759 00e3 8D000000 		.4byte	0x8d
+ 760 00e7 1F000000 		.4byte	.LLST2
+ 761 00eb 0A       		.uleb128 0xa
+ 762 00ec 00000000 		.4byte	.LASF15
+ 763 00f0 01       		.byte	0x1
+ 764 00f1 BB       		.byte	0xbb
+ 765 00f2 0A010000 		.4byte	0x10a
+ 766 00f6 32000000 		.4byte	.LLST3
+ 767 00fa 0A       		.uleb128 0xa
+ 768 00fb 5B010000 		.4byte	.LASF16
+ 769 00ff 01       		.byte	0x1
+ 770 0100 BB       		.byte	0xbb
+ 771 0101 77000000 		.4byte	0x77
+ 772 0105 45000000 		.4byte	.LLST4
+ 773 0109 00       		.byte	0x0
+ 774 010a 0B       		.uleb128 0xb
+ 775 010b 04       		.byte	0x4
+ 776 010c 70000000 		.4byte	0x70
+ 777 0110 09       		.uleb128 0x9
+ 778 0111 01       		.byte	0x1
+ 779 0112 DA000000 		.4byte	.LASF18
+ 780 0116 01       		.byte	0x1
+ 781 0117 E3       		.byte	0xe3
+ 782 0118 01       		.byte	0x1
+ 783 0119 33000000 		.4byte	0x33
+ 784 011d 20000000 		.4byte	.LFB5
+ 785 0121 98000000 		.4byte	.LFE5
+ 786 0125 58000000 		.4byte	.LLST5
+ 787 0129 6A010000 		.4byte	0x16a
+ 788 012d 0A       		.uleb128 0xa
+ 789 012e A5000000 		.4byte	.LASF14
+ 790 0132 01       		.byte	0x1
+ 791 0133 E2       		.byte	0xe2
+ 792 0134 8D000000 		.4byte	0x8d
+ 793 0138 83000000 		.4byte	.LLST6
+ 794 013c 0A       		.uleb128 0xa
+ 795 013d D1000000 		.4byte	.LASF19
+ 796 0141 01       		.byte	0x1
+ 797 0142 E2       		.byte	0xe2
+ 798 0143 70000000 		.4byte	0x70
+ 799 0147 96000000 		.4byte	.LLST7
+ 800 014b 0A       		.uleb128 0xa
+ 801 014c 5B010000 		.4byte	.LASF16
+ 802 0150 01       		.byte	0x1
+ 803 0151 E2       		.byte	0xe2
+ 804 0152 77000000 		.4byte	0x77
+ 805 0156 B5000000 		.4byte	.LLST8
+ 806 015a 0C       		.uleb128 0xc
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 20
+
+
+ 807 015b 0B010000 		.4byte	.LASF24
+ 808 015f 01       		.byte	0x1
+ 809 0160 E4       		.byte	0xe4
+ 810 0161 33000000 		.4byte	0x33
+ 811 0165 DE000000 		.4byte	.LLST9
+ 812 0169 00       		.byte	0x0
+ 813 016a 0D       		.uleb128 0xd
+ 814 016b 01       		.byte	0x1
+ 815 016c 5F000000 		.4byte	.LASF21
+ 816 0170 01       		.byte	0x1
+ 817 0171 CE       		.byte	0xce
+ 818 0172 01       		.byte	0x1
+ 819 0173 98000000 		.4byte	.LFB4
+ 820 0177 BA000000 		.4byte	.LFE4
+ 821 017b 12010000 		.4byte	.LLST10
+ 822 017f C0010000 		.4byte	0x1c0
+ 823 0183 0A       		.uleb128 0xa
+ 824 0184 A5000000 		.4byte	.LASF14
+ 825 0188 01       		.byte	0x1
+ 826 0189 CD       		.byte	0xcd
+ 827 018a 8D000000 		.4byte	0x8d
+ 828 018e 31010000 		.4byte	.LLST11
+ 829 0192 0A       		.uleb128 0xa
+ 830 0193 E9000000 		.4byte	.LASF22
+ 831 0197 01       		.byte	0x1
+ 832 0198 CD       		.byte	0xcd
+ 833 0199 C0010000 		.4byte	0x1c0
+ 834 019d 5A010000 		.4byte	.LLST12
+ 835 01a1 0A       		.uleb128 0xa
+ 836 01a2 3D010000 		.4byte	.LASF23
+ 837 01a6 01       		.byte	0x1
+ 838 01a7 CD       		.byte	0xcd
+ 839 01a8 62000000 		.4byte	0x62
+ 840 01ac 78010000 		.4byte	.LLST13
+ 841 01b0 0C       		.uleb128 0xc
+ 842 01b1 22000000 		.4byte	.LASF25
+ 843 01b5 01       		.byte	0x1
+ 844 01b6 CF       		.byte	0xcf
+ 845 01b7 0A010000 		.4byte	0x10a
+ 846 01bb 96010000 		.4byte	.LLST14
+ 847 01bf 00       		.byte	0x0
+ 848 01c0 0E       		.uleb128 0xe
+ 849 01c1 C5010000 		.4byte	0x1c5
+ 850 01c5 0B       		.uleb128 0xb
+ 851 01c6 04       		.byte	0x4
+ 852 01c7 CB010000 		.4byte	0x1cb
+ 853 01cb 0E       		.uleb128 0xe
+ 854 01cc 70000000 		.4byte	0x70
+ 855 01d0 09       		.uleb128 0x9
+ 856 01d1 01       		.byte	0x1
+ 857 01d2 0B000000 		.4byte	.LASF26
+ 858 01d6 01       		.byte	0x1
+ 859 01d7 84       		.byte	0x84
+ 860 01d8 01       		.byte	0x1
+ 861 01d9 8D000000 		.4byte	0x8d
+ 862 01dd BC000000 		.4byte	.LFB2
+ 863 01e1 74010000 		.4byte	.LFE2
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 21
+
+
+ 864 01e5 A9010000 		.4byte	.LLST15
+ 865 01e9 31020000 		.4byte	0x231
+ 866 01ed 0A       		.uleb128 0xa
+ 867 01ee 52000000 		.4byte	.LASF27
+ 868 01f2 01       		.byte	0x1
+ 869 01f3 83       		.byte	0x83
+ 870 01f4 25000000 		.4byte	0x25
+ 871 01f8 C8010000 		.4byte	.LLST16
+ 872 01fc 0A       		.uleb128 0xa
+ 873 01fd C1010000 		.4byte	.LASF28
+ 874 0201 01       		.byte	0x1
+ 875 0202 83       		.byte	0x83
+ 876 0203 25000000 		.4byte	0x25
+ 877 0207 E6010000 		.4byte	.LLST17
+ 878 020b 0F       		.uleb128 0xf
+ 879 020c 70000000 		.4byte	.LASF29
+ 880 0210 01       		.byte	0x1
+ 881 0211 85       		.byte	0x85
+ 882 0212 25000000 		.4byte	0x25
+ 883 0216 0F       		.uleb128 0xf
+ 884 0217 F2000000 		.4byte	.LASF30
+ 885 021b 01       		.byte	0x1
+ 886 021c 85       		.byte	0x85
+ 887 021d 25000000 		.4byte	0x25
+ 888 0221 0C       		.uleb128 0xc
+ 889 0222 0B010000 		.4byte	.LASF24
+ 890 0226 01       		.byte	0x1
+ 891 0227 86       		.byte	0x86
+ 892 0228 8D000000 		.4byte	0x8d
+ 893 022c 04020000 		.4byte	.LLST18
+ 894 0230 00       		.byte	0x0
+ 895 0231 10       		.uleb128 0x10
+ 896 0232 00010000 		.4byte	.LASF31
+ 897 0236 01       		.byte	0x1
+ 898 0237 73       		.byte	0x73
+ 899 0238 82000000 		.4byte	0x82
+ 900 023c 05       		.byte	0x5
+ 901 023d 03       		.byte	0x3
+ 902 023e 00000000 		.4byte	xRxedChars
+ 903 0242 10       		.uleb128 0x10
+ 904 0243 91010000 		.4byte	.LASF32
+ 905 0247 01       		.byte	0x1
+ 906 0248 74       		.byte	0x74
+ 907 0249 82000000 		.4byte	0x82
+ 908 024d 05       		.byte	0x5
+ 909 024e 03       		.byte	0x3
+ 910 024f 04000000 		.4byte	xCharsForTx
+ 911 0253 10       		.uleb128 0x10
+ 912 0254 85010000 		.4byte	.LASF33
+ 913 0258 01       		.byte	0x1
+ 914 0259 79       		.byte	0x79
+ 915 025a 64020000 		.4byte	0x264
+ 916 025e 05       		.byte	0x5
+ 917 025f 03       		.byte	0x3
+ 918 0260 08000000 		.4byte	plTHREEmpty
+ 919 0264 0B       		.uleb128 0xb
+ 920 0265 04       		.byte	0x4
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 22
+
+
+ 921 0266 6A020000 		.4byte	0x26a
+ 922 026a 11       		.uleb128 0x11
+ 923 026b 33000000 		.4byte	0x33
+ 924 026f 00       		.byte	0x0
+ 925              		.section	.debug_abbrev
+ 926 0000 01       		.uleb128 0x1
+ 927 0001 11       		.uleb128 0x11
+ 928 0002 01       		.byte	0x1
+ 929 0003 25       		.uleb128 0x25
+ 930 0004 0E       		.uleb128 0xe
+ 931 0005 13       		.uleb128 0x13
+ 932 0006 0B       		.uleb128 0xb
+ 933 0007 03       		.uleb128 0x3
+ 934 0008 0E       		.uleb128 0xe
+ 935 0009 1B       		.uleb128 0x1b
+ 936 000a 0E       		.uleb128 0xe
+ 937 000b 11       		.uleb128 0x11
+ 938 000c 01       		.uleb128 0x1
+ 939 000d 12       		.uleb128 0x12
+ 940 000e 01       		.uleb128 0x1
+ 941 000f 10       		.uleb128 0x10
+ 942 0010 06       		.uleb128 0x6
+ 943 0011 00       		.byte	0x0
+ 944 0012 00       		.byte	0x0
+ 945 0013 02       		.uleb128 0x2
+ 946 0014 24       		.uleb128 0x24
+ 947 0015 00       		.byte	0x0
+ 948 0016 0B       		.uleb128 0xb
+ 949 0017 0B       		.uleb128 0xb
+ 950 0018 3E       		.uleb128 0x3e
+ 951 0019 0B       		.uleb128 0xb
+ 952 001a 03       		.uleb128 0x3
+ 953 001b 0E       		.uleb128 0xe
+ 954 001c 00       		.byte	0x0
+ 955 001d 00       		.byte	0x0
+ 956 001e 03       		.uleb128 0x3
+ 957 001f 24       		.uleb128 0x24
+ 958 0020 00       		.byte	0x0
+ 959 0021 0B       		.uleb128 0xb
+ 960 0022 0B       		.uleb128 0xb
+ 961 0023 3E       		.uleb128 0x3e
+ 962 0024 0B       		.uleb128 0xb
+ 963 0025 03       		.uleb128 0x3
+ 964 0026 08       		.uleb128 0x8
+ 965 0027 00       		.byte	0x0
+ 966 0028 00       		.byte	0x0
+ 967 0029 04       		.uleb128 0x4
+ 968 002a 24       		.uleb128 0x24
+ 969 002b 00       		.byte	0x0
+ 970 002c 0B       		.uleb128 0xb
+ 971 002d 0B       		.uleb128 0xb
+ 972 002e 3E       		.uleb128 0x3e
+ 973 002f 0B       		.uleb128 0xb
+ 974 0030 00       		.byte	0x0
+ 975 0031 00       		.byte	0x0
+ 976 0032 05       		.uleb128 0x5
+ 977 0033 0F       		.uleb128 0xf
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 23
+
+
+ 978 0034 00       		.byte	0x0
+ 979 0035 0B       		.uleb128 0xb
+ 980 0036 0B       		.uleb128 0xb
+ 981 0037 00       		.byte	0x0
+ 982 0038 00       		.byte	0x0
+ 983 0039 06       		.uleb128 0x6
+ 984 003a 16       		.uleb128 0x16
+ 985 003b 00       		.byte	0x0
+ 986 003c 03       		.uleb128 0x3
+ 987 003d 0E       		.uleb128 0xe
+ 988 003e 3A       		.uleb128 0x3a
+ 989 003f 0B       		.uleb128 0xb
+ 990 0040 3B       		.uleb128 0x3b
+ 991 0041 0B       		.uleb128 0xb
+ 992 0042 49       		.uleb128 0x49
+ 993 0043 13       		.uleb128 0x13
+ 994 0044 00       		.byte	0x0
+ 995 0045 00       		.byte	0x0
+ 996 0046 07       		.uleb128 0x7
+ 997 0047 2E       		.uleb128 0x2e
+ 998 0048 01       		.byte	0x1
+ 999 0049 3F       		.uleb128 0x3f
+ 1000 004a 0C       		.uleb128 0xc
+ 1001 004b 03       		.uleb128 0x3
+ 1002 004c 0E       		.uleb128 0xe
+ 1003 004d 3A       		.uleb128 0x3a
+ 1004 004e 0B       		.uleb128 0xb
+ 1005 004f 3B       		.uleb128 0x3b
+ 1006 0050 05       		.uleb128 0x5
+ 1007 0051 27       		.uleb128 0x27
+ 1008 0052 0C       		.uleb128 0xc
+ 1009 0053 11       		.uleb128 0x11
+ 1010 0054 01       		.uleb128 0x1
+ 1011 0055 12       		.uleb128 0x12
+ 1012 0056 01       		.uleb128 0x1
+ 1013 0057 40       		.uleb128 0x40
+ 1014 0058 0A       		.uleb128 0xa
+ 1015 0059 01       		.uleb128 0x1
+ 1016 005a 13       		.uleb128 0x13
+ 1017 005b 00       		.byte	0x0
+ 1018 005c 00       		.byte	0x0
+ 1019 005d 08       		.uleb128 0x8
+ 1020 005e 05       		.uleb128 0x5
+ 1021 005f 00       		.byte	0x0
+ 1022 0060 03       		.uleb128 0x3
+ 1023 0061 0E       		.uleb128 0xe
+ 1024 0062 3A       		.uleb128 0x3a
+ 1025 0063 0B       		.uleb128 0xb
+ 1026 0064 3B       		.uleb128 0x3b
+ 1027 0065 05       		.uleb128 0x5
+ 1028 0066 49       		.uleb128 0x49
+ 1029 0067 13       		.uleb128 0x13
+ 1030 0068 02       		.uleb128 0x2
+ 1031 0069 0A       		.uleb128 0xa
+ 1032 006a 00       		.byte	0x0
+ 1033 006b 00       		.byte	0x0
+ 1034 006c 09       		.uleb128 0x9
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 24
+
+
+ 1035 006d 2E       		.uleb128 0x2e
+ 1036 006e 01       		.byte	0x1
+ 1037 006f 3F       		.uleb128 0x3f
+ 1038 0070 0C       		.uleb128 0xc
+ 1039 0071 03       		.uleb128 0x3
+ 1040 0072 0E       		.uleb128 0xe
+ 1041 0073 3A       		.uleb128 0x3a
+ 1042 0074 0B       		.uleb128 0xb
+ 1043 0075 3B       		.uleb128 0x3b
+ 1044 0076 0B       		.uleb128 0xb
+ 1045 0077 27       		.uleb128 0x27
+ 1046 0078 0C       		.uleb128 0xc
+ 1047 0079 49       		.uleb128 0x49
+ 1048 007a 13       		.uleb128 0x13
+ 1049 007b 11       		.uleb128 0x11
+ 1050 007c 01       		.uleb128 0x1
+ 1051 007d 12       		.uleb128 0x12
+ 1052 007e 01       		.uleb128 0x1
+ 1053 007f 40       		.uleb128 0x40
+ 1054 0080 06       		.uleb128 0x6
+ 1055 0081 01       		.uleb128 0x1
+ 1056 0082 13       		.uleb128 0x13
+ 1057 0083 00       		.byte	0x0
+ 1058 0084 00       		.byte	0x0
+ 1059 0085 0A       		.uleb128 0xa
+ 1060 0086 05       		.uleb128 0x5
+ 1061 0087 00       		.byte	0x0
+ 1062 0088 03       		.uleb128 0x3
+ 1063 0089 0E       		.uleb128 0xe
+ 1064 008a 3A       		.uleb128 0x3a
+ 1065 008b 0B       		.uleb128 0xb
+ 1066 008c 3B       		.uleb128 0x3b
+ 1067 008d 0B       		.uleb128 0xb
+ 1068 008e 49       		.uleb128 0x49
+ 1069 008f 13       		.uleb128 0x13
+ 1070 0090 02       		.uleb128 0x2
+ 1071 0091 06       		.uleb128 0x6
+ 1072 0092 00       		.byte	0x0
+ 1073 0093 00       		.byte	0x0
+ 1074 0094 0B       		.uleb128 0xb
+ 1075 0095 0F       		.uleb128 0xf
+ 1076 0096 00       		.byte	0x0
+ 1077 0097 0B       		.uleb128 0xb
+ 1078 0098 0B       		.uleb128 0xb
+ 1079 0099 49       		.uleb128 0x49
+ 1080 009a 13       		.uleb128 0x13
+ 1081 009b 00       		.byte	0x0
+ 1082 009c 00       		.byte	0x0
+ 1083 009d 0C       		.uleb128 0xc
+ 1084 009e 34       		.uleb128 0x34
+ 1085 009f 00       		.byte	0x0
+ 1086 00a0 03       		.uleb128 0x3
+ 1087 00a1 0E       		.uleb128 0xe
+ 1088 00a2 3A       		.uleb128 0x3a
+ 1089 00a3 0B       		.uleb128 0xb
+ 1090 00a4 3B       		.uleb128 0x3b
+ 1091 00a5 0B       		.uleb128 0xb
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 25
+
+
+ 1092 00a6 49       		.uleb128 0x49
+ 1093 00a7 13       		.uleb128 0x13
+ 1094 00a8 02       		.uleb128 0x2
+ 1095 00a9 06       		.uleb128 0x6
+ 1096 00aa 00       		.byte	0x0
+ 1097 00ab 00       		.byte	0x0
+ 1098 00ac 0D       		.uleb128 0xd
+ 1099 00ad 2E       		.uleb128 0x2e
+ 1100 00ae 01       		.byte	0x1
+ 1101 00af 3F       		.uleb128 0x3f
+ 1102 00b0 0C       		.uleb128 0xc
+ 1103 00b1 03       		.uleb128 0x3
+ 1104 00b2 0E       		.uleb128 0xe
+ 1105 00b3 3A       		.uleb128 0x3a
+ 1106 00b4 0B       		.uleb128 0xb
+ 1107 00b5 3B       		.uleb128 0x3b
+ 1108 00b6 0B       		.uleb128 0xb
+ 1109 00b7 27       		.uleb128 0x27
+ 1110 00b8 0C       		.uleb128 0xc
+ 1111 00b9 11       		.uleb128 0x11
+ 1112 00ba 01       		.uleb128 0x1
+ 1113 00bb 12       		.uleb128 0x12
+ 1114 00bc 01       		.uleb128 0x1
+ 1115 00bd 40       		.uleb128 0x40
+ 1116 00be 06       		.uleb128 0x6
+ 1117 00bf 01       		.uleb128 0x1
+ 1118 00c0 13       		.uleb128 0x13
+ 1119 00c1 00       		.byte	0x0
+ 1120 00c2 00       		.byte	0x0
+ 1121 00c3 0E       		.uleb128 0xe
+ 1122 00c4 26       		.uleb128 0x26
+ 1123 00c5 00       		.byte	0x0
+ 1124 00c6 49       		.uleb128 0x49
+ 1125 00c7 13       		.uleb128 0x13
+ 1126 00c8 00       		.byte	0x0
+ 1127 00c9 00       		.byte	0x0
+ 1128 00ca 0F       		.uleb128 0xf
+ 1129 00cb 34       		.uleb128 0x34
+ 1130 00cc 00       		.byte	0x0
+ 1131 00cd 03       		.uleb128 0x3
+ 1132 00ce 0E       		.uleb128 0xe
+ 1133 00cf 3A       		.uleb128 0x3a
+ 1134 00d0 0B       		.uleb128 0xb
+ 1135 00d1 3B       		.uleb128 0x3b
+ 1136 00d2 0B       		.uleb128 0xb
+ 1137 00d3 49       		.uleb128 0x49
+ 1138 00d4 13       		.uleb128 0x13
+ 1139 00d5 00       		.byte	0x0
+ 1140 00d6 00       		.byte	0x0
+ 1141 00d7 10       		.uleb128 0x10
+ 1142 00d8 34       		.uleb128 0x34
+ 1143 00d9 00       		.byte	0x0
+ 1144 00da 03       		.uleb128 0x3
+ 1145 00db 0E       		.uleb128 0xe
+ 1146 00dc 3A       		.uleb128 0x3a
+ 1147 00dd 0B       		.uleb128 0xb
+ 1148 00de 3B       		.uleb128 0x3b
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 26
+
+
+ 1149 00df 0B       		.uleb128 0xb
+ 1150 00e0 49       		.uleb128 0x49
+ 1151 00e1 13       		.uleb128 0x13
+ 1152 00e2 02       		.uleb128 0x2
+ 1153 00e3 0A       		.uleb128 0xa
+ 1154 00e4 00       		.byte	0x0
+ 1155 00e5 00       		.byte	0x0
+ 1156 00e6 11       		.uleb128 0x11
+ 1157 00e7 35       		.uleb128 0x35
+ 1158 00e8 00       		.byte	0x0
+ 1159 00e9 49       		.uleb128 0x49
+ 1160 00ea 13       		.uleb128 0x13
+ 1161 00eb 00       		.byte	0x0
+ 1162 00ec 00       		.byte	0x0
+ 1163 00ed 00       		.byte	0x0
+ 1164              		.section	.debug_pubnames,"",%progbits
+ 1165 0000 75000000 		.4byte	0x75
+ 1166 0004 0200     		.2byte	0x2
+ 1167 0006 00000000 		.4byte	.Ldebug_info0
+ 1168 000a 70020000 		.4byte	0x270
+ 1169 000e 98000000 		.4byte	0x98
+ 1170 0012 76536572 		.ascii	"vSerialClose\000"
+ 1170      69616C43 
+ 1170      6C6F7365 
+ 1170      00
+ 1171 001f BF000000 		.4byte	0xbf
+ 1172 0023 78536572 		.ascii	"xSerialGetChar\000"
+ 1172      69616C47 
+ 1172      65744368 
+ 1172      617200
+ 1173 0032 10010000 		.4byte	0x110
+ 1174 0036 78536572 		.ascii	"xSerialPutChar\000"
+ 1174      69616C50 
+ 1174      75744368 
+ 1174      617200
+ 1175 0045 6A010000 		.4byte	0x16a
+ 1176 0049 76536572 		.ascii	"vSerialPutString\000"
+ 1176      69616C50 
+ 1176      75745374 
+ 1176      72696E67 
+ 1176      00
+ 1177 005a D0010000 		.4byte	0x1d0
+ 1178 005e 78536572 		.ascii	"xSerialPortInitMinimal\000"
+ 1178      69616C50 
+ 1178      6F727449 
+ 1178      6E69744D 
+ 1178      696E696D 
+ 1179 0075 00000000 		.4byte	0x0
+ 1180              		.section	.debug_aranges,"",%progbits
+ 1181 0000 1C000000 		.4byte	0x1c
+ 1182 0004 0200     		.2byte	0x2
+ 1183 0006 00000000 		.4byte	.Ldebug_info0
+ 1184 000a 04       		.byte	0x4
+ 1185 000b 00       		.byte	0x0
+ 1186 000c 0000     		.2byte	0x0
+ 1187 000e 0000     		.2byte	0x0
+ 1188 0010 00000000 		.4byte	.Ltext0
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 27
+
+
+ 1189 0014 74010000 		.4byte	.Letext0-.Ltext0
+ 1190 0018 00000000 		.4byte	0x0
+ 1191 001c 00000000 		.4byte	0x0
+ 1192              		.section	.debug_str,"MS",%progbits,1
+ 1193              	.LASF15:
+ 1194 0000 70635278 		.ascii	"pcRxedChar\000"
+ 1194      65644368 
+ 1194      617200
+ 1195              	.LASF26:
+ 1196 000b 78536572 		.ascii	"xSerialPortInitMinimal\000"
+ 1196      69616C50 
+ 1196      6F727449 
+ 1196      6E69744D 
+ 1196      696E696D 
+ 1197              	.LASF25:
+ 1198 0022 70784E65 		.ascii	"pxNext\000"
+ 1198      787400
+ 1199              	.LASF10:
+ 1200 0029 706F7274 		.ascii	"portTickType\000"
+ 1200      5469636B 
+ 1200      54797065 
+ 1200      00
+ 1201              	.LASF12:
+ 1202 0036 78436F6D 		.ascii	"xComPortHandle\000"
+ 1202      506F7274 
+ 1202      48616E64 
+ 1202      6C6500
+ 1203              	.LASF20:
+ 1204 0045 76536572 		.ascii	"vSerialClose\000"
+ 1204      69616C43 
+ 1204      6C6F7365 
+ 1204      00
+ 1205              	.LASF27:
+ 1206 0052 756C5761 		.ascii	"ulWantedBaud\000"
+ 1206      6E746564 
+ 1206      42617564 
+ 1206      00
+ 1207              	.LASF21:
+ 1208 005f 76536572 		.ascii	"vSerialPutString\000"
+ 1208      69616C50 
+ 1208      75745374 
+ 1208      72696E67 
+ 1208      00
+ 1209              	.LASF29:
+ 1210 0070 756C4469 		.ascii	"ulDivisor\000"
+ 1210      7669736F 
+ 1210      7200
+ 1211              	.LASF35:
+ 1212 007a 73657269 		.ascii	"serial/serial.c\000"
+ 1212      616C2F73 
+ 1212      65726961 
+ 1212      6C2E6300 
+ 1213              	.LASF11:
+ 1214 008a 78517565 		.ascii	"xQueueHandle\000"
+ 1214      75654861 
+ 1214      6E646C65 
+ 1214      00
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 28
+
+
+ 1215              	.LASF4:
+ 1216 0097 756E7369 		.ascii	"unsigned char\000"
+ 1216      676E6564 
+ 1216      20636861 
+ 1216      7200
+ 1217              	.LASF14:
+ 1218 00a5 7078506F 		.ascii	"pxPort\000"
+ 1218      727400
+ 1219              	.LASF0:
+ 1220 00ac 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1220      20756E73 
+ 1220      69676E65 
+ 1220      6420696E 
+ 1220      7400
+ 1221              	.LASF7:
+ 1222 00be 73686F72 		.ascii	"short unsigned int\000"
+ 1222      7420756E 
+ 1222      7369676E 
+ 1222      65642069 
+ 1222      6E7400
+ 1223              	.LASF19:
+ 1224 00d1 634F7574 		.ascii	"cOutChar\000"
+ 1224      43686172 
+ 1224      00
+ 1225              	.LASF18:
+ 1226 00da 78536572 		.ascii	"xSerialPutChar\000"
+ 1226      69616C50 
+ 1226      75744368 
+ 1226      617200
+ 1227              	.LASF22:
+ 1228 00e9 70635374 		.ascii	"pcString\000"
+ 1228      72696E67 
+ 1228      00
+ 1229              	.LASF30:
+ 1230 00f2 756C5761 		.ascii	"ulWantedClock\000"
+ 1230      6E746564 
+ 1230      436C6F63 
+ 1230      6B00
+ 1231              	.LASF31:
+ 1232 0100 78527865 		.ascii	"xRxedChars\000"
+ 1232      64436861 
+ 1232      727300
+ 1233              	.LASF24:
+ 1234 010b 78526574 		.ascii	"xReturn\000"
+ 1234      75726E00 
+ 1235              	.LASF13:
+ 1236 0113 78506F72 		.ascii	"xPort\000"
+ 1236      7400
+ 1237              	.LASF3:
+ 1238 0119 756E7369 		.ascii	"unsigned int\000"
+ 1238      676E6564 
+ 1238      20696E74 
+ 1238      00
+ 1239              	.LASF8:
+ 1240 0126 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1240      206C6F6E 
+ 1240      6720756E 
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 29
+
+
+ 1240      7369676E 
+ 1240      65642069 
+ 1241              	.LASF23:
+ 1242 013d 75735374 		.ascii	"usStringLength\000"
+ 1242      72696E67 
+ 1242      4C656E67 
+ 1242      746800
+ 1243              	.LASF17:
+ 1244 014c 78536572 		.ascii	"xSerialGetChar\000"
+ 1244      69616C47 
+ 1244      65744368 
+ 1244      617200
+ 1245              	.LASF16:
+ 1246 015b 78426C6F 		.ascii	"xBlockTime\000"
+ 1246      636B5469 
+ 1246      6D6500
+ 1247              	.LASF2:
+ 1248 0166 6C6F6E67 		.ascii	"long long int\000"
+ 1248      206C6F6E 
+ 1248      6720696E 
+ 1248      7400
+ 1249              	.LASF34:
+ 1250 0174 474E5520 		.ascii	"GNU C 4.2.2\000"
+ 1250      4320342E 
+ 1250      322E3200 
+ 1251              	.LASF6:
+ 1252 0180 63686172 		.ascii	"char\000"
+ 1252      00
+ 1253              	.LASF33:
+ 1254 0185 706C5448 		.ascii	"plTHREEmpty\000"
+ 1254      5245456D 
+ 1254      70747900 
+ 1255              	.LASF32:
+ 1256 0191 78436861 		.ascii	"xCharsForTx\000"
+ 1256      7273466F 
+ 1256      72547800 
+ 1257              	.LASF5:
+ 1258 019d 73686F72 		.ascii	"short int\000"
+ 1258      7420696E 
+ 1258      7400
+ 1259              	.LASF36:
+ 1260 01a7 2F637967 		.ascii	"/cygdrive/c/Downloads/EDU\000"
+ 1260      64726976 
+ 1260      652F632F 
+ 1260      446F776E 
+ 1260      6C6F6164 
+ 1261              	.LASF28:
+ 1262 01c1 75785175 		.ascii	"uxQueueLength\000"
+ 1262      6575654C 
+ 1262      656E6774 
+ 1262      6800
+ 1263              	.LASF1:
+ 1264 01cf 6C6F6E67 		.ascii	"long int\000"
+ 1264      20696E74 
+ 1264      00
+ 1265              	.LASF9:
+ 1266 01d8 7369676E 		.ascii	"signed char\000"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 30
+
+
+ 1266      65642063 
+ 1266      68617200 
+ 1267              		.ident	"GCC: (GNU) 4.2.2"
+ARM GAS  /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s 			page 31
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 serial.c
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s:1      .text:00000000 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s:16     .text:00000000 vSerialClose
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s:32     .text:00000004 xSerialGetChar
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s:56     .text:0000001c $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s:328    .bss:00000000 xRxedChars
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s:64     .text:00000020 xSerialPutChar
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s:61     .text:00000020 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s:148    .text:0000008c $d
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s:334    .bss:00000008 plTHREEmpty
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s:331    .bss:00000004 xCharsForTx
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s:158    .text:00000098 vSerialPutString
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s:155    .text:00000098 $t
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s:202    .text:000000bc xSerialPortInitMinimal
+/cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccFdZ3H2.s:312    .text:00000144 $d
+
+UNDEFINED SYMBOLS
+xQueueGenericReceive
+vPortEnterCritical
+xQueueGenericSend
+vPortExitCritical
+__udivsi3
+vSerialISRCreateQueues
+vUART_ISR_Wrapper

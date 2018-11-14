@@ -1,0 +1,685 @@
+Archive member included because of file (symbol)
+
+/cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_udivsi3.o)
+                              serial/serial.o (__udivsi3)
+/cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_umodsi3.o)
+                              testUART.o (__umodsi3)
+/cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_dvmd_tls.o)
+                              /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_udivsi3.o) (__div0)
+/cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memcpy.o)
+                              ./FreeRTOS/queue.o (memcpy)
+/cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memset.o)
+                              ./FreeRTOS/tasks.o (memset)
+/cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-strncpy.o)
+                              ./FreeRTOS/tasks.o (strncpy)
+
+Allocating common symbols
+Common symbol       size              file
+
+uart0               0x4               testUART.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+flash            0x00000000         0x00080000
+ram              0x40000000         0x00008000
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD portable/portISR.o
+LOAD spi_write.o
+LOAD serial/serialISR.o
+LOAD main.o
+LOAD serial/serial.o
+LOAD testLEDMatrix.o
+LOAD testRGB.o
+LOAD testLCD.o
+LOAD testUART.o
+LOAD testMotor.o
+LOAD testADC.o
+LOAD ./FreeRTOS/tasks.o
+LOAD ./FreeRTOS/queue.o
+LOAD ./FreeRTOS/list.o
+LOAD portable/MemMang/heap_2.o
+LOAD portable/port.o
+LOAD /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccUJHyNo.o
+START GROUP
+LOAD /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a
+LOAD /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a
+LOAD /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libc.a
+END GROUP
+                0x40007ffc                __stack_end__ = 0x40007ffc
+                0x00000000                . = 0x0
+
+startup         0x00000000       0x44
+ *(.startup)
+ .startup       0x00000000       0x44 /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccUJHyNo.o
+
+prog            0x00000044     0x2888
+ *(.text)
+ .text          0x00000044      0x258 portable/portISR.o
+                0x00000130                vTickISR
+                0x000000ec                vPortExitCritical
+                0x000001f0                vPortYieldProcessor
+                0x00000090                vPortDisableInterruptsFromThumb
+                0x00000044                vPortISRStartFirstTask
+                0x000000a8                vPortEnableInterruptsFromThumb
+                0x000000c0                vPortEnterCritical
+ .text          0x0000029c      0x114 spi_write.o
+                0x0000029c                send_SPI
+                0x0000031c                ledMatrix
+ .text          0x000003b0      0x200 serial/serialISR.o
+                0x00000540                vSerialISRCreateQueues
+                0x000003b0                vUART_ISR_Handler
+                0x000004a0                vUART_ISR_Wrapper
+ .text          0x000005b0      0x1b0 main.o
+                0x000006b0                TestLED
+                0x000005b0                main
+ .text          0x00000760      0x174 serial/serial.o
+                0x00000760                vSerialClose
+                0x000007f8                vSerialPutString
+                0x00000780                xSerialPutChar
+                0x00000764                xSerialGetChar
+                0x0000081c                xSerialPortInitMinimal
+ .text          0x000008d4       0xc8 testLEDMatrix.o
+                0x000008d4                testLEDMatrix
+ .text          0x0000099c       0xe0 testRGB.o
+                0x0000099c                testRGB
+ .text          0x00000a7c      0x234 testLCD.o
+                0x00000b70                delay37us
+                0x00000a7c                initLCD
+                0x00000abc                writeLCD
+                0x00000b4c                lcdBacklight
+                0x00000b7c                WriteString
+                0x00000b9c                testLCD
+ .text          0x00000cb0      0x10c testUART.o
+                0x00000cb0                InitSerial0
+                0x00000cc8                UARTWrStr
+                0x00000cf8                SendNumber
+ .text          0x00000dbc       0xe4 testMotor.o
+                0x00000dbc                testMotor
+ .text          0x00000ea0      0x1f8 testADC.o
+                0x00000ed4                testADC
+ .text          0x00001098      0x94c ./FreeRTOS/tasks.o
+                0x0000119c                uxTaskPriorityGet
+                0x000014f8                vTaskPrioritySet
+                0x00001740                vTaskEndScheduler
+                0x00001604                vTaskPlaceOnEventList
+                0x00001098                xTaskIsTaskSuspended
+                0x000013bc                xTaskResumeFromISR
+                0x00001164                xTaskGetTickCount
+                0x000011c4                xTaskRemoveFromEventList
+                0x00001594                vTaskDelete
+                0x00001988                xTaskCheckForTimeOut
+                0x00001180                vTaskSuspendAll
+                0x00001438                vTaskResume
+                0x000010c0                vTaskSwitchContext
+                0x000014a0                vTaskSuspend
+                0x00001148                uxTaskGetNumberOfTasks
+                0x0000123c                vTaskIncrementTick
+                0x000016c0                vTaskDelayUntil
+                0x000012ec                xTaskResumeAll
+                0x00001944                vTaskStartScheduler
+                0x0000113c                vTaskMissedYield
+                0x000017cc                xTaskCreate
+                0x00001668                vTaskDelay
+                0x00001124                vTaskSetTimeOutState
+ .text          0x000019e4      0x408 ./FreeRTOS/queue.o
+                0x00001af4                xQueueGenericSendFromISR
+                0x00001d84                xQueueCreate
+                0x00001a04                vQueueDelete
+                0x00001ca4                xQueueGenericSend
+                0x00001a60                xQueueReceiveFromISR
+                0x000019f4                xQueueIsQueueFullFromISR
+                0x00001a1c                uxQueueMessagesWaiting
+                0x00001ba8                xQueueGenericReceive
+                0x000019e4                uxQueueMessagesWaitingFromISR
+                0x000019e8                xQueueIsQueueEmptyFromISR
+ .text          0x00001dec       0x90 ./FreeRTOS/list.o
+                0x00001e0c                vListInsertEnd
+                0x00001e5c                vListRemove
+                0x00001e04                vListInitialiseItem
+                0x00001dec                vListInitialise
+                0x00001e28                vListInsert
+ .text          0x00001e7c       0xe4 portable/MemMang/heap_2.o
+                0x00001e7c                vPortFree
+                0x00001eac                pvPortMalloc
+ .text          0x00001f60      0x108 portable/port.o
+                0x00002008                xPortStartScheduler
+                0x00002004                vPortEndScheduler
+                0x00001f60                pxPortInitialiseStack
+ .text          0x00002068       0xb8 /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccUJHyNo.o
+                0x00002068                start
+                0x00002104                endless_loop
+ .text          0x00002120      0x114 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_udivsi3.o)
+                0x00002120                __udivsi3
+                0x00002120                __aeabi_uidiv
+                0x0000221c                __aeabi_uidivmod
+ .text          0x00002234       0xd0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_umodsi3.o)
+                0x00002234                __umodsi3
+ .text          0x00002304        0x4 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_dvmd_tls.o)
+                0x00002304                __aeabi_ldiv0
+                0x00002304                __div0
+                0x00002304                __aeabi_idiv0
+ .text          0x00002308       0xa4 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memcpy.o)
+                0x00002308                memcpy
+ .text          0x000023ac       0x98 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memset.o)
+                0x000023ac                memset
+ .text          0x00002444      0x108 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-strncpy.o)
+                0x00002444                strncpy
+ *(.rodata)
+ .rodata        0x0000254c      0x120 testLEDMatrix.o
+                0x0000254c                eaText
+ .rodata        0x0000266c       0x24 testRGB.o
+ .rodata        0x00002690       0x10 testUART.o
+ *(.rodata*)
+ .rodata.str1.4
+                0x000026a0       0x14 main.o
+ .rodata.str1.4
+                0x000026b4       0x52 testLCD.o
+                                 0x54 (size before relaxing)
+ *fill*         0x00002706        0x2 00
+ .rodata.str1.4
+                0x00002708      0x121 testADC.o
+                                0x124 (size before relaxing)
+ *fill*         0x00002829        0x3 00
+ .rodata.str1.4
+                0x0000282c        0x8 ./FreeRTOS/tasks.o
+ *(.glue_7)
+ .glue_7        0x00002834        0x0 portable/portISR.o
+ .glue_7        0x00002834        0x0 spi_write.o
+ .glue_7        0x00002834        0x0 serial/serialISR.o
+ .glue_7        0x00002834        0x0 main.o
+ .glue_7        0x00002834        0x0 serial/serial.o
+ .glue_7        0x00002834        0x0 testLEDMatrix.o
+ .glue_7        0x00002834        0x0 testRGB.o
+ .glue_7        0x00002834        0x0 testLCD.o
+ .glue_7        0x00002834        0x0 testUART.o
+ .glue_7        0x00002834        0x0 testMotor.o
+ .glue_7        0x00002834        0x0 testADC.o
+ .glue_7        0x00002834        0x0 ./FreeRTOS/tasks.o
+ .glue_7        0x00002834        0x0 ./FreeRTOS/queue.o
+ .glue_7        0x00002834        0x0 ./FreeRTOS/list.o
+ .glue_7        0x00002834        0x0 portable/MemMang/heap_2.o
+ .glue_7        0x00002834        0x0 portable/port.o
+ .glue_7        0x00002834        0x0 /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccUJHyNo.o
+ .glue_7        0x00002834        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_udivsi3.o)
+ .glue_7        0x00002834        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_umodsi3.o)
+ .glue_7        0x00002834        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_dvmd_tls.o)
+ .glue_7        0x00002834        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memcpy.o)
+ .glue_7        0x00002834        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memset.o)
+ .glue_7        0x00002834       0x48 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-strncpy.o)
+                0x00002870                __main_from_arm
+                0x00002858                __xQueueGenericSendFromISR_from_arm
+                0x00002864                __xQueueCreate_from_arm
+                0x00002834                __vTaskIncrementTick_from_arm
+                0x0000284c                __xQueueReceiveFromISR_from_arm
+                0x00002840                __vTaskSwitchContext_from_arm
+ *(.glue_7t)
+ .glue_7t       0x0000287c        0x0 portable/portISR.o
+ .glue_7t       0x0000287c        0x0 spi_write.o
+ .glue_7t       0x0000287c        0x0 serial/serialISR.o
+ .glue_7t       0x0000287c        0x0 main.o
+ .glue_7t       0x0000287c        0x0 serial/serial.o
+ .glue_7t       0x0000287c        0x0 testLEDMatrix.o
+ .glue_7t       0x0000287c        0x0 testRGB.o
+ .glue_7t       0x0000287c        0x0 testLCD.o
+ .glue_7t       0x0000287c        0x0 testUART.o
+ .glue_7t       0x0000287c        0x0 testMotor.o
+ .glue_7t       0x0000287c        0x0 testADC.o
+ .glue_7t       0x0000287c        0x0 ./FreeRTOS/tasks.o
+ .glue_7t       0x0000287c        0x0 ./FreeRTOS/queue.o
+ .glue_7t       0x0000287c        0x0 ./FreeRTOS/list.o
+ .glue_7t       0x0000287c        0x0 portable/MemMang/heap_2.o
+ .glue_7t       0x0000287c        0x0 portable/port.o
+ .glue_7t       0x0000287c        0x0 /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccUJHyNo.o
+ .glue_7t       0x0000287c        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_udivsi3.o)
+ .glue_7t       0x0000287c        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_umodsi3.o)
+ .glue_7t       0x0000287c        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_dvmd_tls.o)
+ .glue_7t       0x0000287c        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memcpy.o)
+ .glue_7t       0x0000287c        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memset.o)
+ .glue_7t       0x0000287c       0x50 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-strncpy.o)
+                0x00002880                __vPortEnterCritical_change_to_arm
+                0x000028ac                __memset_from_thumb
+                0x000028b0                __memset_change_to_arm
+                0x0000288c                __vSerialISRCreateQueues_from_thumb
+                0x000028b4                __strncpy_from_thumb
+                0x00002890                __vSerialISRCreateQueues_change_to_arm
+                0x00002888                __vPortExitCritical_change_to_arm
+                0x000028bc                __memcpy_from_thumb
+                0x000028c4                __vPortISRStartFirstTask_from_thumb
+                0x000028a0                ____umodsi3_change_to_arm
+                0x000028a4                __vPortDisableInterruptsFromThumb_from_thumb
+                0x00002884                __vPortExitCritical_from_thumb
+                0x00002898                ____udivsi3_change_to_arm
+                0x0000289c                ____umodsi3_from_thumb
+                0x0000287c                __vPortEnterCritical_from_thumb
+                0x00002894                ____udivsi3_from_thumb
+                0x000028c8                __vPortISRStartFirstTask_change_to_arm
+                0x000028a8                __vPortDisableInterruptsFromThumb_change_to_arm
+                0x000028c0                __memcpy_change_to_arm
+                0x000028b8                __strncpy_change_to_arm
+ *(.ctors)
+                0x000028cc                __end_of_text__ = .
+
+.vfp11_veneer   0x000028cc        0x0
+ .vfp11_veneer  0x000028cc        0x0 portable/portISR.o
+ .vfp11_veneer  0x000028cc        0x0 spi_write.o
+ .vfp11_veneer  0x000028cc        0x0 serial/serialISR.o
+ .vfp11_veneer  0x000028cc        0x0 main.o
+ .vfp11_veneer  0x000028cc        0x0 serial/serial.o
+ .vfp11_veneer  0x000028cc        0x0 testLEDMatrix.o
+ .vfp11_veneer  0x000028cc        0x0 testRGB.o
+ .vfp11_veneer  0x000028cc        0x0 testLCD.o
+ .vfp11_veneer  0x000028cc        0x0 testUART.o
+ .vfp11_veneer  0x000028cc        0x0 testMotor.o
+ .vfp11_veneer  0x000028cc        0x0 testADC.o
+ .vfp11_veneer  0x000028cc        0x0 ./FreeRTOS/tasks.o
+ .vfp11_veneer  0x000028cc        0x0 ./FreeRTOS/queue.o
+ .vfp11_veneer  0x000028cc        0x0 ./FreeRTOS/list.o
+ .vfp11_veneer  0x000028cc        0x0 portable/MemMang/heap_2.o
+ .vfp11_veneer  0x000028cc        0x0 portable/port.o
+ .vfp11_veneer  0x000028cc        0x0 /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccUJHyNo.o
+ .vfp11_veneer  0x000028cc        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_udivsi3.o)
+ .vfp11_veneer  0x000028cc        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_umodsi3.o)
+ .vfp11_veneer  0x000028cc        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_dvmd_tls.o)
+ .vfp11_veneer  0x000028cc        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memcpy.o)
+ .vfp11_veneer  0x000028cc        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memset.o)
+ .vfp11_veneer  0x000028cc        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-strncpy.o)
+
+.data           0x40000000       0x18 load address 0x000028cc
+                0x40000000                __data_beg__ = .
+                0x000028cc                __data_beg_src__ = __end_of_text__
+ *(.data)
+ .data          0x40000000        0x4 portable/portISR.o
+                0x40000000                ulCriticalNesting
+ .data          0x40000004        0x4 spi_write.o
+ .data          0x40000008        0x0 serial/serialISR.o
+ .data          0x40000008        0x0 main.o
+ .data          0x40000008        0x0 serial/serial.o
+ .data          0x40000008        0x8 testLEDMatrix.o
+                0x40000008                pattern
+ .data          0x40000010        0x0 testRGB.o
+ .data          0x40000010        0x8 testLCD.o
+                0x40000014                Dolny_Wiersz
+                0x40000010                Gorny_Wiersz
+ .data          0x40000018        0x0 testUART.o
+ .data          0x40000018        0x0 testMotor.o
+ .data          0x40000018        0x0 testADC.o
+ .data          0x40000018        0x0 ./FreeRTOS/tasks.o
+ .data          0x40000018        0x0 ./FreeRTOS/queue.o
+ .data          0x40000018        0x0 ./FreeRTOS/list.o
+ .data          0x40000018        0x0 portable/MemMang/heap_2.o
+ .data          0x40000018        0x0 portable/port.o
+ .data          0x40000018        0x0 /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccUJHyNo.o
+ .data          0x40000018        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_udivsi3.o)
+ .data          0x40000018        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_umodsi3.o)
+ .data          0x40000018        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_dvmd_tls.o)
+ .data          0x40000018        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memcpy.o)
+ .data          0x40000018        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memset.o)
+ .data          0x40000018        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-strncpy.o)
+                0x40000018                __data_end__ = .
+
+.bss            0x40000018     0x6134
+                0x40000018                __bss_beg__ = .
+ *(.bss)
+ .bss           0x40000018        0x0 portable/portISR.o
+ .bss           0x40000018        0x1 spi_write.o
+ *fill*         0x40000019        0x3 00
+ .bss           0x4000001c        0xc serial/serialISR.o
+ .bss           0x40000028        0x0 main.o
+ .bss           0x40000028        0xc serial/serial.o
+ .bss           0x40000034        0x0 testLEDMatrix.o
+ .bss           0x40000034        0x0 testRGB.o
+ .bss           0x40000034        0x0 testLCD.o
+ .bss           0x40000034        0x0 testUART.o
+ .bss           0x40000034        0x0 testMotor.o
+ .bss           0x40000034        0x0 testADC.o
+ .bss           0x40000034       0xfc ./FreeRTOS/tasks.o
+                0x40000034                pxCurrentTCB
+ .bss           0x40000130        0x0 ./FreeRTOS/queue.o
+ .bss           0x40000130        0x0 ./FreeRTOS/list.o
+ .bss           0x40000130     0x6018 portable/MemMang/heap_2.o
+ .bss           0x40006148        0x0 portable/port.o
+ .bss           0x40006148        0x0 /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccUJHyNo.o
+ .bss           0x40006148        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_udivsi3.o)
+ .bss           0x40006148        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_umodsi3.o)
+ .bss           0x40006148        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_dvmd_tls.o)
+ .bss           0x40006148        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memcpy.o)
+ .bss           0x40006148        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memset.o)
+ .bss           0x40006148        0x0 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-strncpy.o)
+ COMMON         0x40006148        0x4 testUART.o
+                0x40006148                uart0
+                0x4000614c                . = ALIGN (0x4)
+                0x4000614c                . = ALIGN (0x4)
+                0x4000614c                _end = .
+                0x4000614c                _bss_end__ = .
+                0x4000614c                __bss_end__ = .
+                0x4000614c                __end__ = .
+                0x4000614c                PROVIDE (end, .)
+OUTPUT(eduboard.elf elf32-littlearm)
+
+.debug_abbrev   0x00000000     0x11fe
+ .debug_abbrev  0x00000000       0x76 portable/portISR.o
+ .debug_abbrev  0x00000076       0xa5 spi_write.o
+ .debug_abbrev  0x0000011b       0xc6 serial/serialISR.o
+ .debug_abbrev  0x000001e1       0xa8 main.o
+ .debug_abbrev  0x00000289       0xee serial/serial.o
+ .debug_abbrev  0x00000377       0xfd testLEDMatrix.o
+ .debug_abbrev  0x00000474       0xc4 testRGB.o
+ .debug_abbrev  0x00000538      0x139 testLCD.o
+ .debug_abbrev  0x00000671      0x100 testUART.o
+ .debug_abbrev  0x00000771       0x8b testMotor.o
+ .debug_abbrev  0x000007fc       0xa2 testADC.o
+ .debug_abbrev  0x0000089e      0x251 ./FreeRTOS/tasks.o
+ .debug_abbrev  0x00000aef      0x1aa ./FreeRTOS/queue.o
+ .debug_abbrev  0x00000c99       0xee ./FreeRTOS/list.o
+ .debug_abbrev  0x00000d87      0x148 portable/MemMang/heap_2.o
+ .debug_abbrev  0x00000ecf       0xf1 portable/port.o
+ .debug_abbrev  0x00000fc0       0x12 /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccUJHyNo.o
+ .debug_abbrev  0x00000fd2       0x14 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_udivsi3.o)
+ .debug_abbrev  0x00000fe6       0x14 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_umodsi3.o)
+ .debug_abbrev  0x00000ffa       0x14 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_dvmd_tls.o)
+ .debug_abbrev  0x0000100e       0x99 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memcpy.o)
+ .debug_abbrev  0x000010a7       0xb2 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memset.o)
+ .debug_abbrev  0x00001159       0xa5 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-strncpy.o)
+
+.debug_info     0x00000000     0x2d1e
+ .debug_info    0x00000000      0x113 portable/portISR.o
+ .debug_info    0x00000113       0xf6 spi_write.o
+ .debug_info    0x00000209      0x199 serial/serialISR.o
+ .debug_info    0x000003a2       0xe5 main.o
+ .debug_info    0x00000487      0x270 serial/serial.o
+ .debug_info    0x000006f7      0x13b testLEDMatrix.o
+ .debug_info    0x00000832      0x106 testRGB.o
+ .debug_info    0x00000938      0x1f2 testLCD.o
+ .debug_info    0x00000b2a      0x1ae testUART.o
+ .debug_info    0x00000cd8       0xcd testMotor.o
+ .debug_info    0x00000da5       0xf9 testADC.o
+ .debug_info    0x00000e9e      0xc0a ./FreeRTOS/tasks.o
+ .debug_info    0x00001aa8      0x75d ./FreeRTOS/queue.o
+ .debug_info    0x00002205      0x29e ./FreeRTOS/list.o
+ .debug_info    0x000024a3      0x26d portable/MemMang/heap_2.o
+ .debug_info    0x00002710      0x154 portable/port.o
+ .debug_info    0x00002864       0x43 /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccUJHyNo.o
+ .debug_info    0x000028a7       0x6a /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_udivsi3.o)
+ .debug_info    0x00002911       0x6a /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_umodsi3.o)
+ .debug_info    0x0000297b       0x6a /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_dvmd_tls.o)
+ .debug_info    0x000029e5      0x10e /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memcpy.o)
+ .debug_info    0x00002af3      0x10a /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memset.o)
+ .debug_info    0x00002bfd      0x121 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-strncpy.o)
+
+.debug_line     0x00000000     0x10ab
+ .debug_line    0x00000000       0x6d portable/portISR.o
+ .debug_line    0x0000006d       0x72 spi_write.o
+ .debug_line    0x000000df       0x8e serial/serialISR.o
+ .debug_line    0x0000016d       0xb6 main.o
+ .debug_line    0x00000223       0xcc serial/serial.o
+ .debug_line    0x000002ef       0x70 testLEDMatrix.o
+ .debug_line    0x0000035f       0x79 testRGB.o
+ .debug_line    0x000003d8       0xbc testLCD.o
+ .debug_line    0x00000494       0x8a testUART.o
+ .debug_line    0x0000051e       0x71 testMotor.o
+ .debug_line    0x0000058f       0x9f testADC.o
+ .debug_line    0x0000062e      0x266 ./FreeRTOS/tasks.o
+ .debug_line    0x00000894      0x1d4 ./FreeRTOS/queue.o
+ .debug_line    0x00000a68       0xb0 ./FreeRTOS/list.o
+ .debug_line    0x00000b18       0xb4 portable/MemMang/heap_2.o
+ .debug_line    0x00000bcc       0xac portable/port.o
+ .debug_line    0x00000c78       0x78 /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccUJHyNo.o
+ .debug_line    0x00000cf0       0x84 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_udivsi3.o)
+ .debug_line    0x00000d74       0x6e /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_umodsi3.o)
+ .debug_line    0x00000de2       0x5d /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_dvmd_tls.o)
+ .debug_line    0x00000e3f       0xce /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memcpy.o)
+ .debug_line    0x00000f0d       0xd3 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memset.o)
+ .debug_line    0x00000fe0       0xcb /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-strncpy.o)
+
+.debug_frame    0x00000000      0x944
+ .debug_frame   0x00000000       0x80 portable/portISR.o
+ .debug_frame   0x00000080       0x4c spi_write.o
+ .debug_frame   0x000000cc       0x58 serial/serialISR.o
+ .debug_frame   0x00000124       0x4c main.o
+ .debug_frame   0x00000170       0x90 serial/serial.o
+ .debug_frame   0x00000200       0x28 testLEDMatrix.o
+ .debug_frame   0x00000228       0x30 testRGB.o
+ .debug_frame   0x00000258       0x94 testLCD.o
+ .debug_frame   0x000002ec       0x64 testUART.o
+ .debug_frame   0x00000350       0x2c testMotor.o
+ .debug_frame   0x0000037c       0x40 testADC.o
+ .debug_frame   0x000003bc      0x278 ./FreeRTOS/tasks.o
+ .debug_frame   0x00000634      0x150 ./FreeRTOS/queue.o
+ .debug_frame   0x00000784       0x68 ./FreeRTOS/list.o
+ .debug_frame   0x000007ec       0x44 portable/MemMang/heap_2.o
+ .debug_frame   0x00000830       0x48 portable/port.o
+ .debug_frame   0x00000878       0x2c /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_udivsi3.o)
+ .debug_frame   0x000008a4       0x2c /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_umodsi3.o)
+ .debug_frame   0x000008d0       0x28 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memcpy.o)
+ .debug_frame   0x000008f8       0x20 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memset.o)
+ .debug_frame   0x00000918       0x2c /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-strncpy.o)
+
+.debug_pubnames
+                0x00000000      0x7e3
+ .debug_pubnames
+                0x00000000       0xdc portable/portISR.o
+ .debug_pubnames
+                0x000000dc       0x2d spi_write.o
+ .debug_pubnames
+                0x00000109       0x59 serial/serialISR.o
+ .debug_pubnames
+                0x00000162       0x27 main.o
+ .debug_pubnames
+                0x00000189       0x79 serial/serial.o
+ .debug_pubnames
+                0x00000202       0x3b testLEDMatrix.o
+ .debug_pubnames
+                0x0000023d       0x1e testRGB.o
+ .debug_pubnames
+                0x0000025b       0x88 testLCD.o
+ .debug_pubnames
+                0x000002e3       0x49 testUART.o
+ .debug_pubnames
+                0x0000032c       0x20 testMotor.o
+ .debug_pubnames
+                0x0000034c       0x1e testADC.o
+ .debug_pubnames
+                0x0000036a      0x214 ./FreeRTOS/tasks.o
+ .debug_pubnames
+                0x0000057e      0x111 ./FreeRTOS/queue.o
+ .debug_pubnames
+                0x0000068f       0x71 ./FreeRTOS/list.o
+ .debug_pubnames
+                0x00000700       0x31 portable/MemMang/heap_2.o
+ .debug_pubnames
+                0x00000731       0x5a portable/port.o
+ .debug_pubnames
+                0x0000078b       0x1d /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memcpy.o)
+ .debug_pubnames
+                0x000007a8       0x1d /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memset.o)
+ .debug_pubnames
+                0x000007c5       0x1e /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-strncpy.o)
+
+.debug_aranges  0x00000000      0x2e8
+ .debug_aranges
+                0x00000000       0x20 portable/portISR.o
+ .debug_aranges
+                0x00000020       0x20 spi_write.o
+ .debug_aranges
+                0x00000040       0x20 serial/serialISR.o
+ .debug_aranges
+                0x00000060       0x20 main.o
+ .debug_aranges
+                0x00000080       0x20 serial/serial.o
+ .debug_aranges
+                0x000000a0       0x20 testLEDMatrix.o
+ .debug_aranges
+                0x000000c0       0x20 testRGB.o
+ .debug_aranges
+                0x000000e0       0x20 testLCD.o
+ .debug_aranges
+                0x00000100       0x20 testUART.o
+ .debug_aranges
+                0x00000120       0x20 testMotor.o
+ .debug_aranges
+                0x00000140       0x20 testADC.o
+ .debug_aranges
+                0x00000160       0x20 ./FreeRTOS/tasks.o
+ .debug_aranges
+                0x00000180       0x20 ./FreeRTOS/queue.o
+ .debug_aranges
+                0x000001a0       0x20 ./FreeRTOS/list.o
+ .debug_aranges
+                0x000001c0       0x20 portable/MemMang/heap_2.o
+ .debug_aranges
+                0x000001e0       0x20 portable/port.o
+ .debug_aranges
+                0x00000200       0x28 /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccUJHyNo.o
+ .debug_aranges
+                0x00000228       0x20 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_udivsi3.o)
+ .debug_aranges
+                0x00000248       0x20 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_umodsi3.o)
+ .debug_aranges
+                0x00000268       0x20 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_dvmd_tls.o)
+ .debug_aranges
+                0x00000288       0x20 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memcpy.o)
+ .debug_aranges
+                0x000002a8       0x20 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memset.o)
+ .debug_aranges
+                0x000002c8       0x20 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-strncpy.o)
+
+.debug_str      0x00000000     0x114c
+ .debug_str     0x00000000      0x11b portable/portISR.o
+                                0x14f (size before relaxing)
+ .debug_str     0x0000011b       0x50 spi_write.o
+                                 0xba (size before relaxing)
+ .debug_str     0x0000016b       0xbe serial/serialISR.o
+                                0x1a2 (size before relaxing)
+ .debug_str     0x00000229       0x25 main.o
+                                 0xe1 (size before relaxing)
+ .debug_str     0x0000024e       0xf5 serial/serial.o
+                                0x1e4 (size before relaxing)
+ .debug_str     0x00000343       0x52 testLEDMatrix.o
+                                 0xe4 (size before relaxing)
+ .debug_str     0x00000395       0x40 testRGB.o
+                                 0xbc (size before relaxing)
+ .debug_str     0x000003d5       0x66 testLCD.o
+                                0x102 (size before relaxing)
+ .debug_str     0x0000043b       0x6a testUART.o
+                                0x103 (size before relaxing)
+ .debug_str     0x000004a5       0x3d testMotor.o
+                                 0xd4 (size before relaxing)
+ .debug_str     0x000004e2       0x4b testADC.o
+                                 0xe7 (size before relaxing)
+ .debug_str     0x0000052d      0x613 ./FreeRTOS/tasks.o
+                                0x711 (size before relaxing)
+ .debug_str     0x00000b40      0x295 ./FreeRTOS/queue.o
+                                0x45a (size before relaxing)
+ .debug_str     0x00000dd5       0xa3 ./FreeRTOS/list.o
+                                0x1f0 (size before relaxing)
+ .debug_str     0x00000e78      0x10c portable/MemMang/heap_2.o
+                                0x1cd (size before relaxing)
+ .debug_str     0x00000f84       0x87 portable/port.o
+                                0x15c (size before relaxing)
+ .debug_str     0x0000100b       0xa5 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memcpy.o)
+                                 0xd8 (size before relaxing)
+ .debug_str     0x000010b0       0x57 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memset.o)
+                                0x122 (size before relaxing)
+ .debug_str     0x00001107       0x45 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-strncpy.o)
+                                0x138 (size before relaxing)
+
+.comment        0x00000000      0x156
+ .comment       0x00000000       0x12 portable/portISR.o
+ .comment       0x00000012       0x12 spi_write.o
+ .comment       0x00000024       0x12 serial/serialISR.o
+ .comment       0x00000036       0x12 main.o
+ .comment       0x00000048       0x12 serial/serial.o
+ .comment       0x0000005a       0x12 testLEDMatrix.o
+ .comment       0x0000006c       0x12 testRGB.o
+ .comment       0x0000007e       0x12 testLCD.o
+ .comment       0x00000090       0x12 testUART.o
+ .comment       0x000000a2       0x12 testMotor.o
+ .comment       0x000000b4       0x12 testADC.o
+ .comment       0x000000c6       0x12 ./FreeRTOS/tasks.o
+ .comment       0x000000d8       0x12 ./FreeRTOS/queue.o
+ .comment       0x000000ea       0x12 ./FreeRTOS/list.o
+ .comment       0x000000fc       0x12 portable/MemMang/heap_2.o
+ .comment       0x0000010e       0x12 portable/port.o
+ .comment       0x00000120       0x12 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memcpy.o)
+ .comment       0x00000132       0x12 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memset.o)
+ .comment       0x00000144       0x12 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-strncpy.o)
+
+.ARM.attributes
+                0x00000000       0x10
+ .ARM.attributes
+                0x00000000       0x10 portable/portISR.o
+ .ARM.attributes
+                0x00000010       0x10 spi_write.o
+ .ARM.attributes
+                0x00000020       0x10 serial/serialISR.o
+ .ARM.attributes
+                0x00000030       0x10 main.o
+ .ARM.attributes
+                0x00000040       0x10 serial/serial.o
+ .ARM.attributes
+                0x00000050       0x10 testLEDMatrix.o
+ .ARM.attributes
+                0x00000060       0x10 testRGB.o
+ .ARM.attributes
+                0x00000070       0x10 testLCD.o
+ .ARM.attributes
+                0x00000080       0x10 testUART.o
+ .ARM.attributes
+                0x00000090       0x10 testMotor.o
+ .ARM.attributes
+                0x000000a0       0x10 testADC.o
+ .ARM.attributes
+                0x000000b0       0x10 ./FreeRTOS/tasks.o
+ .ARM.attributes
+                0x000000c0       0x10 ./FreeRTOS/queue.o
+ .ARM.attributes
+                0x000000d0       0x10 ./FreeRTOS/list.o
+ .ARM.attributes
+                0x000000e0       0x10 portable/MemMang/heap_2.o
+ .ARM.attributes
+                0x000000f0       0x10 portable/port.o
+ .ARM.attributes
+                0x00000100       0x10 /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccUJHyNo.o
+ .ARM.attributes
+                0x00000110       0x10 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_udivsi3.o)
+ .ARM.attributes
+                0x00000120       0x10 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_umodsi3.o)
+ .ARM.attributes
+                0x00000130       0x10 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/interwork/libgcc.a(_dvmd_tls.o)
+ .ARM.attributes
+                0x00000140       0x10 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memcpy.o)
+ .ARM.attributes
+                0x00000150       0x10 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memset.o)
+ .ARM.attributes
+                0x00000160       0x10 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-strncpy.o)
+
+.debug_loc      0x00000000     0x1c9b
+ .debug_loc     0x00000000       0x3e spi_write.o
+ .debug_loc     0x0000003e      0x125 serial/serialISR.o
+ .debug_loc     0x00000163       0x74 main.o
+ .debug_loc     0x000001d7      0x222 serial/serial.o
+ .debug_loc     0x000003f9       0x32 testLEDMatrix.o
+ .debug_loc     0x0000042b       0x3e testRGB.o
+ .debug_loc     0x00000469      0x176 testLCD.o
+ .debug_loc     0x000005df      0x1d6 testUART.o
+ .debug_loc     0x000007b5       0x32 testMotor.o
+ .debug_loc     0x000007e7       0x9a testADC.o
+ .debug_loc     0x00000881      0x8ca ./FreeRTOS/tasks.o
+ .debug_loc     0x0000114b      0x5e5 ./FreeRTOS/queue.o
+ .debug_loc     0x00001730       0x50 ./FreeRTOS/list.o
+ .debug_loc     0x00001780      0x1d5 portable/MemMang/heap_2.o
+ .debug_loc     0x00001955       0xa5 portable/port.o
+ .debug_loc     0x000019fa      0x104 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memcpy.o)
+ .debug_loc     0x00001afe       0xa9 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-memset.o)
+ .debug_loc     0x00001ba7       0xf4 /cygdrive/c/gnuarm/bin/../lib/gcc/arm-elf/4.2.2/../../../../arm-elf/lib/interwork/libg.a(lib_a-strncpy.o)
+
+.debug_ranges   0x00000000       0xb0
+ .debug_ranges  0x00000000       0x18 main.o
+ .debug_ranges  0x00000018       0x18 testLCD.o
+ .debug_ranges  0x00000030       0x48 ./FreeRTOS/tasks.o
+ .debug_ranges  0x00000078       0x18 portable/MemMang/heap_2.o
+ .debug_ranges  0x00000090       0x20 /cygdrive/c/DOCUME~1/Admin/USTAWI~1/Temp/ccUJHyNo.o
