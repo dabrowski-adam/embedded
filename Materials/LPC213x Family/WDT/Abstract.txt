@@ -1,0 +1,12 @@
+///////////////////////////////////////////////////////////////////////
+//	WDT Sample Code
+//	NXP Semiconductors
+//	
+//	MCB2130 Board LPC21238:	runs in internal Flash
+//	MCB2130 Ram:		runs in internal RAM
+///////////////////////////////////////////////////////////////////////
+
+In this sample code the LEDs are turned off intitially and if the WDT
+generated the reset, it will turn on the LEDs.
+As counter will keep on feeding the WDT until it runs out, which should
+then cause the the WDT to generate cause a reset.

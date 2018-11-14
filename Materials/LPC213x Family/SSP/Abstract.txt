@@ -1,0 +1,11 @@
+///////////////////////////////////////////////////////////////////////
+//	SSP Sample Code
+//	NXP Semiconductors
+//	
+//	MCB2130 Board LPC21238:	runs in internal Flash
+//	MCB2130 Ram:		runs in internal RAM
+///////////////////////////////////////////////////////////////////////
+
+The SSP is tested in loopback mode by writting 256 bytes to itself.
+The data to be written to the SSP interface is place in the SPIWRData
+array, while the data read back from the loopback is place in SPIRDData.

@@ -1,0 +1,14 @@
+///////////////////////////////////////////////////////////////////////
+//	DAC Sample Code
+//	NXP Semiconductors
+//	
+//	MCB2130 Board LPC21238:	runs in internal Flash
+//	MCB2130 Ram:		runs in internal RAM
+///////////////////////////////////////////////////////////////////////
+
+The DAC will output "noise" onto the onboard speaker. By changing the
+"for" loop in the dactest.c you can create different a different sound
+pitch.
+
+NOTE:
+Make sure that you have the "AOUT" jumper pins closed.

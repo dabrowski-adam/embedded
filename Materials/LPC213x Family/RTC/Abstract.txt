@@ -1,0 +1,11 @@
+///////////////////////////////////////////////////////////////////////
+//	RTC Sample Code
+//	NXP Semiconductors
+//	
+//	MCB2130 Board LPC21238:	runs in internal Flash
+//	MCB2130 Ram:		runs in internal RAM
+///////////////////////////////////////////////////////////////////////
+
+The code sets the RTC registers and the Alarm register with a 5 second
+increment. After the 5 seconds an alarm is triggered causing the LEDs
+on the GPIO to turn on.

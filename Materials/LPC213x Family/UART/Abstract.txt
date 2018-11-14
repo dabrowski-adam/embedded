@@ -1,0 +1,25 @@
+///////////////////////////////////////////////////////////////////////
+//	UART Sample Code
+//	NXP Semiconductors
+//	
+//	MCB2130 Board LPC21238:	runs in internal Flash
+//	MCB2130 Ram:		runs in internal RAM
+///////////////////////////////////////////////////////////////////////
+
+The UART sample code initializes UART0 (COM0) and sends out a "HELLO".
+Afterwards it will simply echo anything it receives.
+
+Use a serial terminal utility with the following settings:
+
+Baud:		115200
+Data:		8
+Parity:		None
+
+Handshake:	None
+
+Note:
+UART0 has a ISP bootloading feature which might cause the LPC2138 to
+stay in the bootloader after a reset (Pin 7 and Pin 4 are used as
+RTS and DTR).
+
+This can be avoided by either disconnectiong the ISP and RST jumpers.

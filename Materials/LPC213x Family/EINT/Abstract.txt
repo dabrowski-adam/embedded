@@ -1,0 +1,10 @@
+///////////////////////////////////////////////////////////////////////
+//	EINT Sample Code
+//	NXP Semiconductors
+//	
+//	MCB2130 Board LPC21238:	runs in internal Flash
+//	MCB2130 Ram:		runs in internal RAM
+///////////////////////////////////////////////////////////////////////
+
+By pressing the EINT0 button an external interrupt is generated. The 
+external interrupt handler will cause the LEDs on the GPIO to toggle.

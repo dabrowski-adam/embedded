@@ -1,0 +1,20 @@
+///////////////////////////////////////////////////////////////////////
+//	SPI Sample Code
+//	NXP Semiconductors
+//	
+//	MCB2130 Board LPC21238:	runs in internal Flash
+//	MCB2130 Ram:		runs in internal RAM
+///////////////////////////////////////////////////////////////////////
+
+This code tests writing and reading from an Atmel AT25160 SPI EEPROM.
+The data to be written is located in the SPIWRData array and the data
+received is in the SPIRDData array.
+
+LPC2138				AT25160 (DIP Package)
+MISO0	P0.5 <-->	SO (Pin 2)
+MOSI0	P0.6 <-->	SI (Pin 5)
+SCK0	P0.4 <-->	SCK(Pin 6)
+SSEL0	P0.7 <-->	/CS(Pin 1)
+
+AT25160 (DIP Package)
+Pull-up /WP and /HOLD (Pins 3 and 7)

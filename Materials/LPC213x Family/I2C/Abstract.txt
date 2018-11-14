@@ -1,0 +1,25 @@
+///////////////////////////////////////////////////////////////////////
+//	I2C Sample Code
+//	NXP Semiconductors
+//	
+//	MCB2130 Board LPC21238:	runs in internal Flash
+//	MCB2130 Ram:		runs in internal RAM
+///////////////////////////////////////////////////////////////////////
+
+This code interfaces to an I2C EEPROM. The EEPROM is a NXP PCF8594C-2.
+The code will perform a page-write to the EEPROM and then read it back.
+
+The following pins are used to interface with the EEPROM.
+
+LPC2138
+P0.2 - SCL
+P0.3 - SDA
+
+PCF8594C-2
+Ground A1, A2, WP, Vss (PINs 1, 2, 3, and 4)
++3v Supply Vdd (Pin 8)
+SCL - (Pin 6) connects to P0.2 on the LPC2138
+SDA - (Pin 5) connects to P0.3 on the LPC2138
+
+NOTE:
+Make sure that you add pull-up resisters (10K is OK) for both pins

@@ -1,0 +1,303 @@
+LARM LINKER/LOCATER V2.50a                                                              02/04/2006  18:44:09  PAGE 1
+
+
+LARM LINKER/LOCATER V2.50a, INVOKED BY:
+C:\KEIL\ARM\BIN\LA.EXE .\Obj\Startup.obj, .\Obj\DiskImg.obj, .\Obj\usbhw.obj, .\Obj\usbcore.obj, .\Obj\usbdesc.obj, .\Ob
+>> j\usbuser.obj, .\Obj\mscuser.obj, .\Obj\memory.obj TO .\Obj\Memory PRINT (.\Lst\Memory.map) CASE CLASSES (DATA (0X400
+>> 00000-0X40007FFF), CODE (0X0-0X7FFFF), CONST (0X0-0X7FFFF))
+
+
+CPU MODE: LITTLE ENDIAN
+
+
+INPUT MODULES INCLUDED:
+  .\Obj\Startup.obj (STARTUP)
+         COMMENT TYPE 0: AA V2.50
+  .\Obj\DiskImg.obj (DiskImg)
+         COMMENT TYPE 0: CARM V2.50a
+  .\Obj\usbhw.obj (usbhw)
+         COMMENT TYPE 0: CARM V2.50a
+  .\Obj\usbcore.obj (usbcore)
+         COMMENT TYPE 0: CARM V2.50a
+  .\Obj\usbdesc.obj (usbdesc)
+         COMMENT TYPE 0: CARM V2.50a
+  .\Obj\usbuser.obj (usbuser)
+         COMMENT TYPE 0: CARM V2.50a
+  .\Obj\mscuser.obj (mscuser)
+         COMMENT TYPE 0: CARM V2.50a
+  .\Obj\memory.obj (memory)
+         COMMENT TYPE 0: CARM V2.50a
+  C:\KEIL\ARM\LIB\CAL.LIB (FIQ)
+         COMMENT TYPE 0: AA V2.50
+  C:\KEIL\ARM\LIB\CAL.LIB (IRQ)
+         COMMENT TYPE 0: AA V2.50
+  C:\KEIL\ARM\LIB\CAL.LIB (DABT)
+         COMMENT TYPE 0: AA V2.50
+  C:\KEIL\ARM\LIB\CAL.LIB (PABT)
+         COMMENT TYPE 0: AA V2.50
+  C:\KEIL\ARM\LIB\CAL.LIB (SWI)
+         COMMENT TYPE 0: AA V2.50
+  C:\KEIL\ARM\LIB\CAL.LIB (UNDEF)
+         COMMENT TYPE 0: AA V2.50
+
+
+ACTIVE MEMORY CLASSES OF MODULE:  .\Obj\Memory (STARTUP)
+
+BASE       START      END        USED       MEMORY CLASS
+========================================================
+00000000H  40000000H  40007FFFH  0000456CH  DATA
+00000000H  00000000H  0007FFFFH  00001C8CH  CODE
+00000000H  00000000H  0007FFFFH  0000110BH  CONST
+
+
+INTERRUPT FUNCTIONS
+
+TYPE  STACK SIZE    FUNCTION NAME
+=================================
+irq                 USB_ISR?A
+
+
+
+
+MEMORY MAP OF MODULE:  .\Obj\Memory (STARTUP)
+
+START      STOP       LENGTH    ALIGN  RELOC  MEMORY CLASS   SEGMENT NAME
+=========================================================================
+00000000H  0000011FH  00000120H     4  AT..   CODE           STARTUPCODE
+00000120H  000001C2H  000000A3H     4  UNIT   CONST          ?CON?usbdesc
+000001C3H  000001C3H  00000001H   ---  ---    **GAP**
+000001C4H  00000203H  00000040H     4  UNIT   CONST          ?CON?usbuser
+LARM LINKER/LOCATER V2.50a                                                            02/04/2006  18:44:09  PAGE 2
+
+
+00000204H  00000223H  00000020H     4  UNIT   CONST          ?C_CLRSEG
+00000224H  0000022BH  00000008H     4  UNIT   CONST          ?C_INITSEG
+0000022CH  000002E3H  000000B8H     4  UNIT   CODE           ?PR?USB_Init?T?usbhw
+000002E4H  0000030BH  00000028H     4  UNIT   CODE           ?PR?USB_Connect?T?usbhw
+0000030CH  00000373H  00000068H     4  UNIT   CODE           ?PR?USB_Reset?T?usbhw
+00000374H  00000383H  00000010H     4  UNIT   CODE           ?PR?USB_Suspend?T?usbhw
+00000384H  00000393H  00000010H     4  UNIT   CODE           ?PR?USB_Resume?T?usbhw
+00000394H  00000397H  00000004H     4  UNIT   CODE           ?PR?USB_WakeUpCfg?T?usbhw
+00000398H  000003CBH  00000034H     4  UNIT   CODE           ?PR?USB_SetAddress?T?usbhw
+000003CCH  00000413H  00000048H     4  UNIT   CODE           ?PR?USB_Configure?T?usbhw
+00000414H  0000046FH  0000005CH     4  UNIT   CODE           ?PR?USB_ConfigEP?T?usbhw
+00000470H  00000473H  00000004H     4  UNIT   CODE           ?PR?USB_DirCtrlEP?T?usbhw
+00000474H  00000493H  00000020H     4  UNIT   CODE           ?PR?USB_EnableEP?T?usbhw
+00000494H  000004B3H  00000020H     4  UNIT   CODE           ?PR?USB_DisableEP?T?usbhw
+000004B4H  000004D3H  00000020H     4  UNIT   CODE           ?PR?USB_ResetEP?T?usbhw
+000004D4H  000004F3H  00000020H     4  UNIT   CODE           ?PR?USB_SetStallEP?T?usbhw
+000004F4H  00000513H  00000020H     4  UNIT   CODE           ?PR?USB_ClrStallEP?T?usbhw
+00000514H  000005ABH  00000098H     4  UNIT   CODE           ?PR?USB_ReadEP?T?usbhw
+000005ACH  0000062BH  00000080H     4  UNIT   CODE           ?PR?USB_WriteEP?T?usbhw
+0000062CH  0000080FH  000001E4H     4  UNIT   CODE           ?PR?USB_ISR?A?usbhw
+00000810H  00000827H  00000018H     4  UNIT   CODE           ?PR?EPAdr?T?usbhw
+00000828H  00000857H  00000030H     4  UNIT   CODE           ?PR?WrCmd?T?usbhw
+00000858H  00000893H  0000003CH     4  UNIT   CODE           ?PR?WrCmdDat?T?usbhw
+00000894H  000008CBH  00000038H     4  UNIT   CODE           ?PR?RdCmdDat?T?usbhw
+000008CCH  000008EBH  00000020H     4  UNIT   CODE           ?PR?USB_ResetCore?T?usbcore
+000008ECH  0000124BH  00000960H     4  UNIT   CODE           ?PR?USB_EndPoint0?T?usbcore
+0000124CH  0000125BH  00000010H     4  UNIT   CODE           ?PR?USB_SetupStage?T?usbcore
+0000125CH  0000129FH  00000044H     4  UNIT   CODE           ?PR?USB_DataInStage?T?usbcore
+000012A0H  000012CBH  0000002CH     4  UNIT   CODE           ?PR?USB_DataOutStage?T?usbcore
+000012CCH  000012DBH  00000010H     4  UNIT   CODE           ?PR?USB_StatusInStage?T?usbcore
+000012DCH  000012EBH  00000010H     4  UNIT   CODE           ?PR?USB_StatusOutStage?T?usbcore
+000012ECH  0000130FH  00000024H     4  UNIT   CODE           ?PR?USB_Reset_Event?T?usbuser
+00001310H  0000132BH  0000001CH     4  UNIT   CODE           ?PR?USB_Suspend_Event?T?usbuser
+0000132CH  00001347H  0000001CH     4  UNIT   CODE           ?PR?USB_Resume_Event?T?usbuser
+00001348H  0000134BH  00000004H     4  UNIT   CODE           ?PR?USB_EndPoint1?T?usbuser
+0000134CH  00001367H  0000001CH     4  UNIT   CODE           ?PR?USB_EndPoint2?T?usbuser
+00001368H  0000136BH  00000004H     4  UNIT   CODE           ?PR?USB_EndPoint3?T?usbuser
+0000136CH  0000136FH  00000004H     4  UNIT   CODE           ?PR?USB_EndPoint4?T?usbuser
+00001370H  00001373H  00000004H     4  UNIT   CODE           ?PR?USB_EndPoint5?T?usbuser
+00001374H  00001377H  00000004H     4  UNIT   CODE           ?PR?USB_EndPoint6?T?usbuser
+00001378H  0000137BH  00000004H     4  UNIT   CODE           ?PR?USB_EndPoint7?T?usbuser
+0000137CH  0000137FH  00000004H     4  UNIT   CODE           ?PR?USB_EndPoint8?T?usbuser
+00001380H  00001383H  00000004H     4  UNIT   CODE           ?PR?USB_EndPoint9?T?usbuser
+00001384H  00001387H  00000004H     4  UNIT   CODE           ?PR?USB_EndPoint10?T?usbuser
+00001388H  0000138BH  00000004H     4  UNIT   CODE           ?PR?USB_EndPoint11?T?usbuser
+0000138CH  0000138FH  00000004H     4  UNIT   CODE           ?PR?USB_EndPoint12?T?usbuser
+00001390H  00001393H  00000004H     4  UNIT   CODE           ?PR?USB_EndPoint13?T?usbuser
+00001394H  00001397H  00000004H     4  UNIT   CODE           ?PR?USB_EndPoint14?T?usbuser
+00001398H  0000139BH  00000004H     4  UNIT   CODE           ?PR?USB_EndPoint15?T?usbuser
+0000139CH  000013C3H  00000028H     4  UNIT   CODE           ?PR?USB_Configure_Event?T?usbuser
+000013C4H  000013DFH  0000001CH     4  UNIT   CODE           ?PR?MSC_Reset?T?mscuser
+000013E0H  000013EFH  00000010H     4  UNIT   CODE           ?PR?MSC_GetMaxLUN?T?mscuser
+000013F0H  000015FBH  0000020CH     4  UNIT   CODE           ?PR?MSC_GetCBW?T?mscuser
+000015FCH  00001627H  0000002CH     4  UNIT   CODE           ?PR?MSC_SetCSW?T?mscuser
+00001628H  0000166FH  00000048H     4  UNIT   CODE           ?PR?MSC_BulkIn?T?mscuser
+00001670H  000016CFH  00000060H     4  UNIT   CODE           ?PR?MSC_BulkOut?T?mscuser
+000016D0H  00001783H  000000B4H     4  UNIT   CODE           ?PR?MSC_MemoryRead?T?mscuser
+00001784H  00001853H  000000D0H     4  UNIT   CODE           ?PR?MSC_MemoryWrite?T?mscuser
+00001854H  0000193BH  000000E8H     4  UNIT   CODE           ?PR?MSC_MemoryVerify?T?mscuser
+0000193CH  000019ABH  00000070H     4  UNIT   CODE           ?PR?MSC_RWSetup?T?mscuser
+000019ACH  00001A03H  00000058H     4  UNIT   CODE           ?PR?DataInFormat?T?mscuser
+00001A04H  00001AA3H  000000A0H     4  UNIT   CODE           ?PR?DataInTransfer?T?mscuser
+00001AA4H  00001AEFH  0000004CH     4  UNIT   CODE           ?PR?MSC_TestUnitReady?T?mscuser
+00001AF0H  00001B53H  00000064H     4  UNIT   CODE           ?PR?MSC_RequestSense?T?mscuser
+00001B54H  00001C0FH  000000BCH     4  UNIT   CODE           ?PR?MSC_Inquiry?T?mscuser
+LARM LINKER/LOCATER V2.50a                                                            02/04/2006  18:44:09  PAGE 3
+
+
+00001C10H  00001C3BH  0000002CH     4  UNIT   CODE           ?PR?MSC_ModeSense6?T?mscuser
+00001C3CH  00001C77H  0000003CH     4  UNIT   CODE           ?PR?MSC_ModeSense10?T?mscuser
+00001C78H  00001CB3H  0000003CH     4  UNIT   CODE           ?PR?MSC_ReadCapacity?T?mscuser
+00001CB4H  00001CFFH  0000004CH     4  UNIT   CODE           ?PR?MSC_ReadFormatCapacity?T?mscuser
+00001D00H  00001D7FH  00000080H     4  UNIT   CODE           ?PR?main?memory
+00001D80H  00001D83H  00000004H     4  UNIT   CODE           ?C?FIQ
+00001D84H  00001D87H  00000004H     4  UNIT   CODE           ?C?IRQ
+00001D88H  00001D8BH  00000004H     4  UNIT   CODE           ?C?DABT
+00001D8CH  00001D8FH  00000004H     4  UNIT   CODE           ?C?PABT
+00001D90H  00001D97H  00000008H     4  UNIT   CODE           ?C?UNDEF
+00001D98H  0000FFFFH  0000E268H   ---  ---    **GAP**
+00010000H  00010FFFH  00001000H     2  AT..   CONST          ?CON?AT_10000_?1?DiskImg
+00011000H  3FFFFFFFH  3FFEF000H   ---  ---    **GAP**
+40000000H  4000048FH  00000490H     4  UNIT   DATA           STACK
+40000490H  400004F0H  00000061H     4  UNIT   DATA           ?DT0?usbcore
+400004F1H  400004F3H  00000003H   ---  ---    **GAP**
+400004F4H  4000056EH  0000007BH     4  UNIT   DATA           ?DT0?mscuser
+4000056FH  40001FFFH  00001A91H   ---  ---    **GAP**
+40002000H  40005FFFH  00004000H     2  AT..   DATA           ?DT0?AT_40002000_?1?mscuser
+
+
+
+REMOVED FUNCTIONS OF MODULE:  .\Obj\Memory (STARTUP)
+
+      ATTRIBUTE  FUNCTION NAME
+      ========================
+       unused    USB_WakeUp?T
+       unused    USB_GetFrame?T
+       inlined   USB_GetStatus?T
+       inlined   USB_SetClrFeature?T
+       inlined   USB_GetDescriptor?T
+       inlined   USB_SetConfiguration?T
+       inlined   USB_SetInterface?T
+
+
+
+PUBLIC SYMBOLS OF MODULE:  .\Obj\Memory (STARTUP)
+
+      VALUE      CLASS    TYPE      PUBLIC SYMBOL NAME
+      ================================================
+      00000204H  ---      ---       ?C?CLRTAB
+      00001D00H  ---      ---       ?C?INIT
+      00000224H  ---      ---       ?C?INITTAB
+      4000052EH  DATA     ---       BulkBuf
+      4000056EH  DATA     BYTE      BulkLen
+      4000052DH  DATA     BYTE      BulkStage
+      40000500H  DATA     ---       CBW
+      40000520H  DATA     ---       CSW
+      00001D88H  CODE     ---       DAbt_Handler?A
+      000019ACH  CODE     ---       DataInFormat?T
+      00001A04H  CODE     ---       DataInTransfer?T
+      00010000H  CONST    ---       DiskImage
+      400004B0H  DATA     ---       EP0Buf
+      40000498H  DATA     ---       EP0Data
+      00000810H  CODE     ---       EPAdr?T
+      00001D80H  CODE     ---       FIQ_Handler?A
+      00001D84H  CODE     ---       IRQ_Handler?A
+      400004FCH  DATA     DWORD     Length
+      00001628H  CODE     ---       MSC_BulkIn?T
+      00001670H  CODE     ---       MSC_BulkOut?T
+      000013F0H  CODE     ---       MSC_GetCBW?T
+      000013E0H  CODE     ---       MSC_GetMaxLUN?T
+      00001B54H  CODE     ---       MSC_Inquiry?T
+      000016D0H  CODE     ---       MSC_MemoryRead?T
+      00001854H  CODE     ---       MSC_MemoryVerify?T
+LARM LINKER/LOCATER V2.50a                                                            02/04/2006  18:44:09  PAGE 4
+
+
+      00001784H  CODE     ---       MSC_MemoryWrite?T
+      00001C3CH  CODE     ---       MSC_ModeSense10?T
+      00001C10H  CODE     ---       MSC_ModeSense6?T
+      0000193CH  CODE     ---       MSC_RWSetup?T
+      00001C78H  CODE     ---       MSC_ReadCapacity?T
+      00001CB4H  CODE     ---       MSC_ReadFormatCapacity?T
+      00001AF0H  CODE     ---       MSC_RequestSense?T
+      000013C4H  CODE     ---       MSC_Reset?T
+      000015FCH  CODE     ---       MSC_SetCSW?T
+      00001AA4H  CODE     ---       MSC_TestUnitReady?T
+      400004F4H  DATA     ---       MemOK
+      40002000H  DATA     ---       Memory
+      400004F8H  DATA     DWORD     Offset
+      00001D8CH  CODE     ---       PAbt_Handler?A
+      00000894H  CODE     ---       RdCmdDat?A
+      000008A0H  CODE     ---       RdCmdDat?T
+      00001D90H  CODE     ---       SWI_Handler?A
+      400004A2H  DATA     ---       SetupPacket
+      400004ACH  DATA     ---       USB_AltSetting
+      000004F4H  CODE     ---       USB_ClrStallEP?T
+      00000132H  CONST    ---       USB_ConfigDescriptor
+      00000414H  CODE     ---       USB_ConfigEP?T
+      400004ABH  DATA     BYTE      USB_Configuration
+      000003CCH  CODE     ---       USB_Configure?T
+      0000139CH  CODE     ---       USB_Configure_Event?T
+      000002E4H  CODE     ---       USB_Connect?T
+      0000125CH  CODE     ---       USB_DataInStage?T
+      000012A0H  CODE     ---       USB_DataOutStage?T
+      400004AAH  DATA     BYTE      USB_DeviceAddress
+      00000120H  CONST    ---       USB_DeviceDescriptor
+      400004A0H  DATA     WORD      USB_DeviceStatus
+      00000470H  CODE     ---       USB_DirCtrlEP?T
+      00000494H  CODE     ---       USB_DisableEP?T
+      00000474H  CODE     ---       USB_EnableEP?T
+      000008ECH  CODE     ---       USB_EndPoint0?T
+      00001384H  CODE     ---       USB_EndPoint10?T
+      00001388H  CODE     ---       USB_EndPoint11?T
+      0000138CH  CODE     ---       USB_EndPoint12?T
+      00001390H  CODE     ---       USB_EndPoint13?T
+      00001394H  CODE     ---       USB_EndPoint14?T
+      00001398H  CODE     ---       USB_EndPoint15?T
+      00001348H  CODE     ---       USB_EndPoint1?T
+      0000134CH  CODE     ---       USB_EndPoint2?T
+      00001368H  CODE     ---       USB_EndPoint3?T
+      0000136CH  CODE     ---       USB_EndPoint4?T
+      00001370H  CODE     ---       USB_EndPoint5?T
+      00001374H  CODE     ---       USB_EndPoint6?T
+      00001378H  CODE     ---       USB_EndPoint7?T
+      0000137CH  CODE     ---       USB_EndPoint8?T
+      00001380H  CODE     ---       USB_EndPoint9?T
+      40000494H  DATA     DWORD     USB_EndPointHalt
+      40000490H  DATA     DWORD     USB_EndPointMask
+      00000000H  CODE     ---       USB_GetFrame?T
+      0000062CH  CODE     ---       USB_ISR?A
+      0000022CH  CODE     ---       USB_Init?T
+      400004F0H  DATA     BYTE      USB_NumInterfaces
+      000001C4H  CONST    ---       USB_P_EP
+      00000514H  CODE     ---       USB_ReadEP?T
+      0000030CH  CODE     ---       USB_Reset?A
+      00000318H  CODE     ---       USB_Reset?T
+      000008CCH  CODE     ---       USB_ResetCore?T
+      000004B4H  CODE     ---       USB_ResetEP?T
+      000012ECH  CODE     ---       USB_Reset_Event?A
+      000012F8H  CODE     ---       USB_Reset_Event?T
+      00000384H  CODE     ---       USB_Resume?A
+LARM LINKER/LOCATER V2.50a                                                            02/04/2006  18:44:09  PAGE 5
+
+
+      00000390H  CODE     ---       USB_Resume?T
+      0000132CH  CODE     ---       USB_Resume_Event?A
+      00001338H  CODE     ---       USB_Resume_Event?T
+      00000398H  CODE     ---       USB_SetAddress?T
+      000004D4H  CODE     ---       USB_SetStallEP?T
+      0000124CH  CODE     ---       USB_SetupStage?T
+      000012CCH  CODE     ---       USB_StatusInStage?T
+      000012DCH  CODE     ---       USB_StatusOutStage?T
+      00000153H  CONST    ---       USB_StringDescriptor
+      00000374H  CODE     ---       USB_Suspend?A
+      00000380H  CODE     ---       USB_Suspend?T
+      00001310H  CODE     ---       USB_Suspend_Event?A
+      0000131CH  CODE     ---       USB_Suspend_Event?T
+      00000000H  CODE     ---       USB_WakeUp?T
+      00000394H  CODE     ---       USB_WakeUpCfg?T
+      000005ACH  CODE     ---       USB_WriteEP?T
+      00001D94H  CODE     ---       Undef_Handler?A
+      00000828H  CODE     ---       WrCmd?A
+      00000834H  CODE     ---       WrCmd?T
+      00000858H  CODE     ---       WrCmdDat?T
+      00000000H  CODE     ---       __startup
+      000000FCH  CODE     ---       exit?A
+      00000100H  CODE     ---       exit?T
+      00001D34H  CODE     ---       main
+
+Program Size: data=17772 const=4363 code=7308
+LARM RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

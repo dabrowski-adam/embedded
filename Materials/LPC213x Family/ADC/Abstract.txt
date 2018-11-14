@@ -1,0 +1,19 @@
+///////////////////////////////////////////////////////////////////////
+//	ADC Sample Code
+//	NXP Semiconductors
+//	
+//	MCB2130 Board LPC21238:	runs in internal Flash
+//	MCB2130 Ram:		runs in internal RAM
+///////////////////////////////////////////////////////////////////////
+
+The internal ADC will sample the analog voltages on each channel and
+store the 10-bit values in an array.
+
+NOTE:
+Check whether the rev number of your controller contains the dedicated
+ADC data registers.
+If they do, then you may set "ADC_REV_DASH_FLAG" to "1".
+If the dedicated data registers are not available, set 
+"ADC_REV_DASH_FLAG" to "0".
+The ADC interrupt will only work with a controller that has the
+dedicated ADC data registers.

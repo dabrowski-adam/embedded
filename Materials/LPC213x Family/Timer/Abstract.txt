@@ -1,0 +1,10 @@
+///////////////////////////////////////////////////////////////////////
+//	Timer Sample Code
+//	NXP Semiconductors
+//	
+//	MCB2130 Board LPC21238:	runs in internal Flash
+//	MCB2130 Ram:		runs in internal RAM
+///////////////////////////////////////////////////////////////////////
+
+The timer sample code will toggle 4 LEDs at a time in an alternating
+fashion.

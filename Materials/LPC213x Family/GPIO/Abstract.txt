@@ -1,0 +1,10 @@
+///////////////////////////////////////////////////////////////////////
+//	GPIO Sample Code
+//	NXP Semiconductors
+//	
+//	MCB2130 Board LPC21238:	runs in internal Flash
+//	MCB2130 Ram:		runs in internal RAM
+///////////////////////////////////////////////////////////////////////
+
+A timer on the board will cause the LEDs on the GPIO to toggle at a 
+periodic interval.

@@ -1,0 +1,19 @@
+///////////////////////////////////////////////////////////////////////
+//	PWM Sample Code
+//	NXP Semiconductors
+//	
+//	MCB2130 Board LPC21238:	runs in internal Flash
+//	MCB2130 Ram:		runs in internal RAM
+///////////////////////////////////////////////////////////////////////
+
+This code will generate 6 different PWM signals that can be view on
+an O-scope.
+
+To view the PWM signals attach the O-scope onto
+
+PWM1	P0.0	(Note: this will cause garbage to come out the UART0)
+PWM2	P0.7
+PWM3	P0.1
+PWM4	P0.8	(Note: this will cause garbage to come out the UART1)
+PWM5	P0.21
+PWM6	P0.9
