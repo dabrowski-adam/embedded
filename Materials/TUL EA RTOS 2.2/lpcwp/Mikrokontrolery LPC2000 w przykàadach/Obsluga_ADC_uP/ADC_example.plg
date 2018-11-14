@@ -1,0 +1,19 @@
+<html>
+<body>
+<pre>
+<h1>µVision3 Build Log</h1>
+<h2>Project:</h2>
+D:\Ksiazka_ARM\Przykladowe_aplikacje\Obsluga_ADC\Obsluga_ADC_uP\ADC_example.uv2
+Project File Date:  08/20/2005
+
+<h2>Output:</h2>
+Build target 'ADC_example'
+assembling Startup.s...
+compiling lcd.c...
+compiling ADC_example.c...
+linking...
+creating hex file...
+"ADC_example.elf" - 0 Error(s), 0 Warning(s).
+</pre>
+</body>
+</html>

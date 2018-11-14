@@ -1,0 +1,81 @@
+<!DOCTYPE CrossStudio_Project_File>
+<solution version="1" Name="MP3Player" >
+  <project file_name="" Name="MP3Player" >
+    <configuration arm_target_loader_parameter="12000000" Target="LPC2148" arm_simulator_memory_simulation_parameter="LPC21;0x80000;0x10000" property_groups_file_path="$(StudioDir)/targets/Philips_LPC210X/propertyGroups.xml" oscillator_frequency="12MHz" linker_memory_map_file="$(StudioDir)/targets/Philips_LPC210X/Philips_LPC2148_MemoryMap.xml" gcc_entry_point="reset_handler" arm_architecture="v4T" linker_additional_files="$(StudioDir)/lib/liblpc2000$(LibExt)$(LIB)" project_directory="" link_include_startup_code="No" project_type="Executable" Name="Common" arm_target_debug_interface_type="ARM7TDI" arm_core_type="ARM7TDMI-S" arm_simulator_memory_simulation_filename="$(StudioDir)/targets/Philips_LPC210X/LPC2000SimulatorMemory.dll" />
+    <configuration linker_section_placement_file="$(StudioDir)/targets/sram_placement.xml" target_reset_script="SRAMReset()" Name="RAM" Placement="RAM" />
+    <configuration arm_target_flash_loader_file_path="$(StudioDir)/targets/Philips_LPC210X/Release/Loader.elf" linker_section_placement_file="$(StudioDir)/targets/flash_placement.xml" target_reset_script="FLASHReset()" arm_target_flash_loader_type="Comms Channel Loader" Name="Flash" Placement="Flash" />
+    <folder Name="System Files" >
+      <file file_name="$(StudioDir)/source/crt0.s" Name="crt0.s" />
+      <file file_name="$(StudioDir)/targets/Philips_LPC210X/Philips_LPC210X_Target.js" Name="Philips_LPC210X_Target.js" >
+        <configuration Name="Common" file_type="Reset Script" />
+      </file>
+      <file file_name="$(StudioDir)/targets/Philips_LPC210X/VIC.c" Name="VIC.c" >
+        <configuration build_exclude_from_build="No" Name="ARM Flash Debug" />
+      </file>
+      <file file_name="$(StudioDir)/targets/Philips_LPC210X/VIC_irq_handler.s" Name="VIC_irq_handler.s" >
+        <configuration build_exclude_from_build="No" Name="ARM Flash Debug" />
+      </file>
+      <file file_name="$(StudioDir)/targets/Philips_LPC210X/LPC210x.c" Name="LPC210x.c" />
+      <file file_name="Philips_LPC2148_Startup.s" Name="Philips_LPC2148_Startup.s" >
+        <configuration c_preprocessor_definitions="USE_USB_RAM;VECTORED_IRQ_INTERRUPTS;VPBDIV_VAL=1;STARTUP_FROM_RESET;PINSEL1_VAL=0x000080000" Name="ARM Flash Debug" />
+        <configuration c_preprocessor_definitions="USE_USB_RAM;VECTORED_IRQ_INTERRUPTS;VPBDIV_VAL=1;STARTUP_FROM_RESET;PINSEL1_VAL=0x000080000" Name="ARM Flash Release" />
+      </file>
+      <file file_name="flash_placement.xml" Name="flash_placement.xml" />
+    </folder>
+    <folder Name="Audio Render Driver" >
+      <file file_name="render-driver/lpc_io.c" Name="lpc_io.c" />
+    </folder>
+    <folder Name="Demo player" >
+      <file file_name="demo.c" Name="demo.c" >
+        <configuration c_preprocessor_definitions="FPM_ARM ;SIZEOF_INT=4 ;SIZE_LONG=4 ;SIZE_LONG_LONG=8;ASO_IMDCT" Name="ARM Flash Debug" />
+        <configuration c_preprocessor_definitions="FPM_ARM;SIZEOF_INT=4;SIZE_LONG=4;SIZE_LONG_LONG=8;ASO_IMDCT" Name="ARM Flash Release" />
+      </file>
+    </folder>
+    <folder Name="EFSL" >
+      <file file_name="efsl/src/debug.c" Name="debug.c" />
+      <file file_name="efsl/src/ui.c" Name="ui.c" />
+      <file file_name="efsl/src/dir.c" Name="dir.c" />
+      <file file_name="efsl/src/disc.c" Name="disc.c" />
+      <file file_name="efsl/src/efs.c" Name="efs.c" />
+      <file file_name="efsl/src/extract.c" Name="extract.c" />
+      <file file_name="efsl/src/fat.c" Name="fat.c" />
+      <file file_name="efsl/src/file.c" Name="file.c" />
+      <file file_name="efsl/src/fs.c" Name="fs.c" />
+      <file file_name="efsl/src/ioman.c" Name="ioman.c" />
+      <file file_name="efsl/src/ls.c" Name="ls.c" />
+      <file file_name="efsl/src/mkfs.c" Name="mkfs.c" />
+      <file file_name="efsl/src/partition.c" Name="partition.c" />
+      <file file_name="efsl/src/plibc.c" Name="plibc.c" />
+      <file file_name="efsl/src/time.c" Name="time.c" />
+    </folder>
+    <folder Name="EFSL driver" >
+      <file file_name="efsl/src/interfaces/sd.c" Name="sd.c" />
+      <file file_name="efsl/src/interfaces/lpc2000_spi.c" Name="lpc2000_spi.c" />
+    </folder>
+    <folder Name="libmad" >
+      <file file_name="libmad/version.c" Name="version.c" />
+      <file file_name="libmad/bit.c" Name="bit.c" />
+      <file file_name="libmad/decoder.c" Name="decoder.c" />
+      <file file_name="libmad/fixed.c" Name="fixed.c" />
+      <file file_name="libmad/frame.c" Name="frame.c" />
+      <file file_name="libmad/huffman.c" Name="huffman.c" />
+      <file file_name="libmad/imdct_l_arm.S" Name="imdct_l_arm.S" />
+      <file file_name="libmad/layer3.c" Name="layer3.c" />
+      <file file_name="libmad/layer12.c" Name="layer12.c" />
+      <file file_name="libmad/stream.c" Name="stream.c" />
+      <file file_name="libmad/synth.c" Name="synth.c" />
+      <file file_name="libmad/timer.c" Name="timer.c" />
+      <file file_name="libmad/minimad.c" Name="minimad.c" />
+      <configuration c_preprocessor_definitions="FPM_ARM ;SIZEOF_INT=4 ;SIZE_LONG=4 ;SIZE_LONG_LONG=8;ASO_IMDCT;OPT_SPEED" Name="ARM Flash Debug" />
+      <configuration c_preprocessor_definitions="FPM_ARM;SIZEOF_INT=4;SIZE_LONG=4;SIZE_LONG_LONG=8;ASO_IMDCT" Name="ARM Flash Release" />
+    </folder>
+    <configuration arm_linker_fiq_stack_size="4" c_user_include_directories="$(ProjectDir)/render-driver;$(ProjectDir)/libmad;$(ProjectDir)/efsl/inc;$(ProjectDir)/efsl/conf;$(ProjectDir)/efsl/inc/interfaces." c_additional_options="-O" arm_linker_und_stack_size="4" arm_linker_stack_size="8192" Name="ARM Flash Debug" linker_output_format="None" arm_linker_svc_stack_size="4" arm_linker_heap_size="0" arm_linker_abt_stack_size="4" />
+    <configuration arm_linker_fiq_stack_size="4" c_user_include_directories="$(ProjectDir)/render-driver;$(ProjectDir)/libmad;$(ProjectDir)/efsl/inc;$(ProjectDir)/efsl/conf;$(ProjectDir)/efsl/inc/interfaces." arm_linker_irq_stack_size="256" c_preprocessor_undefinitions="DEBUG" c_additional_options="-O" build_debug_information="No" arm_linker_und_stack_size="4" arm_linker_stack_size="8192" Name="ARM Flash Release" linker_output_format="hex" arm_linker_svc_stack_size="4" arm_linker_heap_size="0" arm_linker_abt_stack_size="4" />
+  </project>
+  <configuration inherited_configurations="ARM;Flash;Debug" Name="ARM Flash Debug" />
+  <configuration arm_library_instruction_set="ARM" c_preprocessor_definitions="__ARM" arm_instruction_set="ARM" hidden="Yes" Name="ARM" />
+  <configuration c_preprocessor_definitions="__FLASH_BUILD" hidden="Yes" Name="Flash" />
+  <configuration c_preprocessor_definitions="DEBUG" link_include_startup_code="No" gcc_optimization_level="None" build_debug_information="Yes" hidden="Yes" Name="Debug" />
+  <configuration inherited_configurations="ARM;Flash;Release" Name="ARM Flash Release" />
+  <configuration c_preprocessor_definitions="NDEBUG" link_include_startup_code="No" gcc_optimization_level="Level 1" build_debug_information="No" hidden="Yes" Name="Release" />
+</solution>

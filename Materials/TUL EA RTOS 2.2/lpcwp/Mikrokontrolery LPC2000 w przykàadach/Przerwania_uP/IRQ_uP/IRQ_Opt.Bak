@@ -1,0 +1,39 @@
+### uVision2 Project, (C) Keil Software
+### Do not modify !
+
+ cExt (*.c)
+ aExt (*.s*; *.src; *.a*)
+ oExt (*.obj)
+ lExt (*.lib)
+ tExt (*.txt; *.h; *.inc)
+ pExt (*.plm)
+ CppX (*.cpp)
+ DaveTm { 0,0,0,0,0,0,0,0 }
+
+Target (IRQ), 0x0003 // Tools: 'ARM-GNU'
+GRPOPT 1,(Source),1,0,0
+GRPOPT 2,(Startup),1,0,0
+
+OPTFFF 1,1,1,218103810,0,16,32,0,<.\IRQ.c><IRQ.c> { 44,0,0,0,2,0,0,0,3,0,0,0,255,255,255,255,255,255,255,255,252,255,255,255,233,255,255,255,22,0,0,0,22,0,0,0,70,2,0,0,19,1,0,0 }
+OPTFFF 1,2,1,0,0,0,0,0,<.\lcd.c><lcd.c> 
+OPTFFF 2,3,2,0,0,0,0,0,<.\Startup.s><Startup.s> 
+
+
+TARGOPT 1, (IRQ)
+ ARMCLK=12000000
+  OPTTT 1,1,1,0
+  OPTHX 1,65535,0,0,0
+  OPTLX 120,65,8,<.\>
+  OPTOX 16
+  OPTLT 1,1,1,0,1,1,0,1,0,0,0,0
+  OPTXL 1,1,1,1,1,1,1,0,0
+  OPTFL 1,0,1
+  OPTBL 0,(Data Sheet)<DATASHTS\PHILIPS\LPC2131_32_34_36_38.PDF>
+  OPTDL (SARM.DLL)(-cLPC2100)(DARMP.DLL)(-pLPC2138)(SARM.DLL)()(TARMP.DLL)(-pLPC2138)
+  OPTDBG 48125,0,()()()()()()()()()() (BIN\UL2ARM.DLL)()()()
+  OPTKEY 0,(UL2ARM)(-U268761108 -O7 -C0 -FO15 -FD40000000 -FC800 -FN1 -FF0LPC_IAP2_512 -FS00 -FL07D000)
+  OPTDF 0x2
+  OPTLE <>
+  OPTLC <>
+EndOpt
+

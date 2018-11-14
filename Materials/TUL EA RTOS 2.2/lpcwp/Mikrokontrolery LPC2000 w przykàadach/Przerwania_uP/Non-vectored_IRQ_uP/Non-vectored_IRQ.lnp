@@ -1,0 +1,1 @@
+-T .\Flash.ld -mthumb-interwork -Wl,-Ttext=0x00000000,-Tdata=0x40000000 --gc-sections -o Non-vectored_IRQ.elf "non-vectored_irq.o" "lcd.o" "startup.o" -nostartfiles -nodefaultlibs

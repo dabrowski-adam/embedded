@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<HiTOPProject>
+	<Windows>
+		<MDIState RTOS="0" Trace="0" Source="1" Maximized="0" SFRWindow="0"/>
+		<Window Id="Source">
+			<Tabs Count="0"/>
+			<WindowState State="Normal"/>
+			<Rectangle State="Normal">
+				<Size cx="500" cy="427"/>
+				<Position x="0" y="0"/>
+			</Rectangle>
+		</Window>
+		<Window Id="TraceFilter">
+			<Tabs>
+				<Tab Pos="0">
+					<Triggers/>
+				</Tab>
+				<Tab Pos="1">
+					<Regions/>
+				</Tab>
+			</Tabs>
+		</Window>
+		<Window Id="Breakpoint">
+			<Tabs>
+				<Tab Pos="0">
+					<Breaks/>
+				</Tab>
+				<Tab Pos="1">
+					<Breaks/>
+				</Tab>
+			</Tabs>
+		</Window>
+		<Window Id="SFRWindow">
+			<SFRDefinitions File=".\ArmLpt\Derivatives\Philips\Generic.sfr"/>
+		</Window>
+		<Window Id="Disassembly">
+			<List Id="" BkColor="16777215" TextColor="0" DisableColSizing="0">
+				<Header Bold="1"/>
+				<Column Id="0" Order="0" Title="State" Width="24" Visible="1" Alignment="LEFT"/>
+				<Column Id="11" Order="1" Title="Address" Visible="1" RelWidth="0.1721868" Alignment="LEFT"/>
+				<Column Id="12" Order="2" Title="OpCode" Visible="1" RelWidth="0.1324518" Alignment="LEFT"/>
+				<Column Id="13" Order="3" Title="Instruction" Visible="1" RelWidth="0.6953658" Alignment="LEFT"/>
+			</List>
+		</Window>
+	</Windows>
+	<ScriptBarSettings>
+		<LastScriptFile Id=""/>
+	</ScriptBarSettings>
+	<History Id="SCRIPT_FILES" Count="0" Capacity="4"/>
+	<HitopObjects/>
+	<DebugDevice>
+		<ARMConfiguration EMB_ICE="0" Endianes="0" ProcType="0" ETM_EXIST="0" RTCK_USED="0"/>ArmLpt
+		<TargetProcessor Id="PARM"/>
+		<Derivative File=".\ArmLpt\Derivatives\Philips\Default.drv"/>
+		<Communication>
+			<Port>LPT1</Port>
+			<PortAddress Value="888"/>
+			<BaudRate Value="0"/>
+			<DeviceName></DeviceName>
+		</Communication>
+	</DebugDevice>
+	<ConfigurationOptions>
+		<ProcessorSettings>
+			<ProcessorSetting Id="DefMemAc" Value="-1" Element=""/>
+			<ProcessorSetting Id="TClkMode" Value="-1" Element=""/>
+			<ProcessorSetting Id="TAPClock" Value="-1" Element=""/>
+			<ProcessorSetting Id="TClkWSLo" Value="-1" Element=""/>
+			<ProcessorSetting Id="TClkWSHi" Value="-1" Element=""/>
+			<ProcessorSetting Id="TarResLo" Value="-1" Element=""/>
+			<ProcessorSetting Id="TarResHi" Value="-1" Element=""/>
+			<ProcessorSetting Id="TarReTAP" Value="-1" Element=""/>
+			<ProcessorSetting Id="TRST" Value="-1" Element=""/>
+			<ProcessorSetting Id="DBGRQPin" Value="-1" Element=""/>
+			<ProcessorSetting Id="Endianes" Value="-1" Element=""/>
+			<ProcessorSetting Id="ResetTyp" Value="-1" Element=""/>
+			<ProcessorSetting Id="ProcType" Value="-1" Element=""/>
+			<ProcessorSetting Id="CacheMod" Value="-1" Element=""/>
+			<ProcessorSetting Id="CC_Addr" Value="-1" Element=""/>
+		</ProcessorSettings>
+		<EmulatorSettings>
+			<EmulatorSetting Id="PREFERSW" Value="-1" Element=""/>
+		</EmulatorSettings>
+		<GeneralSettings>
+			<GeneralSetting Id="TraceRecordingMode" Value="-1" Element=""/>
+			<GeneralSetting Id="TraceRegionMode" Value="-1" Element=""/>
+			<GeneralSetting Id="TraceInitialState" Value="-1" Element=""/>
+			<GeneralSetting Id="TraceBufferOnStart" Value="-1" Element=""/>
+			<GeneralSetting Id="TraceOnOverflow" Value="-1" Element=""/>
+			<GeneralSetting Id="TraceDisplayMode" Value="-1" Element=""/>
+			<GeneralSetting Id="TraceBusState" Value="-1" Element=""/>
+			<GeneralSetting Id="TriggerBusState" Value="-1" Element=""/>
+			<GeneralSetting Id="TriggerDataType" Value="-1" Element=""/>
+			<GeneralSetting Id="TriggerCounterMode" Value="-1" Element=""/>
+			<GeneralSetting Id="TriggerBreakAction" Value="-1" Element=""/>
+			<GeneralSetting Id="TriggerTraceAction" Value="-1" Element=""/>
+			<GeneralSetting Id="TriggerRealtimerAction" Value="-1" Element=""/>
+			<GeneralSetting Id="ProtectionMode" Value="-1" Element=""/>
+			<GeneralSetting Id="BankMode" Value="-1" Element=""/>
+			<GeneralSetting Id="BankBootBank" Value="-1" Element=""/>
+			<GeneralSetting Id="BankLoadBank" Value="-1" Element=""/>
+			<GeneralSetting Id="BankCurrBank" Value="-1" Element=""/>
+			<GeneralSetting Id="BankIntMode" Value="-1" Element=""/>
+		</GeneralSettings>
+	</ConfigurationOptions>
+	<FlashProgramming RAMBase="0" NumDevices="0" EnableProgramming="1"/>
+	<EditorOptions>
+		<Font lfHeight="-15" lfWeight="400" lfQuality="0" lfFaceName="Courier New" lfOutPrecision="0" lfClipPrecision="0" lfPitchAndFamily="0"/>
+		<Tabulators Size="4"/>
+	</EditorOptions>
+	<LinkerApplications Count="1">
+		<Loader Id="ARMC"/>
+		<Application Pos="0" CodeFile="D:\Ksiazka_ARM\Przykladowe_aplikacje\Sterowanie_diodami_LED\Sterowanie_diodami_LED_uP\LED.htx" LinkerFile="D:\Ksiazka_ARM\Przykladowe_aplikacje\Sterowanie_diodami_LED\Sterowanie_diodami_LED_uP\LED.hex"/>
+	</LinkerApplications>
+	<Directories>
+		<Directory Id="ProjectAddApplication" Dir="D:\Ksiazka_ARM\Przykladowe_aplikacje\Sterowanie_diodami_LED\Sterowanie_diodami_LED_uP\LED.hex"/>
+	</Directories>
+</HiTOPProject>
+

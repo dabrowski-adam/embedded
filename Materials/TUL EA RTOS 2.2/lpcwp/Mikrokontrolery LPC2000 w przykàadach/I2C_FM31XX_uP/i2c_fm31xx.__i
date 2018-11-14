@@ -1,0 +1,1 @@
+-c -mcpu=arm7tdmi -gdwarf-2 -MD -Wall -O -mapcs-frame -mthumb-interwork -IC:\Keil\ARM\INC\Philips\ -Wa,-alhms="i2c_fm31xx.lst" -o i2c_fm31xx.o "I2C_FM31XX.c"

@@ -1,0 +1,1441 @@
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 1
+
+
+   1              		.file	"RC5Receiver.c"
+   2              		.section	.debug_abbrev,"",%progbits
+   3              	.Ldebug_abbrev0:
+   4              		.section	.debug_info,"",%progbits
+   5              	.Ldebug_info0:
+   6              		.section	.debug_line,"",%progbits
+   7              	.Ldebug_line0:
+   8 0000 8C000000 		.text
+   8      02002100 
+   8      00000201 
+   8      FB0E0A00 
+   8      01010101 
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	RC5_RX
+  12              		.type	RC5_RX, %function
+  13              	RC5_RX:
+  14              	.LFB2:
+  15              		.file 1 "RC5Receiver.c"
+   1:RC5Receiver.c **** ////////////////////////////////////////////////////////
+   2:RC5Receiver.c **** // Function:	RC5 receiver
+   3:RC5Receiver.c **** // Target:		LPC2138
+   4:RC5Receiver.c **** // Board:		ZL6ARM
+   5:RC5Receiver.c **** // Quartz:		12MHz
+   6:RC5Receiver.c **** // Compiler:	ARM-GCC-4.0.1 (www.gnuarm.com)
+   7:RC5Receiver.c **** // Author:		Arkadiusz Antoniak @ 2006, Poland
+   8:RC5Receiver.c **** // Copyright:	(c) Arkadiusz Antoniak, 2006
+   9:RC5Receiver.c **** ////////////////////////////////////////////////////////
+  10:RC5Receiver.c **** #include <LPC213x.H>
+  11:RC5Receiver.c **** #include "Timer.h"
+  12:RC5Receiver.c **** #include "lcd.h"
+  13:RC5Receiver.c **** 
+  14:RC5Receiver.c **** extern volatile unsigned int time_count;
+  15:RC5Receiver.c **** 	 
+  16:RC5Receiver.c **** #define IRED_PIN		(IOPIN0 & (1<<2))
+  17:RC5Receiver.c **** #define BIT_TIMER_EN    T1TCR
+  18:RC5Receiver.c **** #define FRAME_TIMEOUT   6000
+  19:RC5Receiver.c **** #define MIN_BIT_TIME    150
+  20:RC5Receiver.c **** #define MAX_BIT_TIME    250
+  21:RC5Receiver.c **** 
+  22:RC5Receiver.c **** //Error codes
+  23:RC5Receiver.c **** #define ERR_BIT_TIME		1
+  24:RC5Receiver.c **** #define ERR_SAMPLING		2
+  25:RC5Receiver.c **** #define ERR_FRAME_TIMEOUT	3
+  26:RC5Receiver.c **** 
+  27:RC5Receiver.c **** 
+  28:RC5Receiver.c **** //*******************************
+  29:RC5Receiver.c **** // RC5 frame receiver
+  30:RC5Receiver.c **** // waits for leading edge of the RC5 frame
+  31:RC5Receiver.c **** // returns:
+  32:RC5Receiver.c **** // 0 - OK
+  33:RC5Receiver.c **** // 1 - bit time error
+  34:RC5Receiver.c **** // 2 - sampling error
+  35:RC5Receiver.c **** // 3 - frame timeout
+  36:RC5Receiver.c **** //*******************************
+  37:RC5Receiver.c **** unsigned int RC5_RX(unsigned int *ptoggle, unsigned int *paddress, unsigned int *pcommand)
+  38:RC5Receiver.c **** {
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 2
+
+
+  16              		.loc 1 38 0
+  17              		@ Function supports interworking.
+  18              		@ args = 0, pretend = 0, frame = 4
+  19              		@ frame_needed = 0, uses_anonymous_args = 0
+  20              	.LVL0:
+  21 0000 F0472DE9 		stmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+  22              	.LCFI0:
+  23 0004 04D04DE2 		sub	sp, sp, #4
+  24              	.LCFI1:
+  25              	.LVL1:
+  26 0008 0240A0E1 		mov	r4, r2
+  27 000c 0E32A0E3 		mov	r3, #-536870912
+  28 0010 0AC983E2 		add	ip, r3, #163840
+  29              	.LVL2:
+  30              	.L3:
+  39:RC5Receiver.c **** 	unsigned int bit_time, tmp_time, i, tmp_ired;
+  40:RC5Receiver.c **** 
+  41:RC5Receiver.c **** 	//wait for start of transmission
+  42:RC5Receiver.c **** 	while(IRED_PIN!=0);
+  31              		.loc 1 42 0
+  32 0014 00309CE5 		ldr	r3, [ip, #0]
+  33 0018 042013E2 		ands	r2, r3, #4
+  34 001c 0300001A 		bne	.L3
+  43:RC5Receiver.c **** 
+  44:RC5Receiver.c **** 	//measure bit pulse time
+  45:RC5Receiver.c **** 	time_count=0;
+  35              		.loc 1 45 0
+  36 0020 F4319FE5 		ldr	r3, .L51
+  37 0024 002083E5 		str	r2, [r3, #0]
+  46:RC5Receiver.c **** 	BIT_TIMER_EN=1;
+  38              		.loc 1 46 0
+  39 0028 0120A0E3 		mov	r2, #1
+  40 002c 0239A0E3 		mov	r3, #32768
+  41 0030 4E3283E2 		add	r3, r3, #-536870908
+  42 0034 002083E5 		str	r2, [r3, #0]
+  43 0038 0E32A0E3 		mov	r3, #-536870912
+  44 003c 0AE983E2 		add	lr, r3, #163840
+  45 0040 D4C19FE5 		ldr	ip, .L51
+  46 0044 5D3DA0E3 		mov	r3, #5952
+  47 0048 302083E2 		add	r2, r3, #48
+  48 004c 150000EA 		b	.L5
+  49              	.L6:
+  47:RC5Receiver.c **** 	while(IRED_PIN==0)
+  48:RC5Receiver.c **** 		if(time_count>FRAME_TIMEOUT)
+  50              		.loc 1 48 0
+  51 0050 00309CE5 		ldr	r3, [ip, #0]
+  52 0054 020053E1 		cmp	r3, r2
+  53 0058 8100008A 		bhi	.L7
+  54              	.L5:
+  55              		.loc 1 47 0
+  56 005c 00309EE5 		ldr	r3, [lr, #0]
+  57 0060 040013E3 		tst	r3, #4
+  58 0064 1200000A 		beq	.L6
+  59 0068 0E32A0E3 		mov	r3, #-536870912
+  60 006c 0AE983E2 		add	lr, r3, #163840
+  61 0070 A4C19FE5 		ldr	ip, .L51
+  62 0074 5D3DA0E3 		mov	r3, #5952
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 3
+
+
+  63 0078 302083E2 		add	r2, r3, #48
+  64 007c 210000EA 		b	.L8
+  65              	.L9:
+  49:RC5Receiver.c **** 			return ERR_FRAME_TIMEOUT;
+  50:RC5Receiver.c **** 
+  51:RC5Receiver.c **** 	while(IRED_PIN!=0)
+  52:RC5Receiver.c **** 		if(time_count>FRAME_TIMEOUT)
+  66              		.loc 1 52 0
+  67 0080 00309CE5 		ldr	r3, [ip, #0]
+  68 0084 020053E1 		cmp	r3, r2
+  69 0088 8100008A 		bhi	.L7
+  70              	.L8:
+  71              		.loc 1 51 0
+  72 008c 00309EE5 		ldr	r3, [lr, #0]
+  73 0090 040013E3 		tst	r3, #4
+  74 0094 1E00001A 		bne	.L9
+  53:RC5Receiver.c **** 			return ERR_FRAME_TIMEOUT;
+  54:RC5Receiver.c **** 
+  55:RC5Receiver.c **** 	bit_time=time_count;
+  75              		.loc 1 55 0
+  76 0098 7C319FE5 		ldr	r3, .L51
+  77 009c 005093E5 		ldr	r5, [r3, #0]
+  78              	.LVL3:
+  56:RC5Receiver.c **** 
+  57:RC5Receiver.c **** 	//error?
+  58:RC5Receiver.c **** 	if((bit_time<MIN_BIT_TIME) || (bit_time>MAX_BIT_TIME))
+  79              		.loc 1 58 0
+  80 00a0 963045E2 		sub	r3, r5, #150
+  81 00a4 640053E3 		cmp	r3, #100
+  82 00a8 0100A083 		movhi	r0, #1
+  83              	.LVL4:
+  84 00ac 8200008A 		bhi	.L13
+  59:RC5Receiver.c **** 		return ERR_BIT_TIME;
+  60:RC5Receiver.c **** 
+  61:RC5Receiver.c **** 	//waiting 0.75*bit time
+  62:RC5Receiver.c **** 	tmp_time=time_count;
+  85              		.loc 1 62 0
+  86 00b0 64319FE5 		ldr	r3, .L51
+  87 00b4 00C093E5 		ldr	ip, [r3, #0]
+  88              	.LVL5:
+  63:RC5Receiver.c **** 	while((time_count-tmp_time)<=(3*bit_time)/4);
+  89              		.loc 1 63 0
+  90 00b8 853085E0 		add	r3, r5, r5, asl #1
+  91 00bc 2321A0E1 		mov	r2, r3, lsr #2
+  92 00c0 54E19FE5 		ldr	lr, .L51
+  93              	.L14:
+  94 00c4 00309EE5 		ldr	r3, [lr, #0]
+  95 00c8 03306CE0 		rsb	r3, ip, r3
+  96 00cc 020053E1 		cmp	r3, r2
+  97 00d0 2F00009A 		bls	.L14
+  64:RC5Receiver.c **** 
+  65:RC5Receiver.c **** 
+  66:RC5Receiver.c **** 	//main RC5 loop
+  67:RC5Receiver.c **** 	for(*pcommand=0,*paddress=0,*ptoggle=0,i=0;i<12;i++)
+  98              		.loc 1 67 0
+  99 00d4 0030A0E3 		mov	r3, #0
+ 100 00d8 003084E5 		str	r3, [r4, #0]
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 4
+
+
+ 101 00dc 003081E5 		str	r3, [r1, #0]
+ 102              	.LVL6:
+ 103 00e0 003080E5 		str	r3, [r0, #0]
+ 104 00e4 0390A0E1 		mov	r9, r3
+ 105              	.LVL7:
+ 106 00e8 0E3283E2 		add	r3, r3, #-536870912
+ 107 00ec 0A7983E2 		add	r7, r3, #163840
+ 108 00f0 24619FE5 		ldr	r6, .L51
+ 109 00f4 5D3DA0E3 		mov	r3, #5952
+ 110 00f8 30A083E2 		add	sl, r3, #48
+ 111 00fc 2531A0E1 		mov	r3, r5, lsr #2
+ 112 0100 00308DE5 		str	r3, [sp, #0]
+ 113              	.LVL8:
+ 114              	.L16:
+  68:RC5Receiver.c **** 	{
+  69:RC5Receiver.c **** 		//waiting for the edge
+  70:RC5Receiver.c **** 		tmp_ired=IRED_PIN;
+ 115              		.loc 1 70 0
+ 116 0104 003097E5 		ldr	r3, [r7, #0]
+ 117 0108 042003E2 		and	r2, r3, #4
+ 118              	.LVL9:
+ 119 010c 450000EA 		b	.L17
+ 120              	.L18:
+  71:RC5Receiver.c **** 		while(IRED_PIN==tmp_ired)
+  72:RC5Receiver.c **** 			if(time_count>FRAME_TIMEOUT)
+ 121              		.loc 1 72 0
+ 122 0110 003096E5 		ldr	r3, [r6, #0]
+ 123 0114 0A0053E1 		cmp	r3, sl
+ 124 0118 8100008A 		bhi	.L7
+ 125              	.L17:
+ 126              		.loc 1 71 0
+ 127 011c 003097E5 		ldr	r3, [r7, #0]
+ 128 0120 043003E2 		and	r3, r3, #4
+ 129 0124 030052E1 		cmp	r2, r3
+ 130 0128 4200000A 		beq	.L18
+  73:RC5Receiver.c **** 				return ERR_FRAME_TIMEOUT;
+  74:RC5Receiver.c **** 
+  75:RC5Receiver.c **** 
+  76:RC5Receiver.c **** 		//waiting 0.25*bit time
+  77:RC5Receiver.c **** 		tmp_time=time_count;
+ 131              		.loc 1 77 0
+ 132 012c 00C096E5 		ldr	ip, [r6, #0]
+ 133              	.LVL10:
+ 134 0130 E4E09FE5 		ldr	lr, .L51
+ 135 0134 00209DE5 		ldr	r2, [sp, #0]
+ 136              	.LVL11:
+ 137              	.L20:
+  78:RC5Receiver.c **** 		while((time_count-tmp_time)<=bit_time/4);
+ 138              		.loc 1 78 0
+ 139 0138 00309EE5 		ldr	r3, [lr, #0]
+ 140 013c 03306CE0 		rsb	r3, ip, r3
+ 141 0140 020053E1 		cmp	r3, r2
+ 142 0144 4C00009A 		bls	.L20
+  79:RC5Receiver.c **** 
+  80:RC5Receiver.c **** 		//sampling two times
+  81:RC5Receiver.c **** 		tmp_ired=IRED_PIN;
+ 143              		.loc 1 81 0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 5
+
+
+ 144 0148 003097E5 		ldr	r3, [r7, #0]
+ 145 014c 048003E2 		and	r8, r3, #4
+  82:RC5Receiver.c **** 
+  83:RC5Receiver.c **** 		//wait for cca. 0.10 of half bit time
+  84:RC5Receiver.c **** 		tmp_time=time_count;
+ 146              		.loc 1 84 0
+ 147 0150 00C09EE5 		ldr	ip, [lr, #0]
+ 148              	.LVL12:
+ 149 0154 C0209FE5 		ldr	r2, .L51
+ 150              	.L22:
+  85:RC5Receiver.c **** 		while((time_count-tmp_time)<=10);
+ 151              		.loc 1 85 0
+ 152 0158 003092E5 		ldr	r3, [r2, #0]
+ 153 015c 03306CE0 		rsb	r3, ip, r3
+ 154 0160 0A0053E3 		cmp	r3, #10
+ 155 0164 5400009A 		bls	.L22
+  86:RC5Receiver.c **** 
+  87:RC5Receiver.c **** 		if(IRED_PIN!=tmp_ired)
+ 156              		.loc 1 87 0
+ 157 0168 003097E5 		ldr	r3, [r7, #0]
+ 158 016c 043003E2 		and	r3, r3, #4
+ 159 0170 030058E1 		cmp	r8, r3
+ 160 0174 7F00001A 		bne	.L37
+  88:RC5Receiver.c **** 			return ERR_SAMPLING;
+  89:RC5Receiver.c **** 
+  90:RC5Receiver.c **** 		if(i==0)
+ 161              		.loc 1 90 0
+ 162 0178 000059E3 		cmp	r9, #0
+ 163 017c 6300001A 		bne	.L26
+  91:RC5Receiver.c **** 		{
+  92:RC5Receiver.c **** 			//toggle bit
+  93:RC5Receiver.c **** 			if(tmp_ired==0)
+ 164              		.loc 1 93 0
+ 165 0180 000058E3 		cmp	r8, #0
+  94:RC5Receiver.c **** 				*ptoggle|=1;
+ 166              		.loc 1 94 0
+ 167 0184 00309005 		ldreq	r3, [r0, #0]
+ 168 0188 01308303 		orreq	r3, r3, #1
+ 169 018c 00308005 		streq	r3, [r0, #0]
+ 170 0190 720000EA 		b	.L38
+ 171              	.L26:
+  95:RC5Receiver.c **** 		}
+  96:RC5Receiver.c **** 		else if(i<6)
+ 172              		.loc 1 96 0
+ 173 0194 050059E3 		cmp	r9, #5
+ 174 0198 6C00008A 		bhi	.L30
+  97:RC5Receiver.c **** 		{
+  98:RC5Receiver.c **** 			//address
+  99:RC5Receiver.c **** 			*paddress<<=1;
+ 175              		.loc 1 99 0
+ 176 019c 003091E5 		ldr	r3, [r1, #0]
+ 177 01a0 8330A0E1 		mov	r3, r3, asl #1
+ 178 01a4 003081E5 		str	r3, [r1, #0]
+ 100:RC5Receiver.c **** 			if(tmp_ired==0)
+ 179              		.loc 1 100 0
+ 180 01a8 000058E3 		cmp	r8, #0
+ 101:RC5Receiver.c **** 				*paddress|=1;
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 6
+
+
+ 181              		.loc 1 101 0
+ 182 01ac 01308303 		orreq	r3, r3, #1
+ 183 01b0 00308105 		streq	r3, [r1, #0]
+ 184 01b4 720000EA 		b	.L38
+ 185              	.L30:
+ 102:RC5Receiver.c **** 		}
+ 103:RC5Receiver.c **** 		else
+ 104:RC5Receiver.c **** 		{
+ 105:RC5Receiver.c **** 			//command
+ 106:RC5Receiver.c **** 			*pcommand<<=1;
+ 186              		.loc 1 106 0
+ 187 01b8 003094E5 		ldr	r3, [r4, #0]
+ 188 01bc 8330A0E1 		mov	r3, r3, asl #1
+ 189 01c0 003084E5 		str	r3, [r4, #0]
+ 107:RC5Receiver.c **** 			if(tmp_ired==0)
+ 190              		.loc 1 107 0
+ 191 01c4 000058E3 		cmp	r8, #0
+ 108:RC5Receiver.c **** 				*pcommand|=1;
+ 192              		.loc 1 108 0
+ 193 01c8 01308303 		orreq	r3, r3, #1
+ 194 01cc 00308405 		streq	r3, [r4, #0]
+ 195              	.L38:
+ 109:RC5Receiver.c **** 		}
+ 110:RC5Receiver.c **** 
+ 111:RC5Receiver.c **** 		//wait half bit time
+ 112:RC5Receiver.c **** 		while((time_count-tmp_time)<=bit_time/2);
+ 196              		.loc 1 112 0
+ 197 01d0 003096E5 		ldr	r3, [r6, #0]
+ 198 01d4 03306CE0 		rsb	r3, ip, r3
+ 199 01d8 A50053E1 		cmp	r3, r5, lsr #1
+ 200 01dc 7200009A 		bls	.L38
+ 201              		.loc 1 67 0
+ 202 01e0 019089E2 		add	r9, r9, #1
+ 203 01e4 0C0059E3 		cmp	r9, #12
+ 204 01e8 3F00001A 		bne	.L16
+ 113:RC5Receiver.c **** 	}
+ 114:RC5Receiver.c **** 	BIT_TIMER_EN=0;
+ 205              		.loc 1 114 0
+ 206 01ec 0020A0E3 		mov	r2, #0
+ 207 01f0 0239A0E3 		mov	r3, #32768
+ 208 01f4 4E3283E2 		add	r3, r3, #-536870908
+ 209 01f8 002083E5 		str	r2, [r3, #0]
+ 210 01fc 0200A0E1 		mov	r0, r2
+ 211              	.LVL13:
+ 212 0200 820000EA 		b	.L13
+ 213              	.LVL14:
+ 214              	.L37:
+ 215              		.loc 1 87 0
+ 216 0204 0200A0E3 		mov	r0, #2
+ 217              	.LVL15:
+ 218 0208 820000EA 		b	.L13
+ 219              	.LVL16:
+ 220              	.L7:
+ 115:RC5Receiver.c **** 
+ 116:RC5Receiver.c **** 	return 0;
+ 221              		.loc 1 116 0
+ 222 020c 0300A0E3 		mov	r0, #3
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 7
+
+
+ 223              	.LVL17:
+ 224              	.L13:
+ 117:RC5Receiver.c **** }
+ 225              		.loc 1 117 0
+ 226 0210 04D08DE2 		add	sp, sp, #4
+ 227 0214 F047BDE8 		ldmfd	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+ 228 0218 1EFF2FE1 		bx	lr
+ 229              	.L52:
+ 230              		.align	2
+ 231              	.L51:
+ 232 021c 00000000 		.word	time_count
+ 233              	.LFE2:
+ 234              		.size	RC5_RX, .-RC5_RX
+ 235              		.align	2
+ 236              		.global	WaitForKeyRelease
+ 237              		.type	WaitForKeyRelease, %function
+ 238              	WaitForKeyRelease:
+ 239              	.LFB3:
+ 118:RC5Receiver.c **** 
+ 119:RC5Receiver.c **** //*******************************
+ 120:RC5Receiver.c **** // Waits for RC5 remote key release
+ 121:RC5Receiver.c **** // returns, when no signal received
+ 122:RC5Receiver.c **** // during at least MinimumNoSignalTime miliseconds
+ 123:RC5Receiver.c **** //*******************************
+ 124:RC5Receiver.c **** void WaitForKeyRelease(unsigned int MinimumNoSignalTime)
+ 125:RC5Receiver.c **** {
+ 240              		.loc 1 125 0
+ 241              		@ Function supports interworking.
+ 242              		@ args = 0, pretend = 0, frame = 0
+ 243              		@ frame_needed = 0, uses_anonymous_args = 0
+ 244              		@ link register save eliminated.
+ 245              	.LVL18:
+ 246              		@ lr needed for prologue
+ 126:RC5Receiver.c **** 	const unsigned int MinNoSignalTicks=115*MinimumNoSignalTime;
+ 247              		.loc 1 126 0
+ 248 0220 803080E0 		add	r3, r0, r0, asl #1
+ 249 0224 830160E0 		rsb	r0, r0, r3, asl #3
+ 250              	.LVL19:
+ 251 0228 001180E0 		add	r1, r0, r0, asl #2
+ 252              	.LVL20:
+ 127:RC5Receiver.c **** 
+ 128:RC5Receiver.c **** 	time_count=0;
+ 253              		.loc 1 128 0
+ 254 022c 0020A0E3 		mov	r2, #0
+ 255 0230 4C309FE5 		ldr	r3, .L65
+ 256 0234 002083E5 		str	r2, [r3, #0]
+ 129:RC5Receiver.c **** 	BIT_TIMER_EN=1;
+ 257              		.loc 1 129 0
+ 258 0238 012082E2 		add	r2, r2, #1
+ 259 023c 0239A0E3 		mov	r3, #32768
+ 260 0240 4E3283E2 		add	r3, r3, #-536870908
+ 261 0244 002083E5 		str	r2, [r3, #0]
+ 262 0248 34209FE5 		ldr	r2, .L65
+ 263 024c 0E32A0E3 		mov	r3, #-536870912
+ 264 0250 0A0983E2 		add	r0, r3, #163840
+ 265 0254 970000EA 		b	.L64
+ 266              	.L55:
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 8
+
+
+ 130:RC5Receiver.c **** 	while(time_count<MinNoSignalTicks)
+ 131:RC5Receiver.c **** 		if(IRED_PIN==0)
+ 267              		.loc 1 131 0
+ 268 0258 003090E5 		ldr	r3, [r0, #0]
+ 269 025c 043013E2 		ands	r3, r3, #4
+ 132:RC5Receiver.c **** 			time_count=0;		
+ 270              		.loc 1 132 0
+ 271 0260 00308205 		streq	r3, [r2, #0]
+ 272              	.L64:
+ 273              		.loc 1 130 0
+ 274 0264 003092E5 		ldr	r3, [r2, #0]
+ 275 0268 030051E1 		cmp	r1, r3
+ 276 026c 9400008A 		bhi	.L55
+ 133:RC5Receiver.c **** 	BIT_TIMER_EN=0;
+ 277              		.loc 1 133 0
+ 278 0270 0020A0E3 		mov	r2, #0
+ 279 0274 0239A0E3 		mov	r3, #32768
+ 280 0278 4E3283E2 		add	r3, r3, #-536870908
+ 281 027c 002083E5 		str	r2, [r3, #0]
+ 134:RC5Receiver.c **** }
+ 282              		.loc 1 134 0
+ 283 0280 1EFF2FE1 		bx	lr
+ 284              	.L66:
+ 285              		.align	2
+ 286              	.L65:
+ 287 0284 00000000 		.word	time_count
+ 288              	.LFE3:
+ 289              		.size	WaitForKeyRelease, .-WaitForKeyRelease
+ 290              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 291              		.align	2
+ 292              	.LC0:
+ 293 0000 52433520 		.ascii	"RC5 Receiver\000"
+ 293      52656365 
+ 293      69766572 
+ 293      00
+ 294 000d 000000   		.align	2
+ 295              	.LC1:
+ 296 0010 55736520 		.ascii	"Use your remote\000"
+ 296      796F7572 
+ 296      2072656D 
+ 296      6F746500 
+ 297              		.align	2
+ 298              	.LC2:
+ 299 0020 436F6D6D 		.ascii	"Command: \000"
+ 299      616E643A 
+ 299      2000
+ 300 002a 0000     		.align	2
+ 301              	.LC3:
+ 302 002c 41646472 		.ascii	"Address: \000"
+ 302      6573733A 
+ 302      2000
+ 303 0036 0000     		.align	2
+ 304              	.LC4:
+ 305 0038 2C20543A 		.ascii	", T:\000"
+ 305      00
+ 306 003d 000000   		.align	2
+ 307              	.LC5:
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 9
+
+
+ 308 0040 4552525F 		.ascii	"ERR_BIT_TIME\000"
+ 308      4249545F 
+ 308      54494D45 
+ 308      00
+ 309 004d 000000   		.align	2
+ 310              	.LC6:
+ 311 0050 4552525F 		.ascii	"ERR_SAMPLING\000"
+ 311      53414D50 
+ 311      4C494E47 
+ 311      00
+ 312 005d 000000   		.align	2
+ 313              	.LC7:
+ 314 0060 4552525F 		.ascii	"ERR_FRAME_TIMEOUT\000"
+ 314      4652414D 
+ 314      455F5449 
+ 314      4D454F55 
+ 314      5400
+ 315 0072 0000     		.text
+ 316              		.align	2
+ 317              		.global	main
+ 318              		.type	main, %function
+ 319              	main:
+ 320              	.LFB4:
+ 135:RC5Receiver.c **** 
+ 136:RC5Receiver.c **** //*******************************
+ 137:RC5Receiver.c **** // MAIN
+ 138:RC5Receiver.c **** //*******************************
+ 139:RC5Receiver.c **** int main(void) 
+ 140:RC5Receiver.c **** {
+ 321              		.loc 1 140 0
+ 322              		@ Function supports interworking.
+ 323              		@ args = 0, pretend = 0, frame = 12
+ 324              		@ frame_needed = 1, uses_anonymous_args = 0
+ 325 0288 0DC0A0E1 		mov	ip, sp
+ 326              	.LCFI2:
+ 327 028c 10D82DE9 		stmfd	sp!, {r4, fp, ip, lr, pc}
+ 328              	.LCFI3:
+ 329 0290 04B04CE2 		sub	fp, ip, #4
+ 330              	.LCFI4:
+ 331 0294 0CD04DE2 		sub	sp, sp, #12
+ 332              	.LCFI5:
+ 141:RC5Receiver.c **** 	//Peripherials' frequency = fclk/4 = 15MHz
+ 142:RC5Receiver.c **** 	VPBDIV&=0xFFFFFFFC;
+ 333              		.loc 1 142 0
+ 334 0298 0E12A0E3 		mov	r1, #-536870912
+ 335 029c 7F2981E2 		add	r2, r1, #2080768
+ 336 02a0 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+ 337 02a4 FC3003E2 		and	r3, r3, #252
+ 338 02a8 0031C2E5 		strb	r3, [r2, #256]
+ 143:RC5Receiver.c **** 	VPBDIV|=0x00;
+ 339              		.loc 1 143 0
+ 340 02ac 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+ 341 02b0 FF3003E2 		and	r3, r3, #255
+ 342 02b4 0031C2E5 		strb	r3, [r2, #256]
+ 144:RC5Receiver.c **** 	
+ 145:RC5Receiver.c **** 	//P1.16..23 defined as outputs
+ 146:RC5Receiver.c **** 	IODIR1 = 0x00FF0000;
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 10
+
+
+ 343              		.loc 1 146 0
+ 344 02b8 0A1981E2 		add	r1, r1, #163840
+ 345 02bc FF38A0E3 		mov	r3, #16711680
+ 346 02c0 183081E5 		str	r3, [r1, #24]
+ 147:RC5Receiver.c **** 
+ 148:RC5Receiver.c **** 	//P0.2 defined as input
+ 149:RC5Receiver.c **** 	IODIR0 = 0xFF000000;
+ 347              		.loc 1 149 0
+ 348 02c4 FF24A0E3 		mov	r2, #-16777216
+ 349 02c8 8E32A0E3 		mov	r3, #-536870904
+ 350 02cc 0A3983E2 		add	r3, r3, #163840
+ 351 02d0 002083E5 		str	r2, [r3, #0]
+ 150:RC5Receiver.c **** 
+ 151:RC5Receiver.c **** 	//inits
+ 152:RC5Receiver.c **** 	LCDInit();
+ 352              		.loc 1 152 0
+ 353 02d4 FEFFFFEB 		bl	LCDInit
+ 153:RC5Receiver.c **** 	init_bit_timer();
+ 354              		.loc 1 153 0
+ 355 02d8 FEFFFFEB 		bl	init_bit_timer
+ 154:RC5Receiver.c **** 
+ 155:RC5Receiver.c **** 	LCDClear();
+ 356              		.loc 1 155 0
+ 357 02dc FEFFFFEB 		bl	LCDClear
+ 156:RC5Receiver.c **** 	LCDText("RC5 Receiver");
+ 358              		.loc 1 156 0
+ 359 02e0 B4009FE5 		ldr	r0, .L78
+ 360 02e4 FEFFFFEB 		bl	LCDText
+ 157:RC5Receiver.c **** 	LCDGotoXY(0,1);
+ 361              		.loc 1 157 0
+ 362 02e8 0000A0E3 		mov	r0, #0
+ 363 02ec 0110A0E3 		mov	r1, #1
+ 364 02f0 FEFFFFEB 		bl	LCDGotoXY
+ 158:RC5Receiver.c **** 	LCDText("Use your remote");
+ 365              		.loc 1 158 0
+ 366 02f4 A4009FE5 		ldr	r0, .L78+4
+ 367 02f8 FEFFFFEB 		bl	LCDText
+ 368              	.LVL21:
+ 369              	.L68:
+ 370              	.LBB2:
+ 159:RC5Receiver.c **** 
+ 160:RC5Receiver.c **** 	while(1)
+ 161:RC5Receiver.c **** 	{
+ 162:RC5Receiver.c **** 		unsigned int toggle,address,command,err;
+ 163:RC5Receiver.c **** 
+ 164:RC5Receiver.c **** 		//receive RC5 frame
+ 165:RC5Receiver.c **** 		err=RC5_RX(&toggle,&address,&command);
+ 371              		.loc 1 165 0
+ 372 02fc 14004BE2 		sub	r0, fp, #20
+ 373 0300 18104BE2 		sub	r1, fp, #24
+ 374 0304 1C204BE2 		sub	r2, fp, #28
+ 375 0308 FEFFFFEB 		bl	RC5_RX
+ 376 030c 0040A0E1 		mov	r4, r0
+ 166:RC5Receiver.c **** 
+ 167:RC5Receiver.c **** 		LCDClear();
+ 377              		.loc 1 167 0
+ 378 0310 FEFFFFEB 		bl	LCDClear
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 11
+
+
+ 168:RC5Receiver.c **** 		if(err==0)
+ 379              		.loc 1 168 0
+ 380 0314 000054E3 		cmp	r4, #0
+ 381 0318 D500001A 		bne	.L69
+ 169:RC5Receiver.c **** 		{
+ 170:RC5Receiver.c **** 			LCDText("Command: ");
+ 382              		.loc 1 170 0
+ 383 031c 80009FE5 		ldr	r0, .L78+8
+ 384 0320 FEFFFFEB 		bl	LCDText
+ 171:RC5Receiver.c **** 			LCD32bitNumberDec(command);
+ 385              		.loc 1 171 0
+ 386 0324 1C001BE5 		ldr	r0, [fp, #-28]
+ 387 0328 FEFFFFEB 		bl	LCD32bitNumberDec
+ 172:RC5Receiver.c **** 			LCDGotoXY(0,1);
+ 388              		.loc 1 172 0
+ 389 032c 0400A0E1 		mov	r0, r4
+ 390 0330 0110A0E3 		mov	r1, #1
+ 391 0334 FEFFFFEB 		bl	LCDGotoXY
+ 173:RC5Receiver.c **** 			LCDText("Address: ");
+ 392              		.loc 1 173 0
+ 393 0338 68009FE5 		ldr	r0, .L78+12
+ 394 033c FEFFFFEB 		bl	LCDText
+ 174:RC5Receiver.c **** 			LCD32bitNumberDec(address);
+ 395              		.loc 1 174 0
+ 396 0340 18001BE5 		ldr	r0, [fp, #-24]
+ 397 0344 FEFFFFEB 		bl	LCD32bitNumberDec
+ 175:RC5Receiver.c **** 			LCDText(", T:");
+ 398              		.loc 1 175 0
+ 399 0348 5C009FE5 		ldr	r0, .L78+16
+ 400 034c FEFFFFEB 		bl	LCDText
+ 176:RC5Receiver.c **** 			LCD32bitNumberDec(toggle);
+ 401              		.loc 1 176 0
+ 402 0350 14001BE5 		ldr	r0, [fp, #-20]
+ 403 0354 FEFFFFEB 		bl	LCD32bitNumberDec
+ 404 0358 E20000EA 		b	.L71
+ 405              	.L69:
+ 177:RC5Receiver.c **** 		}
+ 178:RC5Receiver.c **** 		else if(err==ERR_BIT_TIME)
+ 406              		.loc 1 178 0
+ 407 035c 010054E3 		cmp	r4, #1
+ 408 0360 DA00001A 		bne	.L72
+ 179:RC5Receiver.c **** 			LCDText("ERR_BIT_TIME");
+ 409              		.loc 1 179 0
+ 410 0364 44009FE5 		ldr	r0, .L78+20
+ 411 0368 FEFFFFEB 		bl	LCDText
+ 412 036c E20000EA 		b	.L71
+ 413              	.L72:
+ 180:RC5Receiver.c **** 		else if(err==ERR_SAMPLING)
+ 414              		.loc 1 180 0
+ 415 0370 020054E3 		cmp	r4, #2
+ 416 0374 DF00001A 		bne	.L74
+ 181:RC5Receiver.c **** 			LCDText("ERR_SAMPLING");
+ 417              		.loc 1 181 0
+ 418 0378 34009FE5 		ldr	r0, .L78+24
+ 419 037c FEFFFFEB 		bl	LCDText
+ 420 0380 E20000EA 		b	.L71
+ 421              	.L74:
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 12
+
+
+ 182:RC5Receiver.c **** 		else if(err==ERR_FRAME_TIMEOUT)
+ 422              		.loc 1 182 0
+ 423 0384 030054E3 		cmp	r4, #3
+ 183:RC5Receiver.c **** 			LCDText("ERR_FRAME_TIMEOUT");
+ 424              		.loc 1 183 0
+ 425 0388 28009F05 		ldreq	r0, .L78+28
+ 426 038c FEFFFF0B 		bleq	LCDText
+ 427              	.L71:
+ 184:RC5Receiver.c **** 
+ 185:RC5Receiver.c **** 		//wait for key release (cca. 100ms without signal)
+ 186:RC5Receiver.c **** 		WaitForKeyRelease(100);
+ 428              		.loc 1 186 0
+ 429 0390 6400A0E3 		mov	r0, #100
+ 430 0394 FEFFFFEB 		bl	WaitForKeyRelease
+ 431 0398 BD0000EA 		b	.L68
+ 432              	.L79:
+ 433              		.align	2
+ 434              	.L78:
+ 435 039c 00000000 		.word	.LC0
+ 436 03a0 10000000 		.word	.LC1
+ 437 03a4 20000000 		.word	.LC2
+ 438 03a8 2C000000 		.word	.LC3
+ 439 03ac 38000000 		.word	.LC4
+ 440 03b0 40000000 		.word	.LC5
+ 441 03b4 50000000 		.word	.LC6
+ 442 03b8 60000000 		.word	.LC7
+ 443              	.LBE2:
+ 444              	.LFE4:
+ 445              		.size	main, .-main
+ 446              		.section	.debug_frame,"",%progbits
+ 447              	.Lframe0:
+ 448 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ 449              	.LSCIE0:
+ 450 0004 FFFFFFFF 		.4byte	0xffffffff
+ 451 0008 01       		.byte	0x1
+ 452 0009 00       		.ascii	"\000"
+ 453 000a 01       		.uleb128 0x1
+ 454 000b 7C       		.sleb128 -4
+ 455 000c 0E       		.byte	0xe
+ 456 000d 0C       		.byte	0xc
+ 457 000e 0D       		.uleb128 0xd
+ 458 000f 00       		.uleb128 0x0
+ 459              		.align	2
+ 460              	.LECIE0:
+ 461              	.LSFDE0:
+ 462 0010 24000000 		.4byte	.LEFDE0-.LASFDE0
+ 463              	.LASFDE0:
+ 464 0014 00000000 		.4byte	.Lframe0
+ 465 0018 00000000 		.4byte	.LFB2
+ 466 001c 20020000 		.4byte	.LFE2-.LFB2
+ 467 0020 44       		.byte	0x4
+ 468              		.4byte	.LCFI0-.LFB2
+ 469 0021 0E       		.byte	0xe
+ 470 0022 20       		.uleb128 0x20
+ 471 0023 44       		.byte	0x4
+ 472              		.4byte	.LCFI1-.LCFI0
+ 473 0024 0E       		.byte	0xe
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 13
+
+
+ 474 0025 24       		.uleb128 0x24
+ 475 0026 8E       		.byte	0x8e
+ 476 0027 01       		.uleb128 0x1
+ 477 0028 8A       		.byte	0x8a
+ 478 0029 02       		.uleb128 0x2
+ 479 002a 89       		.byte	0x89
+ 480 002b 03       		.uleb128 0x3
+ 481 002c 88       		.byte	0x88
+ 482 002d 04       		.uleb128 0x4
+ 483 002e 87       		.byte	0x87
+ 484 002f 05       		.uleb128 0x5
+ 485 0030 86       		.byte	0x86
+ 486 0031 06       		.uleb128 0x6
+ 487 0032 85       		.byte	0x85
+ 488 0033 07       		.uleb128 0x7
+ 489 0034 84       		.byte	0x84
+ 490 0035 08       		.uleb128 0x8
+ 491 0036 0000     		.align	2
+ 492              	.LEFDE0:
+ 493              	.LSFDE2:
+ 494 0038 0C000000 		.4byte	.LEFDE2-.LASFDE2
+ 495              	.LASFDE2:
+ 496 003c 00000000 		.4byte	.Lframe0
+ 497 0040 20020000 		.4byte	.LFB3
+ 498 0044 68000000 		.4byte	.LFE3-.LFB3
+ 499              		.align	2
+ 500              	.LEFDE2:
+ 501              	.LSFDE4:
+ 502 0048 1C000000 		.4byte	.LEFDE4-.LASFDE4
+ 503              	.LASFDE4:
+ 504 004c 00000000 		.4byte	.Lframe0
+ 505 0050 88020000 		.4byte	.LFB4
+ 506 0054 34010000 		.4byte	.LFE4-.LFB4
+ 507 0058 44       		.byte	0x4
+ 508              		.4byte	.LCFI2-.LFB4
+ 509 0059 0D       		.byte	0xd
+ 510 005a 0C       		.uleb128 0xc
+ 511 005b 44       		.byte	0x4
+ 512              		.4byte	.LCFI3-.LCFI2
+ 513 005c 8E       		.byte	0x8e
+ 514 005d 02       		.uleb128 0x2
+ 515 005e 8D       		.byte	0x8d
+ 516 005f 03       		.uleb128 0x3
+ 517 0060 8B       		.byte	0x8b
+ 518 0061 04       		.uleb128 0x4
+ 519 0062 84       		.byte	0x84
+ 520 0063 05       		.uleb128 0x5
+ 521 0064 44       		.byte	0x4
+ 522              		.4byte	.LCFI4-.LCFI3
+ 523 0065 0C       		.byte	0xc
+ 524 0066 0B       		.uleb128 0xb
+ 525 0067 04       		.uleb128 0x4
+ 526              		.align	2
+ 527              	.LEFDE4:
+ 528              		.text
+ 529              	.Letext0:
+ 530              		.section	.debug_loc,"",%progbits
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 14
+
+
+ 531              	.Ldebug_loc0:
+ 532              	.LLST0:
+ 533 0000 00000000 		.4byte	.LVL0-.Ltext0
+ 534 0004 08000000 		.4byte	.LVL1-.Ltext0
+ 535 0008 0200     		.2byte	0x2
+ 536 000a 7D       		.byte	0x7d
+ 537 000b 7C       		.sleb128 -4
+ 538 000c 08000000 		.4byte	.LVL1-.Ltext0
+ 539 0010 20020000 		.4byte	.LFE2-.Ltext0
+ 540 0014 0200     		.2byte	0x2
+ 541 0016 7D       		.byte	0x7d
+ 542 0017 00       		.sleb128 0
+ 543 0018 00000000 		.4byte	0x0
+ 544 001c 00000000 		.4byte	0x0
+ 545              	.LLST1:
+ 546 0020 00000000 		.4byte	.LVL0-.Ltext0
+ 547 0024 AC000000 		.4byte	.LVL4-.Ltext0
+ 548 0028 0100     		.2byte	0x1
+ 549 002a 50       		.byte	0x50
+ 550 002b E0000000 		.4byte	.LVL6-.Ltext0
+ 551 002f 00020000 		.4byte	.LVL13-.Ltext0
+ 552 0033 0100     		.2byte	0x1
+ 553 0035 50       		.byte	0x50
+ 554 0036 04020000 		.4byte	.LVL14-.Ltext0
+ 555 003a 08020000 		.4byte	.LVL15-.Ltext0
+ 556 003e 0100     		.2byte	0x1
+ 557 0040 50       		.byte	0x50
+ 558 0041 0C020000 		.4byte	.LVL16-.Ltext0
+ 559 0045 10020000 		.4byte	.LVL17-.Ltext0
+ 560 0049 0100     		.2byte	0x1
+ 561 004b 50       		.byte	0x50
+ 562 004c 00000000 		.4byte	0x0
+ 563 0050 00000000 		.4byte	0x0
+ 564              	.LLST2:
+ 565 0054 00000000 		.4byte	.LVL0-.Ltext0
+ 566 0058 14000000 		.4byte	.LVL2-.Ltext0
+ 567 005c 0100     		.2byte	0x1
+ 568 005e 52       		.byte	0x52
+ 569 005f 14000000 		.4byte	.LVL2-.Ltext0
+ 570 0063 20020000 		.4byte	.LFE2-.Ltext0
+ 571 0067 0100     		.2byte	0x1
+ 572 0069 54       		.byte	0x54
+ 573 006a 00000000 		.4byte	0x0
+ 574 006e 00000000 		.4byte	0x0
+ 575              	.LLST3:
+ 576 0072 B8000000 		.4byte	.LVL5-.Ltext0
+ 577 0076 30010000 		.4byte	.LVL10-.Ltext0
+ 578 007a 0100     		.2byte	0x1
+ 579 007c 5C       		.byte	0x5c
+ 580 007d 30010000 		.4byte	.LVL10-.Ltext0
+ 581 0081 54010000 		.4byte	.LVL12-.Ltext0
+ 582 0085 0100     		.2byte	0x1
+ 583 0087 5C       		.byte	0x5c
+ 584 0088 0C020000 		.4byte	.LVL16-.Ltext0
+ 585 008c 20020000 		.4byte	.LFE2-.Ltext0
+ 586 0090 0100     		.2byte	0x1
+ 587 0092 5C       		.byte	0x5c
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 15
+
+
+ 588 0093 00000000 		.4byte	0x0
+ 589 0097 00000000 		.4byte	0x0
+ 590              	.LLST4:
+ 591 009b 04010000 		.4byte	.LVL8-.Ltext0
+ 592 009f 0C010000 		.4byte	.LVL9-.Ltext0
+ 593 00a3 0100     		.2byte	0x1
+ 594 00a5 58       		.byte	0x58
+ 595 00a6 0C010000 		.4byte	.LVL9-.Ltext0
+ 596 00aa 38010000 		.4byte	.LVL11-.Ltext0
+ 597 00ae 0100     		.2byte	0x1
+ 598 00b0 52       		.byte	0x52
+ 599 00b1 0C020000 		.4byte	.LVL16-.Ltext0
+ 600 00b5 20020000 		.4byte	.LFE2-.Ltext0
+ 601 00b9 0100     		.2byte	0x1
+ 602 00bb 52       		.byte	0x52
+ 603 00bc 00000000 		.4byte	0x0
+ 604 00c0 00000000 		.4byte	0x0
+ 605              	.LLST5:
+ 606 00c4 20020000 		.4byte	.LVL18-.Ltext0
+ 607 00c8 28020000 		.4byte	.LVL19-.Ltext0
+ 608 00cc 0100     		.2byte	0x1
+ 609 00ce 50       		.byte	0x50
+ 610 00cf 00000000 		.4byte	0x0
+ 611 00d3 00000000 		.4byte	0x0
+ 612              		.section	.debug_info
+ 613 0000 5E010000 		.4byte	0x15e
+ 614 0004 0200     		.2byte	0x2
+ 615 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 616 000a 04       		.byte	0x4
+ 617 000b 01       		.uleb128 0x1
+ 618 000c 00000000 		.4byte	.Ldebug_line0
+ 619 0010 BC030000 		.4byte	.Letext0
+ 620 0014 00000000 		.4byte	.Ltext0
+ 621 0018 C6000000 		.4byte	.LASF16
+ 622 001c 01       		.byte	0x1
+ 623 001d 38000000 		.4byte	.LASF17
+ 624 0021 61000000 		.4byte	.LASF18
+ 625 0025 02       		.uleb128 0x2
+ 626 0026 A4000000 		.4byte	0xa4
+ 627 002a 01       		.byte	0x1
+ 628 002b E0000000 		.4byte	.LASF6
+ 629 002f 01       		.byte	0x1
+ 630 0030 26       		.byte	0x26
+ 631 0031 01       		.byte	0x1
+ 632 0032 A4000000 		.4byte	0xa4
+ 633 0036 00000000 		.4byte	.LFB2
+ 634 003a 20020000 		.4byte	.LFE2
+ 635 003e 00000000 		.4byte	.LLST0
+ 636 0042 03       		.uleb128 0x3
+ 637 0043 27000000 		.4byte	.LASF0
+ 638 0047 01       		.byte	0x1
+ 639 0048 25       		.byte	0x25
+ 640 0049 AB000000 		.4byte	0xab
+ 641 004d 20000000 		.4byte	.LLST1
+ 642 0051 04       		.uleb128 0x4
+ 643 0052 D2000000 		.4byte	.LASF1
+ 644 0056 01       		.byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 16
+
+
+ 645 0057 25       		.byte	0x25
+ 646 0058 AB000000 		.4byte	0xab
+ 647 005c 01       		.byte	0x1
+ 648 005d 51       		.byte	0x51
+ 649 005e 03       		.uleb128 0x3
+ 650 005f 58000000 		.4byte	.LASF2
+ 651 0063 01       		.byte	0x1
+ 652 0064 25       		.byte	0x25
+ 653 0065 AB000000 		.4byte	0xab
+ 654 0069 54000000 		.4byte	.LLST2
+ 655 006d 05       		.uleb128 0x5
+ 656 006e 2F000000 		.4byte	.LASF3
+ 657 0072 01       		.byte	0x1
+ 658 0073 27       		.byte	0x27
+ 659 0074 A4000000 		.4byte	0xa4
+ 660 0078 01       		.byte	0x1
+ 661 0079 55       		.byte	0x55
+ 662 007a 06       		.uleb128 0x6
+ 663 007b 00000000 		.4byte	.LASF4
+ 664 007f 01       		.byte	0x1
+ 665 0080 27       		.byte	0x27
+ 666 0081 A4000000 		.4byte	0xa4
+ 667 0085 72000000 		.4byte	.LLST3
+ 668 0089 07       		.uleb128 0x7
+ 669 008a 6900     		.ascii	"i\000"
+ 670 008c 01       		.byte	0x1
+ 671 008d 27       		.byte	0x27
+ 672 008e A4000000 		.4byte	0xa4
+ 673 0092 01       		.byte	0x1
+ 674 0093 59       		.byte	0x59
+ 675 0094 06       		.uleb128 0x6
+ 676 0095 BD000000 		.4byte	.LASF5
+ 677 0099 01       		.byte	0x1
+ 678 009a 27       		.byte	0x27
+ 679 009b A4000000 		.4byte	0xa4
+ 680 009f 9B000000 		.4byte	.LLST4
+ 681 00a3 00       		.byte	0x0
+ 682 00a4 08       		.uleb128 0x8
+ 683 00a5 09000000 		.4byte	.LASF14
+ 684 00a9 04       		.byte	0x4
+ 685 00aa 07       		.byte	0x7
+ 686 00ab 09       		.uleb128 0x9
+ 687 00ac 04       		.byte	0x4
+ 688 00ad A4000000 		.4byte	0xa4
+ 689 00b1 0A       		.uleb128 0xa
+ 690 00b2 E6000000 		.4byte	0xe6
+ 691 00b6 01       		.byte	0x1
+ 692 00b7 46000000 		.4byte	.LASF7
+ 693 00bb 01       		.byte	0x1
+ 694 00bc 7D       		.byte	0x7d
+ 695 00bd 01       		.byte	0x1
+ 696 00be 20020000 		.4byte	.LFB3
+ 697 00c2 88020000 		.4byte	.LFE3
+ 698 00c6 02       		.byte	0x2
+ 699 00c7 7D       		.byte	0x7d
+ 700 00c8 00       		.sleb128 0
+ 701 00c9 03       		.uleb128 0x3
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 17
+
+
+ 702 00ca EF000000 		.4byte	.LASF8
+ 703 00ce 01       		.byte	0x1
+ 704 00cf 7C       		.byte	0x7c
+ 705 00d0 A4000000 		.4byte	0xa4
+ 706 00d4 C4000000 		.4byte	.LLST5
+ 707 00d8 05       		.uleb128 0x5
+ 708 00d9 16000000 		.4byte	.LASF9
+ 709 00dd 01       		.byte	0x1
+ 710 00de 7E       		.byte	0x7e
+ 711 00df E6000000 		.4byte	0xe6
+ 712 00e3 01       		.byte	0x1
+ 713 00e4 51       		.byte	0x51
+ 714 00e5 00       		.byte	0x0
+ 715 00e6 0B       		.uleb128 0xb
+ 716 00e7 A4000000 		.4byte	0xa4
+ 717 00eb 0C       		.uleb128 0xc
+ 718 00ec 48010000 		.4byte	0x148
+ 719 00f0 01       		.byte	0x1
+ 720 00f1 DB000000 		.4byte	.LASF10
+ 721 00f5 01       		.byte	0x1
+ 722 00f6 8C       		.byte	0x8c
+ 723 00f7 01       		.byte	0x1
+ 724 00f8 48010000 		.4byte	0x148
+ 725 00fc 88020000 		.4byte	.LFB4
+ 726 0100 BC030000 		.4byte	.LFE4
+ 727 0104 01       		.byte	0x1
+ 728 0105 5B       		.byte	0x5b
+ 729 0106 0D       		.uleb128 0xd
+ 730 0107 FC020000 		.4byte	.LBB2
+ 731 010b BC030000 		.4byte	.LBE2
+ 732 010f 05       		.uleb128 0x5
+ 733 0110 AE000000 		.4byte	.LASF11
+ 734 0114 01       		.byte	0x1
+ 735 0115 A2       		.byte	0xa2
+ 736 0116 A4000000 		.4byte	0xa4
+ 737 011a 02       		.byte	0x2
+ 738 011b 7B       		.byte	0x7b
+ 739 011c 6C       		.sleb128 -20
+ 740 011d 05       		.uleb128 0x5
+ 741 011e E7000000 		.4byte	.LASF12
+ 742 0122 01       		.byte	0x1
+ 743 0123 A2       		.byte	0xa2
+ 744 0124 A4000000 		.4byte	0xa4
+ 745 0128 02       		.byte	0x2
+ 746 0129 7B       		.byte	0x7b
+ 747 012a 68       		.sleb128 -24
+ 748 012b 05       		.uleb128 0x5
+ 749 012c B5000000 		.4byte	.LASF13
+ 750 0130 01       		.byte	0x1
+ 751 0131 A2       		.byte	0xa2
+ 752 0132 A4000000 		.4byte	0xa4
+ 753 0136 02       		.byte	0x2
+ 754 0137 7B       		.byte	0x7b
+ 755 0138 64       		.sleb128 -28
+ 756 0139 07       		.uleb128 0x7
+ 757 013a 65727200 		.ascii	"err\000"
+ 758 013e 01       		.byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 18
+
+
+ 759 013f A2       		.byte	0xa2
+ 760 0140 A4000000 		.4byte	0xa4
+ 761 0144 01       		.byte	0x1
+ 762 0145 54       		.byte	0x54
+ 763 0146 00       		.byte	0x0
+ 764 0147 00       		.byte	0x0
+ 765 0148 0E       		.uleb128 0xe
+ 766 0149 696E7400 		.ascii	"int\000"
+ 767 014d 04       		.byte	0x4
+ 768 014e 05       		.byte	0x5
+ 769 014f 0F       		.uleb128 0xf
+ 770 0150 03010000 		.4byte	.LASF15
+ 771 0154 01       		.byte	0x1
+ 772 0155 0E       		.byte	0xe
+ 773 0156 5C010000 		.4byte	0x15c
+ 774 015a 01       		.byte	0x1
+ 775 015b 01       		.byte	0x1
+ 776 015c 10       		.uleb128 0x10
+ 777 015d A4000000 		.4byte	0xa4
+ 778 0161 00       		.byte	0x0
+ 779              		.section	.debug_abbrev
+ 780 0000 01       		.uleb128 0x1
+ 781 0001 11       		.uleb128 0x11
+ 782 0002 01       		.byte	0x1
+ 783 0003 10       		.uleb128 0x10
+ 784 0004 06       		.uleb128 0x6
+ 785 0005 12       		.uleb128 0x12
+ 786 0006 01       		.uleb128 0x1
+ 787 0007 11       		.uleb128 0x11
+ 788 0008 01       		.uleb128 0x1
+ 789 0009 25       		.uleb128 0x25
+ 790 000a 0E       		.uleb128 0xe
+ 791 000b 13       		.uleb128 0x13
+ 792 000c 0B       		.uleb128 0xb
+ 793 000d 03       		.uleb128 0x3
+ 794 000e 0E       		.uleb128 0xe
+ 795 000f 1B       		.uleb128 0x1b
+ 796 0010 0E       		.uleb128 0xe
+ 797 0011 00       		.byte	0x0
+ 798 0012 00       		.byte	0x0
+ 799 0013 02       		.uleb128 0x2
+ 800 0014 2E       		.uleb128 0x2e
+ 801 0015 01       		.byte	0x1
+ 802 0016 01       		.uleb128 0x1
+ 803 0017 13       		.uleb128 0x13
+ 804 0018 3F       		.uleb128 0x3f
+ 805 0019 0C       		.uleb128 0xc
+ 806 001a 03       		.uleb128 0x3
+ 807 001b 0E       		.uleb128 0xe
+ 808 001c 3A       		.uleb128 0x3a
+ 809 001d 0B       		.uleb128 0xb
+ 810 001e 3B       		.uleb128 0x3b
+ 811 001f 0B       		.uleb128 0xb
+ 812 0020 27       		.uleb128 0x27
+ 813 0021 0C       		.uleb128 0xc
+ 814 0022 49       		.uleb128 0x49
+ 815 0023 13       		.uleb128 0x13
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 19
+
+
+ 816 0024 11       		.uleb128 0x11
+ 817 0025 01       		.uleb128 0x1
+ 818 0026 12       		.uleb128 0x12
+ 819 0027 01       		.uleb128 0x1
+ 820 0028 40       		.uleb128 0x40
+ 821 0029 06       		.uleb128 0x6
+ 822 002a 00       		.byte	0x0
+ 823 002b 00       		.byte	0x0
+ 824 002c 03       		.uleb128 0x3
+ 825 002d 05       		.uleb128 0x5
+ 826 002e 00       		.byte	0x0
+ 827 002f 03       		.uleb128 0x3
+ 828 0030 0E       		.uleb128 0xe
+ 829 0031 3A       		.uleb128 0x3a
+ 830 0032 0B       		.uleb128 0xb
+ 831 0033 3B       		.uleb128 0x3b
+ 832 0034 0B       		.uleb128 0xb
+ 833 0035 49       		.uleb128 0x49
+ 834 0036 13       		.uleb128 0x13
+ 835 0037 02       		.uleb128 0x2
+ 836 0038 06       		.uleb128 0x6
+ 837 0039 00       		.byte	0x0
+ 838 003a 00       		.byte	0x0
+ 839 003b 04       		.uleb128 0x4
+ 840 003c 05       		.uleb128 0x5
+ 841 003d 00       		.byte	0x0
+ 842 003e 03       		.uleb128 0x3
+ 843 003f 0E       		.uleb128 0xe
+ 844 0040 3A       		.uleb128 0x3a
+ 845 0041 0B       		.uleb128 0xb
+ 846 0042 3B       		.uleb128 0x3b
+ 847 0043 0B       		.uleb128 0xb
+ 848 0044 49       		.uleb128 0x49
+ 849 0045 13       		.uleb128 0x13
+ 850 0046 02       		.uleb128 0x2
+ 851 0047 0A       		.uleb128 0xa
+ 852 0048 00       		.byte	0x0
+ 853 0049 00       		.byte	0x0
+ 854 004a 05       		.uleb128 0x5
+ 855 004b 34       		.uleb128 0x34
+ 856 004c 00       		.byte	0x0
+ 857 004d 03       		.uleb128 0x3
+ 858 004e 0E       		.uleb128 0xe
+ 859 004f 3A       		.uleb128 0x3a
+ 860 0050 0B       		.uleb128 0xb
+ 861 0051 3B       		.uleb128 0x3b
+ 862 0052 0B       		.uleb128 0xb
+ 863 0053 49       		.uleb128 0x49
+ 864 0054 13       		.uleb128 0x13
+ 865 0055 02       		.uleb128 0x2
+ 866 0056 0A       		.uleb128 0xa
+ 867 0057 00       		.byte	0x0
+ 868 0058 00       		.byte	0x0
+ 869 0059 06       		.uleb128 0x6
+ 870 005a 34       		.uleb128 0x34
+ 871 005b 00       		.byte	0x0
+ 872 005c 03       		.uleb128 0x3
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 20
+
+
+ 873 005d 0E       		.uleb128 0xe
+ 874 005e 3A       		.uleb128 0x3a
+ 875 005f 0B       		.uleb128 0xb
+ 876 0060 3B       		.uleb128 0x3b
+ 877 0061 0B       		.uleb128 0xb
+ 878 0062 49       		.uleb128 0x49
+ 879 0063 13       		.uleb128 0x13
+ 880 0064 02       		.uleb128 0x2
+ 881 0065 06       		.uleb128 0x6
+ 882 0066 00       		.byte	0x0
+ 883 0067 00       		.byte	0x0
+ 884 0068 07       		.uleb128 0x7
+ 885 0069 34       		.uleb128 0x34
+ 886 006a 00       		.byte	0x0
+ 887 006b 03       		.uleb128 0x3
+ 888 006c 08       		.uleb128 0x8
+ 889 006d 3A       		.uleb128 0x3a
+ 890 006e 0B       		.uleb128 0xb
+ 891 006f 3B       		.uleb128 0x3b
+ 892 0070 0B       		.uleb128 0xb
+ 893 0071 49       		.uleb128 0x49
+ 894 0072 13       		.uleb128 0x13
+ 895 0073 02       		.uleb128 0x2
+ 896 0074 0A       		.uleb128 0xa
+ 897 0075 00       		.byte	0x0
+ 898 0076 00       		.byte	0x0
+ 899 0077 08       		.uleb128 0x8
+ 900 0078 24       		.uleb128 0x24
+ 901 0079 00       		.byte	0x0
+ 902 007a 03       		.uleb128 0x3
+ 903 007b 0E       		.uleb128 0xe
+ 904 007c 0B       		.uleb128 0xb
+ 905 007d 0B       		.uleb128 0xb
+ 906 007e 3E       		.uleb128 0x3e
+ 907 007f 0B       		.uleb128 0xb
+ 908 0080 00       		.byte	0x0
+ 909 0081 00       		.byte	0x0
+ 910 0082 09       		.uleb128 0x9
+ 911 0083 0F       		.uleb128 0xf
+ 912 0084 00       		.byte	0x0
+ 913 0085 0B       		.uleb128 0xb
+ 914 0086 0B       		.uleb128 0xb
+ 915 0087 49       		.uleb128 0x49
+ 916 0088 13       		.uleb128 0x13
+ 917 0089 00       		.byte	0x0
+ 918 008a 00       		.byte	0x0
+ 919 008b 0A       		.uleb128 0xa
+ 920 008c 2E       		.uleb128 0x2e
+ 921 008d 01       		.byte	0x1
+ 922 008e 01       		.uleb128 0x1
+ 923 008f 13       		.uleb128 0x13
+ 924 0090 3F       		.uleb128 0x3f
+ 925 0091 0C       		.uleb128 0xc
+ 926 0092 03       		.uleb128 0x3
+ 927 0093 0E       		.uleb128 0xe
+ 928 0094 3A       		.uleb128 0x3a
+ 929 0095 0B       		.uleb128 0xb
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 21
+
+
+ 930 0096 3B       		.uleb128 0x3b
+ 931 0097 0B       		.uleb128 0xb
+ 932 0098 27       		.uleb128 0x27
+ 933 0099 0C       		.uleb128 0xc
+ 934 009a 11       		.uleb128 0x11
+ 935 009b 01       		.uleb128 0x1
+ 936 009c 12       		.uleb128 0x12
+ 937 009d 01       		.uleb128 0x1
+ 938 009e 40       		.uleb128 0x40
+ 939 009f 0A       		.uleb128 0xa
+ 940 00a0 00       		.byte	0x0
+ 941 00a1 00       		.byte	0x0
+ 942 00a2 0B       		.uleb128 0xb
+ 943 00a3 26       		.uleb128 0x26
+ 944 00a4 00       		.byte	0x0
+ 945 00a5 49       		.uleb128 0x49
+ 946 00a6 13       		.uleb128 0x13
+ 947 00a7 00       		.byte	0x0
+ 948 00a8 00       		.byte	0x0
+ 949 00a9 0C       		.uleb128 0xc
+ 950 00aa 2E       		.uleb128 0x2e
+ 951 00ab 01       		.byte	0x1
+ 952 00ac 01       		.uleb128 0x1
+ 953 00ad 13       		.uleb128 0x13
+ 954 00ae 3F       		.uleb128 0x3f
+ 955 00af 0C       		.uleb128 0xc
+ 956 00b0 03       		.uleb128 0x3
+ 957 00b1 0E       		.uleb128 0xe
+ 958 00b2 3A       		.uleb128 0x3a
+ 959 00b3 0B       		.uleb128 0xb
+ 960 00b4 3B       		.uleb128 0x3b
+ 961 00b5 0B       		.uleb128 0xb
+ 962 00b6 27       		.uleb128 0x27
+ 963 00b7 0C       		.uleb128 0xc
+ 964 00b8 49       		.uleb128 0x49
+ 965 00b9 13       		.uleb128 0x13
+ 966 00ba 11       		.uleb128 0x11
+ 967 00bb 01       		.uleb128 0x1
+ 968 00bc 12       		.uleb128 0x12
+ 969 00bd 01       		.uleb128 0x1
+ 970 00be 40       		.uleb128 0x40
+ 971 00bf 0A       		.uleb128 0xa
+ 972 00c0 00       		.byte	0x0
+ 973 00c1 00       		.byte	0x0
+ 974 00c2 0D       		.uleb128 0xd
+ 975 00c3 0B       		.uleb128 0xb
+ 976 00c4 01       		.byte	0x1
+ 977 00c5 11       		.uleb128 0x11
+ 978 00c6 01       		.uleb128 0x1
+ 979 00c7 12       		.uleb128 0x12
+ 980 00c8 01       		.uleb128 0x1
+ 981 00c9 00       		.byte	0x0
+ 982 00ca 00       		.byte	0x0
+ 983 00cb 0E       		.uleb128 0xe
+ 984 00cc 24       		.uleb128 0x24
+ 985 00cd 00       		.byte	0x0
+ 986 00ce 03       		.uleb128 0x3
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 22
+
+
+ 987 00cf 08       		.uleb128 0x8
+ 988 00d0 0B       		.uleb128 0xb
+ 989 00d1 0B       		.uleb128 0xb
+ 990 00d2 3E       		.uleb128 0x3e
+ 991 00d3 0B       		.uleb128 0xb
+ 992 00d4 00       		.byte	0x0
+ 993 00d5 00       		.byte	0x0
+ 994 00d6 0F       		.uleb128 0xf
+ 995 00d7 34       		.uleb128 0x34
+ 996 00d8 00       		.byte	0x0
+ 997 00d9 03       		.uleb128 0x3
+ 998 00da 0E       		.uleb128 0xe
+ 999 00db 3A       		.uleb128 0x3a
+ 1000 00dc 0B       		.uleb128 0xb
+ 1001 00dd 3B       		.uleb128 0x3b
+ 1002 00de 0B       		.uleb128 0xb
+ 1003 00df 49       		.uleb128 0x49
+ 1004 00e0 13       		.uleb128 0x13
+ 1005 00e1 3F       		.uleb128 0x3f
+ 1006 00e2 0C       		.uleb128 0xc
+ 1007 00e3 3C       		.uleb128 0x3c
+ 1008 00e4 0C       		.uleb128 0xc
+ 1009 00e5 00       		.byte	0x0
+ 1010 00e6 00       		.byte	0x0
+ 1011 00e7 10       		.uleb128 0x10
+ 1012 00e8 35       		.uleb128 0x35
+ 1013 00e9 00       		.byte	0x0
+ 1014 00ea 49       		.uleb128 0x49
+ 1015 00eb 13       		.uleb128 0x13
+ 1016 00ec 00       		.byte	0x0
+ 1017 00ed 00       		.byte	0x0
+ 1018 00ee 00       		.byte	0x0
+ 1019              		.section	.debug_pubnames,"",%progbits
+ 1020 0000 38000000 		.4byte	0x38
+ 1021 0004 0200     		.2byte	0x2
+ 1022 0006 00000000 		.4byte	.Ldebug_info0
+ 1023 000a 62010000 		.4byte	0x162
+ 1024 000e 25000000 		.4byte	0x25
+ 1025 0012 5243355F 		.ascii	"RC5_RX\000"
+ 1025      525800
+ 1026 0019 B1000000 		.4byte	0xb1
+ 1027 001d 57616974 		.ascii	"WaitForKeyRelease\000"
+ 1027      466F724B 
+ 1027      65795265 
+ 1027      6C656173 
+ 1027      6500
+ 1028 002f EB000000 		.4byte	0xeb
+ 1029 0033 6D61696E 		.ascii	"main\000"
+ 1029      00
+ 1030 0038 00000000 		.4byte	0x0
+ 1031              		.section	.debug_aranges,"",%progbits
+ 1032 0000 1C000000 		.4byte	0x1c
+ 1033 0004 0200     		.2byte	0x2
+ 1034 0006 00000000 		.4byte	.Ldebug_info0
+ 1035 000a 04       		.byte	0x4
+ 1036 000b 00       		.byte	0x0
+ 1037 000c 0000     		.2byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 23
+
+
+ 1038 000e 0000     		.2byte	0x0
+ 1039 0010 00000000 		.4byte	.Ltext0
+ 1040 0014 BC030000 		.4byte	.Letext0-.Ltext0
+ 1041 0018 00000000 		.4byte	0x0
+ 1042 001c 00000000 		.4byte	0x0
+ 1043              		.section	.debug_str,"MS",%progbits,1
+ 1044              	.LASF4:
+ 1045 0000 746D705F 		.ascii	"tmp_time\000"
+ 1045      74696D65 
+ 1045      00
+ 1046              	.LASF14:
+ 1047 0009 756E7369 		.ascii	"unsigned int\000"
+ 1047      676E6564 
+ 1047      20696E74 
+ 1047      00
+ 1048              	.LASF9:
+ 1049 0016 4D696E4E 		.ascii	"MinNoSignalTicks\000"
+ 1049      6F536967 
+ 1049      6E616C54 
+ 1049      69636B73 
+ 1049      00
+ 1050              	.LASF0:
+ 1051 0027 70746F67 		.ascii	"ptoggle\000"
+ 1051      676C6500 
+ 1052              	.LASF3:
+ 1053 002f 6269745F 		.ascii	"bit_time\000"
+ 1053      74696D65 
+ 1053      00
+ 1054              	.LASF17:
+ 1055 0038 52433552 		.ascii	"RC5Receiver.c\000"
+ 1055      65636569 
+ 1055      7665722E 
+ 1055      6300
+ 1056              	.LASF7:
+ 1057 0046 57616974 		.ascii	"WaitForKeyRelease\000"
+ 1057      466F724B 
+ 1057      65795265 
+ 1057      6C656173 
+ 1057      6500
+ 1058              	.LASF2:
+ 1059 0058 70636F6D 		.ascii	"pcommand\000"
+ 1059      6D616E64 
+ 1059      00
+ 1060              	.LASF18:
+ 1061 0061 2F637967 		.ascii	"/cygdrive/d/Ksiazka_ARM/Przykladowe_aplikacje/Odbio"
+ 1061      64726976 
+ 1061      652F642F 
+ 1061      4B736961 
+ 1061      7A6B615F 
+ 1062 0094 726E696B 		.ascii	"rnik_RC5/Odbiornik_RC5_uP\000"
+ 1062      5F524335 
+ 1062      2F4F6462 
+ 1062      696F726E 
+ 1062      696B5F52 
+ 1063              	.LASF11:
+ 1064 00ae 746F6767 		.ascii	"toggle\000"
+ 1064      6C6500
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 24
+
+
+ 1065              	.LASF13:
+ 1066 00b5 636F6D6D 		.ascii	"command\000"
+ 1066      616E6400 
+ 1067              	.LASF5:
+ 1068 00bd 746D705F 		.ascii	"tmp_ired\000"
+ 1068      69726564 
+ 1068      00
+ 1069              	.LASF16:
+ 1070 00c6 474E5520 		.ascii	"GNU C 4.0.1\000"
+ 1070      4320342E 
+ 1070      302E3100 
+ 1071              	.LASF1:
+ 1072 00d2 70616464 		.ascii	"paddress\000"
+ 1072      72657373 
+ 1072      00
+ 1073              	.LASF10:
+ 1074 00db 6D61696E 		.ascii	"main\000"
+ 1074      00
+ 1075              	.LASF6:
+ 1076 00e0 5243355F 		.ascii	"RC5_RX\000"
+ 1076      525800
+ 1077              	.LASF12:
+ 1078 00e7 61646472 		.ascii	"address\000"
+ 1078      65737300 
+ 1079              	.LASF8:
+ 1080 00ef 4D696E69 		.ascii	"MinimumNoSignalTime\000"
+ 1080      6D756D4E 
+ 1080      6F536967 
+ 1080      6E616C54 
+ 1080      696D6500 
+ 1081              	.LASF15:
+ 1082 0103 74696D65 		.ascii	"time_count\000"
+ 1082      5F636F75 
+ 1082      6E7400
+ 1083              		.ident	"GCC: (GNU) 4.0.1"
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s 			page 25
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 RC5Receiver.c
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s:13     .text:00000000 RC5_RX
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s:21     .text:00000000 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s:232    .text:0000021c $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s:238    .text:00000220 WaitForKeyRelease
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s:248    .text:00000220 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s:287    .text:00000284 $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s:319    .text:00000288 main
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s:325    .text:00000288 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZNA5Ah.s:435    .text:0000039c $d
+
+UNDEFINED SYMBOLS
+time_count
+LCDInit
+init_bit_timer
+LCDClear
+LCDText
+LCDGotoXY
+LCD32bitNumberDec

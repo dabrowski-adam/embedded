@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<HiTOPProject>
+	<Windows>
+		<MDIState RTOS="0" Trace="0" Source="1" Maximized="0" SFRWindow="0"/>
+		<Window Id="Source">
+			<Tabs Count="2">
+				<Tab Pos="0" Module="led" FilePath="D:\Ksiazka_ARM\Przykladowe_aplikacje\Sterowanie_diodami_LED\Sterowanie_diodami_LED_uP\led.c" Application="LED"/>
+				<Tab Pos="1" Module="Startup" FilePath="D:\Ksiazka_ARM\Przykladowe_aplikacje\Sterowanie_diodami_LED\Sterowanie_diodami_LED_uP\Startup.s" Application="LED"/>
+			</Tabs>
+			<WindowState State="Normal"/>
+			<Rectangle State="Normal">
+				<Size cx="500" cy="427"/>
+				<Position x="0" y="0"/>
+			</Rectangle>
+		</Window>
+		<Window Id="TraceFilter">
+			<Tabs>
+				<Tab Pos="0">
+					<Triggers/>
+				</Tab>
+				<Tab Pos="1">
+					<Regions/>
+				</Tab>
+			</Tabs>
+		</Window>
+		<Window Id="Breakpoint">
+			<Tabs>
+				<Tab Pos="0">
+					<Breaks>
+						<Breakpoint Id="B2" App="LED" UsesTrigger="0"/>
+						<Breakpoint Id="B4" App="LED" UsesTrigger="0"/>
+					</Breaks>
+				</Tab>
+				<Tab Pos="1">
+					<Breaks/>
+				</Tab>
+			</Tabs>
+		</Window>
+		<Window Id="SFRWindow">
+			<SFRDefinitions File=".\ArmLpt\Derivatives\Philips\Generic.sfr"/>
+		</Window>
+		<Window Id="Disassembly">
+			<List Id="" BkColor="16777215" TextColor="0" DisableColSizing="0">
+				<Header Bold="1"/>
+				<Column Id="0" Order="0" Title="State" Width="24" Visible="1" Alignment="LEFT"/>
+				<Column Id="11" Order="1" Title="Address" Visible="1" RelWidth="0.1721868" Alignment="LEFT"/>
+				<Column Id="12" Order="2" Title="OpCode" Visible="1" RelWidth="0.1324518" Alignment="LEFT"/>
+				<Column Id="13" Order="3" Title="Instruction" Visible="1" RelWidth="0.6953658" Alignment="LEFT"/>
+			</List>
+		</Window>
+	</Windows>
+	<History Id="SCRIPT_FILES" Count="0" Capacity="4"/>
+	<HitopObjects>
+		<Breakpoints>
+			<Breakpoint Id="B2" Cond="" Expr="#led#57" Type="EXEC" AddrEnd="" AddrLen="1" Creator="Automatic" Enabled="1" HexAddr="0x40000688" UsesTrigger="0"/>
+			<Breakpoint Id="B3" Cond="" Expr="#led#31" Type="EXEC" AddrEnd="" AddrLen="1" Creator="Automatic" Enabled="1" HexAddr="0x4000058C" UsesTrigger="0"/>
+			<Breakpoint Id="B4" Cond="" Expr="#led#81" Type="EXEC" AddrEnd="" AddrLen="1" Creator="Automatic" Enabled="1" HexAddr="0x40000778" UsesTrigger="0"/>
+		</Breakpoints>
+		<Watches>
+			<Watch Id="O1" Expr="#led#main#i"/>
+		</Watches>
+	</HitopObjects>
+	<DebugDevice>
+		<ARMConfiguration EMB_ICE="0" Endianes="0" ProcType="0" ETM_EXIST="0" RTCK_USED="0"/>ArmLpt
+		<TargetProcessor Id="PARM"/>
+		<Derivative File=".\ArmLpt\Derivatives\Philips\Default.drv"/>
+		<Communication>
+			<Port>LPT1</Port>
+			<PortAddress Value="888"/>
+			<BaudRate Value="0"/>
+			<DeviceName></DeviceName>
+		</Communication>
+	</DebugDevice>
+	<ConfigurationOptions>
+		<ProcessorSettings>
+			<ProcessorSetting Id="DefMemAc" Value="2" Element="   32bit"/>
+			<ProcessorSetting Id="TClkMode" Value="1" Element="adaptive"/>
+			<ProcessorSetting Id="TAPClock" Value="14" Element="20.00MHz"/>
+			<ProcessorSetting Id="TClkWSLo" Value="0" Element="       0"/>
+			<ProcessorSetting Id="TClkWSHi" Value="0" Element="       0"/>
+			<ProcessorSetting Id="TarResLo" Value="2" Element="   210ms"/>
+			<ProcessorSetting Id="TarResHi" Value="6" Element="   660ms"/>
+			<ProcessorSetting Id="TarReTAP" Value="1" Element="     yes"/>
+			<ProcessorSetting Id="TRST" Value="1" Element=""/>
+			<ProcessorSetting Id="DBGRQPin" Value="0" Element=" missing"/>
+			<ProcessorSetting Id="Endianes" Value="0" Element="  little"/>
+			<ProcessorSetting Id="ResetTyp" Value="1" Element="    soft"/>
+			<ProcessorSetting Id="ProcType" Value="0" Element="ARM7TDMI"/>
+			<ProcessorSetting Id="CacheMod" Value="0" Element="DISABLED"/>
+			<ProcessorSetting Id="CC_Addr" Value="0" Element=""/>
+		</ProcessorSettings>
+		<EmulatorSettings>
+			<EmulatorSetting Id="PREFERSW" Value="0" Element="PREF__SW"/>
+		</EmulatorSettings>
+		<GeneralSettings>
+			<GeneralSetting Id="TraceRecordingMode" Value="0" Element=""/>
+			<GeneralSetting Id="TraceRegionMode" Value="0" Element=""/>
+			<GeneralSetting Id="TraceInitialState" Value="0" Element=""/>
+			<GeneralSetting Id="TraceBufferOnStart" Value="0" Element=""/>
+			<GeneralSetting Id="TraceOnOverflow" Value="0" Element=""/>
+			<GeneralSetting Id="TraceDisplayMode" Value="0" Element=""/>
+			<GeneralSetting Id="TraceBusState" Value="0" Element=""/>
+			<GeneralSetting Id="TriggerBusState" Value="0" Element=""/>
+			<GeneralSetting Id="TriggerDataType" Value="0" Element=""/>
+			<GeneralSetting Id="TriggerCounterMode" Value="0" Element=""/>
+			<GeneralSetting Id="TriggerBreakAction" Value="0" Element=""/>
+			<GeneralSetting Id="TriggerTraceAction" Value="0" Element=""/>
+			<GeneralSetting Id="TriggerRealtimerAction" Value="0" Element=""/>
+			<GeneralSetting Id="ProtectionMode" Value="0" Element=""/>
+			<GeneralSetting Id="BankMode" Value="0" Element=""/>
+			<GeneralSetting Id="BankBootBank" Value="0" Element=""/>
+			<GeneralSetting Id="BankLoadBank" Value="0" Element=""/>
+			<GeneralSetting Id="BankCurrBank" Value="0" Element=""/>
+			<GeneralSetting Id="BankIntMode" Value="0" Element=""/>
+		</GeneralSettings>
+	</ConfigurationOptions>
+	<EditorOptions>
+		<Font lfHeight="-15" lfWeight="400" lfQuality="0" lfFaceName="Courier New" lfOutPrecision="0" lfClipPrecision="0" lfPitchAndFamily="0"/>
+		<Tabulators Size="4"/>
+	</EditorOptions>
+	<LinkerApplications Count="1">
+		<Loader Id="ARMC"/>
+		<Application Pos="0" Load="1" CodeFile="D:\Ksiazka_ARM\Przykladowe_aplikacje\Sterowanie_diodami_LED\Sterowanie_diodami_LED_uP\LED.htx" LinkerFile="D:\Ksiazka_ARM\Przykladowe_aplikacje\Sterowanie_diodami_LED\Sterowanie_diodami_LED_uP\LED.hex">
+			<SymbolLoader MessageFile="" NeedsSymprepRun="0">
+				<Options Cache="128" Reload="RELOAD" CmdFile="" DestDir="D:\Ksiazka_ARM\Przykladowe_aplikacje\Sterowanie_diodami_LED\Sterowanie_diodami_LED_uP\" OnlySym="0" StdCode="" Verbose="1" CtrlFile="" WarnLevel="0">
+					<SourcePath>
+						<Path Text=".\"/>
+						<Path Text="D:\Ksiazka_ARM\Przykladowe_aplikacje\Sterowanie_diodami_LED\Sterowanie_diodami_LED_uP\"/>
+					</SourcePath>
+					<ProcessorSpecific/>
+					<DebugModules Include="1"/>
+				</Options>
+			</SymbolLoader>
+			<RTOS Id="" Dll=""/>
+		</Application>
+	</LinkerApplications>
+	<Directories>
+		<Directory Id="ProjectAddApplication" Dir="D:\Ksiazka_ARM\Przykladowe_aplikacje\Sterowanie_diodami_LED\Sterowanie_diodami_LED_uP\LED.hex"/>
+	</Directories>
+	<FlashProgramming RAMBase="0" RAMLength="" NumDevices="0" EnableProgramming="1"/>
+	<Applications>
+		<AppPath Id="LED">D:\Ksiazka_ARM\Przykladowe_aplikacje\Sterowanie_diodami_LED\Sterowanie_diodami_LED_uP\</AppPath>
+	</Applications>
+	<ScriptBarSettings>
+		<ScriptButton Id="1" File="" ButtonText=""/>
+		<ScriptButton Id="2" File="" ButtonText=""/>
+		<ScriptButton Id="3" File="" ButtonText=""/>
+		<ScriptButton Id="4" File="" ButtonText=""/>
+		<ScriptButton Id="5" File="" ButtonText=""/>
+		<ScriptButton Id="6" File="" ButtonText=""/>
+		<ScriptButton Id="7" File="" ButtonText=""/>
+		<ScriptButton Id="8" File="" ButtonText=""/>
+		<ScriptButton Id="9" File="" ButtonText=""/>
+		<ScriptButton Id="10" File="" ButtonText=""/>
+		<LastScriptFile Id=""/>
+	</ScriptBarSettings>
+	<ScreenLayouts>
+		<Layout Description="Default">
+			<Windows>
+				<BarState Id="">
+					<Bar XPos="0" YPos="5" BarID="10001" Index="0" Docking="1" MRUDockID="0" BarPlacement="GJAAAAAAGJAAAAAAIMCAAAAAIHAAAAAAAAEAAAAAIHAAAAAAAAEAAAAAIHAAAAAABAAAAAAABAAAAAAALPCAAAAA" MRUFloatXPos="-2147483648" MRUFloatYPos="-842150451" MRUDockTopPos="5" MRUFloatStyle="4" MRUDockLeftPos="0" MRUDockRightPos="1024" MRUDockBottomPos="125"/>
+					<Bar BarID="59393" Index="1"/>
+					<Bar Bars="6" BarID="59419" Bar_0="0" Bar_1="59392" Bar_2="40721" Bar_3="0" Bar_4="40362" Bar_5="0" Index="2"/>
+					<Bar Bars="8" BarID="59422" Bar_0="0" Bar_1="10001" Bar_2="40932" Bar_3="0" Bar_4="40371" Bar_5="40379" Bar_6="40373" Bar_7="0" Index="3"/>
+					<Bar Bars="5" BarID="59420" Bar_0="0" Bar_1="40364" Bar_2="0" Bar_3="124928" Bar_4="0" Index="4"/>
+					<Bar Bars="4" BarID="59421" Bar_0="0" Bar_1="40372" Bar_2="106468" Bar_3="0" Index="5"/>
+					<Bar XPos="455" YPos="25" BarID="40362" Index="6" Docking="1" MRUDockID="59419" MRUFloatXPos="-2147483648" MRUFloatYPos="-842150451" MRUDockTopPos="25" MRUFloatStyle="8196" MRUDockLeftPos="455" MRUDockRightPos="770" MRUDockBottomPos="50"/>
+					<Bar XPos="0" BarID="40364" Index="7" Docking="1" MRUDockID="0" BarPlacement="IMAAAAAAIMAAAAAAIMAAAAAAIMAAAAAAIMAAAAAALPBAAAAAIMAAAAAAJJBAAAAABAAAAAAABAAAAAAALPAAAAAA" MRUFloatXPos="-2147483648" MRUFloatYPos="-842150451" MRUDockTopPos="-1" MRUFloatStyle="4" MRUDockLeftPos="0" MRUDockRightPos="200" MRUDockBottomPos="408"/>
+					<Bar XPos="454" BarID="40721" Index="8" Docking="1" MRUWidth="285" MRUDockID="59419" MRUFloatXPos="326" MRUFloatYPos="73" MRUDockTopPos="-1" MRUFloatStyle="8192" MRUDockLeftPos="454" MRUDockRightPos="750" MRUDockBottomPos="25"/>
+					<Bar XPos="0" BarID="59392" Index="9" Docking="1" MRUDockID="59419" MRUFloatXPos="-2147483648" MRUFloatYPos="-842150451" MRUDockTopPos="-1" MRUFloatStyle="8196" MRUDockLeftPos="0" MRUDockRightPos="404" MRUDockBottomPos="25"/>
+					<Bar XPos="718" YPos="5" BarID="40932" Index="10" Docking="1" Visible="0" MRUDockID="59422" BarPlacement="POAAAAAAFLAAAAAACDBAAAAAIHAAAAAACDBAAAAAIHAAAAAACDBAAAAAIHAAAAAAAAAAAAAAAAAAAAAALPCAAAAA" MRUFloatXPos="269" MRUFloatYPos="307" MRUDockTopPos="5" MRUFloatStyle="8192" MRUDockLeftPos="718" MRUDockRightPos="1024" MRUDockBottomPos="125"/>
+					<Bar XPos="0" YPos="131" BarID="40371" Index="11" Docking="1" MRUDockID="59422" BarPlacement="IHAAAAAAAJBAAAAACACAAAAAIHAAAAAACACAAAAAIHAAAAAAAAEAAAAAIHAAAAAABAAAAAAABAAAAAAALPCAAAAA" MRUFloatXPos="-2147483648" MRUFloatYPos="-842150451" MRUDockTopPos="131" MRUFloatStyle="4" MRUDockLeftPos="0" MRUDockRightPos="1024" MRUDockBottomPos="251"/>
+					<Bar XPos="6" BarID="40372" Index="12" Docking="1" Visible="0" MRUDockID="0" BarPlacement="GLAAAAAALMAAAAAAAJBAAAAAIMAAAAAAGLAAAAAALMAAAAAAGLAAAAAALMAAAAAABAAAAAAAAAAAAAAALPCAAAAA" MRUFloatXPos="-2147483648" MRUFloatYPos="-842150451" MRUDockTopPos="-1" MRUFloatStyle="4" MRUDockLeftPos="6" MRUDockRightPos="188" MRUDockBottomPos="506"/>
+					<Bar XPos="520" YPos="131" BarID="40373" Index="13" Docking="1" Visible="0" MRUDockID="59422" BarPlacement="IHAAAAAAAJBAAAAAIPBAAAAAIHAAAAAAIPBAAAAAIHAAAAAAIPBAAAAAIHAAAAAAAAAAAAAAAAAAAAAALPCAAAAA" MRUFloatXPos="-2147483648" MRUFloatYPos="-842150451" MRUDockTopPos="131" MRUFloatStyle="4" MRUDockLeftPos="520" MRUDockRightPos="1024" MRUDockBottomPos="251"/>
+					<Bar XPos="391" YPos="131" BarID="40379" Index="14" Docking="1" Visible="0" MRUDockID="0" BarPlacement="IHAAAAAAAJBAAAAANPAAAAAAIHAAAAAANPAAAAAAIHAAAAAANPAAAAAAIHAAAAAAAAAAAAAAAAAAAAAALPCAAAAA" MRUFloatXPos="-2147483648" MRUFloatYPos="-842150451" MRUDockTopPos="131" MRUFloatStyle="4" MRUDockLeftPos="391" MRUDockRightPos="644" MRUDockBottomPos="241"/>
+					<Summary Bars="15" ScreenCX="1024" ScreenCY="768"/>
+				</BarState>
+				<MDIState RTOS="0" Trace="0" Source="1" Maximized="0" SFRWindow="0"/>
+				<Window Id="Source">
+					<WindowState State="Normal"></WindowState>
+					<Rectangle State="Normal">
+						<Size cx="500" cy="427"></Size>
+						<Position x="0" y="0"></Position>
+					</Rectangle>
+				</Window>
+			</Windows>
+		</Layout>
+	</ScreenLayouts>
+</HiTOPProject>
+

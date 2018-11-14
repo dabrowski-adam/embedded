@@ -1,0 +1,1 @@
+-T .\Flash.ld -mthumb-interwork -Wl,-Ttext=0x00000000,-Tdata=0x40000000 --gc-sections -o ISR_data_swap.elf "startup.o" "isr_data_swap.o" "lcd.o" -nostartfiles -nodefaultlibs

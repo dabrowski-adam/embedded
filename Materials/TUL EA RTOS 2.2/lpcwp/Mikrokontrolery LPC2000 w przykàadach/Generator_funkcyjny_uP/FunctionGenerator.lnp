@@ -1,0 +1,1 @@
+-T .\Flash.ld -mthumb-interwork -Wl,-Ttext=0x00000000,-Tdata=0x40000000 --gc-sections -o FunctionGenerator.elf "startup.o" "timer.o" "lcd.o" "functiongenerator.o" "division.o" "usersettings.o" "delay.o" -nostartfiles -nodefaultlibs

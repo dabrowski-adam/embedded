@@ -1,0 +1,1 @@
+-T .\Flash.ld -mthumb-interwork -Wl,-Ttext=0x00000000,-Tdata=0x40000000 --gc-sections -o ARMSpectrumAnalyzer.elf "startup.o" "armspectrumanalyzer.o" "uart.o" "lcd.o" "fft.o" "complex.o" "fix.o" "samplingmodule.o" -nostartfiles -nodefaultlibs

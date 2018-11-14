@@ -1,0 +1,1 @@
+-T .\Flash.ld -mthumb-interwork -Wl,-Ttext=0x00000000,-Tdata=0x40000000 --gc-sections -o SPI_MCP23S08_SWITCH.elf "startup.o" "lcd.o" "spi_mcp23s08_switch.o" -nostartfiles -nodefaultlibs

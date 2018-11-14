@@ -1,0 +1,123 @@
+<!DOCTYPE CrossStudio_for_ARM_Session_File>
+<session>
+ <Autos>
+  <Watches active="0" />
+ </Autos>
+ <Bookmarks/>
+ <Breakpoints>
+  <BreakpointListItem actiontype="0" chainFrom="" line="-1" length="0" triggertype="0" useHWbreakpoint="false" group="ARM Exceptions" breakdatatype="5" value="0" name="unnamed" counter="0" state="2" mask="0" comparison="0" expression="D_Abort" filename="" />
+  <BreakpointListItem actiontype="0" chainFrom="" line="-1" length="0" triggertype="0" useHWbreakpoint="false" group="ARM Exceptions" breakdatatype="5" value="0" name="unnamed" counter="0" state="3" mask="0" comparison="0" expression="FIQ" filename="" />
+  <BreakpointListItem actiontype="0" chainFrom="" line="-1" length="0" triggertype="0" useHWbreakpoint="false" group="ARM Exceptions" breakdatatype="5" value="0" name="unnamed" counter="0" state="3" mask="0" comparison="0" expression="IRQ" filename="" />
+  <BreakpointListItem actiontype="0" chainFrom="" line="-1" length="0" triggertype="0" useHWbreakpoint="false" group="ARM Exceptions" breakdatatype="5" value="0" name="unnamed" counter="0" state="2" mask="0" comparison="0" expression="P_Abort" filename="" />
+  <BreakpointListItem actiontype="0" chainFrom="" line="-1" length="0" triggertype="0" useHWbreakpoint="false" group="ARM Exceptions" breakdatatype="5" value="0" name="unnamed" counter="0" state="3" mask="0" comparison="0" expression="Reset" filename="" />
+  <BreakpointListItem actiontype="0" chainFrom="" line="-1" length="0" triggertype="0" useHWbreakpoint="false" group="ARM Exceptions" breakdatatype="5" value="0" name="unnamed" counter="0" state="3" mask="0" comparison="0" expression="SWI" filename="" />
+  <BreakpointListItem actiontype="0" chainFrom="" line="-1" length="0" triggertype="0" useHWbreakpoint="false" group="ARM Exceptions" breakdatatype="5" value="0" name="unnamed" counter="0" state="2" mask="0" comparison="0" expression="Undef" filename="" />
+  <BreakpointListItem actiontype="0" chainFrom="" line="-1" length="0" triggertype="0" useHWbreakpoint="false" group="Cortex-M3 Exceptions" breakdatatype="5" value="0" name="unnamed" counter="0" state="2" mask="0" comparison="0" expression="BusFault" filename="" />
+  <BreakpointListItem actiontype="0" chainFrom="" line="-1" length="0" triggertype="0" useHWbreakpoint="false" group="Cortex-M3 Exceptions" breakdatatype="5" value="0" name="unnamed" counter="0" state="2" mask="0" comparison="0" expression="ExceptionEntryReturnFault" filename="" />
+  <BreakpointListItem actiontype="0" chainFrom="" line="-1" length="0" triggertype="0" useHWbreakpoint="false" group="Cortex-M3 Exceptions" breakdatatype="5" value="0" name="unnamed" counter="0" state="2" mask="0" comparison="0" expression="HardFault" filename="" />
+  <BreakpointListItem actiontype="0" chainFrom="" line="-1" length="0" triggertype="0" useHWbreakpoint="false" group="Cortex-M3 Exceptions" breakdatatype="5" value="0" name="unnamed" counter="0" state="2" mask="0" comparison="0" expression="MemManage" filename="" />
+  <BreakpointListItem actiontype="0" chainFrom="" line="-1" length="0" triggertype="0" useHWbreakpoint="false" group="Cortex-M3 Exceptions" breakdatatype="5" value="0" name="unnamed" counter="0" state="3" mask="0" comparison="0" expression="Reset" filename="" />
+  <BreakpointListItem actiontype="0" chainFrom="" line="-1" length="0" triggertype="0" useHWbreakpoint="false" group="Cortex-M3 Exceptions" breakdatatype="5" value="0" name="unnamed" counter="0" state="2" mask="0" comparison="0" expression="UsageFault_CheckingError" filename="" />
+  <BreakpointListItem actiontype="0" chainFrom="" line="-1" length="0" triggertype="0" useHWbreakpoint="false" group="Cortex-M3 Exceptions" breakdatatype="5" value="0" name="unnamed" counter="0" state="2" mask="0" comparison="0" expression="UsageFault_Coprocessor" filename="" />
+  <BreakpointListItem actiontype="0" chainFrom="" line="-1" length="0" triggertype="0" useHWbreakpoint="false" group="Cortex-M3 Exceptions" breakdatatype="5" value="0" name="unnamed" counter="0" state="2" mask="0" comparison="0" expression="UsageFault_StateError" filename="" />
+ </Breakpoints>
+ <ExecutionCountWindow/>
+ <Memory1>
+  <MemoryWindow autoEvaluate="0" addressText="PWMMR0" numColumns="8" sizeText="1" dataSize="1" radix="16" addressSpace="" />
+ </Memory1>
+ <Memory2>
+  <MemoryWindow autoEvaluate="0" addressText="" numColumns="8" sizeText="" dataSize="1" radix="16" addressSpace="" />
+ </Memory2>
+ <Memory3>
+  <MemoryWindow autoEvaluate="0" addressText="" numColumns="8" sizeText="" dataSize="1" radix="16" addressSpace="" />
+ </Memory3>
+ <Memory4>
+  <MemoryWindow autoEvaluate="0" addressText="" numColumns="8" sizeText="" dataSize="1" radix="16" addressSpace="" />
+ </Memory4>
+ <Project>
+  <ProjectSessionItem path="MP3Player" name="unnamed" />
+  <ProjectSessionItem path="MP3Player;MP3Player" name="unnamed" />
+  <ProjectSessionItem path="MP3Player;MP3Player;Audio Render Driver" name="unnamed" />
+  <ProjectSessionItem path="MP3Player;MP3Player;Demo player" name="unnamed" />
+  <ProjectSessionItem path="MP3Player;MP3Player;EFSL" name="unnamed" />
+  <ProjectSessionItem path="MP3Player;MP3Player;EFSL driver" name="unnamed" />
+  <ProjectSessionItem path="MP3Player;MP3Player;libmad" name="unnamed" />
+  <ProjectSessionItem path="MP3Player;MP3Player;System Files" name="unnamed" />
+ </Project>
+ <Register1>
+  <RegisterWindow unsignedDisplays="" asciiDisplays="" octalDisplays="" openGroups="CPU - Current Mode" visibleGroups="CPU - Current Mode" decimalDisplays="" binaryDisplays="" />
+ </Register1>
+ <Register2>
+  <RegisterWindow unsignedDisplays="" asciiDisplays="" octalDisplays="" openGroups="CPU - Current Mode" visibleGroups="CPU - Current Mode" decimalDisplays="" binaryDisplays="" />
+ </Register2>
+ <Register3>
+  <RegisterWindow unsignedDisplays="" asciiDisplays="" octalDisplays="" openGroups="" visibleGroups="CPU - Current Mode" decimalDisplays="" binaryDisplays="" />
+ </Register3>
+ <Register4>
+  <RegisterWindow unsignedDisplays="" asciiDisplays="" octalDisplays="" openGroups="" visibleGroups="" decimalDisplays="" binaryDisplays="" />
+ </Register4>
+ <SourceNavigatorWindow/>
+ <TraceWindow>
+  <Trace wrap="Yes" type="1" enabled="Yes" />
+ </TraceWindow>
+ <Watch1>
+  <Watches active="1" >
+   <Watchpoint linenumber="0" radix="16" name="nch" expression="nch" filename="" />
+   <Watchpoint evalMode="3" linenumber="56" evalType="0" radix="16" name="file_name" expression="file_name" filename="C:\ARM_Rowley\NXP_MP3Player\demo.c" />
+   <Watchpoint linenumber="0" radix="10" name="PWMMR0" expression="*(register 4;*)0xe0014018" filename="" />
+   <Watchpoint linenumber="0" radix="10" name="PWMMR1" expression="*(register 4;*)0xe001401c" filename="" />
+   <Watchpoint linenumber="0" radix="-1" name="blk_ch1[9]" expression="blk_ch1[9]" filename="" />
+  </Watches>
+ </Watch1>
+ <Watch2>
+  <Watches active="0" />
+ </Watch2>
+ <Watch3>
+  <Watches active="0" />
+ </Watch3>
+ <Watch4>
+  <Watches active="0" />
+ </Watch4>
+ <Files>
+  <SessionOpenFile useTextEdit="1" useBinaryEdit="0" x="0" debugPath="C:\ARM_Rowley\MP3Player\render-driver\lpc_io.c" y="104" useHTMLEdit="0" path="C:\ARM_Rowley\MP3Player\render-driver\lpc_io.c" left="0" selected="0" name="unnamed" top="128" />
+  <SessionOpenFile useTextEdit="1" useBinaryEdit="0" x="0" debugPath="C:\ARM_Rowley\MP3Player\demo.c" y="97" useHTMLEdit="0" path="C:\ARM_Rowley\MP3Player\demo.c" left="0" selected="1" name="unnamed" top="74" />
+  <SessionOpenFile useTextEdit="1" useBinaryEdit="0" x="62" debugPath="C:\ARM_Rowley\MP3Player\efsl\src\fat.c" y="9" useHTMLEdit="0" path="C:\ARM_Rowley\MP3Player\efsl\src\fat.c" left="0" selected="0" name="unnamed" top="4" />
+  <SessionOpenFile useTextEdit="1" useBinaryEdit="0" x="0" debugPath="C:\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.6\source\crt0.s" y="212" useHTMLEdit="0" path="C:\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.6\source\crt0.s" left="0" selected="0" name="unnamed" top="199" />
+  <SessionOpenFile useTextEdit="0" useBinaryEdit="0" x="0" debugPath="" y="0" useHTMLEdit="0" path="C:\ARM_Rowley\MP3Player\flash_placement.xml" left="0" selected="0" name="unnamed" top="0" />
+  <SessionOpenFile useTextEdit="0" useBinaryEdit="0" x="0" debugPath="" y="0" useHTMLEdit="0" path="C:\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.6\targets\Philips_LPC210X\Philips_LPC2148_MemoryMap.xml" left="0" selected="0" name="unnamed" top="0" />
+ </Files>
+ <ARMCrossStudioWindow activeProject="MP3Player" autoConnectTarget="/Macraigor Wiggler (20 Pin)" debugSearchFileMap="..\libmad-0.15.1b\minimad.c
+
+\cygdrive\c\Keil\ARM\GNU\Boards\Keil\MCB2130\libmad-0.15.1b\bit.c
+C:\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\bit.c
+\cygdrive\c\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\bit.c
+C:\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\bit.c
+\cygdrive\c\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\crt0.S
+
+\cygdrive\c\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\decoder.c
+\decoder.c
+\cygdrive\c\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\fixed.c
+\fixed.c
+\cygdrive\c\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\frame.c
+\frame.c
+\cygdrive\c\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\imdct_l_arm.S
+\imdct_l_arm.S
+\cygdrive\c\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\layer12.c
+\layer12.c
+\cygdrive\c\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\layer3.c
+\layer3.c
+\cygdrive\c\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\lpc_io.c
+C:\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\lpc_io.c
+\cygdrive\c\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\minimad.c
+C:\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\minimad.c
+\cygdrive\c\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\Philips_LPC210X_Startup.s
+
+\cygdrive\c\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\stream.c
+\stream.c
+\cygdrive\c\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\synth.c
+\synth.c
+\cygdrive\c\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\libmad-0.15.1b\timer.c
+\timer.c
+\cygdrive\c\Program Files\Rowley Associates Limited\CrossWorks for ARM 1.5\samples\Philips_LPC210X\Keil_MCB2140\MP3Player\ARM Flash Debug\Startup.s
+\Startup.s" fileDialogInitialDirectory="C:\ARM_Rowley\MP3Player\ARM Flash Release" fileDialogDefaultFilter="*" autoConnectCapabilities="1407" debugSearchPath="" buildConfiguration="ARM Flash Debug" />
+</session>

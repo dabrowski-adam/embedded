@@ -1,0 +1,433 @@
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZoamwQ.s 			page 1
+
+
+   1              		.file	"VPB.c"
+   2              		.section	.debug_abbrev,"",%progbits
+   3              	.Ldebug_abbrev0:
+   4              		.section	.debug_info,"",%progbits
+   5              	.Ldebug_info0:
+   6              		.section	.debug_line,"",%progbits
+   7              	.Ldebug_line0:
+   8 0000 36000000 		.text
+   8      02001900 
+   8      00000201 
+   8      FB0E0A00 
+   8      01010101 
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	delay
+  12              		.type	delay, %function
+  13              	delay:
+  14              	.LFB2:
+  15              		.file 1 "VPB.c"
+   1:VPB.c         **** ////////////////////////////////////////////////////////
+   2:VPB.c         **** // Function:	Periphelial devices clock choosing
+   3:VPB.c         **** // Target:		LPC2138
+   4:VPB.c         **** // Board:		ZL6ARM
+   5:VPB.c         **** // Quartz:		12MHz
+   6:VPB.c         **** // Compiler:	ARM-GCC
+   7:VPB.c         **** // Author:		Arkadiusz Antoniak @ 2006, Poland
+   8:VPB.c         **** // Copyright:	(c) Arkadiusz Antoniak, 2006
+   9:VPB.c         **** ////////////////////////////////////////////////////////
+  10:VPB.c         **** #include <LPC213x.H>	    
+  11:VPB.c         **** 
+  12:VPB.c         **** 
+  13:VPB.c         **** //*******************************
+  14:VPB.c         **** // Delay function
+  15:VPB.c         **** //*******************************
+  16:VPB.c         **** void delay(unsigned int del_time) 
+  17:VPB.c         **** { 
+  16              		.loc 1 17 0
+  17              		@ Function supports interworking.
+  18              		@ args = 0, pretend = 0, frame = 0
+  19              		@ frame_needed = 0, uses_anonymous_args = 0
+  20              		@ link register save eliminated.
+  21              	.LVL0:
+  22              		@ lr needed for prologue
+  18:VPB.c         **** 	unsigned int i;
+  19:VPB.c         **** 	for(i=0;i<del_time;i++);	   
+  23              		.loc 1 19 0
+  24 0000 000050E3 		cmp	r0, #0
+  25 0004 1EFF2F01 		bxeq	lr
+  26 0008 0030A0E3 		mov	r3, #0
+  27              	.LVL1:
+  28              	.L4:
+  29 000c 013083E2 		add	r3, r3, #1
+  30 0010 030050E1 		cmp	r0, r3
+  31 0014 0100001A 		bne	.L4
+  32 0018 1EFF2FE1 		bx	lr
+  33              	.LFE2:
+  34              		.size	delay, .-delay
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZoamwQ.s 			page 2
+
+
+  35              		.align	2
+  36              		.global	main
+  37              		.type	main, %function
+  38              	main:
+  39              	.LFB3:
+  20:VPB.c         **** }
+  21:VPB.c         **** 
+  22:VPB.c         **** //*******************************
+  23:VPB.c         **** // MAIN
+  24:VPB.c         **** //*******************************
+  25:VPB.c         **** int main (void)
+  26:VPB.c         **** {
+  40              		.loc 1 26 0
+  41              		@ Function supports interworking.
+  42              		@ args = 0, pretend = 0, frame = 0
+  43              		@ frame_needed = 0, uses_anonymous_args = 0
+  44              		@ link register save eliminated.
+  45              	.LVL2:
+  46              		@ lr needed for prologue
+  27:VPB.c         **** 	//Peripherials' frequency pclk = fclk/4 = 15MHz
+  28:VPB.c         **** 	//VPBDIV&=0xFFFFFFFC;
+  29:VPB.c         **** 	//VPBDIV|=0x00;
+  30:VPB.c         **** 
+  31:VPB.c         **** 	//Peripherials' frequency pclk = fclk = 60MHz
+  32:VPB.c         **** 	//VPBDIV&=0xFFFFFFFC;
+  33:VPB.c         **** 	//VPBDIV|=0x01;
+  34:VPB.c         **** 
+  35:VPB.c         **** 	//Peripherials' frequency pclk = fclk/2 = 30MHz
+  36:VPB.c         **** 	VPBDIV&=0xFFFFFFFC;
+  47              		.loc 1 36 0
+  48 001c 0E12A0E3 		mov	r1, #-536870912
+  49 0020 7F2981E2 		add	r2, r1, #2080768
+  50 0024 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+  51 0028 FC3003E2 		and	r3, r3, #252
+  52 002c 0031C2E5 		strb	r3, [r2, #256]
+  37:VPB.c         **** 	VPBDIV|=0x02;
+  53              		.loc 1 37 0
+  54 0030 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+  55 0034 023083E3 		orr	r3, r3, #2
+  56 0038 0031C2E5 		strb	r3, [r2, #256]
+  38:VPB.c         **** 
+  39:VPB.c         **** 
+  40:VPB.c         **** 	//Port direction configuration
+  41:VPB.c         **** 	IODIR0 = 0xFF000000;
+  57              		.loc 1 41 0
+  58 003c FF24A0E3 		mov	r2, #-16777216
+  59 0040 8E32A0E3 		mov	r3, #-536870904
+  60 0044 0A3983E2 		add	r3, r3, #163840
+  61 0048 002083E5 		str	r2, [r3, #0]
+  42:VPB.c         **** 	IODIR1 = 0x00FF0000;
+  62              		.loc 1 42 0
+  63 004c 0A1981E2 		add	r1, r1, #163840
+  64 0050 FF38A0E3 		mov	r3, #16711680
+  65 0054 183081E5 		str	r3, [r1, #24]
+  66 0058 0E32A0E3 		mov	r3, #-536870912
+  67 005c 0A3983E2 		add	r3, r3, #163840
+  68 0060 FF28A0E3 		mov	r2, #16711680
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZoamwQ.s 			page 3
+
+
+  69              	.L8:
+  43:VPB.c         **** 
+  44:VPB.c         **** 	while(1)
+  45:VPB.c         **** 	{		
+  46:VPB.c         **** 		IOSET1=0x00FF0000;
+  70              		.loc 1 46 0
+  71 0064 142083E5 		str	r2, [r3, #20]
+  47:VPB.c         **** 		IOCLR1=0x00FF0000;
+  72              		.loc 1 47 0
+  73 0068 1C2083E5 		str	r2, [r3, #28]
+  74 006c 170000EA 		b	.L8
+  75              	.LFE3:
+  76              		.size	main, .-main
+  77              		.section	.debug_frame,"",%progbits
+  78              	.Lframe0:
+  79 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+  80              	.LSCIE0:
+  81 0004 FFFFFFFF 		.4byte	0xffffffff
+  82 0008 01       		.byte	0x1
+  83 0009 00       		.ascii	"\000"
+  84 000a 01       		.uleb128 0x1
+  85 000b 7C       		.sleb128 -4
+  86 000c 0E       		.byte	0xe
+  87 000d 0C       		.byte	0xc
+  88 000e 0D       		.uleb128 0xd
+  89 000f 00       		.uleb128 0x0
+  90              		.align	2
+  91              	.LECIE0:
+  92              	.LSFDE0:
+  93 0010 0C000000 		.4byte	.LEFDE0-.LASFDE0
+  94              	.LASFDE0:
+  95 0014 00000000 		.4byte	.Lframe0
+  96 0018 00000000 		.4byte	.LFB2
+  97 001c 1C000000 		.4byte	.LFE2-.LFB2
+  98              		.align	2
+  99              	.LEFDE0:
+ 100              	.LSFDE2:
+ 101 0020 0C000000 		.4byte	.LEFDE2-.LASFDE2
+ 102              	.LASFDE2:
+ 103 0024 00000000 		.4byte	.Lframe0
+ 104 0028 1C000000 		.4byte	.LFB3
+ 105 002c 54000000 		.4byte	.LFE3-.LFB3
+ 106              		.align	2
+ 107              	.LEFDE2:
+ 108              		.text
+ 109              	.Letext0:
+ 110              		.section	.debug_info
+ 111 0000 79000000 		.4byte	0x79
+ 112 0004 0200     		.2byte	0x2
+ 113 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 114 000a 04       		.byte	0x4
+ 115 000b 01       		.uleb128 0x1
+ 116 000c 00000000 		.4byte	.Ldebug_line0
+ 117 0010 70000000 		.4byte	.Letext0
+ 118 0014 00000000 		.4byte	.Ltext0
+ 119 0018 00000000 		.4byte	.LASF1
+ 120 001c 01       		.byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZoamwQ.s 			page 4
+
+
+ 121 001d 7F000000 		.4byte	.LASF2
+ 122 0021 0C000000 		.4byte	.LASF3
+ 123 0025 02       		.uleb128 0x2
+ 124 0026 56000000 		.4byte	0x56
+ 125 002a 01       		.byte	0x1
+ 126 002b 8A000000 		.4byte	.LASF4
+ 127 002f 01       		.byte	0x1
+ 128 0030 11       		.byte	0x11
+ 129 0031 01       		.byte	0x1
+ 130 0032 00000000 		.4byte	.LFB2
+ 131 0036 1C000000 		.4byte	.LFE2
+ 132 003a 02       		.byte	0x2
+ 133 003b 7D       		.byte	0x7d
+ 134 003c 00       		.sleb128 0
+ 135 003d 03       		.uleb128 0x3
+ 136 003e 76000000 		.4byte	.LASF5
+ 137 0042 01       		.byte	0x1
+ 138 0043 10       		.byte	0x10
+ 139 0044 56000000 		.4byte	0x56
+ 140 0048 01       		.byte	0x1
+ 141 0049 50       		.byte	0x50
+ 142 004a 04       		.uleb128 0x4
+ 143 004b 6900     		.ascii	"i\000"
+ 144 004d 01       		.byte	0x1
+ 145 004e 12       		.byte	0x12
+ 146 004f 56000000 		.4byte	0x56
+ 147 0053 01       		.byte	0x1
+ 148 0054 53       		.byte	0x53
+ 149 0055 00       		.byte	0x0
+ 150 0056 05       		.uleb128 0x5
+ 151 0057 69000000 		.4byte	.LASF0
+ 152 005b 04       		.byte	0x4
+ 153 005c 07       		.byte	0x7
+ 154 005d 06       		.uleb128 0x6
+ 155 005e 01       		.byte	0x1
+ 156 005f 85000000 		.4byte	.LASF6
+ 157 0063 01       		.byte	0x1
+ 158 0064 1A       		.byte	0x1a
+ 159 0065 01       		.byte	0x1
+ 160 0066 75000000 		.4byte	0x75
+ 161 006a 1C000000 		.4byte	.LFB3
+ 162 006e 70000000 		.4byte	.LFE3
+ 163 0072 02       		.byte	0x2
+ 164 0073 7D       		.byte	0x7d
+ 165 0074 00       		.sleb128 0
+ 166 0075 07       		.uleb128 0x7
+ 167 0076 696E7400 		.ascii	"int\000"
+ 168 007a 04       		.byte	0x4
+ 169 007b 05       		.byte	0x5
+ 170 007c 00       		.byte	0x0
+ 171              		.section	.debug_abbrev
+ 172 0000 01       		.uleb128 0x1
+ 173 0001 11       		.uleb128 0x11
+ 174 0002 01       		.byte	0x1
+ 175 0003 10       		.uleb128 0x10
+ 176 0004 06       		.uleb128 0x6
+ 177 0005 12       		.uleb128 0x12
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZoamwQ.s 			page 5
+
+
+ 178 0006 01       		.uleb128 0x1
+ 179 0007 11       		.uleb128 0x11
+ 180 0008 01       		.uleb128 0x1
+ 181 0009 25       		.uleb128 0x25
+ 182 000a 0E       		.uleb128 0xe
+ 183 000b 13       		.uleb128 0x13
+ 184 000c 0B       		.uleb128 0xb
+ 185 000d 03       		.uleb128 0x3
+ 186 000e 0E       		.uleb128 0xe
+ 187 000f 1B       		.uleb128 0x1b
+ 188 0010 0E       		.uleb128 0xe
+ 189 0011 00       		.byte	0x0
+ 190 0012 00       		.byte	0x0
+ 191 0013 02       		.uleb128 0x2
+ 192 0014 2E       		.uleb128 0x2e
+ 193 0015 01       		.byte	0x1
+ 194 0016 01       		.uleb128 0x1
+ 195 0017 13       		.uleb128 0x13
+ 196 0018 3F       		.uleb128 0x3f
+ 197 0019 0C       		.uleb128 0xc
+ 198 001a 03       		.uleb128 0x3
+ 199 001b 0E       		.uleb128 0xe
+ 200 001c 3A       		.uleb128 0x3a
+ 201 001d 0B       		.uleb128 0xb
+ 202 001e 3B       		.uleb128 0x3b
+ 203 001f 0B       		.uleb128 0xb
+ 204 0020 27       		.uleb128 0x27
+ 205 0021 0C       		.uleb128 0xc
+ 206 0022 11       		.uleb128 0x11
+ 207 0023 01       		.uleb128 0x1
+ 208 0024 12       		.uleb128 0x12
+ 209 0025 01       		.uleb128 0x1
+ 210 0026 40       		.uleb128 0x40
+ 211 0027 0A       		.uleb128 0xa
+ 212 0028 00       		.byte	0x0
+ 213 0029 00       		.byte	0x0
+ 214 002a 03       		.uleb128 0x3
+ 215 002b 05       		.uleb128 0x5
+ 216 002c 00       		.byte	0x0
+ 217 002d 03       		.uleb128 0x3
+ 218 002e 0E       		.uleb128 0xe
+ 219 002f 3A       		.uleb128 0x3a
+ 220 0030 0B       		.uleb128 0xb
+ 221 0031 3B       		.uleb128 0x3b
+ 222 0032 0B       		.uleb128 0xb
+ 223 0033 49       		.uleb128 0x49
+ 224 0034 13       		.uleb128 0x13
+ 225 0035 02       		.uleb128 0x2
+ 226 0036 0A       		.uleb128 0xa
+ 227 0037 00       		.byte	0x0
+ 228 0038 00       		.byte	0x0
+ 229 0039 04       		.uleb128 0x4
+ 230 003a 34       		.uleb128 0x34
+ 231 003b 00       		.byte	0x0
+ 232 003c 03       		.uleb128 0x3
+ 233 003d 08       		.uleb128 0x8
+ 234 003e 3A       		.uleb128 0x3a
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZoamwQ.s 			page 6
+
+
+ 235 003f 0B       		.uleb128 0xb
+ 236 0040 3B       		.uleb128 0x3b
+ 237 0041 0B       		.uleb128 0xb
+ 238 0042 49       		.uleb128 0x49
+ 239 0043 13       		.uleb128 0x13
+ 240 0044 02       		.uleb128 0x2
+ 241 0045 0A       		.uleb128 0xa
+ 242 0046 00       		.byte	0x0
+ 243 0047 00       		.byte	0x0
+ 244 0048 05       		.uleb128 0x5
+ 245 0049 24       		.uleb128 0x24
+ 246 004a 00       		.byte	0x0
+ 247 004b 03       		.uleb128 0x3
+ 248 004c 0E       		.uleb128 0xe
+ 249 004d 0B       		.uleb128 0xb
+ 250 004e 0B       		.uleb128 0xb
+ 251 004f 3E       		.uleb128 0x3e
+ 252 0050 0B       		.uleb128 0xb
+ 253 0051 00       		.byte	0x0
+ 254 0052 00       		.byte	0x0
+ 255 0053 06       		.uleb128 0x6
+ 256 0054 2E       		.uleb128 0x2e
+ 257 0055 00       		.byte	0x0
+ 258 0056 3F       		.uleb128 0x3f
+ 259 0057 0C       		.uleb128 0xc
+ 260 0058 03       		.uleb128 0x3
+ 261 0059 0E       		.uleb128 0xe
+ 262 005a 3A       		.uleb128 0x3a
+ 263 005b 0B       		.uleb128 0xb
+ 264 005c 3B       		.uleb128 0x3b
+ 265 005d 0B       		.uleb128 0xb
+ 266 005e 27       		.uleb128 0x27
+ 267 005f 0C       		.uleb128 0xc
+ 268 0060 49       		.uleb128 0x49
+ 269 0061 13       		.uleb128 0x13
+ 270 0062 11       		.uleb128 0x11
+ 271 0063 01       		.uleb128 0x1
+ 272 0064 12       		.uleb128 0x12
+ 273 0065 01       		.uleb128 0x1
+ 274 0066 40       		.uleb128 0x40
+ 275 0067 0A       		.uleb128 0xa
+ 276 0068 00       		.byte	0x0
+ 277 0069 00       		.byte	0x0
+ 278 006a 07       		.uleb128 0x7
+ 279 006b 24       		.uleb128 0x24
+ 280 006c 00       		.byte	0x0
+ 281 006d 03       		.uleb128 0x3
+ 282 006e 08       		.uleb128 0x8
+ 283 006f 0B       		.uleb128 0xb
+ 284 0070 0B       		.uleb128 0xb
+ 285 0071 3E       		.uleb128 0x3e
+ 286 0072 0B       		.uleb128 0xb
+ 287 0073 00       		.byte	0x0
+ 288 0074 00       		.byte	0x0
+ 289 0075 00       		.byte	0x0
+ 290              		.section	.debug_pubnames,"",%progbits
+ 291 0000 21000000 		.4byte	0x21
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZoamwQ.s 			page 7
+
+
+ 292 0004 0200     		.2byte	0x2
+ 293 0006 00000000 		.4byte	.Ldebug_info0
+ 294 000a 7D000000 		.4byte	0x7d
+ 295 000e 25000000 		.4byte	0x25
+ 296 0012 64656C61 		.ascii	"delay\000"
+ 296      7900
+ 297 0018 5D000000 		.4byte	0x5d
+ 298 001c 6D61696E 		.ascii	"main\000"
+ 298      00
+ 299 0021 00000000 		.4byte	0x0
+ 300              		.section	.debug_aranges,"",%progbits
+ 301 0000 1C000000 		.4byte	0x1c
+ 302 0004 0200     		.2byte	0x2
+ 303 0006 00000000 		.4byte	.Ldebug_info0
+ 304 000a 04       		.byte	0x4
+ 305 000b 00       		.byte	0x0
+ 306 000c 0000     		.2byte	0x0
+ 307 000e 0000     		.2byte	0x0
+ 308 0010 00000000 		.4byte	.Ltext0
+ 309 0014 70000000 		.4byte	.Letext0-.Ltext0
+ 310 0018 00000000 		.4byte	0x0
+ 311 001c 00000000 		.4byte	0x0
+ 312              		.section	.debug_str,"MS",%progbits,1
+ 313              	.LASF1:
+ 314 0000 474E5520 		.ascii	"GNU C 4.0.1\000"
+ 314      4320342E 
+ 314      302E3100 
+ 315              	.LASF3:
+ 316 000c 2F637967 		.ascii	"/cygdrive/d/Ksiazka_ARM/Przykladowe_aplikacje/Takto"
+ 316      64726976 
+ 316      652F642F 
+ 316      4B736961 
+ 316      7A6B615F 
+ 317 003f 77616E69 		.ascii	"wanie_peryferiow/Taktowanie_peryferiow_uP\000"
+ 317      655F7065 
+ 317      72796665 
+ 317      72696F77 
+ 317      2F54616B 
+ 318              	.LASF0:
+ 319 0069 756E7369 		.ascii	"unsigned int\000"
+ 319      676E6564 
+ 319      20696E74 
+ 319      00
+ 320              	.LASF5:
+ 321 0076 64656C5F 		.ascii	"del_time\000"
+ 321      74696D65 
+ 321      00
+ 322              	.LASF2:
+ 323 007f 5650422E 		.ascii	"VPB.c\000"
+ 323      6300
+ 324              	.LASF6:
+ 325 0085 6D61696E 		.ascii	"main\000"
+ 325      00
+ 326              	.LASF4:
+ 327 008a 64656C61 		.ascii	"delay\000"
+ 327      7900
+ 328              		.ident	"GCC: (GNU) 4.0.1"
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZoamwQ.s 			page 8
+
+
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZoamwQ.s 			page 9
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 VPB.c
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZoamwQ.s:13     .text:00000000 delay
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZoamwQ.s:24     .text:00000000 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZoamwQ.s:38     .text:0000001c main
+
+NO UNDEFINED SYMBOLS

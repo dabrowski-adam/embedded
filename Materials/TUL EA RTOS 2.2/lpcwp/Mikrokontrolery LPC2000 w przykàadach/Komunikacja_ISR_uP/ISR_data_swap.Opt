@@ -1,0 +1,38 @@
+### uVision2 Project, (C) Keil Software
+### Do not modify !
+
+ cExt (*.c)
+ aExt (*.s*; *.src; *.a*)
+ oExt (*.obj)
+ lExt (*.lib)
+ tExt (*.txt; *.h; *.inc)
+ pExt (*.plm)
+ CppX (*.cpp)
+ DaveTm { 0,0,0,0,0,0,0,0 }
+
+Target (ISR_data_swap), 0x0003 // Tools: 'ARM-GNU'
+GRPOPT 1,(Startup),0,0,0
+GRPOPT 2,(Source),1,0,0
+
+OPTFFF 1,1,2,0,0,0,0,0,<.\Startup.s><Startup.s> 
+OPTFFF 2,2,1,2,0,1,15,0,<.\ISR_data_swap.c><ISR_data_swap.c> { 44,0,0,0,2,0,0,0,3,0,0,0,255,255,255,255,255,255,255,255,252,255,255,255,233,255,255,255,0,0,0,0,0,0,0,0,48,2,0,0,253,0,0,0 }
+OPTFFF 2,3,1,0,0,0,0,0,<.\lcd.c><lcd.c> 
+
+
+TARGOPT 1, (ISR_data_swap)
+ ARMCLK=12000000
+  OPTTT 1,1,1,0
+  OPTHX 1,65535,0,0,0
+  OPTLX 120,65,8,<.\>
+  OPTOX 16
+  OPTLT 1,1,1,0,1,1,0,1,0,0,0,0
+  OPTXL 1,1,1,1,1,1,1,0,0
+  OPTFL 1,0,1
+  OPTBL 0,(Data Sheet)<DATASHTS\PHILIPS\LPC2131_32_34_36_38.PDF>
+  OPTDL (SARM.DLL)(-cLPC2100)(DARMP.DLL)(-pLPC2138)(SARM.DLL)()(TARMP.DLL)(-pLPC2138)
+  OPTDBG 48125,0,()()()()()()()()()() ()()()()
+  OPTDF 0x40000002
+  OPTLE <>
+  OPTLC <>
+EndOpt
+

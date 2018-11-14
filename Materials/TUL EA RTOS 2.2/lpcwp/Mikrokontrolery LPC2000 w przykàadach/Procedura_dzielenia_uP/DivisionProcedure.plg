@@ -1,0 +1,20 @@
+<html>
+<body>
+<pre>
+<h1>µVision3 Build Log</h1>
+<h2>Project:</h2>
+D:\Ksiazka_ARM\Przykladowe_aplikacje\Procedura_dzielenia\Procedura_dzielenia_uP\DivisionProcedure.uv2
+Project File Date:  08/21/2005
+
+<h2>Output:</h2>
+Build target 'DivisionProcedure'
+assembling Startup.s...
+compiling lcd.c...
+compiling DivisionProcedure.c...
+assembling division.s...
+linking...
+creating hex file...
+"DivisionProcedure.elf" - 0 Error(s), 0 Warning(s).
+</pre>
+</body>
+</html>

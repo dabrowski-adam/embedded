@@ -1,0 +1,1 @@
+-c -mcpu=arm7tdmi -gdwarf-2 -MD -Wall -O -mapcs-frame -mthumb-interwork -IC:\Keil\ARM\INC\Philips\ -Wa,-alhms="isr_data_swap.lst" -o isr_data_swap.o "ISR_data_swap.c"

@@ -1,0 +1,2 @@
+Dependencies for Project 'ARMSpectrumAnalyzer', Target 'Target 1': (DO NOT MODIFY !)
+F (.\Startup.s)(0x41533724)(-m arm7tdmi -gdwarf2 -mthumb-interwork --MD Startup.d -IC:\Keil\ARM\INC\Philips\ -o Startup.o)

@@ -1,0 +1,791 @@
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s 			page 1
+
+
+   1              		.file	"ISR_data_swap.c"
+   2              		.section	.debug_abbrev,"",%progbits
+   3              	.Ldebug_abbrev0:
+   4              		.section	.debug_info,"",%progbits
+   5              	.Ldebug_info0:
+   6              		.section	.debug_line,"",%progbits
+   7              	.Ldebug_line0:
+   8 0000 51000000 		.text
+   8      02002300 
+   8      00000201 
+   8      FB0E0A00 
+   8      01010101 
+   9              	.Ltext0:
+  10              		.global	fInterruptOccured
+  11              		.bss
+  12              		.align	2
+  13              		.type	fInterruptOccured, %object
+  14              		.size	fInterruptOccured, 4
+  15              	fInterruptOccured:
+  16 0000 00000000 		.space	4
+  17              		.text
+  18              		.align	2
+  19              		.global	InitTimer0
+  20              		.type	InitTimer0, %function
+  21              	InitTimer0:
+  22              	.LFB2:
+  23              		.file 1 "ISR_data_swap.c"
+   1:ISR_data_swap.c **** ////////////////////////////////////////////////////////
+   2:ISR_data_swap.c **** // Function:	Data swap between ISR and main example
+   3:ISR_data_swap.c **** // Target:		LPC2138
+   4:ISR_data_swap.c **** // Board:		ZL6ARM
+   5:ISR_data_swap.c **** // Quartz:		12MHz
+   6:ISR_data_swap.c **** // Compiler:	ARM-GCC
+   7:ISR_data_swap.c **** // Author:		Arkadiusz Antoniak @ 2006, Poland
+   8:ISR_data_swap.c **** // Copyright:	(c) Arkadiusz Antoniak, 2006
+   9:ISR_data_swap.c **** ////////////////////////////////////////////////////////
+  10:ISR_data_swap.c **** #include <LPC213x.H>	    
+  11:ISR_data_swap.c **** #include "lcd.h"
+  12:ISR_data_swap.c **** 
+  13:ISR_data_swap.c **** //Globals
+  14:ISR_data_swap.c **** /*unsigned int fInterruptOccured=0;*/
+  15:ISR_data_swap.c **** volatile unsigned int fInterruptOccured=0;
+  16:ISR_data_swap.c **** 
+  17:ISR_data_swap.c **** //Timer0 match interrupt handler's header
+  18:ISR_data_swap.c **** void tc0(void) __attribute__ ((interrupt("IRQ")));
+  19:ISR_data_swap.c **** 
+  20:ISR_data_swap.c **** //*******************************
+  21:ISR_data_swap.c **** // Timer0 Init
+  22:ISR_data_swap.c **** //*******************************
+  23:ISR_data_swap.c **** void InitTimer0(void) 
+  24:ISR_data_swap.c **** {
+  24              		.loc 1 24 0
+  25              		@ Function supports interworking.
+  26              		@ args = 0, pretend = 0, frame = 0
+  27              		@ frame_needed = 0, uses_anonymous_args = 0
+  28              		@ link register save eliminated.
+  29              	.LVL0:
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s 			page 2
+
+
+  30              		@ lr needed for prologue
+  25:ISR_data_swap.c ****     T0MR0 = 7499999;                  		// 0.5s = 7.5*10^6-1 counts
+  31              		.loc 1 25 0
+  32 0000 0E22A0E3 		mov	r2, #-536870912
+  33 0004 012982E2 		add	r2, r2, #16384
+  34 0008 7238A0E3 		mov	r3, #7471104
+  35 000c 073A83E2 		add	r3, r3, #28672
+  36 0010 DF3083E2 		add	r3, r3, #223
+  37 0014 183082E5 		str	r3, [r2, #24]
+  26:ISR_data_swap.c ****     T0MCR = 3;                             	// Interrupt and Reset on MR0
+  38              		.loc 1 26 0
+  39 0018 0330A0E3 		mov	r3, #3
+  40 001c 143082E5 		str	r3, [r2, #20]
+  27:ISR_data_swap.c ****     T0TCR = 1;                             	// Timer0 enable
+  41              		.loc 1 27 0
+  42 0020 0120A0E3 		mov	r2, #1
+  43 0024 0139A0E3 		mov	r3, #16384
+  44 0028 4E3283E2 		add	r3, r3, #-536870908
+  45 002c 002083E5 		str	r2, [r3, #0]
+  28:ISR_data_swap.c ****     VICVectAddr0 = (unsigned long)tc0;      // set interrupt vector in 0
+  46              		.loc 1 28 0
+  47 0030 28209FE5 		ldr	r2, .L3
+  48 0034 2233A0E3 		mov	r3, #-2013265920
+  49 0038 C339A0E1 		mov	r3, r3, asr #19
+  50 003c 002083E5 		str	r2, [r3, #0]
+  29:ISR_data_swap.c ****     VICVectCntl0 = 0x20 | 4;                // use it for Timer 0 Interrupt
+  51              		.loc 1 29 0
+  52 0040 2420A0E3 		mov	r2, #36
+  53 0044 0932A0E3 		mov	r3, #-1879048192
+  54 0048 C339A0E1 		mov	r3, r3, asr #19
+  55 004c 002083E5 		str	r2, [r3, #0]
+  30:ISR_data_swap.c ****     VICIntEnable = 0x00000010;              // Enable Timer0 Interrupt
+  56              		.loc 1 30 0
+  57 0050 142042E2 		sub	r2, r2, #20
+  58 0054 FE3EE0E3 		mvn	r3, #4064
+  59 0058 0F2003E5 		str	r2, [r3, #-15]
+  31:ISR_data_swap.c **** }
+  60              		.loc 1 31 0
+  61 005c 1EFF2FE1 		bx	lr
+  62              	.L4:
+  63              		.align	2
+  64              	.L3:
+  65 0060 00000000 		.word	tc0
+  66              	.LFE2:
+  67              		.size	InitTimer0, .-InitTimer0
+  68              		.align	2
+  69              		.global	delay
+  70              		.type	delay, %function
+  71              	delay:
+  72              	.LFB3:
+  32:ISR_data_swap.c **** 
+  33:ISR_data_swap.c **** //*******************************
+  34:ISR_data_swap.c **** // Delay function
+  35:ISR_data_swap.c **** //*******************************
+  36:ISR_data_swap.c **** void delay(unsigned int del_time) 
+  37:ISR_data_swap.c **** { 
+  73              		.loc 1 37 0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s 			page 3
+
+
+  74              		@ Function supports interworking.
+  75              		@ args = 0, pretend = 0, frame = 0
+  76              		@ frame_needed = 0, uses_anonymous_args = 0
+  77              		@ link register save eliminated.
+  78              	.LVL1:
+  79              		@ lr needed for prologue
+  38:ISR_data_swap.c **** 	unsigned int i;
+  39:ISR_data_swap.c **** 	for(i=0;i<del_time;i++);	   
+  80              		.loc 1 39 0
+  81 0064 000050E3 		cmp	r0, #0
+  82 0068 1EFF2F01 		bxeq	lr
+  83 006c 0030A0E3 		mov	r3, #0
+  84              	.LVL2:
+  85              	.L8:
+  86 0070 013083E2 		add	r3, r3, #1
+  87 0074 030050E1 		cmp	r0, r3
+  88 0078 1A00001A 		bne	.L8
+  89 007c 1EFF2FE1 		bx	lr
+  90              	.LFE3:
+  91              		.size	delay, .-delay
+  92              		.section	.rodata.str1.4,"aMS",%progbits,1
+  93              		.align	2
+  94              	.LC0:
+  95 0000 49535220 		.ascii	"ISR data swap\000"
+  95      64617461 
+  95      20737761 
+  95      7000
+  96 000e 0000     		.text
+  97              		.align	2
+  98              		.global	main
+  99              		.type	main, %function
+ 100              	main:
+ 101              	.LFB4:
+  40:ISR_data_swap.c **** }
+  41:ISR_data_swap.c **** 
+  42:ISR_data_swap.c **** //*******************************
+  43:ISR_data_swap.c **** // MAIN
+  44:ISR_data_swap.c **** //*******************************
+  45:ISR_data_swap.c **** int main (void)
+  46:ISR_data_swap.c **** {
+ 102              		.loc 1 46 0
+ 103              		@ Function supports interworking.
+ 104              		@ args = 0, pretend = 0, frame = 0
+ 105              		@ frame_needed = 1, uses_anonymous_args = 0
+ 106 0080 0DC0A0E1 		mov	ip, sp
+ 107              	.LCFI0:
+ 108 0084 00D82DE9 		stmfd	sp!, {fp, ip, lr, pc}
+ 109              	.LCFI1:
+ 110 0088 04B04CE2 		sub	fp, ip, #4
+ 111              	.LCFI2:
+  47:ISR_data_swap.c **** 	//Peripherials' frequency = fclk/4 = 15MHz
+  48:ISR_data_swap.c **** 	VPBDIV&=0xFFFFFFFC;
+ 112              		.loc 1 48 0
+ 113 008c 0E12A0E3 		mov	r1, #-536870912
+ 114 0090 7F2981E2 		add	r2, r1, #2080768
+ 115 0094 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+ 116 0098 FC3003E2 		and	r3, r3, #252
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s 			page 4
+
+
+ 117 009c 0031C2E5 		strb	r3, [r2, #256]
+  49:ISR_data_swap.c **** 	VPBDIV|=0x00;
+ 118              		.loc 1 49 0
+ 119 00a0 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+ 120 00a4 FF3003E2 		and	r3, r3, #255
+ 121 00a8 0031C2E5 		strb	r3, [r2, #256]
+  50:ISR_data_swap.c **** 
+  51:ISR_data_swap.c **** 	//Port direction configuration
+  52:ISR_data_swap.c **** 	IODIR0 = 0xFF000000;
+ 122              		.loc 1 52 0
+ 123 00ac FF24A0E3 		mov	r2, #-16777216
+ 124 00b0 8E32A0E3 		mov	r3, #-536870904
+ 125 00b4 0A3983E2 		add	r3, r3, #163840
+ 126 00b8 002083E5 		str	r2, [r3, #0]
+  53:ISR_data_swap.c **** 	IODIR1 = 0x00FF0000;
+ 127              		.loc 1 53 0
+ 128 00bc 0A1981E2 		add	r1, r1, #163840
+ 129 00c0 FF38A0E3 		mov	r3, #16711680
+ 130 00c4 183081E5 		str	r3, [r1, #24]
+  54:ISR_data_swap.c **** 
+  55:ISR_data_swap.c **** 	LCDInit();
+ 131              		.loc 1 55 0
+ 132 00c8 FEFFFFEB 		bl	LCDInit
+  56:ISR_data_swap.c **** 	LCDClear();
+ 133              		.loc 1 56 0
+ 134 00cc FEFFFFEB 		bl	LCDClear
+  57:ISR_data_swap.c **** 	LCDText("ISR data swap");
+ 135              		.loc 1 57 0
+ 136 00d0 30009FE5 		ldr	r0, .L21
+ 137 00d4 FEFFFFEB 		bl	LCDText
+  58:ISR_data_swap.c **** 
+  59:ISR_data_swap.c **** 	InitTimer0();
+ 138              		.loc 1 59 0
+ 139 00d8 FEFFFFEB 		bl	InitTimer0
+ 140 00dc 28209FE5 		ldr	r2, .L21+4
+ 141 00e0 0000A0E3 		mov	r0, #0
+ 142 00e4 0E32A0E3 		mov	r3, #-536870912
+ 143 00e8 0A1983E2 		add	r1, r3, #163840
+ 144              	.L20:
+  60:ISR_data_swap.c **** 
+  61:ISR_data_swap.c **** 	while(1)
+  62:ISR_data_swap.c **** 		if(fInterruptOccured!=0)
+ 145              		.loc 1 62 0
+ 146 00ec 003092E5 		ldr	r3, [r2, #0]
+ 147 00f0 000053E3 		cmp	r3, #0
+  63:ISR_data_swap.c **** 		{
+  64:ISR_data_swap.c **** 			fInterruptOccured=0;
+ 148              		.loc 1 64 0
+ 149 00f4 00008215 		strne	r0, [r2, #0]
+  65:ISR_data_swap.c **** 
+  66:ISR_data_swap.c **** 			//Toggle LEDs 4...7
+  67:ISR_data_swap.c **** 			IOPIN1^=0x00F00000;
+ 150              		.loc 1 67 0
+ 151 00f8 10309115 		ldrne	r3, [r1, #16]
+ 152 00fc 0F362312 		eorne	r3, r3, #15728640
+ 153 0100 10308115 		strne	r3, [r1, #16]
+ 154 0104 390000EA 		b	.L20
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s 			page 5
+
+
+ 155              	.L22:
+ 156              		.align	2
+ 157              	.L21:
+ 158 0108 00000000 		.word	.LC0
+ 159 010c 00000000 		.word	fInterruptOccured
+ 160              	.LFE4:
+ 161              		.size	main, .-main
+ 162              		.align	2
+ 163              		.global	tc0
+ 164              		.type	tc0, %function
+ 165              	tc0:
+ 166              	.LFB5:
+  68:ISR_data_swap.c **** 		}
+  69:ISR_data_swap.c **** }
+  70:ISR_data_swap.c **** 
+  71:ISR_data_swap.c **** //*******************************
+  72:ISR_data_swap.c **** // Timer0 match interrupt routine
+  73:ISR_data_swap.c **** //*******************************
+  74:ISR_data_swap.c **** void tc0(void) 
+  75:ISR_data_swap.c **** {
+ 167              		.loc 1 75 0
+ 168              		@ Interrupt Service Routine.
+ 169              		@ args = 0, pretend = 0, frame = 0
+ 170              		@ frame_needed = 0, uses_anonymous_args = 0
+ 171              		@ link register save eliminated.
+ 172              	.LVL3:
+ 173 0110 0E002DE9 		stmfd	sp!, {r1, r2, r3}
+ 174              	.LCFI3:
+ 175              		@ lr needed for prologue
+  76:ISR_data_swap.c **** 	//Toggle LEDs 0...3
+  77:ISR_data_swap.c **** 	IOPIN1^=0x000F0000;
+ 176              		.loc 1 77 0
+ 177 0114 0E22A0E3 		mov	r2, #-536870912
+ 178 0118 0A1982E2 		add	r1, r2, #163840
+ 179 011c 103091E5 		ldr	r3, [r1, #16]
+ 180 0120 0F3823E2 		eor	r3, r3, #983040
+ 181 0124 103081E5 		str	r3, [r1, #16]
+  78:ISR_data_swap.c **** 
+  79:ISR_data_swap.c **** 	//Set interrupt occured flag
+  80:ISR_data_swap.c **** 	fInterruptOccured=1;
+ 182              		.loc 1 80 0
+ 183 0128 0110A0E3 		mov	r1, #1
+ 184 012c 1C309FE5 		ldr	r3, .L25
+ 185 0130 001083E5 		str	r1, [r3, #0]
+  81:ISR_data_swap.c **** 
+  82:ISR_data_swap.c **** 	//Clear interrupt flag & acknowledge interrupt
+  83:ISR_data_swap.c ****     T0IR = 1;					
+ 186              		.loc 1 83 0
+ 187 0134 012982E2 		add	r2, r2, #16384
+ 188 0138 001082E5 		str	r1, [r2, #0]
+  84:ISR_data_swap.c ****     VICVectAddr = 0;
+ 189              		.loc 1 84 0
+ 190 013c 0020A0E3 		mov	r2, #0
+ 191 0140 3F3DE0E3 		mvn	r3, #4032
+ 192 0144 0F2003E5 		str	r2, [r3, #-15]
+  85:ISR_data_swap.c **** }
+ 193              		.loc 1 85 0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s 			page 6
+
+
+ 194 0148 0E00BDE8 		ldmfd	sp!, {r1, r2, r3}
+ 195 014c 04F05EE2 		subs	pc, lr, #4
+ 196              	.L26:
+ 197              		.align	2
+ 198              	.L25:
+ 199 0150 00000000 		.word	fInterruptOccured
+ 200              	.LFE5:
+ 201              		.size	tc0, .-tc0
+ 202              		.section	.debug_frame,"",%progbits
+ 203              	.Lframe0:
+ 204 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ 205              	.LSCIE0:
+ 206 0004 FFFFFFFF 		.4byte	0xffffffff
+ 207 0008 01       		.byte	0x1
+ 208 0009 00       		.ascii	"\000"
+ 209 000a 01       		.uleb128 0x1
+ 210 000b 7C       		.sleb128 -4
+ 211 000c 0E       		.byte	0xe
+ 212 000d 0C       		.byte	0xc
+ 213 000e 0D       		.uleb128 0xd
+ 214 000f 00       		.uleb128 0x0
+ 215              		.align	2
+ 216              	.LECIE0:
+ 217              	.LSFDE0:
+ 218 0010 0C000000 		.4byte	.LEFDE0-.LASFDE0
+ 219              	.LASFDE0:
+ 220 0014 00000000 		.4byte	.Lframe0
+ 221 0018 00000000 		.4byte	.LFB2
+ 222 001c 64000000 		.4byte	.LFE2-.LFB2
+ 223              		.align	2
+ 224              	.LEFDE0:
+ 225              	.LSFDE2:
+ 226 0020 0C000000 		.4byte	.LEFDE2-.LASFDE2
+ 227              	.LASFDE2:
+ 228 0024 00000000 		.4byte	.Lframe0
+ 229 0028 64000000 		.4byte	.LFB3
+ 230 002c 1C000000 		.4byte	.LFE3-.LFB3
+ 231              		.align	2
+ 232              	.LEFDE2:
+ 233              	.LSFDE4:
+ 234 0030 1C000000 		.4byte	.LEFDE4-.LASFDE4
+ 235              	.LASFDE4:
+ 236 0034 00000000 		.4byte	.Lframe0
+ 237 0038 80000000 		.4byte	.LFB4
+ 238 003c 90000000 		.4byte	.LFE4-.LFB4
+ 239 0040 44       		.byte	0x4
+ 240              		.4byte	.LCFI0-.LFB4
+ 241 0041 0D       		.byte	0xd
+ 242 0042 0C       		.uleb128 0xc
+ 243 0043 44       		.byte	0x4
+ 244              		.4byte	.LCFI1-.LCFI0
+ 245 0044 8E       		.byte	0x8e
+ 246 0045 02       		.uleb128 0x2
+ 247 0046 8D       		.byte	0x8d
+ 248 0047 03       		.uleb128 0x3
+ 249 0048 8B       		.byte	0x8b
+ 250 0049 04       		.uleb128 0x4
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s 			page 7
+
+
+ 251 004a 44       		.byte	0x4
+ 252              		.4byte	.LCFI2-.LCFI1
+ 253 004b 0C       		.byte	0xc
+ 254 004c 0B       		.uleb128 0xb
+ 255 004d 04       		.uleb128 0x4
+ 256 004e 0000     		.align	2
+ 257              	.LEFDE4:
+ 258              	.LSFDE6:
+ 259 0050 18000000 		.4byte	.LEFDE6-.LASFDE6
+ 260              	.LASFDE6:
+ 261 0054 00000000 		.4byte	.Lframe0
+ 262 0058 10010000 		.4byte	.LFB5
+ 263 005c 44000000 		.4byte	.LFE5-.LFB5
+ 264 0060 44       		.byte	0x4
+ 265              		.4byte	.LCFI3-.LFB5
+ 266 0061 0E       		.byte	0xe
+ 267 0062 0C       		.uleb128 0xc
+ 268 0063 83       		.byte	0x83
+ 269 0064 01       		.uleb128 0x1
+ 270 0065 82       		.byte	0x82
+ 271 0066 02       		.uleb128 0x2
+ 272 0067 81       		.byte	0x81
+ 273 0068 03       		.uleb128 0x3
+ 274 0069 000000   		.align	2
+ 275              	.LEFDE6:
+ 276              		.text
+ 277              	.Letext0:
+ 278              		.section	.debug_info
+ 279 0000 B7000000 		.4byte	0xb7
+ 280 0004 0200     		.2byte	0x2
+ 281 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 282 000a 04       		.byte	0x4
+ 283 000b 01       		.uleb128 0x1
+ 284 000c 00000000 		.4byte	.Ldebug_line0
+ 285 0010 54010000 		.4byte	.Letext0
+ 286 0014 00000000 		.4byte	.Ltext0
+ 287 0018 9A000000 		.4byte	.LASF4
+ 288 001c 01       		.byte	0x1
+ 289 001d 84000000 		.4byte	.LASF5
+ 290 0021 33000000 		.4byte	.LASF6
+ 291 0025 02       		.uleb128 0x2
+ 292 0026 01       		.byte	0x1
+ 293 0027 00000000 		.4byte	.LASF0
+ 294 002b 01       		.byte	0x1
+ 295 002c 18       		.byte	0x18
+ 296 002d 01       		.byte	0x1
+ 297 002e 00000000 		.4byte	.LFB2
+ 298 0032 64000000 		.4byte	.LFE2
+ 299 0036 02       		.byte	0x2
+ 300 0037 7D       		.byte	0x7d
+ 301 0038 00       		.sleb128 0
+ 302 0039 03       		.uleb128 0x3
+ 303 003a 6A000000 		.4byte	0x6a
+ 304 003e 01       		.byte	0x1
+ 305 003f 94000000 		.4byte	.LASF7
+ 306 0043 01       		.byte	0x1
+ 307 0044 25       		.byte	0x25
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s 			page 8
+
+
+ 308 0045 01       		.byte	0x1
+ 309 0046 64000000 		.4byte	.LFB3
+ 310 004a 80000000 		.4byte	.LFE3
+ 311 004e 02       		.byte	0x2
+ 312 004f 7D       		.byte	0x7d
+ 313 0050 00       		.sleb128 0
+ 314 0051 04       		.uleb128 0x4
+ 315 0052 18000000 		.4byte	.LASF8
+ 316 0056 01       		.byte	0x1
+ 317 0057 24       		.byte	0x24
+ 318 0058 6A000000 		.4byte	0x6a
+ 319 005c 01       		.byte	0x1
+ 320 005d 50       		.byte	0x50
+ 321 005e 05       		.uleb128 0x5
+ 322 005f 6900     		.ascii	"i\000"
+ 323 0061 01       		.byte	0x1
+ 324 0062 26       		.byte	0x26
+ 325 0063 6A000000 		.4byte	0x6a
+ 326 0067 01       		.byte	0x1
+ 327 0068 53       		.byte	0x53
+ 328 0069 00       		.byte	0x0
+ 329 006a 06       		.uleb128 0x6
+ 330 006b 0B000000 		.4byte	.LASF2
+ 331 006f 04       		.byte	0x4
+ 332 0070 07       		.byte	0x7
+ 333 0071 07       		.uleb128 0x7
+ 334 0072 01       		.byte	0x1
+ 335 0073 A6000000 		.4byte	.LASF1
+ 336 0077 01       		.byte	0x1
+ 337 0078 2E       		.byte	0x2e
+ 338 0079 01       		.byte	0x1
+ 339 007a 88000000 		.4byte	0x88
+ 340 007e 80000000 		.4byte	.LFB4
+ 341 0082 10010000 		.4byte	.LFE4
+ 342 0086 01       		.byte	0x1
+ 343 0087 5B       		.byte	0x5b
+ 344 0088 08       		.uleb128 0x8
+ 345 0089 696E7400 		.ascii	"int\000"
+ 346 008d 04       		.byte	0x4
+ 347 008e 05       		.byte	0x5
+ 348 008f 09       		.uleb128 0x9
+ 349 0090 01       		.byte	0x1
+ 350 0091 74633000 		.ascii	"tc0\000"
+ 351 0095 01       		.byte	0x1
+ 352 0096 4B       		.byte	0x4b
+ 353 0097 01       		.byte	0x1
+ 354 0098 10010000 		.4byte	.LFB5
+ 355 009c 54010000 		.4byte	.LFE5
+ 356 00a0 02       		.byte	0x2
+ 357 00a1 7D       		.byte	0x7d
+ 358 00a2 00       		.sleb128 0
+ 359 00a3 0A       		.uleb128 0xa
+ 360 00a4 21000000 		.4byte	.LASF3
+ 361 00a8 01       		.byte	0x1
+ 362 00a9 0F       		.byte	0xf
+ 363 00aa B5000000 		.4byte	0xb5
+ 364 00ae 01       		.byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s 			page 9
+
+
+ 365 00af 05       		.byte	0x5
+ 366 00b0 03       		.byte	0x3
+ 367 00b1 00000000 		.4byte	fInterruptOccured
+ 368 00b5 0B       		.uleb128 0xb
+ 369 00b6 6A000000 		.4byte	0x6a
+ 370 00ba 00       		.byte	0x0
+ 371              		.section	.debug_abbrev
+ 372 0000 01       		.uleb128 0x1
+ 373 0001 11       		.uleb128 0x11
+ 374 0002 01       		.byte	0x1
+ 375 0003 10       		.uleb128 0x10
+ 376 0004 06       		.uleb128 0x6
+ 377 0005 12       		.uleb128 0x12
+ 378 0006 01       		.uleb128 0x1
+ 379 0007 11       		.uleb128 0x11
+ 380 0008 01       		.uleb128 0x1
+ 381 0009 25       		.uleb128 0x25
+ 382 000a 0E       		.uleb128 0xe
+ 383 000b 13       		.uleb128 0x13
+ 384 000c 0B       		.uleb128 0xb
+ 385 000d 03       		.uleb128 0x3
+ 386 000e 0E       		.uleb128 0xe
+ 387 000f 1B       		.uleb128 0x1b
+ 388 0010 0E       		.uleb128 0xe
+ 389 0011 00       		.byte	0x0
+ 390 0012 00       		.byte	0x0
+ 391 0013 02       		.uleb128 0x2
+ 392 0014 2E       		.uleb128 0x2e
+ 393 0015 00       		.byte	0x0
+ 394 0016 3F       		.uleb128 0x3f
+ 395 0017 0C       		.uleb128 0xc
+ 396 0018 03       		.uleb128 0x3
+ 397 0019 0E       		.uleb128 0xe
+ 398 001a 3A       		.uleb128 0x3a
+ 399 001b 0B       		.uleb128 0xb
+ 400 001c 3B       		.uleb128 0x3b
+ 401 001d 0B       		.uleb128 0xb
+ 402 001e 27       		.uleb128 0x27
+ 403 001f 0C       		.uleb128 0xc
+ 404 0020 11       		.uleb128 0x11
+ 405 0021 01       		.uleb128 0x1
+ 406 0022 12       		.uleb128 0x12
+ 407 0023 01       		.uleb128 0x1
+ 408 0024 40       		.uleb128 0x40
+ 409 0025 0A       		.uleb128 0xa
+ 410 0026 00       		.byte	0x0
+ 411 0027 00       		.byte	0x0
+ 412 0028 03       		.uleb128 0x3
+ 413 0029 2E       		.uleb128 0x2e
+ 414 002a 01       		.byte	0x1
+ 415 002b 01       		.uleb128 0x1
+ 416 002c 13       		.uleb128 0x13
+ 417 002d 3F       		.uleb128 0x3f
+ 418 002e 0C       		.uleb128 0xc
+ 419 002f 03       		.uleb128 0x3
+ 420 0030 0E       		.uleb128 0xe
+ 421 0031 3A       		.uleb128 0x3a
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s 			page 10
+
+
+ 422 0032 0B       		.uleb128 0xb
+ 423 0033 3B       		.uleb128 0x3b
+ 424 0034 0B       		.uleb128 0xb
+ 425 0035 27       		.uleb128 0x27
+ 426 0036 0C       		.uleb128 0xc
+ 427 0037 11       		.uleb128 0x11
+ 428 0038 01       		.uleb128 0x1
+ 429 0039 12       		.uleb128 0x12
+ 430 003a 01       		.uleb128 0x1
+ 431 003b 40       		.uleb128 0x40
+ 432 003c 0A       		.uleb128 0xa
+ 433 003d 00       		.byte	0x0
+ 434 003e 00       		.byte	0x0
+ 435 003f 04       		.uleb128 0x4
+ 436 0040 05       		.uleb128 0x5
+ 437 0041 00       		.byte	0x0
+ 438 0042 03       		.uleb128 0x3
+ 439 0043 0E       		.uleb128 0xe
+ 440 0044 3A       		.uleb128 0x3a
+ 441 0045 0B       		.uleb128 0xb
+ 442 0046 3B       		.uleb128 0x3b
+ 443 0047 0B       		.uleb128 0xb
+ 444 0048 49       		.uleb128 0x49
+ 445 0049 13       		.uleb128 0x13
+ 446 004a 02       		.uleb128 0x2
+ 447 004b 0A       		.uleb128 0xa
+ 448 004c 00       		.byte	0x0
+ 449 004d 00       		.byte	0x0
+ 450 004e 05       		.uleb128 0x5
+ 451 004f 34       		.uleb128 0x34
+ 452 0050 00       		.byte	0x0
+ 453 0051 03       		.uleb128 0x3
+ 454 0052 08       		.uleb128 0x8
+ 455 0053 3A       		.uleb128 0x3a
+ 456 0054 0B       		.uleb128 0xb
+ 457 0055 3B       		.uleb128 0x3b
+ 458 0056 0B       		.uleb128 0xb
+ 459 0057 49       		.uleb128 0x49
+ 460 0058 13       		.uleb128 0x13
+ 461 0059 02       		.uleb128 0x2
+ 462 005a 0A       		.uleb128 0xa
+ 463 005b 00       		.byte	0x0
+ 464 005c 00       		.byte	0x0
+ 465 005d 06       		.uleb128 0x6
+ 466 005e 24       		.uleb128 0x24
+ 467 005f 00       		.byte	0x0
+ 468 0060 03       		.uleb128 0x3
+ 469 0061 0E       		.uleb128 0xe
+ 470 0062 0B       		.uleb128 0xb
+ 471 0063 0B       		.uleb128 0xb
+ 472 0064 3E       		.uleb128 0x3e
+ 473 0065 0B       		.uleb128 0xb
+ 474 0066 00       		.byte	0x0
+ 475 0067 00       		.byte	0x0
+ 476 0068 07       		.uleb128 0x7
+ 477 0069 2E       		.uleb128 0x2e
+ 478 006a 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s 			page 11
+
+
+ 479 006b 3F       		.uleb128 0x3f
+ 480 006c 0C       		.uleb128 0xc
+ 481 006d 03       		.uleb128 0x3
+ 482 006e 0E       		.uleb128 0xe
+ 483 006f 3A       		.uleb128 0x3a
+ 484 0070 0B       		.uleb128 0xb
+ 485 0071 3B       		.uleb128 0x3b
+ 486 0072 0B       		.uleb128 0xb
+ 487 0073 27       		.uleb128 0x27
+ 488 0074 0C       		.uleb128 0xc
+ 489 0075 49       		.uleb128 0x49
+ 490 0076 13       		.uleb128 0x13
+ 491 0077 11       		.uleb128 0x11
+ 492 0078 01       		.uleb128 0x1
+ 493 0079 12       		.uleb128 0x12
+ 494 007a 01       		.uleb128 0x1
+ 495 007b 40       		.uleb128 0x40
+ 496 007c 0A       		.uleb128 0xa
+ 497 007d 00       		.byte	0x0
+ 498 007e 00       		.byte	0x0
+ 499 007f 08       		.uleb128 0x8
+ 500 0080 24       		.uleb128 0x24
+ 501 0081 00       		.byte	0x0
+ 502 0082 03       		.uleb128 0x3
+ 503 0083 08       		.uleb128 0x8
+ 504 0084 0B       		.uleb128 0xb
+ 505 0085 0B       		.uleb128 0xb
+ 506 0086 3E       		.uleb128 0x3e
+ 507 0087 0B       		.uleb128 0xb
+ 508 0088 00       		.byte	0x0
+ 509 0089 00       		.byte	0x0
+ 510 008a 09       		.uleb128 0x9
+ 511 008b 2E       		.uleb128 0x2e
+ 512 008c 00       		.byte	0x0
+ 513 008d 3F       		.uleb128 0x3f
+ 514 008e 0C       		.uleb128 0xc
+ 515 008f 03       		.uleb128 0x3
+ 516 0090 08       		.uleb128 0x8
+ 517 0091 3A       		.uleb128 0x3a
+ 518 0092 0B       		.uleb128 0xb
+ 519 0093 3B       		.uleb128 0x3b
+ 520 0094 0B       		.uleb128 0xb
+ 521 0095 27       		.uleb128 0x27
+ 522 0096 0C       		.uleb128 0xc
+ 523 0097 11       		.uleb128 0x11
+ 524 0098 01       		.uleb128 0x1
+ 525 0099 12       		.uleb128 0x12
+ 526 009a 01       		.uleb128 0x1
+ 527 009b 40       		.uleb128 0x40
+ 528 009c 0A       		.uleb128 0xa
+ 529 009d 00       		.byte	0x0
+ 530 009e 00       		.byte	0x0
+ 531 009f 0A       		.uleb128 0xa
+ 532 00a0 34       		.uleb128 0x34
+ 533 00a1 00       		.byte	0x0
+ 534 00a2 03       		.uleb128 0x3
+ 535 00a3 0E       		.uleb128 0xe
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s 			page 12
+
+
+ 536 00a4 3A       		.uleb128 0x3a
+ 537 00a5 0B       		.uleb128 0xb
+ 538 00a6 3B       		.uleb128 0x3b
+ 539 00a7 0B       		.uleb128 0xb
+ 540 00a8 49       		.uleb128 0x49
+ 541 00a9 13       		.uleb128 0x13
+ 542 00aa 3F       		.uleb128 0x3f
+ 543 00ab 0C       		.uleb128 0xc
+ 544 00ac 02       		.uleb128 0x2
+ 545 00ad 0A       		.uleb128 0xa
+ 546 00ae 00       		.byte	0x0
+ 547 00af 00       		.byte	0x0
+ 548 00b0 0B       		.uleb128 0xb
+ 549 00b1 35       		.uleb128 0x35
+ 550 00b2 00       		.byte	0x0
+ 551 00b3 49       		.uleb128 0x49
+ 552 00b4 13       		.uleb128 0x13
+ 553 00b5 00       		.byte	0x0
+ 554 00b6 00       		.byte	0x0
+ 555 00b7 00       		.byte	0x0
+ 556              		.section	.debug_pubnames,"",%progbits
+ 557 0000 4E000000 		.4byte	0x4e
+ 558 0004 0200     		.2byte	0x2
+ 559 0006 00000000 		.4byte	.Ldebug_info0
+ 560 000a BB000000 		.4byte	0xbb
+ 561 000e 25000000 		.4byte	0x25
+ 562 0012 496E6974 		.ascii	"InitTimer0\000"
+ 562      54696D65 
+ 562      723000
+ 563 001d 39000000 		.4byte	0x39
+ 564 0021 64656C61 		.ascii	"delay\000"
+ 564      7900
+ 565 0027 71000000 		.4byte	0x71
+ 566 002b 6D61696E 		.ascii	"main\000"
+ 566      00
+ 567 0030 8F000000 		.4byte	0x8f
+ 568 0034 74633000 		.ascii	"tc0\000"
+ 569 0038 A3000000 		.4byte	0xa3
+ 570 003c 66496E74 		.ascii	"fInterruptOccured\000"
+ 570      65727275 
+ 570      70744F63 
+ 570      63757265 
+ 570      6400
+ 571 004e 00000000 		.4byte	0x0
+ 572              		.section	.debug_aranges,"",%progbits
+ 573 0000 1C000000 		.4byte	0x1c
+ 574 0004 0200     		.2byte	0x2
+ 575 0006 00000000 		.4byte	.Ldebug_info0
+ 576 000a 04       		.byte	0x4
+ 577 000b 00       		.byte	0x0
+ 578 000c 0000     		.2byte	0x0
+ 579 000e 0000     		.2byte	0x0
+ 580 0010 00000000 		.4byte	.Ltext0
+ 581 0014 54010000 		.4byte	.Letext0-.Ltext0
+ 582 0018 00000000 		.4byte	0x0
+ 583 001c 00000000 		.4byte	0x0
+ 584              		.section	.debug_str,"MS",%progbits,1
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s 			page 13
+
+
+ 585              	.LASF0:
+ 586 0000 496E6974 		.ascii	"InitTimer0\000"
+ 586      54696D65 
+ 586      723000
+ 587              	.LASF2:
+ 588 000b 756E7369 		.ascii	"unsigned int\000"
+ 588      676E6564 
+ 588      20696E74 
+ 588      00
+ 589              	.LASF8:
+ 590 0018 64656C5F 		.ascii	"del_time\000"
+ 590      74696D65 
+ 590      00
+ 591              	.LASF3:
+ 592 0021 66496E74 		.ascii	"fInterruptOccured\000"
+ 592      65727275 
+ 592      70744F63 
+ 592      63757265 
+ 592      6400
+ 593              	.LASF6:
+ 594 0033 2F637967 		.ascii	"/cygdrive/d/Ksiazka_ARM/Przykladowe_aplikacje/Komun"
+ 594      64726976 
+ 594      652F642F 
+ 594      4B736961 
+ 594      7A6B615F 
+ 595 0066 696B6163 		.ascii	"ikacja_ISR/Komunikacja_ISR_uP\000"
+ 595      6A615F49 
+ 595      53522F4B 
+ 595      6F6D756E 
+ 595      696B6163 
+ 596              	.LASF5:
+ 597 0084 4953525F 		.ascii	"ISR_data_swap.c\000"
+ 597      64617461 
+ 597      5F737761 
+ 597      702E6300 
+ 598              	.LASF7:
+ 599 0094 64656C61 		.ascii	"delay\000"
+ 599      7900
+ 600              	.LASF4:
+ 601 009a 474E5520 		.ascii	"GNU C 4.0.1\000"
+ 601      4320342E 
+ 601      302E3100 
+ 602              	.LASF1:
+ 603 00a6 6D61696E 		.ascii	"main\000"
+ 603      00
+ 604              		.ident	"GCC: (GNU) 4.0.1"
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s 			page 14
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 ISR_data_swap.c
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s:15     .bss:00000000 fInterruptOccured
+                             .bss:00000000 $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s:21     .text:00000000 InitTimer0
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s:32     .text:00000000 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s:65     .text:00000060 $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s:165    .text:00000110 tc0
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s:71     .text:00000064 delay
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s:81     .text:00000064 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s:100    .text:00000080 main
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s:158    .text:00000108 $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s:173    .text:00000110 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/cchaxMWp.s:199    .text:00000150 $d
+
+UNDEFINED SYMBOLS
+LCDInit
+LCDClear
+LCDText

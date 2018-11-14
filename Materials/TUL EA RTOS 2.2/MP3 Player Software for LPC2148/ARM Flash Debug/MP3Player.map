@@ -1,0 +1,1136 @@
+Archive member included because of file (symbol)
+
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/liblpc2000_v4t_a_le.a(liblpc2000_get_cclk.o)
+                              ARM Flash Debug/LPC210x.o (liblpc2000_get_cclk)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/liblpc2000_v4t_a_le.a(liblpc2000_get_pclk.o)
+                              ARM Flash Debug/LPC210x.o (liblpc2000_get_pclk)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a(libarm_isr_enable_disable_irq.o)
+                              ARM Flash Debug/VIC.o (ctl_global_interrupts_re_enable_from_isr)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a(libarm_enable_irq.o)
+                              ARM Flash Debug/lpc_io.o (__ARMLIB_enableIRQ)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(debug_printf.o)
+                              ARM Flash Debug/demo.o (debug_printf)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(__int32_umod.o)
+                              ARM Flash Debug/file.o (__umodsi3)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(__int32_div.o)
+                              ARM Flash Debug/fs.o (__divsi3)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(__int32_mod.o)
+                              ARM Flash Debug/ls.o (__modsi3)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(__int32_udivmod.o)
+                              ARM Flash Debug/lpc_io.o (__udivsi3)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(memcpy.o)
+                              ARM Flash Debug/layer3.o (memcpy)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(memset.o)
+                              ARM Flash Debug/synth.o (memset)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(memmove.o)
+                              ARM Flash Debug/layer3.o (memmove)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(strncpy.o)
+                              ARM Flash Debug/demo.o (strncpy)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(sprintf.o)
+                              ARM Flash Debug/timer.o (sprintf)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libgccfp_v4t_a_le.a(_addsubdf3.o)
+                              ARM Flash Debug/layer3.o (__floatsidf)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libgccfp_v4t_a_le.a(_muldivdf3.o)
+                              ARM Flash Debug/layer3.o (__muldf3)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/lib_vfprintf_long_v4t_a_le.a(__vfprintf_long.o)
+                              C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(sprintf.o) (__vfprintf)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a(__debug_operations.o)
+                              C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(debug_printf.o) (__do_debug_operation)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a(libarmdi_dcc_write.o)
+                              C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a(__debug_operations.o) (libarm_dcc_write)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a(libarm_run_dcc_port_server.o)
+                              C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a(__debug_operations.o) (libarm_run_dcc_port_server)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a(libarmdi_dcc_read.o)
+                              C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a(libarm_run_dcc_port_server.o) (libarm_dcc_read)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(strlen.o)
+                              C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/lib_vfprintf_long_v4t_a_le.a(__vfprintf_long.o) (strlen)
+C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(__hex_lc_uc.o)
+                              C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/lib_vfprintf_long_v4t_a_le.a(__vfprintf_long.o) (__hex_uc)
+
+Allocating common symbols
+Common symbol       size              file
+
+list                0x34              ARM Flash Debug/demo.o
+pippo               0x2               ARM Flash Debug/lpc_io.o
+efs                 0x2c4             ARM Flash Debug/demo.o
+MainData            0xa07             ARM Flash Debug/stream.o
+file_name           0xd               ARM Flash Debug/demo.o
+file                0x50              ARM Flash Debug/demo.o
+size                0x4               ARM Flash Debug/demo.o
+Sync                0x3480            ARM Flash Debug/decoder.o
+frame_overlap_buff  0x1200            ARM Flash Debug/layer3.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+UNPLACED_SECTIONS 0xffffffff         0x00000000         xw
+AHB_Peripherals  0xffe00000         0x00200000         xw
+APB_Peripherals  0xe0000000         0x00200000         xw
+USB_DMA_RAM      0x7fd00000         0x00002000         xw
+SRAM             0x40000000         0x00008000         xw
+FLASH            0x00000000         0x00080000         xr
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+                0xffe00000                __AHB_Peripherals_segment_start__ = 0xffe00000
+                0x00000000                __AHB_Peripherals_segment_end__ = 0x0
+                0xe0000000                __APB_Peripherals_segment_start__ = 0xe0000000
+                0xe0200000                __APB_Peripherals_segment_end__ = 0xe0200000
+                0x7fd00000                __USB_DMA_RAM_segment_start__ = 0x7fd00000
+                0x7fd02000                __USB_DMA_RAM_segment_end__ = 0x7fd02000
+                0x40000000                __SRAM_segment_start__ = 0x40000000
+                0x40008000                __SRAM_segment_end__ = 0x40008000
+                0x00000000                __FLASH_segment_start__ = 0x0
+                0x00080000                __FLASH_segment_end__ = 0x80000
+                0x00002000                __STACKSIZE__ = 0x2000
+                0x00000100                __STACKSIZE_IRQ__ = 0x100
+                0x00000004                __STACKSIZE_FIQ__ = 0x4
+                0x00000004                __STACKSIZE_SVC__ = 0x4
+                0x00000004                __STACKSIZE_ABT__ = 0x4
+                0x00000004                __STACKSIZE_UND__ = 0x4
+                0x00000000                __HEAPSIZE__ = 0x0
+                0x40000000                __vectors_ram_load_start__ = __SRAM_segment_start__
+
+.vectors_ram    0x40000000       0x3c
+                0x40000000                __vectors_ram_start__ = .
+ *(.vectors_ram)
+                0x4000003c                . = ((__vectors_ram_start__ + 0x3c) MAX_K .)
+ *fill*         0x40000000       0x3c 00
+                0x4000003c                __vectors_ram_end__ = (__vectors_ram_start__ + SIZEOF (.vectors_ram))
+                0x00000001                . = ASSERT (((__vectors_ram_end__ >= __SRAM_segment_start__) && (__vectors_ram_end__ <= (__SRAM_segment_start__ + 0x8000))), error: .vectors_ram is too large to fit in SRAM memory segment)
+                0x00000000                __vectors_load_start__ = __FLASH_segment_start__
+
+.vectors        0x00000000       0x38
+                0x00000000                __vectors_start__ = .
+ *(.vectors .vectors.*)
+ .vectors       0x00000000       0x38 ARM Flash Debug/Philips_LPC2148_Startup.o
+                0x00000000                _vectors
+                0x00000038                __vectors_end__ = (__vectors_start__ + SIZEOF (.vectors))
+                0x00000001                . = ASSERT (((__vectors_end__ >= __FLASH_segment_start__) && (__vectors_end__ <= (__FLASH_segment_start__ + 0x80000))), error: .vectors is too large to fit in FLASH memory segment)
+                0x00000038                __init_load_start__ = (__vectors_end__ ALIGN 0x4)
+
+.init           0x00000038      0x274
+                0x00000038                __init_start__ = .
+ *(.init .init.*)
+ *fill*         0x00000038        0x8 00
+ .init          0x00000040      0x1c0 ARM Flash Debug/crt0.o
+                0x00000040                __start
+                0x00000040                _start
+ .init          0x00000200       0xac ARM Flash Debug/Philips_LPC2148_Startup.o
+                0x00000200                reset_handler
+                0x00000288                undef_handler
+                0x00000290                pabort_handler
+                0x00000294                dabort_handler
+                0x0000028c                swi_handler
+                0x00000298                fiq_handler
+                0x000002ac                __init_end__ = (__init_start__ + SIZEOF (.init))
+                0x00000001                . = ASSERT (((__init_end__ >= __FLASH_segment_start__) && (__init_end__ <= (__FLASH_segment_start__ + 0x80000))), error: .init is too large to fit in FLASH memory segment)
+                0x000002ac                __text_load_start__ = (__init_end__ ALIGN 0x4)
+
+.text           0x000002ac     0xe724
+                0x000002ac                __text_start__ = .
+ *(.text .text.* .glue_7t .glue_7 .gnu.linkonce.t.*)
+ .text          0x000002ac      0x1c4 ARM Flash Debug/VIC.o
+                0x000003d4                ctl_unmask_isr
+                0x000002ac                ctl_set_isr
+                0x000003ec                ctl_mask_isr
+ .text          0x00000470       0x3c ARM Flash Debug/VIC_irq_handler.o
+                0x00000470                irq_handler
+ .text          0x000004ac       0xc8 ARM Flash Debug/LPC210x.o
+                0x000004dc                ctl_get_ticks_per_second
+                0x000004e4                ctl_start_timer
+ .text          0x00000574      0x328 ARM Flash Debug/lpc_io.o
+                0x00000840                init_IO
+                0x00000734                tc0
+                0x00000674                render_sample_block
+                0x00000700                init_timer
+                0x00000610                render_sample
+                0x00000574                enable_audio_render
+                0x00000814                set_dac_sample_rate
+                0x000005ac                disable_audio_render
+                0x000005e0                wait_end_of_excerpt
+ .text          0x0000089c      0x1d8 ARM Flash Debug/demo.o
+                0x00000928                main
+                0x0000089c                format_file_name
+ .text          0x00000a74      0x4a0 ARM Flash Debug/ui.o
+                0x00000cb0                rmfile
+                0x00000d68                listFiles
+                0x00000a74                mkdir
+ .text          0x00000f14      0x614 ARM Flash Debug/dir.o
+                0x000010bc                dir_updateDirectoryEntry
+                0x000013d0                dir_findinCluster
+                0x00001490                dir_findinDir
+                0x0000114c                dir_setFirstCluster
+                0x000012d8                dir_findinBuf
+                0x00000f94                dir_addCluster
+                0x0000130c                dir_findinRootArea
+                0x0000119c                dir_createDirectoryEntry
+                0x00000ff4                dir_createDefaultEntry
+                0x0000123c                dir_findFileinBuf
+                0x0000110c                dir_setFileSize
+                0x00001040                dir_getFatFileName
+                0x000011e8                dir_getFileStructure
+                0x00000f14                dir_findFreeEntryinBuf
+ .text          0x00001528       0x7c ARM Flash Debug/disc.o
+                0x00001588                disc_initDisc
+                0x00001528                disc_loadMBR
+ .text          0x000015a4       0xa4 ARM Flash Debug/efs.o
+                0x000015a4                efs_init
+ .text          0x00001648      0x100 ARM Flash Debug/extract.o
+                0x000016d0                ex_getPartitionField
+                0x00001648                ex_getb16
+                0x000016ac                ex_setb32
+                0x00001664                ex_getb32
+                0x00001744                ex_setPartitionField
+                0x00001698                ex_setb16
+ .text          0x00001748      0xb1c ARM Flash Debug/fat.o
+                0x00001c5c                fat_getNextClusterChain
+                0x00001854                fat_setNextClusterAddressWBuf
+                0x00001748                fat_getSectorAddressFatEntry
+                0x00001990                fat_getNextClusterAddressWBuf
+                0x00001d64                fat_LogicToDiscCluster
+                0x00002030                fat_setNextClusterAddress
+                0x00001fd4                fat_countFreeClusters
+                0x00001ee0                fat_getNextClusterAddress
+                0x00001e0c                fat_DiscToLogicCluster
+                0x000017b8                fat_isEocMarker
+                0x00001a50                fat_allocClusterChain
+                0x0000181c                fat_giveEocMarker
+                0x00001e80                fat_countClustersInChain
+                0x000021e4                fat_unlinkClusterChain
+ .text          0x00002264      0xb04 ARM Flash Debug/file.o
+                0x00002b88                file_write
+                0x00002344                file_normalToFatName
+                0x000024ac                file_requiredCluster
+                0x00002498                file_getAttr
+                0x000022c4                file_validateChar
+                0x000025f8                file_fopen
+                0x00002d38                file_read
+                0x00002bb8                file_fread
+                0x00002464                file_setAttr
+                0x00002550                file_fclose
+                0x00002264                file_setpos
+                0x0000227c                file_initFile
+                0x000029b4                file_fwrite
+ .text          0x00002d68      0x978 ARM Flash Debug/fs.o
+                0x00002e20                fs_countDataSectors
+                0x00003560                fs_loadVolumeId
+                0x00002f9c                fs_sectorToCluster
+                0x00002eb4                fs_determineFatType
+                0x00003670                fs_initFs
+                0x00002f58                fs_clusterToSector
+                0x000032e4                fs_findFile
+                0x00003458                fs_findFreeFile
+                0x00003054                fs_setFirstClusterInDirEntry
+                0x00003008                fs_getFirstClusterRootDir
+                0x00003230                fs_flushFs
+                0x00003258                fs_umount
+                0x00003000                fs_giveFreeClusterHint
+                0x00003270                fs_getLastCluster
+                0x00002f00                fs_findFirstSectorRootDir
+                0x00003064                fs_setFsInfo
+                0x00003510                fs_getNextFreeCluster
+                0x00002d68                fs_verifySanity
+                0x00003100                fs_getFsInfo
+                0x00003034                fs_initClusterChain
+                0x0000301c                fs_initCurrentDir
+                0x000031b8                fs_clearCluster
+                0x00003620                fs_isValidFat
+ .text          0x000036e0     0x1024 ARM Flash Debug/ioman.o
+                0x00004218                ioman_putSectorInCache
+                0x00004124                ioman_flushRange
+                0x00003a3c                ioman_getPtr
+                0x00003994                ioman_push
+                0x00003b60                ioman_findFreeSpot
+                0x00003780                ioman_getUseCnt
+                0x00003dbc                ioman_printStatus
+                0x00004018                ioman_flushSector
+                0x000041e4                ioman_readSector
+                0x00003bb8                ioman_findUnusedSpot
+                0x000043d4                ioman_getSector
+                0x00003af4                ioman_findSectorInCache
+                0x00003cd8                ioman_findOverallocableSpot
+                0x00004604                ioman_reset
+                0x000038a0                ioman_decRefCnt
+                0x00003a64                ioman_getBp
+                0x000037e0                ioman_decUseCnt
+                0x000036e0                ioman_getBuffer
+                0x00003ee0                ioman_writeSector
+                0x00004344                ioman_releaseSector
+                0x00003f1c                ioman_directSectorWrite
+                0x000046c8                ioman_init
+                0x00004098                ioman_flushAll
+                0x00003868                ioman_incRefCnt
+                0x000036e8                ioman_setAttr
+                0x00004290                ioman_directSectorRead
+                0x00003900                ioman_pop
+                0x0000374c                ioman_getAttr
+                0x00003818                ioman_resetUseCnt
+                0x00003840                ioman_getRefCnt
+                0x000038d8                ioman_resetRefCnt
+                0x000037a8                ioman_incUseCnt
+                0x00003ab8                ioman_resetCacheItem
+ .text          0x00004704      0x2d4 ARM Flash Debug/ls.o
+                0x0000478c                ls_getRootAreaEntry
+                0x00004738                ls_fileEntryToDirListEntry
+                0x000048d0                ls_getDirEntry
+                0x0000480c                ls_getRealDirEntry
+                0x00004918                ls_getNext
+                0x00004704                ls_isValidFileEntry
+                0x00004968                ls_openDir
+ .text          0x000049d8      0x218 ARM Flash Debug/mkfs.o
+                0x000049d8                mkfs_makevfat
+ .text          0x00004bf0      0x200 ARM Flash Debug/partition.o
+                0x00004d54                part_getSect
+                0x00004db8                part_readBuf
+                0x00004c6c                part_getRealLBA
+                0x00004c28                part_initPartition
+                0x00004cb8                part_directSectorRead
+                0x00004bf0                part_isFatPart
+                0x00004d80                part_writeBuf
+                0x00004d34                part_relSect
+                0x00004cec                part_flushPart
+                0x00004c84                part_directSectorWrite
+ .text          0x00004df0       0xac ARM Flash Debug/plibc.o
+                0x00004e7c                memSet
+                0x00004e5c                memClr
+                0x00004e38                memCpy
+                0x00004df0                strMatch
+ .text          0x00004e9c       0x18 ARM Flash Debug/time.o
+                0x00004e9c                fs_makeDate
+                0x00004ea4                fs_makeTime
+                0x00004eac                fs_hasTimeSupport
+ .text          0x00004eb4      0x74c ARM Flash Debug/sd.o
+                0x00005148                sd_getDriveSize
+                0x0000524c                sd_readSector
+                0x00004eb4                sd_Resp8bError
+                0x000050c0                sd_Command
+                0x00005050                sd_Resp8b
+                0x00005320                sd_writeSector
+                0x0000508c                sd_Resp16b
+                0x000053b8                sd_State
+                0x00005528                sd_Init
+ .text          0x00005600      0x258 ARM Flash Debug/lpc2000_spi.o
+                0x00005668                if_spiInit
+                0x00005600                if_setPos
+                0x00005624                if_spiSend
+                0x00005758                if_writeBuf
+                0x00005770                if_readBuf
+                0x00005608                if_spiSetSpeed
+                0x0000578c                if_initInterface
+ .text          0x00005858      0x2ec ARM Flash Debug/bit.o
+                0x00005870                mad_bit_length
+                0x00005890                mad_bit_nextbyte
+                0x000059d0                mad_bit_crc
+                0x000058a8                mad_bit_skip
+                0x00005858                mad_bit_init
+                0x000058fc                mad_bit_read
+ .text          0x00005b44      0x324 ARM Flash Debug/decoder.o
+                0x00005b44                mad_decoder_init
+                0x00005b9c                mad_decoder_finish
+                0x00005ba4                mad_decoder_run
+                0x00005be0                mad_decoder_message
+ .text          0x00005e68       0xd8 ARM Flash Debug/fixed.o
+                0x00005e68                mad_f_abs
+                0x00005e74                mad_f_div
+ .text          0x00005f40      0x958 ARM Flash Debug/frame.o
+                0x00005f40                mad_header_init
+                0x00006308                mad_header_decode
+                0x00006060                mad_frame_init
+                0x000067bc                mad_frame_decode
+                0x00005fa8                mad_frame_mute
+                0x00005f8c                mad_frame_finish
+ .text          0x00006898      0x964 ARM Flash Debug/imdct_l_arm.o
+                0x00006898                _III_imdct_l
+                0x00006898                III_imdct_l
+ .text          0x000071fc     0x2954 ARM Flash Debug/layer3.o
+                0x000075ec                mad_layer_III
+ .text          0x00009b50      0xc18 ARM Flash Debug/layer12.o
+                0x00009ca0                mad_layer_II
+                0x0000a3c8                mad_layer_I
+ .text          0x0000a768      0x340 ARM Flash Debug/stream.o
+                0x0000a77c                mad_stream_skip
+                0x0000a78c                mad_stream_errorstr
+                0x0000a9a4                mad_stream_sync
+                0x0000aa1c                mad_stream_buffer
+                0x0000a768                mad_stream_finish
+                0x0000aa4c                mad_stream_init
+ .text          0x0000aaa8     0x1a90 ARM Flash Debug/synth.o
+                0x0000aaa8                mad_synth_mute
+                0x0000ab1c                mad_synth_init
+                0x0000b870                mad_synth_frame
+ .text          0x0000c538      0xc10 ARM Flash Debug/timer.o
+                0x0000c538                mad_timer_compare
+                0x0000cf00                mad_timer_set
+                0x0000c668                mad_timer_multiply
+                0x0000c62c                mad_timer_add
+                0x0000c578                mad_timer_negate
+                0x0000c5ac                mad_timer_abs
+                0x0000caa8                mad_timer_string
+                0x0000c814                mad_timer_fraction
+                0x0000c8b0                mad_timer_count
+ .text          0x0000d148      0x188 ARM Flash Debug/minimad.o
+                0x0000d184                mp3_play
+                0x0000d148                abort
+ .text          0x0000d2d0       0x30 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/liblpc2000_v4t_a_le.a(liblpc2000_get_cclk.o)
+                0x0000d2d0                liblpc2000_get_cclk
+ .text          0x0000d300       0x2c C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/liblpc2000_v4t_a_le.a(liblpc2000_get_pclk.o)
+                0x0000d300                liblpc2000_get_pclk
+ *fill*         0x0000d32c        0x4 00
+ .text          0x0000d330       0x50 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a(libarm_isr_enable_disable_irq.o)
+                0x0000d330                ctl_global_interrupts_re_enable_from_isr
+                0x0000d330                libarm_isr_enable_irq
+                0x0000d354                ctl_global_interrupts_un_re_enable_from_isr
+                0x0000d354                libarm_isr_disable_irq
+ .text          0x0000d380       0x10 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a(libarm_enable_irq.o)
+                0x0000d380                __ARMLIB_enableIRQ
+                0x0000d380                libarm_enable_irq
+ .text          0x0000d390       0x20 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(debug_printf.o)
+                0x0000d390                debug_printf
+ .text          0x0000d3b0       0x20 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(__int32_umod.o)
+                0x0000d3b0                __umodsi3
+                0x0000d3b0                __int32_umod
+ .text          0x0000d3d0       0x50 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(__int32_div.o)
+                0x0000d3d0                __int32_div
+                0x0000d3d0                __divsi3
+ .text          0x0000d420       0x50 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(__int32_mod.o)
+                0x0000d420                __int32_mod
+                0x0000d420                __modsi3
+ .text          0x0000d470       0x30 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(__int32_udivmod.o)
+                0x0000d470                __int32_udiv
+                0x0000d470                __int32_udivmod
+                0x0000d470                __udivsi3
+ .text          0x0000d4a0       0x60 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(memcpy.o)
+                0x0000d4a0                memcpy
+ .text          0x0000d500       0xa0 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(memset.o)
+                0x0000d500                memset
+ .text          0x0000d5a0       0x58 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(memmove.o)
+                0x0000d5a0                memmove
+ .text          0x0000d5f8       0x78 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(strncpy.o)
+                0x0000d5f8                strncpy
+ .text          0x0000d670       0x44 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(sprintf.o)
+                0x0000d670                sprintf
+ .text          0x0000d6b4      0x41c C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libgccfp_v4t_a_le.a(_addsubdf3.o)
+                0x0000da70                __floatdidf
+                0x0000d9f4                __floatsidf
+                0x0000d9d0                __aeabi_ui2d
+                0x0000d6b4                __aeabi_drsub
+                0x0000da1c                __extendsfdf2
+                0x0000d6c0                __adddf3
+                0x0000d9d0                __floatunsidf
+                0x0000d6c0                __aeabi_dadd
+                0x0000da5c                __aeabi_ul2d
+                0x0000d6bc                __aeabi_dsub
+                0x0000da5c                __floatundidf
+                0x0000d9f4                __aeabi_i2d
+                0x0000da70                __aeabi_l2d
+                0x0000da1c                __aeabi_f2d
+                0x0000d6bc                __subdf3
+ .text          0x0000dad0      0x49c C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libgccfp_v4t_a_le.a(_muldivdf3.o)
+                0x0000dd60                __aeabi_ddiv
+                0x0000dad0                __aeabi_dmul
+                0x0000dd60                __divdf3
+                0x0000dad0                __muldf3
+ .text          0x0000df6c      0x764 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/lib_vfprintf_long_v4t_a_le.a(__vfprintf_long.o)
+                0x0000e028                __vfprintf
+ .text          0x0000e6d0       0x50 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a(__debug_operations.o)
+                0x0000e700                __do_nvdebug_operation
+                0x0000e6d0                __do_debug_operation
+ .text          0x0000e720       0x20 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a(libarmdi_dcc_write.o)
+                0x0000e720                libarm_dcc_write
+ .text          0x0000e740      0x204 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a(libarm_run_dcc_port_server.o)
+                0x0000e740                libarm_run_dcc_port_server
+ *fill*         0x0000e944        0xc 00
+ .text          0x0000e950       0x20 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a(libarmdi_dcc_read.o)
+                0x0000e950                libarm_dcc_read
+ .text          0x0000e970       0x60 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(strlen.o)
+                0x0000e970                strlen
+                0x0000e9d0                __text_end__ = (__text_start__ + SIZEOF (.text))
+                0x00000001                . = ASSERT (((__text_end__ >= __FLASH_segment_start__) && (__text_end__ <= (__FLASH_segment_start__ + 0x80000))), error: .text is too large to fit in FLASH memory segment)
+                0x0000e9d0                __dtors_load_start__ = (__text_end__ ALIGN 0x4)
+
+.dtors          0x0000e9d0        0x0
+                0x0000e9d0                __dtors_start__ = .
+ *(SORT(.dtors.*))
+ *(.dtors)
+                0x0000e9d0                __dtors_end__ = (__dtors_start__ + SIZEOF (.dtors))
+                0x00000001                . = ASSERT (((__dtors_end__ >= __FLASH_segment_start__) && (__dtors_end__ <= (__FLASH_segment_start__ + 0x80000))), error: .dtors is too large to fit in FLASH memory segment)
+                0x0000e9d0                __ctors_load_start__ = (__dtors_end__ ALIGN 0x4)
+
+.ctors          0x0000e9d0        0x0
+                0x0000e9d0                __ctors_start__ = .
+ *(SORT(.ctors.*))
+ *(.ctors)
+                0x0000e9d0                __ctors_end__ = (__ctors_start__ + SIZEOF (.ctors))
+                0x00000001                . = ASSERT (((__ctors_end__ >= __FLASH_segment_start__) && (__ctors_end__ <= (__FLASH_segment_start__ + 0x80000))), error: .ctors is too large to fit in FLASH memory segment)
+                0x0000e9d0                __rodata_load_start__ = (__ctors_end__ ALIGN 0x4)
+
+.rodata         0x0000e9d0     0xc02c
+                0x0000e9d0                __rodata_start__ = .
+ *(.rodata .rodata.* .gnu.linkonce.r.*)
+ .rodata.str1.4
+                0x0000e9d0       0x82 ARM Flash Debug/demo.o
+                                 0x84 (size before relaxing)
+ *fill*         0x0000ea52        0x2 00
+ .rodata.str1.4
+                0x0000ea54       0x52 ARM Flash Debug/ui.o
+                                 0x54 (size before relaxing)
+ *fill*         0x0000eaa6        0x2 00
+ .rodata.str1.4
+                0x0000eaa8       0x3e ARM Flash Debug/fat.o
+                                 0x40 (size before relaxing)
+ *fill*         0x0000eae6        0x2 00
+ .rodata.str1.4
+                0x0000eae8       0xa3 ARM Flash Debug/ioman.o
+                                 0xa4 (size before relaxing)
+ *fill*         0x0000eb8b        0x1 00
+ .rodata.str1.4
+                0x0000eb8c       0x5d ARM Flash Debug/mkfs.o
+                                 0x60 (size before relaxing)
+ *fill*         0x0000ebe9        0x3 00
+ .rodata.str1.4
+                0x0000ebec      0x25b ARM Flash Debug/sd.o
+                                0x260 (size before relaxing)
+ *fill*         0x0000ee47        0x1 00
+ .rodata.str1.4
+                0x0000ee48       0xaa ARM Flash Debug/lpc2000_spi.o
+                                 0xac (size before relaxing)
+ *fill*         0x0000eef2        0x2 00
+ .rodata        0x0000eef4       0xb4 ARM Flash Debug/version.o
+                0x0000eef4                mad_version
+                0x0000ef18                mad_copyright
+                0x0000ef7c                mad_build
+                0x0000ef4c                mad_author
+ .rodata        0x0000efa8      0x200 ARM Flash Debug/bit.o
+ .rodata        0x0000f1a8      0x144 ARM Flash Debug/frame.o
+ .rodata        0x0000f2ec     0x2344 ARM Flash Debug/huffman.o
+                0x0000f2ec                mad_huff_quad_table
+                0x0000f2f4                mad_huff_pair_table
+ .rodata.str1.4
+                0x00011630       0x21 ARM Flash Debug/layer3.o
+                                 0x24 (size before relaxing)
+ *fill*         0x00011651        0x3 00
+ .rodata        0x00011654     0x8594 ARM Flash Debug/layer3.o
+ .rodata        0x00019be8      0x334 ARM Flash Debug/layer12.o
+ .rodata.str1.4
+                0x00019f1c      0x238 ARM Flash Debug/stream.o
+ .rodata        0x0001a154      0x880 ARM Flash Debug/synth.o
+ .rodata        0x0001a9d4        0x8 ARM Flash Debug/timer.o
+                0x0001a9d4                mad_timer_zero
+ .rodata        0x0001a9dc       0x20 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(__hex_lc_uc.o)
+                0x0001a9dc                __hex_uc
+                0x0001a9ec                __hex_lc
+                0x0001a9fc                __rodata_end__ = (__rodata_start__ + SIZEOF (.rodata))
+                0x00000001                . = ASSERT (((__rodata_end__ >= __FLASH_segment_start__) && (__rodata_end__ <= (__FLASH_segment_start__ + 0x80000))), error: .rodata is too large to fit in FLASH memory segment)
+                0x0001a9fc                __fast_load_start__ = (__rodata_end__ ALIGN 0x4)
+
+.fast           0x4000003c        0x0 load address 0x0001a9fc
+                0x4000003c                __fast_start__ = .
+ *(.fast .fast.*)
+                0x4000003c                __fast_end__ = (__fast_start__ + SIZEOF (.fast))
+                0x0001a9fc                __fast_load_end__ = (__fast_load_start__ + SIZEOF (.fast))
+                0x00000001                . = ASSERT ((((__fast_load_start__ + SIZEOF (.fast)) >= __FLASH_segment_start__) && ((__fast_load_start__ + SIZEOF (.fast)) <= (__FLASH_segment_start__ + 0x80000))), error: .fast is too large to fit in FLASH memory segment)
+
+.fast_run       0x4000003c        0x0
+                0x4000003c                __fast_run_start__ = .
+                0x4000003c                . = ((__fast_run_start__ + SIZEOF (.fast)) MAX_K .)
+                0x4000003c                __fast_run_end__ = (__fast_run_start__ + SIZEOF (.fast_run))
+                0x00000001                . = ASSERT (((__fast_run_end__ >= __SRAM_segment_start__) && (__fast_run_end__ <= (__SRAM_segment_start__ + 0x8000))), error: .fast_run is too large to fit in SRAM memory segment)
+                0x0001a9fc                __data_load_start__ = ((__fast_load_start__ + SIZEOF (.fast)) ALIGN 0x4)
+
+.data           0x4000003c        0x0 load address 0x0001a9fc
+                0x4000003c                __data_start__ = .
+ *(.data .data.* .gnu.linkonce.d.*)
+                0x4000003c                __data_end__ = (__data_start__ + SIZEOF (.data))
+                0x0001a9fc                __data_load_end__ = (__data_load_start__ + SIZEOF (.data))
+                0x0001a9fc                __FLASH_segment_used_end__ = (((__fast_load_start__ + SIZEOF (.fast)) ALIGN 0x4) + SIZEOF (.data))
+                0x00000001                . = ASSERT ((((__data_load_start__ + SIZEOF (.data)) >= __FLASH_segment_start__) && ((__data_load_start__ + SIZEOF (.data)) <= (__FLASH_segment_start__ + 0x80000))), error: .data is too large to fit in FLASH memory segment)
+
+.data_run       0x4000003c        0x0
+                0x4000003c                __data_run_start__ = .
+                0x4000003c                . = ((__data_run_start__ + SIZEOF (.data)) MAX_K .)
+                0x4000003c                __data_run_end__ = (__data_run_start__ + SIZEOF (.data_run))
+                0x00000001                . = ASSERT (((__data_run_end__ >= __SRAM_segment_start__) && (__data_run_end__ <= (__SRAM_segment_start__ + 0x8000))), error: .data_run is too large to fit in SRAM memory segment)
+                0x4000003c                __bss_load_start__ = (__data_run_end__ ALIGN 0x4)
+
+.bss            0x4000003c     0x6277
+                0x4000003c                __bss_start__ = .
+ *(.bss .bss.* .gnu.linkonce.b.*)
+ .bss           0x4000003c       0x80 ARM Flash Debug/VIC.o
+ .bss           0x400000bc        0x4 ARM Flash Debug/LPC210x.o
+ .bss           0x400000c0      0x808 ARM Flash Debug/lpc_io.o
+ .bss           0x400008c8      0x604 ARM Flash Debug/minimad.o
+ *(COMMON)
+ COMMON         0x40000ecc        0x2 ARM Flash Debug/lpc_io.o
+                0x40000ecc                pippo
+ *fill*         0x40000ece        0x2 00
+ COMMON         0x40000ed0      0x35c ARM Flash Debug/demo.o
+                0x40000ed0                list
+                0x40000f04                efs
+                0x400011c8                file_name
+                0x400011d8                file
+                0x40001228                size
+ COMMON         0x4000122c     0x3480 ARM Flash Debug/decoder.o
+                0x4000122c                Sync
+ COMMON         0x400046ac     0x1200 ARM Flash Debug/layer3.o
+                0x400046ac                frame_overlap_buff
+ COMMON         0x400058ac      0xa07 ARM Flash Debug/stream.o
+                0x400058ac                MainData
+                0x400062b3                __bss_end__ = (__bss_start__ + SIZEOF (.bss))
+                0x00000001                . = ASSERT (((__bss_end__ >= __SRAM_segment_start__) && (__bss_end__ <= (__SRAM_segment_start__ + 0x8000))), error: .bss is too large to fit in SRAM memory segment)
+                0x400062b4                __non_init_load_start__ = (__bss_end__ ALIGN 0x4)
+
+.non_init       0x400062b4        0x0
+                0x400062b4                __non_init_start__ = .
+ *(.non_init .non_init.*)
+                0x400062b4                __non_init_end__ = (__non_init_start__ + SIZEOF (.non_init))
+                0x00000001                . = ASSERT (((__non_init_end__ >= __SRAM_segment_start__) && (__non_init_end__ <= (__SRAM_segment_start__ + 0x8000))), error: .non_init is too large to fit in SRAM memory segment)
+                0x400062b4                __heap_load_start__ = (__non_init_end__ ALIGN 0x4)
+
+.heap           0x400062b4        0x0
+                0x400062b4                __heap_start__ = .
+ *(.heap)
+                0x400062b4                . = ((__heap_start__ + __HEAPSIZE__) MAX_K .)
+                0x400062b4                __heap_end__ = (__heap_start__ + SIZEOF (.heap))
+                0x00000001                . = ASSERT (((__heap_end__ >= __SRAM_segment_start__) && (__heap_end__ <= (__SRAM_segment_start__ + 0x8000))), error: .heap is too large to fit in SRAM memory segment)
+                0x400062b4                __stack_irq_load_start__ = (__heap_end__ ALIGN 0x4)
+
+.stack_irq      0x400062b4      0x100
+                0x400062b4                __stack_irq_start__ = .
+ *(.stack_irq)
+                0x400063b4                . = ((__stack_irq_start__ + __STACKSIZE_IRQ__) MAX_K .)
+ *fill*         0x400062b4      0x100 00
+                0x400063b4                __stack_irq_end__ = (__stack_irq_start__ + SIZEOF (.stack_irq))
+                0x00000001                . = ASSERT (((__stack_irq_end__ >= __SRAM_segment_start__) && (__stack_irq_end__ <= (__SRAM_segment_start__ + 0x8000))), error: .stack_irq is too large to fit in SRAM memory segment)
+                0x400063b4                __stack_fiq_load_start__ = (__stack_irq_end__ ALIGN 0x4)
+
+.stack_fiq      0x400063b4        0x4
+                0x400063b4                __stack_fiq_start__ = .
+ *(.stack_fiq)
+                0x400063b8                . = ((__stack_fiq_start__ + __STACKSIZE_FIQ__) MAX_K .)
+ *fill*         0x400063b4        0x4 00
+                0x400063b8                __stack_fiq_end__ = (__stack_fiq_start__ + SIZEOF (.stack_fiq))
+                0x00000001                . = ASSERT (((__stack_fiq_end__ >= __SRAM_segment_start__) && (__stack_fiq_end__ <= (__SRAM_segment_start__ + 0x8000))), error: .stack_fiq is too large to fit in SRAM memory segment)
+                0x400063b8                __stack_svc_load_start__ = (__stack_fiq_end__ ALIGN 0x4)
+
+.stack_svc      0x400063b8        0x4
+                0x400063b8                __stack_svc_start__ = .
+ *(.stack_svc)
+                0x400063bc                . = ((__stack_svc_start__ + __STACKSIZE_SVC__) MAX_K .)
+ *fill*         0x400063b8        0x4 00
+                0x400063bc                __stack_svc_end__ = (__stack_svc_start__ + SIZEOF (.stack_svc))
+                0x00000001                . = ASSERT (((__stack_svc_end__ >= __SRAM_segment_start__) && (__stack_svc_end__ <= (__SRAM_segment_start__ + 0x8000))), error: .stack_svc is too large to fit in SRAM memory segment)
+                0x400063bc                __stack_abt_load_start__ = (__stack_svc_end__ ALIGN 0x4)
+
+.stack_abt      0x400063bc        0x4
+                0x400063bc                __stack_abt_start__ = .
+ *(.stack_abt)
+                0x400063c0                . = ((__stack_abt_start__ + __STACKSIZE_ABT__) MAX_K .)
+ *fill*         0x400063bc        0x4 00
+                0x400063c0                __stack_abt_end__ = (__stack_abt_start__ + SIZEOF (.stack_abt))
+                0x00000001                . = ASSERT (((__stack_abt_end__ >= __SRAM_segment_start__) && (__stack_abt_end__ <= (__SRAM_segment_start__ + 0x8000))), error: .stack_abt is too large to fit in SRAM memory segment)
+                0x400063c0                __stack_und_load_start__ = (__stack_abt_end__ ALIGN 0x4)
+
+.stack_und      0x400063c0        0x4
+                0x400063c0                __stack_und_start__ = .
+ *(.stack_und)
+                0x400063c4                . = ((__stack_und_start__ + __STACKSIZE_UND__) MAX_K .)
+ *fill*         0x400063c0        0x4 00
+                0x400063c4                __stack_und_end__ = (__stack_und_start__ + SIZEOF (.stack_und))
+                0x400063c4                __SRAM_segment_used_end__ = ((__stack_abt_end__ ALIGN 0x4) + SIZEOF (.stack_und))
+                0x00000001                . = ASSERT (((__stack_und_end__ >= __SRAM_segment_start__) && (__stack_und_end__ <= (__SRAM_segment_start__ + 0x8000))), error: .stack_und is too large to fit in SRAM memory segment)
+                0x7fd00000                __stack_load_start__ = (__USB_DMA_RAM_segment_start__ ALIGN 0x4)
+
+.stack          0x7fd00000     0x2000
+                0x7fd00000                __stack_start__ = .
+ *(.stack)
+                0x7fd02000                . = ((__stack_start__ + __STACKSIZE__) MAX_K .)
+ *fill*         0x7fd00000     0x2000 00
+                0x7fd02000                __stack_end__ = (__stack_start__ + SIZEOF (.stack))
+                0x7fd02000                __USB_DMA_RAM_segment_used_end__ = ((__USB_DMA_RAM_segment_start__ ALIGN 0x4) + SIZEOF (.stack))
+                0x00000001                . = ASSERT (((__stack_end__ >= __USB_DMA_RAM_segment_start__) && (__stack_end__ <= (__USB_DMA_RAM_segment_start__ + 0x2000))), error: .stack is too large to fit in USB_DMA_RAM memory segment)
+START GROUP
+LOAD ARM Flash Debug/crt0.o
+LOAD ARM Flash Debug/VIC.o
+LOAD ARM Flash Debug/VIC_irq_handler.o
+LOAD ARM Flash Debug/LPC210x.o
+LOAD ARM Flash Debug/Philips_LPC2148_Startup.o
+LOAD ARM Flash Debug/lpc_io.o
+LOAD ARM Flash Debug/demo.o
+LOAD ARM Flash Debug/debug.o
+LOAD ARM Flash Debug/ui.o
+LOAD ARM Flash Debug/dir.o
+LOAD ARM Flash Debug/disc.o
+LOAD ARM Flash Debug/efs.o
+LOAD ARM Flash Debug/extract.o
+LOAD ARM Flash Debug/fat.o
+LOAD ARM Flash Debug/file.o
+LOAD ARM Flash Debug/fs.o
+LOAD ARM Flash Debug/ioman.o
+LOAD ARM Flash Debug/ls.o
+LOAD ARM Flash Debug/mkfs.o
+LOAD ARM Flash Debug/partition.o
+LOAD ARM Flash Debug/plibc.o
+LOAD ARM Flash Debug/time.o
+LOAD ARM Flash Debug/sd.o
+LOAD ARM Flash Debug/lpc2000_spi.o
+LOAD ARM Flash Debug/version.o
+LOAD ARM Flash Debug/bit.o
+LOAD ARM Flash Debug/decoder.o
+LOAD ARM Flash Debug/fixed.o
+LOAD ARM Flash Debug/frame.o
+LOAD ARM Flash Debug/huffman.o
+LOAD ARM Flash Debug/imdct_l_arm.o
+LOAD ARM Flash Debug/layer3.o
+LOAD ARM Flash Debug/layer12.o
+LOAD ARM Flash Debug/stream.o
+LOAD ARM Flash Debug/synth.o
+LOAD ARM Flash Debug/timer.o
+LOAD ARM Flash Debug/minimad.o
+LOAD C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/liblpc2000_v4t_a_le.a
+LOAD C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a
+LOAD C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libm_v4t_a_le.a
+LOAD C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a
+LOAD C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libcpp_v4t_a_le.a
+LOAD C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libgccfp_v4t_a_le.a
+LOAD C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/lib_vfprintf_long_v4t_a_le.a
+LOAD C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/lib_vfscanf_long_v4t_a_le.a
+END GROUP
+OUTPUT(ARM Flash Debug/MP3Player.elf elf32-littlearm)
+
+.debug_line     0x00000000     0x2d23
+ .debug_line    0x00000000       0xf4 ARM Flash Debug/crt0.o
+ .debug_line    0x000000f4      0x132 ARM Flash Debug/VIC.o
+ .debug_line    0x00000226       0xc5 ARM Flash Debug/VIC_irq_handler.o
+ .debug_line    0x000002eb      0x118 ARM Flash Debug/LPC210x.o
+ .debug_line    0x00000403       0xa3 ARM Flash Debug/Philips_LPC2148_Startup.o
+ .debug_line    0x000004a6       0x94 ARM Flash Debug/lpc_io.o
+ .debug_line    0x0000053a      0x11c ARM Flash Debug/demo.o
+ .debug_line    0x00000656       0x1d ARM Flash Debug/debug.o
+ .debug_line    0x00000673      0x15a ARM Flash Debug/ui.o
+ .debug_line    0x000007cd      0x184 ARM Flash Debug/dir.o
+ .debug_line    0x00000951       0xe1 ARM Flash Debug/disc.o
+ .debug_line    0x00000a32       0xff ARM Flash Debug/efs.o
+ .debug_line    0x00000b31       0xae ARM Flash Debug/extract.o
+ .debug_line    0x00000bdf      0x1fd ARM Flash Debug/fat.o
+ .debug_line    0x00000ddc      0x1fc ARM Flash Debug/file.o
+ .debug_line    0x00000fd8      0x1ce ARM Flash Debug/fs.o
+ .debug_line    0x000011a6      0x21a ARM Flash Debug/ioman.o
+ .debug_line    0x000013c0      0x12b ARM Flash Debug/ls.o
+ .debug_line    0x000014eb      0x118 ARM Flash Debug/mkfs.o
+ .debug_line    0x00001603      0x122 ARM Flash Debug/partition.o
+ .debug_line    0x00001725       0x95 ARM Flash Debug/plibc.o
+ .debug_line    0x000017ba       0x89 ARM Flash Debug/time.o
+ .debug_line    0x00001843      0x157 ARM Flash Debug/sd.o
+ .debug_line    0x0000199a      0x12a ARM Flash Debug/lpc2000_spi.o
+ .debug_line    0x00001ac4       0x49 ARM Flash Debug/version.o
+ .debug_line    0x00001b0d       0x9f ARM Flash Debug/bit.o
+ .debug_line    0x00001bac      0x10c ARM Flash Debug/decoder.o
+ .debug_line    0x00001cb8       0x77 ARM Flash Debug/fixed.o
+ .debug_line    0x00001d2f      0x16a ARM Flash Debug/frame.o
+ .debug_line    0x00001e99       0x56 ARM Flash Debug/huffman.o
+ .debug_line    0x00001eef      0x21f ARM Flash Debug/imdct_l_arm.o
+ .debug_line    0x0000210e      0x472 ARM Flash Debug/layer3.o
+ .debug_line    0x00002580      0x1a6 ARM Flash Debug/layer12.o
+ .debug_line    0x00002726       0xea ARM Flash Debug/stream.o
+ .debug_line    0x00002810      0x2ad ARM Flash Debug/synth.o
+ .debug_line    0x00002abd      0x12f ARM Flash Debug/timer.o
+ .debug_line    0x00002bec      0x137 ARM Flash Debug/minimad.o
+
+.debug_info     0x00000000     0xf939
+ .debug_info    0x00000000       0xac ARM Flash Debug/crt0.o
+ .debug_info    0x000000ac      0x21a ARM Flash Debug/VIC.o
+ .debug_info    0x000002c6       0xc8 ARM Flash Debug/VIC_irq_handler.o
+ .debug_info    0x0000038e       0xcd ARM Flash Debug/LPC210x.o
+ .debug_info    0x0000045b       0x6b ARM Flash Debug/Philips_LPC2148_Startup.o
+ .debug_info    0x000004c6      0x219 ARM Flash Debug/lpc_io.o
+ .debug_info    0x000006df      0x879 ARM Flash Debug/demo.o
+ .debug_info    0x00000f58       0x57 ARM Flash Debug/debug.o
+ .debug_info    0x00000faf      0x874 ARM Flash Debug/ui.o
+ .debug_info    0x00001823      0xba5 ARM Flash Debug/dir.o
+ .debug_info    0x000023c8      0x353 ARM Flash Debug/disc.o
+ .debug_info    0x0000271b      0x522 ARM Flash Debug/efs.o
+ .debug_info    0x00002c3d      0x27b ARM Flash Debug/extract.o
+ .debug_info    0x00002eb8      0xae8 ARM Flash Debug/fat.o
+ .debug_info    0x000039a0      0xbff ARM Flash Debug/file.o
+ .debug_info    0x0000459f      0xc46 ARM Flash Debug/fs.o
+ .debug_info    0x000051e5      0xb52 ARM Flash Debug/ioman.o
+ .debug_info    0x00005d37      0x7a1 ARM Flash Debug/ls.o
+ .debug_info    0x000064d8      0x3c0 ARM Flash Debug/mkfs.o
+ .debug_info    0x00006898      0x5ce ARM Flash Debug/partition.o
+ .debug_info    0x00006e66      0x19c ARM Flash Debug/plibc.o
+ .debug_info    0x00007002       0xb2 ARM Flash Debug/time.o
+ .debug_info    0x000070b4      0x43b ARM Flash Debug/sd.o
+ .debug_info    0x000074ef      0x2df ARM Flash Debug/lpc2000_spi.o
+ .debug_info    0x000077ce       0xd7 ARM Flash Debug/version.o
+ .debug_info    0x000078a5      0x266 ARM Flash Debug/bit.o
+ .debug_info    0x00007b0b      0x973 ARM Flash Debug/decoder.o
+ .debug_info    0x0000847e       0xca ARM Flash Debug/fixed.o
+ .debug_info    0x00008548      0x7d1 ARM Flash Debug/frame.o
+ .debug_info    0x00008d19      0x51c ARM Flash Debug/huffman.o
+ .debug_info    0x00009235       0x6e ARM Flash Debug/imdct_l_arm.o
+ .debug_info    0x000092a3     0x22e3 ARM Flash Debug/layer3.o
+ .debug_info    0x0000b586      0xaa3 ARM Flash Debug/layer12.o
+ .debug_info    0x0000c029      0x3a8 ARM Flash Debug/stream.o
+ .debug_info    0x0000c3d1     0x2039 ARM Flash Debug/synth.o
+ .debug_info    0x0000e40a      0x5a7 ARM Flash Debug/timer.o
+ .debug_info    0x0000e9b1      0xf88 ARM Flash Debug/minimad.o
+
+.debug_abbrev   0x00000000     0x2e54
+ .debug_abbrev  0x00000000       0x14 ARM Flash Debug/crt0.o
+ .debug_abbrev  0x00000014      0x12f ARM Flash Debug/VIC.o
+ .debug_abbrev  0x00000143       0x14 ARM Flash Debug/VIC_irq_handler.o
+ .debug_abbrev  0x00000157       0xa6 ARM Flash Debug/LPC210x.o
+ .debug_abbrev  0x000001fd       0x10 ARM Flash Debug/Philips_LPC2148_Startup.o
+ .debug_abbrev  0x0000020d      0x14d ARM Flash Debug/lpc_io.o
+ .debug_abbrev  0x0000035a      0x112 ARM Flash Debug/demo.o
+ .debug_abbrev  0x0000046c       0x1f ARM Flash Debug/debug.o
+ .debug_abbrev  0x0000048b      0x113 ARM Flash Debug/ui.o
+ .debug_abbrev  0x0000059e      0x19c ARM Flash Debug/dir.o
+ .debug_abbrev  0x0000073a       0xd4 ARM Flash Debug/disc.o
+ .debug_abbrev  0x0000080e       0xb4 ARM Flash Debug/efs.o
+ .debug_abbrev  0x000008c2      0x116 ARM Flash Debug/extract.o
+ .debug_abbrev  0x000009d8      0x1f7 ARM Flash Debug/fat.o
+ .debug_abbrev  0x00000bcf      0x20a ARM Flash Debug/file.o
+ .debug_abbrev  0x00000dd9      0x229 ARM Flash Debug/fs.o
+ .debug_abbrev  0x00001002      0x1fa ARM Flash Debug/ioman.o
+ .debug_abbrev  0x000011fc      0x111 ARM Flash Debug/ls.o
+ .debug_abbrev  0x0000130d       0xd7 ARM Flash Debug/mkfs.o
+ .debug_abbrev  0x000013e4      0x117 ARM Flash Debug/partition.o
+ .debug_abbrev  0x000014fb       0xbd ARM Flash Debug/plibc.o
+ .debug_abbrev  0x000015b8       0x43 ARM Flash Debug/time.o
+ .debug_abbrev  0x000015fb      0x19e ARM Flash Debug/sd.o
+ .debug_abbrev  0x00001799      0x195 ARM Flash Debug/lpc2000_spi.o
+ .debug_abbrev  0x0000192e       0x49 ARM Flash Debug/version.o
+ .debug_abbrev  0x00001977      0x125 ARM Flash Debug/bit.o
+ .debug_abbrev  0x00001a9c      0x1f4 ARM Flash Debug/decoder.o
+ .debug_abbrev  0x00001c90       0xa3 ARM Flash Debug/fixed.o
+ .debug_abbrev  0x00001d33      0x27f ARM Flash Debug/frame.o
+ .debug_abbrev  0x00001fb2      0x10a ARM Flash Debug/huffman.o
+ .debug_abbrev  0x000020bc       0x14 ARM Flash Debug/imdct_l_arm.o
+ .debug_abbrev  0x000020d0      0x33a ARM Flash Debug/layer3.o
+ .debug_abbrev  0x0000240a      0x25a ARM Flash Debug/layer12.o
+ .debug_abbrev  0x00002664      0x13c ARM Flash Debug/stream.o
+ .debug_abbrev  0x000027a0      0x25c ARM Flash Debug/synth.o
+ .debug_abbrev  0x000029fc      0x234 ARM Flash Debug/timer.o
+ .debug_abbrev  0x00002c30      0x224 ARM Flash Debug/minimad.o
+
+.debug_aranges  0x00000000      0x448
+ .debug_aranges
+                0x00000000       0x20 ARM Flash Debug/crt0.o
+ .debug_aranges
+                0x00000020       0x20 ARM Flash Debug/VIC.o
+ .debug_aranges
+                0x00000040       0x20 ARM Flash Debug/VIC_irq_handler.o
+ .debug_aranges
+                0x00000060       0x20 ARM Flash Debug/LPC210x.o
+ .debug_aranges
+                0x00000080       0x28 ARM Flash Debug/Philips_LPC2148_Startup.o
+ .debug_aranges
+                0x000000a8       0x20 ARM Flash Debug/lpc_io.o
+ .debug_aranges
+                0x000000c8       0x20 ARM Flash Debug/demo.o
+ .debug_aranges
+                0x000000e8       0x20 ARM Flash Debug/ui.o
+ .debug_aranges
+                0x00000108       0x20 ARM Flash Debug/dir.o
+ .debug_aranges
+                0x00000128       0x20 ARM Flash Debug/disc.o
+ .debug_aranges
+                0x00000148       0x20 ARM Flash Debug/efs.o
+ .debug_aranges
+                0x00000168       0x20 ARM Flash Debug/extract.o
+ .debug_aranges
+                0x00000188       0x20 ARM Flash Debug/fat.o
+ .debug_aranges
+                0x000001a8       0x20 ARM Flash Debug/file.o
+ .debug_aranges
+                0x000001c8       0x20 ARM Flash Debug/fs.o
+ .debug_aranges
+                0x000001e8       0x20 ARM Flash Debug/ioman.o
+ .debug_aranges
+                0x00000208       0x20 ARM Flash Debug/ls.o
+ .debug_aranges
+                0x00000228       0x20 ARM Flash Debug/mkfs.o
+ .debug_aranges
+                0x00000248       0x20 ARM Flash Debug/partition.o
+ .debug_aranges
+                0x00000268       0x20 ARM Flash Debug/plibc.o
+ .debug_aranges
+                0x00000288       0x20 ARM Flash Debug/time.o
+ .debug_aranges
+                0x000002a8       0x20 ARM Flash Debug/sd.o
+ .debug_aranges
+                0x000002c8       0x20 ARM Flash Debug/lpc2000_spi.o
+ .debug_aranges
+                0x000002e8       0x20 ARM Flash Debug/bit.o
+ .debug_aranges
+                0x00000308       0x20 ARM Flash Debug/decoder.o
+ .debug_aranges
+                0x00000328       0x20 ARM Flash Debug/fixed.o
+ .debug_aranges
+                0x00000348       0x20 ARM Flash Debug/frame.o
+ .debug_aranges
+                0x00000368       0x20 ARM Flash Debug/imdct_l_arm.o
+ .debug_aranges
+                0x00000388       0x20 ARM Flash Debug/layer3.o
+ .debug_aranges
+                0x000003a8       0x20 ARM Flash Debug/layer12.o
+ .debug_aranges
+                0x000003c8       0x20 ARM Flash Debug/stream.o
+ .debug_aranges
+                0x000003e8       0x20 ARM Flash Debug/synth.o
+ .debug_aranges
+                0x00000408       0x20 ARM Flash Debug/timer.o
+ .debug_aranges
+                0x00000428       0x20 ARM Flash Debug/minimad.o
+
+.debug_frame    0x00000000     0x1bfc
+ .debug_frame   0x00000000       0x6c ARM Flash Debug/VIC.o
+ .debug_frame   0x0000006c       0x60 ARM Flash Debug/LPC210x.o
+ .debug_frame   0x000000cc       0xf4 ARM Flash Debug/lpc_io.o
+ .debug_frame   0x000001c0       0x50 ARM Flash Debug/demo.o
+ .debug_frame   0x00000210       0x94 ARM Flash Debug/ui.o
+ .debug_frame   0x000002a4      0x214 ARM Flash Debug/dir.o
+ .debug_frame   0x000004b8       0x50 ARM Flash Debug/disc.o
+ .debug_frame   0x00000508       0x30 ARM Flash Debug/efs.o
+ .debug_frame   0x00000538       0x8c ARM Flash Debug/extract.o
+ .debug_frame   0x000005c4      0x1d4 ARM Flash Debug/fat.o
+ .debug_frame   0x00000798      0x190 ARM Flash Debug/file.o
+ .debug_frame   0x00000928      0x288 ARM Flash Debug/fs.o
+ .debug_frame   0x00000bb0      0x36c ARM Flash Debug/ioman.o
+ .debug_frame   0x00000f1c       0xe0 ARM Flash Debug/ls.o
+ .debug_frame   0x00000ffc       0x40 ARM Flash Debug/mkfs.o
+ .debug_frame   0x0000103c      0x130 ARM Flash Debug/partition.o
+ .debug_frame   0x0000116c       0x5c ARM Flash Debug/plibc.o
+ .debug_frame   0x000011c8       0x40 ARM Flash Debug/time.o
+ .debug_frame   0x00001208      0x144 ARM Flash Debug/sd.o
+ .debug_frame   0x0000134c       0xbc ARM Flash Debug/lpc2000_spi.o
+ .debug_frame   0x00001408       0x94 ARM Flash Debug/bit.o
+ .debug_frame   0x0000149c       0xb4 ARM Flash Debug/decoder.o
+ .debug_frame   0x00001550       0x40 ARM Flash Debug/fixed.o
+ .debug_frame   0x00001590       0xf0 ARM Flash Debug/frame.o
+ .debug_frame   0x00001680       0xf8 ARM Flash Debug/layer3.o
+ .debug_frame   0x00001778       0xc4 ARM Flash Debug/layer12.o
+ .debug_frame   0x0000183c       0x9c ARM Flash Debug/stream.o
+ .debug_frame   0x000018d8      0x108 ARM Flash Debug/synth.o
+ .debug_frame   0x000019e0      0x194 ARM Flash Debug/timer.o
+ .debug_frame   0x00001b74       0x88 ARM Flash Debug/minimad.o
+
+.debug_loc      0x00000000     0xa867
+ .debug_loc     0x00000000      0x158 ARM Flash Debug/VIC.o
+ .debug_loc     0x00000158       0x5d ARM Flash Debug/LPC210x.o
+ .debug_loc     0x000001b5      0x150 ARM Flash Debug/lpc_io.o
+ .debug_loc     0x00000305       0xa0 ARM Flash Debug/demo.o
+ .debug_loc     0x000003a5      0x283 ARM Flash Debug/ui.o
+ .debug_loc     0x00000628      0x7df ARM Flash Debug/dir.o
+ .debug_loc     0x00000e07       0x82 ARM Flash Debug/disc.o
+ .debug_loc     0x00000e89       0x5b ARM Flash Debug/efs.o
+ .debug_loc     0x00000ee4       0xd9 ARM Flash Debug/extract.o
+ .debug_loc     0x00000fbd      0xa3a ARM Flash Debug/fat.o
+ .debug_loc     0x000019f7      0x84a ARM Flash Debug/file.o
+ .debug_loc     0x00002241      0x6dd ARM Flash Debug/fs.o
+ .debug_loc     0x0000291e      0xbec ARM Flash Debug/ioman.o
+ .debug_loc     0x0000350a      0x278 ARM Flash Debug/ls.o
+ .debug_loc     0x00003782       0x91 ARM Flash Debug/mkfs.o
+ .debug_loc     0x00003813      0x323 ARM Flash Debug/partition.o
+ .debug_loc     0x00003b36       0x89 ARM Flash Debug/plibc.o
+ .debug_loc     0x00003bbf      0x5de ARM Flash Debug/sd.o
+ .debug_loc     0x0000419d      0x18a ARM Flash Debug/lpc2000_spi.o
+ .debug_loc     0x00004327      0x1fa ARM Flash Debug/bit.o
+ .debug_loc     0x00004521      0x203 ARM Flash Debug/decoder.o
+ .debug_loc     0x00004724       0xaa ARM Flash Debug/fixed.o
+ .debug_loc     0x000047ce      0x3f2 ARM Flash Debug/frame.o
+ .debug_loc     0x00004bc0     0x337a ARM Flash Debug/layer3.o
+ .debug_loc     0x00007f3a      0xb60 ARM Flash Debug/layer12.o
+ .debug_loc     0x00008a9a      0x116 ARM Flash Debug/stream.o
+ .debug_loc     0x00008bb0     0x1554 ARM Flash Debug/synth.o
+ .debug_loc     0x0000a104      0x649 ARM Flash Debug/timer.o
+ .debug_loc     0x0000a74d      0x11a ARM Flash Debug/minimad.o
+
+.debug_pubnames
+                0x00000000     0x136d
+ .debug_pubnames
+                0x00000000       0x46 ARM Flash Debug/VIC.o
+ .debug_pubnames
+                0x00000046       0x43 ARM Flash Debug/LPC210x.o
+ .debug_pubnames
+                0x00000089       0xca ARM Flash Debug/lpc_io.o
+ .debug_pubnames
+                0x00000153       0x61 ARM Flash Debug/demo.o
+ .debug_pubnames
+                0x000001b4       0x35 ARM Flash Debug/ui.o
+ .debug_pubnames
+                0x000001e9      0x158 ARM Flash Debug/dir.o
+ .debug_pubnames
+                0x00000341       0x35 ARM Flash Debug/disc.o
+ .debug_pubnames
+                0x00000376       0x1f ARM Flash Debug/efs.o
+ .debug_pubnames
+                0x00000395       0x7c ARM Flash Debug/extract.o
+ .debug_pubnames
+                0x00000411      0x19b ARM Flash Debug/fat.o
+ .debug_pubnames
+                0x000005ac       0xf9 ARM Flash Debug/file.o
+ .debug_pubnames
+                0x000006a5      0x205 ARM Flash Debug/fs.o
+ .debug_pubnames
+                0x000008aa      0x2cd ARM Flash Debug/ioman.o
+ .debug_pubnames
+                0x00000b77       0xa9 ARM Flash Debug/ls.o
+ .debug_pubnames
+                0x00000c20       0x24 ARM Flash Debug/mkfs.o
+ .debug_pubnames
+                0x00000c44       0xdd ARM Flash Debug/partition.o
+ .debug_pubnames
+                0x00000d21       0x40 ARM Flash Debug/plibc.o
+ .debug_pubnames
+                0x00000d61       0x48 ARM Flash Debug/time.o
+ .debug_pubnames
+                0x00000da9       0xa3 ARM Flash Debug/sd.o
+ .debug_pubnames
+                0x00000e4c       0x85 ARM Flash Debug/lpc2000_spi.o
+ .debug_pubnames
+                0x00000ed1       0x51 ARM Flash Debug/version.o
+ .debug_pubnames
+                0x00000f22       0x7d ARM Flash Debug/bit.o
+ .debug_pubnames
+                0x00000f9f       0x73 ARM Flash Debug/decoder.o
+ .debug_pubnames
+                0x00001012       0x2e ARM Flash Debug/fixed.o
+ .debug_pubnames
+                0x00001040       0x8c ARM Flash Debug/frame.o
+ .debug_pubnames
+                0x000010cc       0x42 ARM Flash Debug/huffman.o
+ .debug_pubnames
+                0x0000110e       0x3b ARM Flash Debug/layer3.o
+ .debug_pubnames
+                0x00001149       0x33 ARM Flash Debug/layer12.o
+ .debug_pubnames
+                0x0000117c       0x9f ARM Flash Debug/stream.o
+ .debug_pubnames
+                0x0000121b       0x4c ARM Flash Debug/synth.o
+ .debug_pubnames
+                0x00001267       0xdd ARM Flash Debug/timer.o
+ .debug_pubnames
+                0x00001344       0x29 ARM Flash Debug/minimad.o
+
+.debug_str      0x00000000     0x2c75
+ .debug_str     0x00000000      0x228 ARM Flash Debug/VIC.o
+                                0x23a (size before relaxing)
+ .debug_str     0x00000228       0xc7 ARM Flash Debug/LPC210x.o
+                                0x14c (size before relaxing)
+ .debug_str     0x000002ef      0x11c ARM Flash Debug/lpc_io.o
+                                0x199 (size before relaxing)
+ .debug_str     0x0000040b      0x32c ARM Flash Debug/demo.o
+                                0x502 (size before relaxing)
+ .debug_str     0x00000737       0x29 ARM Flash Debug/debug.o
+                                 0xbd (size before relaxing)
+ .debug_str     0x00000760       0xa8 ARM Flash Debug/ui.o
+                                0x4ee (size before relaxing)
+ .debug_str     0x00000808      0x189 ARM Flash Debug/dir.o
+                                0x5db (size before relaxing)
+ .debug_str     0x00000991       0x43 ARM Flash Debug/disc.o
+                                0x1d5 (size before relaxing)
+ .debug_str     0x000009d4       0x35 ARM Flash Debug/efs.o
+                                0x357 (size before relaxing)
+ .debug_str     0x00000a09       0x7d ARM Flash Debug/extract.o
+                                0x178 (size before relaxing)
+ .debug_str     0x00000a86      0x1f6 ARM Flash Debug/fat.o
+                                0x56d (size before relaxing)
+ .debug_str     0x00000c7c      0x161 ARM Flash Debug/file.o
+                                0x5ca (size before relaxing)
+ .debug_str     0x00000ddd      0x227 ARM Flash Debug/fs.o
+                                0x67c (size before relaxing)
+ .debug_str     0x00001004      0x2a1 ARM Flash Debug/ioman.o
+                                0x400 (size before relaxing)
+ .debug_str     0x000012a5       0xa7 ARM Flash Debug/ls.o
+                                0x478 (size before relaxing)
+ .debug_str     0x0000134c       0x36 ARM Flash Debug/mkfs.o
+                                0x1ee (size before relaxing)
+ .debug_str     0x00001382       0xe6 ARM Flash Debug/partition.o
+                                0x2b2 (size before relaxing)
+ .debug_str     0x00001468       0x52 ARM Flash Debug/plibc.o
+                                0x117 (size before relaxing)
+ .debug_str     0x000014ba       0x52 ARM Flash Debug/time.o
+                                 0xf5 (size before relaxing)
+ .debug_str     0x0000150c       0xfb ARM Flash Debug/sd.o
+                                0x1f4 (size before relaxing)
+ .debug_str     0x00001607       0xac ARM Flash Debug/lpc2000_spi.o
+                                0x19e (size before relaxing)
+ .debug_str     0x000016b3       0x58 ARM Flash Debug/version.o
+                                 0xac (size before relaxing)
+ .debug_str     0x0000170b       0x8d ARM Flash Debug/bit.o
+                                0x137 (size before relaxing)
+ .debug_str     0x00001798      0x572 ARM Flash Debug/decoder.o
+                                0x6a6 (size before relaxing)
+ .debug_str     0x00001d0a       0x3b ARM Flash Debug/fixed.o
+                                 0xa8 (size before relaxing)
+ .debug_str     0x00001d45      0x120 ARM Flash Debug/frame.o
+                                0x5e0 (size before relaxing)
+ .debug_str     0x00001e65      0x12d ARM Flash Debug/huffman.o
+                                0x1ad (size before relaxing)
+ .debug_str     0x00001f92      0x56b ARM Flash Debug/layer3.o
+                                0xb0c (size before relaxing)
+ .debug_str     0x000024fd       0xf2 ARM Flash Debug/layer12.o
+                                0x624 (size before relaxing)
+ .debug_str     0x000025ef       0x90 ARM Flash Debug/stream.o
+                                0x3a7 (size before relaxing)
+ .debug_str     0x0000267f      0x21e ARM Flash Debug/synth.o
+                                0x4dd (size before relaxing)
+ .debug_str     0x0000289d      0x368 ARM Flash Debug/timer.o
+                                0x42e (size before relaxing)
+ .debug_str     0x00002c05       0x70 ARM Flash Debug/minimad.o
+                                0xa1f (size before relaxing)
+
+.comment        0x00000000      0x707
+ .comment       0x00000000       0x2b ARM Flash Debug/VIC.o
+ .comment       0x0000002b       0x2b ARM Flash Debug/LPC210x.o
+ .comment       0x00000056       0x2b ARM Flash Debug/lpc_io.o
+ .comment       0x00000081       0x2b ARM Flash Debug/demo.o
+ .comment       0x000000ac       0x2b ARM Flash Debug/debug.o
+ .comment       0x000000d7       0x2b ARM Flash Debug/ui.o
+ .comment       0x00000102       0x2b ARM Flash Debug/dir.o
+ .comment       0x0000012d       0x2b ARM Flash Debug/disc.o
+ .comment       0x00000158       0x2b ARM Flash Debug/efs.o
+ .comment       0x00000183       0x2b ARM Flash Debug/extract.o
+ .comment       0x000001ae       0x2b ARM Flash Debug/fat.o
+ .comment       0x000001d9       0x2b ARM Flash Debug/file.o
+ .comment       0x00000204       0x2b ARM Flash Debug/fs.o
+ .comment       0x0000022f       0x2b ARM Flash Debug/ioman.o
+ .comment       0x0000025a       0x2b ARM Flash Debug/ls.o
+ .comment       0x00000285       0x2b ARM Flash Debug/mkfs.o
+ .comment       0x000002b0       0x2b ARM Flash Debug/partition.o
+ .comment       0x000002db       0x2b ARM Flash Debug/plibc.o
+ .comment       0x00000306       0x2b ARM Flash Debug/time.o
+ .comment       0x00000331       0x2b ARM Flash Debug/sd.o
+ .comment       0x0000035c       0x2b ARM Flash Debug/lpc2000_spi.o
+ .comment       0x00000387       0x2b ARM Flash Debug/version.o
+ .comment       0x000003b2       0x2b ARM Flash Debug/bit.o
+ .comment       0x000003dd       0x2b ARM Flash Debug/decoder.o
+ .comment       0x00000408       0x2b ARM Flash Debug/fixed.o
+ .comment       0x00000433       0x2b ARM Flash Debug/frame.o
+ .comment       0x0000045e       0x2b ARM Flash Debug/huffman.o
+ .comment       0x00000489       0x2b ARM Flash Debug/layer3.o
+ .comment       0x000004b4       0x2b ARM Flash Debug/layer12.o
+ .comment       0x000004df       0x2b ARM Flash Debug/stream.o
+ .comment       0x0000050a       0x2b ARM Flash Debug/synth.o
+ .comment       0x00000535       0x2b ARM Flash Debug/timer.o
+ .comment       0x00000560       0x2b ARM Flash Debug/minimad.o
+ .comment       0x0000058b       0x12 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/liblpc2000_v4t_a_le.a(liblpc2000_get_cclk.o)
+ .comment       0x0000059d       0x12 C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/liblpc2000_v4t_a_le.a(liblpc2000_get_pclk.o)
+ .comment       0x000005af       0x2b C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(debug_printf.o)
+ .comment       0x000005da       0x2b C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(memmove.o)
+ .comment       0x00000605       0x2b C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(strncpy.o)
+ .comment       0x00000630       0x2b C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(sprintf.o)
+ .comment       0x0000065b       0x2b C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/lib_vfprintf_long_v4t_a_le.a(__vfprintf_long.o)
+ .comment       0x00000686       0x2b C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a(__debug_operations.o)
+ .comment       0x000006b1       0x2b C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libarmdi_v4t_a_le.a(libarm_run_dcc_port_server.o)
+ .comment       0x000006dc       0x2b C:/Program Files/Rowley Associates Limited/CrossWorks for ARM 1.6/lib/libc_v4t_a_le.a(__hex_lc_uc.o)
+
+.debug_ranges   0x00000000      0x7a0
+ .debug_ranges  0x00000000       0x80 ARM Flash Debug/frame.o
+ .debug_ranges  0x00000080      0x6c0 ARM Flash Debug/layer3.o
+ .debug_ranges  0x00000740       0x48 ARM Flash Debug/layer12.o
+ .debug_ranges  0x00000788       0x18 ARM Flash Debug/minimad.o

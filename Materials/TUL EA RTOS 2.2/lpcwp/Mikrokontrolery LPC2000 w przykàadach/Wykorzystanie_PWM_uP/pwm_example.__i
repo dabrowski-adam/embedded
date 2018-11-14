@@ -1,0 +1,1 @@
+-c -mcpu=arm7tdmi -gdwarf-2 -MD -Wall -O -mapcs-frame -mthumb-interwork -IC:\Keil\ARM\INC\Philips\ -Wa,-alhms="pwm_example.lst" -o pwm_example.o "PWM_example.c"

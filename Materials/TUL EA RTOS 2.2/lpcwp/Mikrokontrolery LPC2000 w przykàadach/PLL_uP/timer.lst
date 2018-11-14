@@ -1,0 +1,212 @@
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccaF1LQA.s 			page 1
+
+
+   1              		.file	"Timer.c"
+   2              		.section	.debug_abbrev,"",%progbits
+   3              	.Ldebug_abbrev0:
+   4              		.section	.debug_info,"",%progbits
+   5              	.Ldebug_info0:
+   6              		.section	.debug_line,"",%progbits
+   7              	.Ldebug_line0:
+   8 0000 32000000 		.text
+   8      02001B00 
+   8      00000201 
+   8      FB0E0A00 
+   8      01010101 
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	InitTimer0
+  12              		.type	InitTimer0, %function
+  13              	InitTimer0:
+  14              	.LFB2:
+  15              		.file 1 "Timer.c"
+   1:Timer.c       **** #include <LPC213x.H>
+   2:Timer.c       **** #include "Timer.h"
+   3:Timer.c       **** 
+   4:Timer.c       **** //Setup the Timer/Counter0
+   5:Timer.c       **** void InitTimer0(void) 
+   6:Timer.c       **** {
+  16              		.loc 1 6 0
+  17              		@ Function supports interworking.
+  18              		@ args = 0, pretend = 0, frame = 0
+  19              		@ frame_needed = 0, uses_anonymous_args = 0
+  20              		@ link register save eliminated.
+  21              	.LVL0:
+  22              		@ lr needed for prologue
+   7:Timer.c       ****     T0MR0 = 49;	                // fout=pclk/100 (pclk=fclk)
+  23              		.loc 1 7 0
+  24 0000 0E22A0E3 		mov	r2, #-536870912
+  25 0004 012982E2 		add	r2, r2, #16384
+  26 0008 3100A0E3 		mov	r0, #49
+  27 000c 180082E5 		str	r0, [r2, #24]
+   8:Timer.c       ****     T0MCR = 2;	                // Reset on MR0
+  28              		.loc 1 8 0
+  29 0010 0230A0E3 		mov	r3, #2
+  30 0014 143082E5 		str	r3, [r2, #20]
+   9:Timer.c       ****     T0TCR = 1;	                // Timer0 Enable
+  31              		.loc 1 9 0
+  32 0018 0110A0E3 		mov	r1, #1
+  33 001c 0139A0E3 		mov	r3, #16384
+  34 0020 4E3283E2 		add	r3, r3, #-536870908
+  35 0024 001083E5 		str	r1, [r3, #0]
+  10:Timer.c       ****     T0EMR = (1<<0)|(3<<4);      // Toggle MAT0.0 on MR0
+  36              		.loc 1 10 0
+  37 0028 3C0082E5 		str	r0, [r2, #60]
+  11:Timer.c       **** }
+  38              		.loc 1 11 0
+  39 002c 1EFF2FE1 		bx	lr
+  40              	.LFE2:
+  41              		.size	InitTimer0, .-InitTimer0
+  42              		.section	.debug_frame,"",%progbits
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccaF1LQA.s 			page 2
+
+
+  43              	.Lframe0:
+  44 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+  45              	.LSCIE0:
+  46 0004 FFFFFFFF 		.4byte	0xffffffff
+  47 0008 01       		.byte	0x1
+  48 0009 00       		.ascii	"\000"
+  49 000a 01       		.uleb128 0x1
+  50 000b 7C       		.sleb128 -4
+  51 000c 0E       		.byte	0xe
+  52 000d 0C       		.byte	0xc
+  53 000e 0D       		.uleb128 0xd
+  54 000f 00       		.uleb128 0x0
+  55              		.align	2
+  56              	.LECIE0:
+  57              	.LSFDE0:
+  58 0010 0C000000 		.4byte	.LEFDE0-.LASFDE0
+  59              	.LASFDE0:
+  60 0014 00000000 		.4byte	.Lframe0
+  61 0018 00000000 		.4byte	.LFB2
+  62 001c 30000000 		.4byte	.LFE2-.LFB2
+  63              		.align	2
+  64              	.LEFDE0:
+  65              		.text
+  66              	.Letext0:
+  67              		.section	.debug_info
+  68 0000 36000000 		.4byte	0x36
+  69 0004 0200     		.2byte	0x2
+  70 0006 00000000 		.4byte	.Ldebug_abbrev0
+  71 000a 04       		.byte	0x4
+  72 000b 01       		.uleb128 0x1
+  73 000c 00000000 		.4byte	.Ldebug_line0
+  74 0010 30000000 		.4byte	.Letext0
+  75 0014 00000000 		.4byte	.Ltext0
+  76 0018 00000000 		.4byte	.LASF0
+  77 001c 01       		.byte	0x1
+  78 001d 0C000000 		.4byte	.LASF1
+  79 0021 1F000000 		.4byte	.LASF2
+  80 0025 02       		.uleb128 0x2
+  81 0026 01       		.byte	0x1
+  82 0027 14000000 		.4byte	.LASF3
+  83 002b 01       		.byte	0x1
+  84 002c 06       		.byte	0x6
+  85 002d 01       		.byte	0x1
+  86 002e 00000000 		.4byte	.LFB2
+  87 0032 30000000 		.4byte	.LFE2
+  88 0036 02       		.byte	0x2
+  89 0037 7D       		.byte	0x7d
+  90 0038 00       		.sleb128 0
+  91 0039 00       		.byte	0x0
+  92              		.section	.debug_abbrev
+  93 0000 01       		.uleb128 0x1
+  94 0001 11       		.uleb128 0x11
+  95 0002 01       		.byte	0x1
+  96 0003 10       		.uleb128 0x10
+  97 0004 06       		.uleb128 0x6
+  98 0005 12       		.uleb128 0x12
+  99 0006 01       		.uleb128 0x1
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccaF1LQA.s 			page 3
+
+
+ 100 0007 11       		.uleb128 0x11
+ 101 0008 01       		.uleb128 0x1
+ 102 0009 25       		.uleb128 0x25
+ 103 000a 0E       		.uleb128 0xe
+ 104 000b 13       		.uleb128 0x13
+ 105 000c 0B       		.uleb128 0xb
+ 106 000d 03       		.uleb128 0x3
+ 107 000e 0E       		.uleb128 0xe
+ 108 000f 1B       		.uleb128 0x1b
+ 109 0010 0E       		.uleb128 0xe
+ 110 0011 00       		.byte	0x0
+ 111 0012 00       		.byte	0x0
+ 112 0013 02       		.uleb128 0x2
+ 113 0014 2E       		.uleb128 0x2e
+ 114 0015 00       		.byte	0x0
+ 115 0016 3F       		.uleb128 0x3f
+ 116 0017 0C       		.uleb128 0xc
+ 117 0018 03       		.uleb128 0x3
+ 118 0019 0E       		.uleb128 0xe
+ 119 001a 3A       		.uleb128 0x3a
+ 120 001b 0B       		.uleb128 0xb
+ 121 001c 3B       		.uleb128 0x3b
+ 122 001d 0B       		.uleb128 0xb
+ 123 001e 27       		.uleb128 0x27
+ 124 001f 0C       		.uleb128 0xc
+ 125 0020 11       		.uleb128 0x11
+ 126 0021 01       		.uleb128 0x1
+ 127 0022 12       		.uleb128 0x12
+ 128 0023 01       		.uleb128 0x1
+ 129 0024 40       		.uleb128 0x40
+ 130 0025 0A       		.uleb128 0xa
+ 131 0026 00       		.byte	0x0
+ 132 0027 00       		.byte	0x0
+ 133 0028 00       		.byte	0x0
+ 134              		.section	.debug_pubnames,"",%progbits
+ 135 0000 1D000000 		.4byte	0x1d
+ 136 0004 0200     		.2byte	0x2
+ 137 0006 00000000 		.4byte	.Ldebug_info0
+ 138 000a 3A000000 		.4byte	0x3a
+ 139 000e 25000000 		.4byte	0x25
+ 140 0012 496E6974 		.ascii	"InitTimer0\000"
+ 140      54696D65 
+ 140      723000
+ 141 001d 00000000 		.4byte	0x0
+ 142              		.section	.debug_aranges,"",%progbits
+ 143 0000 1C000000 		.4byte	0x1c
+ 144 0004 0200     		.2byte	0x2
+ 145 0006 00000000 		.4byte	.Ldebug_info0
+ 146 000a 04       		.byte	0x4
+ 147 000b 00       		.byte	0x0
+ 148 000c 0000     		.2byte	0x0
+ 149 000e 0000     		.2byte	0x0
+ 150 0010 00000000 		.4byte	.Ltext0
+ 151 0014 30000000 		.4byte	.Letext0-.Ltext0
+ 152 0018 00000000 		.4byte	0x0
+ 153 001c 00000000 		.4byte	0x0
+ 154              		.section	.debug_str,"MS",%progbits,1
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccaF1LQA.s 			page 4
+
+
+ 155              	.LASF0:
+ 156 0000 474E5520 		.ascii	"GNU C 4.0.1\000"
+ 156      4320342E 
+ 156      302E3100 
+ 157              	.LASF1:
+ 158 000c 54696D65 		.ascii	"Timer.c\000"
+ 158      722E6300 
+ 159              	.LASF3:
+ 160 0014 496E6974 		.ascii	"InitTimer0\000"
+ 160      54696D65 
+ 160      723000
+ 161              	.LASF2:
+ 162 001f 2F637967 		.ascii	"/cygdrive/d/Ksiazka_ARM/Przykladowe_aplikacje/PLL/P"
+ 162      64726976 
+ 162      652F642F 
+ 162      4B736961 
+ 162      7A6B615F 
+ 163 0052 4C4C5F75 		.ascii	"LL_uP\000"
+ 163      5000
+ 164              		.ident	"GCC: (GNU) 4.0.1"
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccaF1LQA.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 Timer.c
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccaF1LQA.s:13     .text:00000000 InitTimer0
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccaF1LQA.s:24     .text:00000000 $a
+
+NO UNDEFINED SYMBOLS

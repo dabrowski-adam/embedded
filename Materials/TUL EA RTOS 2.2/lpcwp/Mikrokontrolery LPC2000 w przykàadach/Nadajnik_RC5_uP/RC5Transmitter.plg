@@ -1,0 +1,20 @@
+<html>
+<body>
+<pre>
+<h1>µVision3 Build Log</h1>
+<h2>Project:</h2>
+D:\Ksiazka_ARM\Przykladowe_aplikacje\Nadajnik_RC5\Nadajnik_RC5_uP\RC5Transmitter.uv2
+Project File Date:  02/22/2006
+
+<h2>Output:</h2>
+Build target 'RC5Transmitter'
+assembling Startup.s...
+compiling Timer.c...
+compiling RC5Transmitter.c...
+compiling RC5_TX.c...
+linking...
+creating hex file...
+"RC5Transmitter.elf" - 0 Error(s), 0 Warning(s).
+</pre>
+</body>
+</html>

@@ -1,0 +1,673 @@
+   1              		.file	"I2C_PCF8574_SWITCH_INT.c"
+   9              	.Ltext0:
+  10              		.global	lock
+  11              		.bss
+  12              		.align	2
+  15              	lock:
+  16 0000 00000000 		.space	4
+  17              		.text
+  18              		.align	2
+  19              		.global	EINT0Init
+  21              	EINT0Init:
+  22              	.LFB2:
+  23              		.file 1 "I2C_PCF8574_SWITCH_INT.c"
+   1:I2C_PCF8574_SWITCH_INT.c **** ////////////////////////////////////////////////////////
+   2:I2C_PCF8574_SWITCH_INT.c **** // Function:	I2C example - dipswitch reading 
+   3:I2C_PCF8574_SWITCH_INT.c **** //              via PCF8574 using EINT0 interrupt.
+   4:I2C_PCF8574_SWITCH_INT.c **** //              Nested interrupts example.
+   5:I2C_PCF8574_SWITCH_INT.c **** // Target:		LPC2138
+   6:I2C_PCF8574_SWITCH_INT.c **** // Board:		ZL6ARM
+   7:I2C_PCF8574_SWITCH_INT.c **** // Quartz:		12MHz
+   8:I2C_PCF8574_SWITCH_INT.c **** // Compiler:	ARM-GCC
+   9:I2C_PCF8574_SWITCH_INT.c **** // Author:		Arkadiusz Antoniak @ 2005, Poland
+  10:I2C_PCF8574_SWITCH_INT.c **** // Copyright:	(c) Arkadiusz Antoniak, 2005
+  11:I2C_PCF8574_SWITCH_INT.c **** ////////////////////////////////////////////////////////
+  12:I2C_PCF8574_SWITCH_INT.c **** #include <LPC213x.H>	    
+  13:I2C_PCF8574_SWITCH_INT.c **** #include "lcd.h"
+  14:I2C_PCF8574_SWITCH_INT.c **** 
+  15:I2C_PCF8574_SWITCH_INT.c **** // Macro for enabling interrupts, moving to System mode and relevant stack operations
+  16:I2C_PCF8574_SWITCH_INT.c **** #define IENABLE /* Nested Interrupts Entry */ \
+  17:I2C_PCF8574_SWITCH_INT.c **** asm ( "MRS LR, SPSR" ); /* Copy SPSR_irq to LR */ \
+  18:I2C_PCF8574_SWITCH_INT.c **** asm ( "STMFD SP!, {LR}" ); /* Save SPSR_irq */ \
+  19:I2C_PCF8574_SWITCH_INT.c **** asm ( "MSR CPSR_c, #0x1F" ); /* Enable IRQ (Sys Mode) */ \
+  20:I2C_PCF8574_SWITCH_INT.c **** asm ( "STMFD SP!, {LR}" ); /* Save LR */ \
+  21:I2C_PCF8574_SWITCH_INT.c **** 
+  22:I2C_PCF8574_SWITCH_INT.c **** // Macro for disabling interrupts, switching back to IRQ and relevant stack operations
+  23:I2C_PCF8574_SWITCH_INT.c **** #define IDISABLE /* Nested Interrupts Exit */ \
+  24:I2C_PCF8574_SWITCH_INT.c **** asm ( "LDMFD SP!, {LR}" ); /* Restore LR */ \
+  25:I2C_PCF8574_SWITCH_INT.c **** asm ( "MSR CPSR_c, #0x92" ); /* Disable IRQ (IRQ Mode) */ \
+  26:I2C_PCF8574_SWITCH_INT.c **** asm ( "LDMFD SP!, {LR}" ); /* Restore SPSR_irq to LR */ \
+  27:I2C_PCF8574_SWITCH_INT.c **** asm ( "MSR SPSR_cxsf, LR" ); /* Copy LR to SPSR_irq */ \
+  28:I2C_PCF8574_SWITCH_INT.c **** 
+  29:I2C_PCF8574_SWITCH_INT.c **** 
+  30:I2C_PCF8574_SWITCH_INT.c **** //Constants
+  31:I2C_PCF8574_SWITCH_INT.c **** #define SLAVE_ADDRESS_PCF8574_W 0x4E
+  32:I2C_PCF8574_SWITCH_INT.c **** #define SLAVE_ADDRESS_PCF8574_R 0x4F
+  33:I2C_PCF8574_SWITCH_INT.c **** 
+  34:I2C_PCF8574_SWITCH_INT.c **** //Globals
+  35:I2C_PCF8574_SWITCH_INT.c **** unsigned int I2CData,I2CAddress;
+  36:I2C_PCF8574_SWITCH_INT.c **** volatile unsigned int lock=0;
+  37:I2C_PCF8574_SWITCH_INT.c **** 
+  38:I2C_PCF8574_SWITCH_INT.c **** //I2C interrupt handler's header
+  39:I2C_PCF8574_SWITCH_INT.c **** void I2CISR(void) __attribute__ ((interrupt));
+  40:I2C_PCF8574_SWITCH_INT.c **** 
+  41:I2C_PCF8574_SWITCH_INT.c **** //EINT0 interrupt handler's header
+  42:I2C_PCF8574_SWITCH_INT.c **** void EINT0ISR(void) __attribute__ ((interrupt));
+  43:I2C_PCF8574_SWITCH_INT.c **** 
+  44:I2C_PCF8574_SWITCH_INT.c **** //*******************************
+  45:I2C_PCF8574_SWITCH_INT.c **** // EINT0 Init
+  46:I2C_PCF8574_SWITCH_INT.c **** //*******************************
+  47:I2C_PCF8574_SWITCH_INT.c **** void EINT0Init(void)
+  48:I2C_PCF8574_SWITCH_INT.c **** {
+  24              		.loc 1 48 0
+  25              		@ Function supports interworking.
+  26              		@ args = 0, pretend = 0, frame = 0
+  27              		@ frame_needed = 0, uses_anonymous_args = 0
+  28              		@ link register save eliminated.
+  29              	.LVL0:
+  30              		@ lr needed for prologue
+  49:I2C_PCF8574_SWITCH_INT.c **** 	//P0.1=EINT0
+  50:I2C_PCF8574_SWITCH_INT.c **** 	PINSEL0|=(3<<2);
+  31              		.loc 1 50 0
+  32 0000 0E22A0E3 		mov	r2, #-536870912
+  33 0004 0B1982E2 		add	r1, r2, #180224
+  34 0008 003091E5 		ldr	r3, [r1, #0]
+  35 000c 0C3083E3 		orr	r3, r3, #12
+  36 0010 003081E5 		str	r3, [r1, #0]
+  51:I2C_PCF8574_SWITCH_INT.c **** 	
+  52:I2C_PCF8574_SWITCH_INT.c **** 	//EXT0 edge trigered
+  53:I2C_PCF8574_SWITCH_INT.c **** 	EXTMODE=1;
+  37              		.loc 1 53 0
+  38 0014 7F2982E2 		add	r2, r2, #2080768
+  39 0018 0130A0E3 		mov	r3, #1
+  40 001c 4831C2E5 		strb	r3, [r2, #328]
+  54:I2C_PCF8574_SWITCH_INT.c **** 	
+  55:I2C_PCF8574_SWITCH_INT.c **** 	//Falling edge
+  56:I2C_PCF8574_SWITCH_INT.c **** 	EXTPOLAR=0;
+  41              		.loc 1 56 0
+  42 0020 013043E2 		sub	r3, r3, #1
+  43 0024 4C31C2E5 		strb	r3, [r2, #332]
+  57:I2C_PCF8574_SWITCH_INT.c **** 
+  58:I2C_PCF8574_SWITCH_INT.c **** 	//VIC Slot 1 used for handling EINT0 IRQ
+  59:I2C_PCF8574_SWITCH_INT.c **** 	VICVectCntl1 = 0x0000002E;
+  44              		.loc 1 59 0
+  45 0028 2E20A0E3 		mov	r2, #46
+  46 002c DF3EE0E3 		mvn	r3, #3568
+  47 0030 0B2003E5 		str	r2, [r3, #-11]
+  60:I2C_PCF8574_SWITCH_INT.c **** 	VICVectAddr1 = (unsigned int)EINT0ISR;
+  48              		.loc 1 60 0
+  49 0034 18209FE5 		ldr	r2, .L3
+  50 0038 013C43E2 		sub	r3, r3, #256
+  51 003c 0B2003E5 		str	r2, [r3, #-11]
+  61:I2C_PCF8574_SWITCH_INT.c **** 	VICIntEnable |= 0x00004000;
+  52              		.loc 1 61 0
+  53 0040 FE2EE0E3 		mvn	r2, #4064
+  54 0044 0F3012E5 		ldr	r3, [r2, #-15]
+  55 0048 013983E3 		orr	r3, r3, #16384
+  56 004c 0F3002E5 		str	r3, [r2, #-15]
+  62:I2C_PCF8574_SWITCH_INT.c **** }
+  57              		.loc 1 62 0
+  58 0050 1EFF2FE1 		bx	lr
+  59              	.L4:
+  60              		.align	2
+  61              	.L3:
+  62 0054 00000000 		.word	EINT0ISR
+  63              	.LFE2:
+  65              		.align	2
+  66              		.global	I2CInit
+  68              	I2CInit:
+  69              	.LFB3:
+  63:I2C_PCF8574_SWITCH_INT.c **** 
+  64:I2C_PCF8574_SWITCH_INT.c **** //*******************************
+  65:I2C_PCF8574_SWITCH_INT.c **** // I2C Init
+  66:I2C_PCF8574_SWITCH_INT.c **** //*******************************
+  67:I2C_PCF8574_SWITCH_INT.c **** void I2CInit(void)
+  68:I2C_PCF8574_SWITCH_INT.c **** {
+  70              		.loc 1 68 0
+  71              		@ Function supports interworking.
+  72              		@ args = 0, pretend = 0, frame = 0
+  73              		@ frame_needed = 0, uses_anonymous_args = 0
+  74              		@ link register save eliminated.
+  75              	.LVL1:
+  76              		@ lr needed for prologue
+  69:I2C_PCF8574_SWITCH_INT.c **** 	//P0.2=SCL0, P0.3=SDA0
+  70:I2C_PCF8574_SWITCH_INT.c **** 	PINSEL0&=~(15<<4);
+  77              		.loc 1 70 0
+  78 0058 0E12A0E3 		mov	r1, #-536870912
+  79 005c 0B2981E2 		add	r2, r1, #180224
+  80 0060 003092E5 		ldr	r3, [r2, #0]
+  81 0064 F030C3E3 		bic	r3, r3, #240
+  82 0068 003082E5 		str	r3, [r2, #0]
+  71:I2C_PCF8574_SWITCH_INT.c **** 	PINSEL0|=(5<<4);
+  83              		.loc 1 71 0
+  84 006c 003092E5 		ldr	r3, [r2, #0]
+  85 0070 503083E3 		orr	r3, r3, #80
+  86 0074 003082E5 		str	r3, [r2, #0]
+  72:I2C_PCF8574_SWITCH_INT.c **** 
+  73:I2C_PCF8574_SWITCH_INT.c **** 	//VIC Slot 0 used for handling I2C IRQ
+  74:I2C_PCF8574_SWITCH_INT.c **** 	VICVectCntl0 = 0x00000029;
+  87              		.loc 1 74 0
+  88 0078 2920A0E3 		mov	r2, #41
+  89 007c 0932A0E3 		mov	r3, #-1879048192
+  90 0080 C339A0E1 		mov	r3, r3, asr #19
+  91 0084 002083E5 		str	r2, [r3, #0]
+  75:I2C_PCF8574_SWITCH_INT.c **** 	VICVectAddr0 = (unsigned int)I2CISR;
+  92              		.loc 1 75 0
+  93 0088 2C209FE5 		ldr	r2, .L7
+  94 008c 2233A0E3 		mov	r3, #-2013265920
+  95 0090 C339A0E1 		mov	r3, r3, asr #19
+  96 0094 002083E5 		str	r2, [r3, #0]
+  76:I2C_PCF8574_SWITCH_INT.c **** 	VICIntEnable |= 0x00000200;
+  97              		.loc 1 76 0
+  98 0098 FE2EE0E3 		mvn	r2, #4064
+  99 009c 0F3012E5 		ldr	r3, [r2, #-15]
+ 100 00a0 023C83E3 		orr	r3, r3, #512
+ 101 00a4 0F3002E5 		str	r3, [r2, #-15]
+  77:I2C_PCF8574_SWITCH_INT.c **** 
+  78:I2C_PCF8574_SWITCH_INT.c **** 	//Set bit rate 15MHz/(I2SCLH+I2SCLL)=cca. 57.6k
+  79:I2C_PCF8574_SWITCH_INT.c **** 	I2C0SCLH 		 = 0x82;
+ 102              		.loc 1 79 0
+ 103 00a8 071981E2 		add	r1, r1, #114688
+ 104 00ac 8230A0E3 		mov	r3, #130
+ 105 00b0 B031C1E1 		strh	r3, [r1, #16]	@ movhi
+  80:I2C_PCF8574_SWITCH_INT.c **** 	I2C0SCLL 		 = 0x82;
+ 106              		.loc 1 80 0
+ 107 00b4 B431C1E1 		strh	r3, [r1, #20]	@ movhi
+  81:I2C_PCF8574_SWITCH_INT.c **** }
+ 108              		.loc 1 81 0
+ 109 00b8 1EFF2FE1 		bx	lr
+ 110              	.L8:
+ 111              		.align	2
+ 112              	.L7:
+ 113 00bc 00000000 		.word	I2CISR
+ 114              	.LFE3:
+ 116              		.align	2
+ 117              		.global	I2CPCF8574ReceiveByte
+ 119              	I2CPCF8574ReceiveByte:
+ 120              	.LFB4:
+  82:I2C_PCF8574_SWITCH_INT.c **** 
+  83:I2C_PCF8574_SWITCH_INT.c **** //*******************************
+  84:I2C_PCF8574_SWITCH_INT.c **** // I2C Receive Byte from PCF8574
+  85:I2C_PCF8574_SWITCH_INT.c **** //*******************************
+  86:I2C_PCF8574_SWITCH_INT.c **** unsigned int I2CPCF8574ReceiveByte(unsigned int SlaveAddress)
+  87:I2C_PCF8574_SWITCH_INT.c **** {
+ 121              		.loc 1 87 0
+ 122              		@ Function supports interworking.
+ 123              		@ args = 0, pretend = 0, frame = 0
+ 124              		@ frame_needed = 0, uses_anonymous_args = 0
+ 125              		@ link register save eliminated.
+ 126              	.LVL2:
+ 127              		@ lr needed for prologue
+  88:I2C_PCF8574_SWITCH_INT.c **** 	I2CAddress=SlaveAddress;
+ 128              		.loc 1 88 0
+ 129 00c0 54309FE5 		ldr	r3, .L19
+ 130 00c4 000083E5 		str	r0, [r3, #0]
+ 131 00c8 50209FE5 		ldr	r2, .L19+4
+ 132              	.L10:
+  89:I2C_PCF8574_SWITCH_INT.c **** 
+  90:I2C_PCF8574_SWITCH_INT.c **** 	while(lock==1);
+ 133              		.loc 1 90 0
+ 134 00cc 003092E5 		ldr	r3, [r2, #0]
+ 135 00d0 010053E3 		cmp	r3, #1
+ 136 00d4 3100000A 		beq	.L10
+  91:I2C_PCF8574_SWITCH_INT.c **** 	lock=1;
+ 137              		.loc 1 91 0
+ 138 00d8 0130A0E3 		mov	r3, #1
+ 139 00dc 003082E5 		str	r3, [r2, #0]
+  92:I2C_PCF8574_SWITCH_INT.c **** 
+  93:I2C_PCF8574_SWITCH_INT.c **** 	I2C0CONCLR 	= 0x000000FF;				//Clear all I2C settings
+ 140              		.loc 1 93 0
+ 141 00e0 0E22A0E3 		mov	r2, #-536870912
+ 142 00e4 072982E2 		add	r2, r2, #114688
+ 143 00e8 023043E2 		sub	r3, r3, #2
+ 144 00ec 1830C2E5 		strb	r3, [r2, #24]
+  94:I2C_PCF8574_SWITCH_INT.c **** 	I2C0CONSET 	= 0x00000040; 				//Enable the I2C interface
+ 145              		.loc 1 94 0
+ 146 00f0 413083E2 		add	r3, r3, #65
+ 147 00f4 0030C2E5 		strb	r3, [r2, #0]
+  95:I2C_PCF8574_SWITCH_INT.c **** 	I2C0CONSET 	= 0x00000020; 				//Start condition
+ 148              		.loc 1 95 0
+ 149 00f8 203043E2 		sub	r3, r3, #32
+ 150 00fc 0030C2E5 		strb	r3, [r2, #0]
+ 151 0100 18209FE5 		ldr	r2, .L19+4
+ 152              	.L12:
+  96:I2C_PCF8574_SWITCH_INT.c **** 
+  97:I2C_PCF8574_SWITCH_INT.c **** 	while(lock==1);
+ 153              		.loc 1 97 0
+ 154 0104 003092E5 		ldr	r3, [r2, #0]
+ 155 0108 010053E3 		cmp	r3, #1
+ 156 010c 3F00000A 		beq	.L12
+  98:I2C_PCF8574_SWITCH_INT.c **** 	return I2CData;
+  99:I2C_PCF8574_SWITCH_INT.c **** }
+ 157              		.loc 1 99 0
+ 158 0110 0C309FE5 		ldr	r3, .L19+8
+ 159 0114 000093E5 		ldr	r0, [r3, #0]
+ 160              	.LVL3:
+ 161 0118 1EFF2FE1 		bx	lr
+ 162              	.L20:
+ 163              		.align	2
+ 164              	.L19:
+ 165 011c 00000000 		.word	I2CAddress
+ 166 0120 00000000 		.word	lock
+ 167 0124 00000000 		.word	I2CData
+ 168              	.LFE4:
+ 170              		.align	2
+ 171              		.global	delay
+ 173              	delay:
+ 174              	.LFB5:
+ 100:I2C_PCF8574_SWITCH_INT.c **** 
+ 101:I2C_PCF8574_SWITCH_INT.c **** //*******************************
+ 102:I2C_PCF8574_SWITCH_INT.c **** // Delay function
+ 103:I2C_PCF8574_SWITCH_INT.c **** //*******************************
+ 104:I2C_PCF8574_SWITCH_INT.c **** void delay(unsigned int del_time) 
+ 105:I2C_PCF8574_SWITCH_INT.c **** { 
+ 175              		.loc 1 105 0
+ 176              		@ Function supports interworking.
+ 177              		@ args = 0, pretend = 0, frame = 0
+ 178              		@ frame_needed = 0, uses_anonymous_args = 0
+ 179              		@ link register save eliminated.
+ 180              	.LVL4:
+ 181              		@ lr needed for prologue
+ 106:I2C_PCF8574_SWITCH_INT.c **** 	unsigned int i;
+ 107:I2C_PCF8574_SWITCH_INT.c **** 	for(i=0;i<del_time;i++);	   
+ 182              		.loc 1 107 0
+ 183 0128 000050E3 		cmp	r0, #0
+ 184 012c 1EFF2F01 		bxeq	lr
+ 185 0130 0030A0E3 		mov	r3, #0
+ 186              	.LVL5:
+ 187              	.L24:
+ 188 0134 013083E2 		add	r3, r3, #1
+ 189 0138 030050E1 		cmp	r0, r3
+ 190 013c 4B00001A 		bne	.L24
+ 191 0140 1EFF2FE1 		bx	lr
+ 192              	.LFE5:
+ 194              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 195              		.align	2
+ 196              	.LC0:
+ 197 0000 49324320 		.ascii	"I2C PCF8574\000"
+ 197      50434638 
+ 197      35373400 
+ 198              		.align	2
+ 199              	.LC1:
+ 200 000c 53574954 		.ascii	"SWITCH INT\000"
+ 200      43482049 
+ 200      4E5400
+ 201              		.text
+ 202              		.align	2
+ 203              		.global	main
+ 205              	main:
+ 206              	.LFB6:
+ 108:I2C_PCF8574_SWITCH_INT.c **** }
+ 109:I2C_PCF8574_SWITCH_INT.c **** 
+ 110:I2C_PCF8574_SWITCH_INT.c **** //*******************************
+ 111:I2C_PCF8574_SWITCH_INT.c **** // MAIN
+ 112:I2C_PCF8574_SWITCH_INT.c **** //*******************************
+ 113:I2C_PCF8574_SWITCH_INT.c **** int main (void)
+ 114:I2C_PCF8574_SWITCH_INT.c **** {
+ 207              		.loc 1 114 0
+ 208              		@ Function supports interworking.
+ 209              		@ args = 0, pretend = 0, frame = 0
+ 210              		@ frame_needed = 1, uses_anonymous_args = 0
+ 211 0144 0DC0A0E1 		mov	ip, sp
+ 212              	.LCFI0:
+ 213 0148 00D82DE9 		stmfd	sp!, {fp, ip, lr, pc}
+ 214              	.LCFI1:
+ 215 014c 04B04CE2 		sub	fp, ip, #4
+ 216              	.LCFI2:
+ 115:I2C_PCF8574_SWITCH_INT.c **** 	//Peripherials' frequency = fclk/4 = 15MHz
+ 116:I2C_PCF8574_SWITCH_INT.c **** 	VPBDIV&=0xFFFFFFFC;
+ 217              		.loc 1 116 0
+ 218 0150 0E12A0E3 		mov	r1, #-536870912
+ 219 0154 7F2981E2 		add	r2, r1, #2080768
+ 220 0158 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+ 221 015c FC3003E2 		and	r3, r3, #252
+ 222 0160 0031C2E5 		strb	r3, [r2, #256]
+ 117:I2C_PCF8574_SWITCH_INT.c **** 	VPBDIV|=0x00;
+ 223              		.loc 1 117 0
+ 224 0164 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+ 225 0168 FF3003E2 		and	r3, r3, #255
+ 226 016c 0031C2E5 		strb	r3, [r2, #256]
+ 118:I2C_PCF8574_SWITCH_INT.c **** 
+ 119:I2C_PCF8574_SWITCH_INT.c **** 	//Port direction configuration
+ 120:I2C_PCF8574_SWITCH_INT.c **** 	IODIR0 = 0xFF000000;
+ 227              		.loc 1 120 0
+ 228 0170 FF24A0E3 		mov	r2, #-16777216
+ 229 0174 8E32A0E3 		mov	r3, #-536870904
+ 230 0178 0A3983E2 		add	r3, r3, #163840
+ 231 017c 002083E5 		str	r2, [r3, #0]
+ 121:I2C_PCF8574_SWITCH_INT.c **** 	IODIR1 = 0x00FF0000;
+ 232              		.loc 1 121 0
+ 233 0180 0A1981E2 		add	r1, r1, #163840
+ 234 0184 FF38A0E3 		mov	r3, #16711680
+ 235 0188 183081E5 		str	r3, [r1, #24]
+ 122:I2C_PCF8574_SWITCH_INT.c **** 
+ 123:I2C_PCF8574_SWITCH_INT.c **** 	I2CInit();
+ 236              		.loc 1 123 0
+ 237 018c FEFFFFEB 		bl	I2CInit
+ 124:I2C_PCF8574_SWITCH_INT.c **** 	EINT0Init();
+ 238              		.loc 1 124 0
+ 239 0190 FEFFFFEB 		bl	EINT0Init
+ 125:I2C_PCF8574_SWITCH_INT.c **** 	LCDInit();
+ 240              		.loc 1 125 0
+ 241 0194 FEFFFFEB 		bl	LCDInit
+ 126:I2C_PCF8574_SWITCH_INT.c **** 
+ 127:I2C_PCF8574_SWITCH_INT.c **** 	LCDClear();
+ 242              		.loc 1 127 0
+ 243 0198 FEFFFFEB 		bl	LCDClear
+ 128:I2C_PCF8574_SWITCH_INT.c **** 
+ 129:I2C_PCF8574_SWITCH_INT.c **** 	LCDText("I2C PCF8574");
+ 244              		.loc 1 129 0
+ 245 019c 20009FE5 		ldr	r0, .L30
+ 246 01a0 FEFFFFEB 		bl	LCDText
+ 130:I2C_PCF8574_SWITCH_INT.c **** 	LCDGotoXY(0,1);
+ 247              		.loc 1 130 0
+ 248 01a4 0000A0E3 		mov	r0, #0
+ 249 01a8 0110A0E3 		mov	r1, #1
+ 250 01ac FEFFFFEB 		bl	LCDGotoXY
+ 131:I2C_PCF8574_SWITCH_INT.c **** 	LCDText("SWITCH INT");
+ 251              		.loc 1 131 0
+ 252 01b0 10009FE5 		ldr	r0, .L30+4
+ 253 01b4 FEFFFFEB 		bl	LCDText
+ 132:I2C_PCF8574_SWITCH_INT.c **** 	delay(0x400000);
+ 254              		.loc 1 132 0
+ 255 01b8 0105A0E3 		mov	r0, #4194304
+ 256 01bc FEFFFFEB 		bl	delay
+ 257              	.L28:
+ 258 01c0 6E0000EA 		b	.L28
+ 259              	.L31:
+ 260              		.align	2
+ 261              	.L30:
+ 262 01c4 00000000 		.word	.LC0
+ 263 01c8 0C000000 		.word	.LC1
+ 264              	.LFE6:
+ 266              		.section	.rodata.str1.4
+ 267 0017 00       		.align	2
+ 268              	.LC2:
+ 269 0018 496E703D 		.ascii	"Inp=\000"
+ 269      00
+ 270 001d 000000   		.align	2
+ 271              	.LC3:
+ 272 0020 20646563 		.ascii	" dec        \000"
+ 272      20202020 
+ 272      20202020 
+ 272      00
+ 273 002d 000000   		.align	2
+ 274              	.LC4:
+ 275 0030 2062696E 		.ascii	" bin\000"
+ 275      00
+ 276 0035 000000   		.text
+ 277              		.align	2
+ 278              		.global	EINT0ISR
+ 280              	EINT0ISR:
+ 281              	.LFB7:
+ 133:I2C_PCF8574_SWITCH_INT.c **** 
+ 134:I2C_PCF8574_SWITCH_INT.c **** 	while(1);
+ 135:I2C_PCF8574_SWITCH_INT.c **** }
+ 136:I2C_PCF8574_SWITCH_INT.c **** 
+ 137:I2C_PCF8574_SWITCH_INT.c **** //*******************************
+ 138:I2C_PCF8574_SWITCH_INT.c **** // EINT0 interrupt routine
+ 139:I2C_PCF8574_SWITCH_INT.c **** //*******************************
+ 140:I2C_PCF8574_SWITCH_INT.c **** void EINT0ISR(void)
+ 141:I2C_PCF8574_SWITCH_INT.c **** {
+ 282              		.loc 1 141 0
+ 283              		@ Interrupt Service Routine.
+ 284              		@ args = 0, pretend = 0, frame = 0
+ 285              		@ frame_needed = 1, uses_anonymous_args = 0
+ 286 01cc 04C02DE5 		str	ip, [sp, #-4]!
+ 287 01d0 0DC0A0E1 		mov	ip, sp
+ 288              	.LCFI3:
+ 289 01d4 7FD82DE9 		stmfd	sp!, {r0, r1, r2, r3, r4, r5, r6, fp, ip, lr, pc}
+ 290              	.LCFI4:
+ 291 01d8 04B04CE2 		sub	fp, ip, #4
+ 292              	.LCFI5:
+ 142:I2C_PCF8574_SWITCH_INT.c **** 	unsigned int i;
+ 143:I2C_PCF8574_SWITCH_INT.c **** 	unsigned int val;
+ 144:I2C_PCF8574_SWITCH_INT.c **** 	
+ 145:I2C_PCF8574_SWITCH_INT.c **** 	EXTINT=0x01;							//Clear EINT0 interrupt flag
+ 293              		.loc 1 145 0
+ 294 01dc 0140A0E3 		mov	r4, #1
+ 295 01e0 0E32A0E3 		mov	r3, #-536870912
+ 296 01e4 7F3983E2 		add	r3, r3, #2080768
+ 297 01e8 4041C3E5 		strb	r4, [r3, #320]
+ 146:I2C_PCF8574_SWITCH_INT.c **** 
+ 147:I2C_PCF8574_SWITCH_INT.c **** 	IENABLE;
+ 298              		.loc 1 147 0
+ 299 01ec 00E04FE1 		MRS LR, SPSR
+ 300 01f0 00402DE9 		STMFD SP!, {LR}
+ 301 01f4 1FF021E3 		MSR CPSR_c, #0x1F
+ 302 01f8 00402DE9 		STMFD SP!, {LR}
+ 148:I2C_PCF8574_SWITCH_INT.c **** 
+ 149:I2C_PCF8574_SWITCH_INT.c **** 	val=I2CPCF8574ReceiveByte(SLAVE_ADDRESS_PCF8574_R);
+ 303              		.loc 1 149 0
+ 304 01fc 4F00A0E3 		mov	r0, #79
+ 305 0200 FEFFFFEB 		bl	I2CPCF8574ReceiveByte
+ 306 0204 0060A0E1 		mov	r6, r0
+ 307              	.LVL6:
+ 150:I2C_PCF8574_SWITCH_INT.c **** 
+ 151:I2C_PCF8574_SWITCH_INT.c **** 	LCDGotoXY(0,0);
+ 308              		.loc 1 151 0
+ 309 0208 0000A0E3 		mov	r0, #0
+ 310 020c 0010A0E1 		mov	r1, r0
+ 311 0210 FEFFFFEB 		bl	LCDGotoXY
+ 152:I2C_PCF8574_SWITCH_INT.c **** 	LCDText("Inp=");
+ 312              		.loc 1 152 0
+ 313 0214 80509FE5 		ldr	r5, .L38
+ 314 0218 0500A0E1 		mov	r0, r5
+ 315 021c FEFFFFEB 		bl	LCDText
+ 153:I2C_PCF8574_SWITCH_INT.c **** 	LCD32bitNumberDec(val);
+ 316              		.loc 1 153 0
+ 317 0220 0600A0E1 		mov	r0, r6
+ 318 0224 FEFFFFEB 		bl	LCD32bitNumberDec
+ 154:I2C_PCF8574_SWITCH_INT.c **** 	LCDText(" dec        ");
+ 319              		.loc 1 154 0
+ 320 0228 70009FE5 		ldr	r0, .L38+4
+ 321 022c FEFFFFEB 		bl	LCDText
+ 155:I2C_PCF8574_SWITCH_INT.c **** 
+ 156:I2C_PCF8574_SWITCH_INT.c **** 	LCDGotoXY(0,1);
+ 322              		.loc 1 156 0
+ 323 0230 0000A0E3 		mov	r0, #0
+ 324 0234 0410A0E1 		mov	r1, r4
+ 325 0238 FEFFFFEB 		bl	LCDGotoXY
+ 157:I2C_PCF8574_SWITCH_INT.c **** 	LCDText("Inp=");
+ 326              		.loc 1 157 0
+ 327 023c 0500A0E1 		mov	r0, r5
+ 328 0240 FEFFFFEB 		bl	LCDText
+ 329              	.LVL7:
+ 330 0244 074084E2 		add	r4, r4, #7
+ 331 0248 0150A0E3 		mov	r5, #1
+ 332              	.L33:
+ 333              	.LBB2:
+ 158:I2C_PCF8574_SWITCH_INT.c **** 	for(i=8;i>0;i--)
+ 159:I2C_PCF8574_SWITCH_INT.c **** 	{
+ 160:I2C_PCF8574_SWITCH_INT.c **** 		unsigned int tmp=val&(1<<(i-1));
+ 334              		.loc 1 160 0
+ 335 024c 014044E2 		sub	r4, r4, #1
+ 161:I2C_PCF8574_SWITCH_INT.c **** 		LCD32bitNumberDec(tmp>>(i-1));
+ 336              		.loc 1 161 0
+ 337 0250 150406E0 		and	r0, r6, r5, asl r4
+ 338 0254 3004A0E1 		mov	r0, r0, lsr r4
+ 339 0258 FEFFFFEB 		bl	LCD32bitNumberDec
+ 340              	.LBE2:
+ 341              		.loc 1 158 0
+ 342 025c 000054E3 		cmp	r4, #0
+ 343 0260 9100001A 		bne	.L33
+ 162:I2C_PCF8574_SWITCH_INT.c **** 	}
+ 163:I2C_PCF8574_SWITCH_INT.c **** 	LCDText(" bin");
+ 344              		.loc 1 163 0
+ 345 0264 38009FE5 		ldr	r0, .L38+8
+ 346 0268 FEFFFFEB 		bl	LCDText
+ 164:I2C_PCF8574_SWITCH_INT.c **** 
+ 165:I2C_PCF8574_SWITCH_INT.c **** 	delay(0x20000);
+ 347              		.loc 1 165 0
+ 348 026c 0208A0E3 		mov	r0, #131072
+ 349 0270 FEFFFFEB 		bl	delay
+ 166:I2C_PCF8574_SWITCH_INT.c **** 
+ 167:I2C_PCF8574_SWITCH_INT.c **** 	IDISABLE;
+ 350              		.loc 1 167 0
+ 351 0274 0040BDE8 		LDMFD SP!, {LR}
+ 352 0278 92F021E3 		MSR CPSR_c, #0x92
+ 353 027c 0040BDE8 		LDMFD SP!, {LR}
+ 354 0280 0EF06FE1 		MSR SPSR_cxsf, LR
+ 168:I2C_PCF8574_SWITCH_INT.c **** 
+ 169:I2C_PCF8574_SWITCH_INT.c **** 	VICVectAddr=0x00000000;					//Clear interrupt in 
+ 355              		.loc 1 169 0
+ 356 0284 3F3DE0E3 		mvn	r3, #4032
+ 357 0288 0F4003E5 		str	r4, [r3, #-15]
+ 170:I2C_PCF8574_SWITCH_INT.c **** }
+ 358              		.loc 1 170 0
+ 359 028c 28D04BE2 		sub	sp, fp, #40
+ 360 0290 7F689DE8 		ldmfd	sp, {r0, r1, r2, r3, r4, r5, r6, fp, sp, lr}
+ 361 0294 0010BDE8 		ldmfd	sp!, {ip}
+ 362 0298 04F05EE2 		subs	pc, lr, #4
+ 363              	.L39:
+ 364              		.align	2
+ 365              	.L38:
+ 366 029c 18000000 		.word	.LC2
+ 367 02a0 20000000 		.word	.LC3
+ 368 02a4 30000000 		.word	.LC4
+ 369              	.LFE7:
+ 371              		.align	2
+ 372              		.global	I2CISR
+ 374              	I2CISR:
+ 375              	.LFB8:
+ 171:I2C_PCF8574_SWITCH_INT.c **** 
+ 172:I2C_PCF8574_SWITCH_INT.c **** //*******************************
+ 173:I2C_PCF8574_SWITCH_INT.c **** // I2C interrupt routine
+ 174:I2C_PCF8574_SWITCH_INT.c **** //*******************************
+ 175:I2C_PCF8574_SWITCH_INT.c **** void I2CISR(void)
+ 176:I2C_PCF8574_SWITCH_INT.c **** {
+ 376              		.loc 1 176 0
+ 377              		@ Interrupt Service Routine.
+ 378              		@ args = 0, pretend = 0, frame = 0
+ 379              		@ frame_needed = 0, uses_anonymous_args = 0
+ 380              		@ link register save eliminated.
+ 381              	.LVL8:
+ 382 02a8 0C002DE9 		stmfd	sp!, {r2, r3}
+ 383              	.LCFI6:
+ 384              		@ lr needed for prologue
+ 177:I2C_PCF8574_SWITCH_INT.c **** 	//Simple state machine
+ 178:I2C_PCF8574_SWITCH_INT.c **** 	switch (I2C0STAT)
+ 385              		.loc 1 178 0
+ 386 02ac 4E32A0E3 		mov	r3, #-536870908
+ 387 02b0 073983E2 		add	r3, r3, #114688
+ 388 02b4 0030D3E5 		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 389 02b8 FF3003E2 		and	r3, r3, #255
+ 390 02bc 500053E3 		cmp	r3, #80
+ 391 02c0 CE00000A 		beq	.L45
+ 392 02c4 BC00008A 		bhi	.L47
+ 393 02c8 480053E3 		cmp	r3, #72
+ 179:I2C_PCF8574_SWITCH_INT.c **** 	{
+ 180:I2C_PCF8574_SWITCH_INT.c **** 		//Receive byte conditions
+ 181:I2C_PCF8574_SWITCH_INT.c **** 		case (0x08):						//Start bit
+ 182:I2C_PCF8574_SWITCH_INT.c **** 			I2C0CONCLR=0x20;					//Clear start bit
+ 183:I2C_PCF8574_SWITCH_INT.c **** 			I2C0DAT=I2CAddress; 				//Send address
+ 184:I2C_PCF8574_SWITCH_INT.c **** 			break;
+ 185:I2C_PCF8574_SWITCH_INT.c **** 
+ 186:I2C_PCF8574_SWITCH_INT.c **** 		case (0x40) :						//Slave Address +R, ACK
+ 187:I2C_PCF8574_SWITCH_INT.c **** 			I2C0CONSET 	= 0x04;				//Enable ACK for data byte
+ 188:I2C_PCF8574_SWITCH_INT.c **** 			break;
+ 189:I2C_PCF8574_SWITCH_INT.c **** 
+ 190:I2C_PCF8574_SWITCH_INT.c **** 		case (0x48) :						//Slave Address +R, Not Ack
+ 191:I2C_PCF8574_SWITCH_INT.c **** 			I2C0CONSET 	= 0x20;				//Resend Start condition
+ 394              		.loc 1 191 0
+ 395 02cc 2020A003 		moveq	r2, #32
+ 396 02d0 0E32A003 		moveq	r3, #-536870912
+ 397 02d4 07398302 		addeq	r3, r3, #114688
+ 398 02d8 0020C305 		streqb	r2, [r3, #0]
+ 399              		.loc 1 178 0
+ 400 02dc DF00000A 		beq	.L41
+ 401 02e0 DF00008A 		bhi	.L41
+ 402 02e4 080053E3 		cmp	r3, #8
+ 403 02e8 BF00000A 		beq	.L42
+ 404 02ec 400053E3 		cmp	r3, #64
+ 405 02f0 DF00001A 		bne	.L41
+ 406 02f4 C90000EA 		b	.L43
+ 407              	.L47:
+ 408 02f8 580053E3 		cmp	r3, #88
+ 409 02fc DF00001A 		bne	.L41
+ 410 0300 DB0000EA 		b	.L46
+ 411              	.L42:
+ 412              		.loc 1 182 0
+ 413 0304 2020A0E3 		mov	r2, #32
+ 414 0308 0E32A0E3 		mov	r3, #-536870912
+ 415 030c 073983E2 		add	r3, r3, #114688
+ 416 0310 1820C3E5 		strb	r2, [r3, #24]
+ 417              		.loc 1 183 0
+ 418 0314 8C309FE5 		ldr	r3, .L49
+ 419 0318 0020D3E5 		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 420 031c 8E32A0E3 		mov	r3, #-536870904
+ 421 0320 073983E2 		add	r3, r3, #114688
+ 422 0324 0020C3E5 		strb	r2, [r3, #0]
+ 423 0328 DF0000EA 		b	.L41
+ 424              	.L43:
+ 425              		.loc 1 187 0
+ 426 032c 0420A0E3 		mov	r2, #4
+ 427 0330 0E32A0E3 		mov	r3, #-536870912
+ 428 0334 073983E2 		add	r3, r3, #114688
+ 429 0338 0020C3E5 		strb	r2, [r3, #0]
+ 430 033c DF0000EA 		b	.L41
+ 431              	.L45:
+ 192:I2C_PCF8574_SWITCH_INT.c **** 			break;
+ 193:I2C_PCF8574_SWITCH_INT.c **** 
+ 194:I2C_PCF8574_SWITCH_INT.c **** 		case (0x50) :						//Data Received, ACK 
+ 195:I2C_PCF8574_SWITCH_INT.c **** 			I2CData 	= I2C0DAT;
+ 432              		.loc 1 195 0
+ 433 0340 8E32A0E3 		mov	r3, #-536870904
+ 434 0344 073983E2 		add	r3, r3, #114688
+ 435 0348 0020D3E5 		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 436 034c 58309FE5 		ldr	r3, .L49+4
+ 437 0350 002083E5 		str	r2, [r3, #0]
+ 196:I2C_PCF8574_SWITCH_INT.c **** 			I2C0CONSET 	= 0x10;				//Stop condition
+ 438              		.loc 1 196 0
+ 439 0354 1020A0E3 		mov	r2, #16
+ 440 0358 0E32A0E3 		mov	r3, #-536870912
+ 441 035c 073983E2 		add	r3, r3, #114688
+ 442 0360 0020C3E5 		strb	r2, [r3, #0]
+ 197:I2C_PCF8574_SWITCH_INT.c **** 			lock 		= 0;            	//Signal end of I2C activity							
+ 443              		.loc 1 197 0
+ 444 0364 102042E2 		sub	r2, r2, #16
+ 445 0368 40309FE5 		ldr	r3, .L49+8
+ 446 036c 002083E5 		str	r2, [r3, #0]
+ 447 0370 DF0000EA 		b	.L41
+ 448              	.L46:
+ 198:I2C_PCF8574_SWITCH_INT.c **** 			break;
+ 199:I2C_PCF8574_SWITCH_INT.c **** 
+ 200:I2C_PCF8574_SWITCH_INT.c **** 		case (0x58):						//Data Received, Not Ack
+ 201:I2C_PCF8574_SWITCH_INT.c **** 			I2C0CONSET 	= 0x20;				//Resend Start condition
+ 449              		.loc 1 201 0
+ 450 0374 2020A0E3 		mov	r2, #32
+ 451 0378 0E32A0E3 		mov	r3, #-536870912
+ 452 037c 073983E2 		add	r3, r3, #114688
+ 453 0380 0020C3E5 		strb	r2, [r3, #0]
+ 454              	.L41:
+ 202:I2C_PCF8574_SWITCH_INT.c **** 			break;
+ 203:I2C_PCF8574_SWITCH_INT.c **** 
+ 204:I2C_PCF8574_SWITCH_INT.c **** 		default :
+ 205:I2C_PCF8574_SWITCH_INT.c **** 			break;
+ 206:I2C_PCF8574_SWITCH_INT.c **** 	}
+ 207:I2C_PCF8574_SWITCH_INT.c **** 
+ 208:I2C_PCF8574_SWITCH_INT.c **** 	I2C0CONCLR 	= 0x08;						//Clear I2C interrupt flag
+ 455              		.loc 1 208 0
+ 456 0384 0820A0E3 		mov	r2, #8
+ 457 0388 0E32A0E3 		mov	r3, #-536870912
+ 458 038c 073983E2 		add	r3, r3, #114688
+ 459 0390 1820C3E5 		strb	r2, [r3, #24]
+ 209:I2C_PCF8574_SWITCH_INT.c **** 	VICVectAddr = 0x00000000;				//Acknowlage interrupt
+ 460              		.loc 1 209 0
+ 461 0394 082042E2 		sub	r2, r2, #8
+ 462 0398 3F3DE0E3 		mvn	r3, #4032
+ 463 039c 0F2003E5 		str	r2, [r3, #-15]
+ 210:I2C_PCF8574_SWITCH_INT.c **** }
+ 464              		.loc 1 210 0
+ 465 03a0 0C00BDE8 		ldmfd	sp!, {r2, r3}
+ 466 03a4 04F05EE2 		subs	pc, lr, #4
+ 467              	.L50:
+ 468              		.align	2
+ 469              	.L49:
+ 470 03a8 00000000 		.word	I2CAddress
+ 471 03ac 00000000 		.word	I2CData
+ 472 03b0 00000000 		.word	lock
+ 473              	.LFE8:
+ 475              		.comm	I2CData,4,4
+ 476              		.comm	I2CAddress,4,4
+ 605              	.Letext0:

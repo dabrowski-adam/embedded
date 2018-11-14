@@ -1,0 +1,625 @@
+   1              		.file	"UART_example.c"
+   9              	.Ltext0:
+  10              		.global	Msg1
+  11              		.section	.rodata
+  12              		.align	2
+  15              	Msg1:
+  16 0000 53312070 		.ascii	"S1 pressed\000"
+  16      72657373 
+  16      656400
+  17              		.global	Msg2
+  18 000b 00       		.align	2
+  21              	Msg2:
+  22 000c 53322070 		.ascii	"S2 pressed\000"
+  22      72657373 
+  22      656400
+  23              		.global	Msg3
+  24 0017 00       		.align	2
+  27              	Msg3:
+  28 0018 53332070 		.ascii	"S3 pressed\000"
+  28      72657373 
+  28      656400
+  29              		.global	Msg4
+  30 0023 00       		.align	2
+  33              	Msg4:
+  34 0024 53342070 		.ascii	"S4 pressed\000"
+  34      72657373 
+  34      656400
+  35 002f 00       		.text
+  36              		.align	2
+  37              		.global	UARTInit
+  39              	UARTInit:
+  40              	.LFB2:
+  41              		.file 1 "UART_example.c"
+   1:UART_example.c **** ////////////////////////////////////////////////////////
+   2:UART_example.c **** // Function:	UART example
+   3:UART_example.c **** // Target:		LPC2138
+   4:UART_example.c **** // Board:		ZL6ARM
+   5:UART_example.c **** // Quartz:		12MHz
+   6:UART_example.c **** // Compiler:	ARM-GCC-4.0.1 (www.gnuarm.com)
+   7:UART_example.c **** // Author:		Arkadiusz Antoniak @ 2006, Poland
+   8:UART_example.c **** // Copyright:	(c) Arkadiusz Antoniak, 2006
+   9:UART_example.c **** ////////////////////////////////////////////////////////
+  10:UART_example.c **** #include <LPC213x.H>	    
+  11:UART_example.c **** #include "lcd.h"
+  12:UART_example.c **** #include "switches_pins.h"
+  13:UART_example.c **** 
+  14:UART_example.c **** //Macros
+  15:UART_example.c **** #define TEMT		(1<<6)
+  16:UART_example.c **** #define RDR			(1<<0)
+  17:UART_example.c **** #define LF			0x0A
+  18:UART_example.c **** #define CR			0x0D
+  19:UART_example.c **** #define SW_DELAY	delay(0x8000)
+  20:UART_example.c **** 
+  21:UART_example.c **** //Globals
+  22:UART_example.c **** const char Msg1[]="S1 pressed";
+  23:UART_example.c **** const char Msg2[]="S2 pressed";
+  24:UART_example.c **** const char Msg3[]="S3 pressed";
+  25:UART_example.c **** const char Msg4[]="S4 pressed";
+  26:UART_example.c **** 
+  27:UART_example.c **** //UART0 receiver interrupt handler's header
+  28:UART_example.c **** void UART0_RECISR(void) __attribute__ ((interrupt("IRQ")));
+  29:UART_example.c **** 
+  30:UART_example.c **** 
+  31:UART_example.c **** //*******************************
+  32:UART_example.c **** // UART Init
+  33:UART_example.c **** //*******************************
+  34:UART_example.c **** void UARTInit(void)
+  35:UART_example.c **** {
+  42              		.loc 1 35 0
+  43              		@ Function supports interworking.
+  44              		@ args = 0, pretend = 0, frame = 0
+  45              		@ frame_needed = 0, uses_anonymous_args = 0
+  46              		@ link register save eliminated.
+  47              	.LVL0:
+  48              		@ lr needed for prologue
+  36:UART_example.c **** 	//P0.0=TxD0, P0.1=RxD0
+  37:UART_example.c **** 	PINSEL0=0x05;
+  49              		.loc 1 37 0
+  50 0000 0E22A0E3 		mov	r2, #-536870912
+  51 0004 0B3982E2 		add	r3, r2, #180224
+  52 0008 05C0A0E3 		mov	ip, #5
+  53 000c 00C083E5 		str	ip, [r3, #0]
+  38:UART_example.c **** 
+  39:UART_example.c **** 	//8 bit, no Parity, 1 Stop bit, enable access to DLAB
+  40:UART_example.c ****   	U0LCR=0x83;
+  54              		.loc 1 40 0
+  55 0010 0319A0E3 		mov	r1, #49152
+  56 0014 CE0281E2 		add	r0, r1, #-536870900
+  57 0018 7C30E0E3 		mvn	r3, #124
+  58 001c 0030C0E5 		strb	r3, [r0, #0]
+  41:UART_example.c **** 
+  42:UART_example.c **** 	//BAUDRATE=115200bps @ VPBfreq=60MHz
+  43:UART_example.c ****   	U0DLL=33;
+  59              		.loc 1 43 0
+  60 0020 012082E0 		add	r2, r2, r1
+  61 0024 9E3083E2 		add	r3, r3, #158
+  62 0028 0030C2E5 		strb	r3, [r2, #0]
+  44:UART_example.c **** 	U0DLM=0;
+  63              		.loc 1 44 0
+  64 002c 4E2281E2 		add	r2, r1, #-536870908
+  65 0030 213043E2 		sub	r3, r3, #33
+  66 0034 0030C2E5 		strb	r3, [r2, #0]
+  45:UART_example.c **** 
+  46:UART_example.c **** 	//Disable access to DLAB
+  47:UART_example.c **** 	U0LCR = 0x03; 
+  67              		.loc 1 47 0
+  68 0038 033083E2 		add	r3, r3, #3
+  69 003c 0030C0E5 		strb	r3, [r0, #0]
+  48:UART_example.c **** 
+  49:UART_example.c **** 	//Enable & reset FIFO's. Trigger level for Rx FIFO=1
+  50:UART_example.c **** 	U0FCR=0x07;
+  70              		.loc 1 50 0
+  71 0040 8E1281E2 		add	r1, r1, #-536870904
+  72 0044 043083E2 		add	r3, r3, #4
+  73 0048 0030C1E5 		strb	r3, [r1, #0]
+  51:UART_example.c **** 
+  52:UART_example.c **** 	//Enable RDA and RLS interrupt
+  53:UART_example.c ****    	U0IER=(1<<0)|(1<<2);
+  74              		.loc 1 53 0
+  75 004c 00C0C2E5 		strb	ip, [r2, #0]
+  54:UART_example.c **** 
+  55:UART_example.c **** 	//VIC channel0 for UART0 receiver interrupt
+  56:UART_example.c ****     VICVectAddr0 = (unsigned long)UART0_RECISR;
+  76              		.loc 1 56 0
+  77 0050 28209FE5 		ldr	r2, .L3
+  78 0054 2233A0E3 		mov	r3, #-2013265920
+  79 0058 C339A0E1 		mov	r3, r3, asr #19
+  80 005c 002083E5 		str	r2, [r3, #0]
+  57:UART_example.c ****     VICVectCntl0 = 0x20 | 6;
+  81              		.loc 1 57 0
+  82 0060 2620A0E3 		mov	r2, #38
+  83 0064 0932A0E3 		mov	r3, #-1879048192
+  84 0068 C339A0E1 		mov	r3, r3, asr #19
+  85 006c 002083E5 		str	r2, [r3, #0]
+  58:UART_example.c ****     VICIntEnable = 0x00000040;
+  86              		.loc 1 58 0
+  87 0070 1A2082E2 		add	r2, r2, #26
+  88 0074 FE3EE0E3 		mvn	r3, #4064
+  89 0078 0F2003E5 		str	r2, [r3, #-15]
+  59:UART_example.c **** }
+  90              		.loc 1 59 0
+  91 007c 1EFF2FE1 		bx	lr
+  92              	.L4:
+  93              		.align	2
+  94              	.L3:
+  95 0080 00000000 		.word	UART0_RECISR
+  96              	.LFE2:
+  98              		.align	2
+  99              		.global	SendByte
+ 101              	SendByte:
+ 102              	.LFB3:
+  60:UART_example.c **** 
+  61:UART_example.c **** //*******************************
+  62:UART_example.c **** // Send Byte via UART0
+  63:UART_example.c **** //*******************************
+  64:UART_example.c **** void SendByte(unsigned char ch)
+  65:UART_example.c **** {
+ 103              		.loc 1 65 0
+ 104              		@ Function supports interworking.
+ 105              		@ args = 0, pretend = 0, frame = 0
+ 106              		@ frame_needed = 0, uses_anonymous_args = 0
+ 107              		@ link register save eliminated.
+ 108              	.LVL1:
+ 109              		@ lr needed for prologue
+ 110 0084 FF0000E2 		and	r0, r0, #255
+  66:UART_example.c **** 	U0THR=ch;
+ 111              		.loc 1 66 0
+ 112 0088 0E32A0E3 		mov	r3, #-536870912
+ 113 008c 033983E2 		add	r3, r3, #49152
+ 114 0090 0000C3E5 		strb	r0, [r3, #0]
+ 115 0094 033943E2 		sub	r3, r3, #49152
+ 116 0098 032983E2 		add	r2, r3, #49152
+ 117              	.L6:
+  67:UART_example.c **** 	while(!(U0LSR & TEMT));
+ 118              		.loc 1 67 0
+ 119 009c 1430D2E5 		ldrb	r3, [r2, #20]	@ zero_extendqisi2
+ 120 00a0 400013E3 		tst	r3, #64
+ 121 00a4 2500000A 		beq	.L6
+  68:UART_example.c **** }
+ 122              		.loc 1 68 0
+ 123 00a8 1EFF2FE1 		bx	lr
+ 124              	.LFE3:
+ 126              		.align	2
+ 127              		.global	SendString
+ 129              	SendString:
+ 130              	.LFB4:
+  69:UART_example.c **** 
+  70:UART_example.c **** //*******************************
+  71:UART_example.c **** // Send String
+  72:UART_example.c **** //*******************************
+  73:UART_example.c **** void SendString(const char *pStr)
+  74:UART_example.c **** {
+ 131              		.loc 1 74 0
+ 132              		@ Function supports interworking.
+ 133              		@ args = 0, pretend = 0, frame = 0
+ 134              		@ frame_needed = 1, uses_anonymous_args = 0
+ 135              	.LVL2:
+ 136 00ac 0DC0A0E1 		mov	ip, sp
+ 137              	.LCFI0:
+ 138 00b0 10D82DE9 		stmfd	sp!, {r4, fp, ip, lr, pc}
+ 139              	.LCFI1:
+ 140 00b4 04B04CE2 		sub	fp, ip, #4
+ 141              	.LCFI2:
+ 142 00b8 0030A0E1 		mov	r3, r0
+  75:UART_example.c **** 	while(*pStr)
+ 143              		.loc 1 75 0
+ 144 00bc 0000D0E5 		ldrb	r0, [r0, #0]	@ zero_extendqisi2
+ 145              	.LVL3:
+ 146 00c0 000050E3 		cmp	r0, #0
+ 147 00c4 3500000A 		beq	.L12
+ 148 00c8 0340A0E1 		mov	r4, r3
+ 149              	.L14:
+  76:UART_example.c **** 		SendByte(*pStr++);
+ 150              		.loc 1 76 0
+ 151 00cc FEFFFFEB 		bl	SendByte
+ 152              	.LVL4:
+ 153              		.loc 1 75 0
+ 154 00d0 0100F4E5 		ldrb	r0, [r4, #1]!	@ zero_extendqisi2
+ 155 00d4 000050E3 		cmp	r0, #0
+ 156 00d8 3100001A 		bne	.L14
+ 157              	.LVL5:
+ 158              	.L12:
+  77:UART_example.c **** 
+  78:UART_example.c **** 	SendByte(CR);
+ 159              		.loc 1 78 0
+ 160 00dc 0D00A0E3 		mov	r0, #13
+ 161 00e0 FEFFFFEB 		bl	SendByte
+ 162              	.LVL6:
+  79:UART_example.c **** 	SendByte(LF);
+ 163              		.loc 1 79 0
+ 164 00e4 0A00A0E3 		mov	r0, #10
+ 165 00e8 FEFFFFEB 		bl	SendByte
+  80:UART_example.c **** }
+ 166              		.loc 1 80 0
+ 167 00ec 10D04BE2 		sub	sp, fp, #16
+ 168 00f0 10689DE8 		ldmfd	sp, {r4, fp, sp, lr}
+ 169 00f4 1EFF2FE1 		bx	lr
+ 170              	.LFE4:
+ 172              		.align	2
+ 173              		.global	delay
+ 175              	delay:
+ 176              	.LFB5:
+  81:UART_example.c **** 
+  82:UART_example.c **** //*******************************
+  83:UART_example.c **** // Delay function
+  84:UART_example.c **** //*******************************
+  85:UART_example.c **** void delay(unsigned int del_time) 
+  86:UART_example.c **** { 
+ 177              		.loc 1 86 0
+ 178              		@ Function supports interworking.
+ 179              		@ args = 0, pretend = 0, frame = 0
+ 180              		@ frame_needed = 0, uses_anonymous_args = 0
+ 181              		@ link register save eliminated.
+ 182              	.LVL7:
+ 183              		@ lr needed for prologue
+  87:UART_example.c **** 	unsigned int i;
+  88:UART_example.c **** 	for(i=0;i<del_time;i++);	   
+ 184              		.loc 1 88 0
+ 185 00f8 000050E3 		cmp	r0, #0
+ 186 00fc 1EFF2F01 		bxeq	lr
+ 187 0100 0030A0E3 		mov	r3, #0
+ 188              	.LVL8:
+ 189              	.L20:
+ 190 0104 013083E2 		add	r3, r3, #1
+ 191 0108 030050E1 		cmp	r0, r3
+ 192 010c 3F00001A 		bne	.L20
+ 193 0110 1EFF2FE1 		bx	lr
+ 194              	.LFE5:
+ 196              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 197              		.align	2
+ 198              	.LC0:
+ 199 0000 55415254 		.ascii	"UART example\000"
+ 199      20657861 
+ 199      6D706C65 
+ 199      00
+ 200              		.text
+ 201              		.align	2
+ 202              		.global	main
+ 204              	main:
+ 205              	.LFB6:
+  89:UART_example.c **** }
+  90:UART_example.c **** 
+  91:UART_example.c **** //*******************************
+  92:UART_example.c **** // MAIN
+  93:UART_example.c **** //*******************************
+  94:UART_example.c **** int main (void)
+  95:UART_example.c **** {
+ 206              		.loc 1 95 0
+ 207              		@ Function supports interworking.
+ 208              		@ args = 0, pretend = 0, frame = 0
+ 209              		@ frame_needed = 1, uses_anonymous_args = 0
+ 210 0114 0DC0A0E1 		mov	ip, sp
+ 211              	.LCFI3:
+ 212 0118 10D82DE9 		stmfd	sp!, {r4, fp, ip, lr, pc}
+ 213              	.LCFI4:
+ 214 011c 04B04CE2 		sub	fp, ip, #4
+ 215              	.LCFI5:
+  96:UART_example.c **** 	//Peripherials' frequency = fclk = 60MHz
+  97:UART_example.c **** 	VPBDIV&=0xFFFFFFFC;
+ 216              		.loc 1 97 0
+ 217 0120 0E12A0E3 		mov	r1, #-536870912
+ 218 0124 7F2981E2 		add	r2, r1, #2080768
+ 219 0128 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+ 220 012c FC3003E2 		and	r3, r3, #252
+ 221 0130 0031C2E5 		strb	r3, [r2, #256]
+  98:UART_example.c **** 	VPBDIV|=0x01;
+ 222              		.loc 1 98 0
+ 223 0134 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+ 224 0138 013083E3 		orr	r3, r3, #1
+ 225 013c 0031C2E5 		strb	r3, [r2, #256]
+  99:UART_example.c **** 
+ 100:UART_example.c **** 	//Port direction configuration
+ 101:UART_example.c **** 	IODIR0 = 0xFF000000;
+ 226              		.loc 1 101 0
+ 227 0140 FF24A0E3 		mov	r2, #-16777216
+ 228 0144 8E32A0E3 		mov	r3, #-536870904
+ 229 0148 0A3983E2 		add	r3, r3, #163840
+ 230 014c 002083E5 		str	r2, [r3, #0]
+ 102:UART_example.c **** 	IODIR1 = 0x00FF0000;
+ 231              		.loc 1 102 0
+ 232 0150 0A1981E2 		add	r1, r1, #163840
+ 233 0154 FF38A0E3 		mov	r3, #16711680
+ 234 0158 183081E5 		str	r3, [r1, #24]
+ 103:UART_example.c **** 
+ 104:UART_example.c **** 	LCDInit();
+ 235              		.loc 1 104 0
+ 236 015c FEFFFFEB 		bl	LCDInit
+ 105:UART_example.c **** 
+ 106:UART_example.c **** 	LCDClear();
+ 237              		.loc 1 106 0
+ 238 0160 FEFFFFEB 		bl	LCDClear
+ 107:UART_example.c **** 
+ 108:UART_example.c **** 	LCDText("UART example");
+ 239              		.loc 1 108 0
+ 240 0164 B4009FE5 		ldr	r0, .L36
+ 241 0168 FEFFFFEB 		bl	LCDText
+ 109:UART_example.c **** 	delay(0x400000);
+ 242              		.loc 1 109 0
+ 243 016c 0105A0E3 		mov	r0, #4194304
+ 244 0170 FEFFFFEB 		bl	delay
+ 110:UART_example.c **** 
+ 111:UART_example.c **** 	UARTInit();
+ 245              		.loc 1 111 0
+ 246 0174 FEFFFFEB 		bl	UARTInit
+ 247 0178 0E32A0E3 		mov	r3, #-536870912
+ 248 017c 0A4983E2 		add	r4, r3, #163840
+ 249              	.L24:
+ 112:UART_example.c **** 
+ 113:UART_example.c **** 	//Endless loop
+ 114:UART_example.c **** 	while(1)
+ 115:UART_example.c **** 	{
+ 116:UART_example.c **** 		if(SW1==0)
+ 250              		.loc 1 116 0
+ 251 0180 003094E5 		ldr	r3, [r4, #0]
+ 252 0184 100013E3 		tst	r3, #16
+ 253 0188 6400001A 		bne	.L25
+ 117:UART_example.c **** 			SendString(Msg1);
+ 254              		.loc 1 117 0
+ 255 018c 90009FE5 		ldr	r0, .L36+4
+ 256 0190 FEFFFFEB 		bl	SendString
+ 257 0194 740000EA 		b	.L27
+ 258              	.L25:
+ 118:UART_example.c **** 		else if(SW2==0)
+ 259              		.loc 1 118 0
+ 260 0198 003094E5 		ldr	r3, [r4, #0]
+ 261 019c 200013E3 		tst	r3, #32
+ 262 01a0 6A00001A 		bne	.L28
+ 119:UART_example.c **** 			SendString(Msg2);
+ 263              		.loc 1 119 0
+ 264 01a4 7C009FE5 		ldr	r0, .L36+8
+ 265 01a8 FEFFFFEB 		bl	SendString
+ 266 01ac 740000EA 		b	.L27
+ 267              	.L28:
+ 120:UART_example.c **** 		else if(SW3==0)
+ 268              		.loc 1 120 0
+ 269 01b0 003094E5 		ldr	r3, [r4, #0]
+ 270 01b4 400013E3 		tst	r3, #64
+ 271 01b8 7000001A 		bne	.L30
+ 121:UART_example.c **** 			SendString(Msg3);
+ 272              		.loc 1 121 0
+ 273 01bc 68009FE5 		ldr	r0, .L36+12
+ 274 01c0 FEFFFFEB 		bl	SendString
+ 275 01c4 740000EA 		b	.L27
+ 276              	.L30:
+ 122:UART_example.c **** 		else if(SW4==0)
+ 277              		.loc 1 122 0
+ 278 01c8 003094E5 		ldr	r3, [r4, #0]
+ 279 01cc 800013E3 		tst	r3, #128
+ 123:UART_example.c **** 			SendString(Msg4);
+ 280              		.loc 1 123 0
+ 281 01d0 58009F05 		ldreq	r0, .L36+16
+ 282 01d4 FEFFFF0B 		bleq	SendString
+ 283              	.L27:
+ 124:UART_example.c **** 
+ 125:UART_example.c **** 		if(!SW1|!SW2|!SW3|!SW4)
+ 284              		.loc 1 125 0
+ 285 01d8 002094E5 		ldr	r2, [r4, #0]
+ 286 01dc 003094E5 		ldr	r3, [r4, #0]
+ 287 01e0 001094E5 		ldr	r1, [r4, #0]
+ 288 01e4 000094E5 		ldr	r0, [r4, #0]
+ 289 01e8 102022E2 		eor	r2, r2, #16
+ 290 01ec A332A0E1 		mov	r3, r3, lsr #5
+ 291 01f0 013023E2 		eor	r3, r3, #1
+ 292 01f4 223283E1 		orr	r3, r3, r2, lsr #4
+ 293 01f8 401021E2 		eor	r1, r1, #64
+ 294 01fc 213383E1 		orr	r3, r3, r1, lsr #6
+ 295 0200 800020E2 		eor	r0, r0, #128
+ 296 0204 A03383E1 		orr	r3, r3, r0, lsr #7
+ 297 0208 010013E3 		tst	r3, #1
+ 126:UART_example.c **** 			delay(0x80000);
+ 298              		.loc 1 126 0
+ 299 020c 0207A013 		movne	r0, #524288
+ 300 0210 FEFFFF1B 		blne	delay
+ 301              	.L33:
+ 127:UART_example.c **** 
+ 128:UART_example.c **** 		SW_DELAY;
+ 302              		.loc 1 128 0
+ 303 0214 0209A0E3 		mov	r0, #32768
+ 304 0218 FEFFFFEB 		bl	delay
+ 305 021c 5E0000EA 		b	.L24
+ 306              	.L37:
+ 307              		.align	2
+ 308              	.L36:
+ 309 0220 00000000 		.word	.LC0
+ 310 0224 00000000 		.word	Msg1
+ 311 0228 00000000 		.word	Msg2
+ 312 022c 00000000 		.word	Msg3
+ 313 0230 00000000 		.word	Msg4
+ 314              	.LFE6:
+ 316              		.section	.rodata.str1.4
+ 317 000d 000000   		.align	2
+ 318              	.LC1:
+ 319 0010 4572726F 		.ascii	"Error: \000"
+ 319      723A2000 
+ 320              		.align	2
+ 321              	.LC2:
+ 322 0018 4F452000 		.ascii	"OE \000"
+ 323              		.align	2
+ 324              	.LC3:
+ 325 001c 50452000 		.ascii	"PE \000"
+ 326              		.align	2
+ 327              	.LC4:
+ 328 0020 46452000 		.ascii	"FE \000"
+ 329              		.align	2
+ 330              	.LC5:
+ 331 0024 20202020 		.ascii	"               \000"
+ 331      20202020 
+ 331      20202020 
+ 331      20202000 
+ 332              		.text
+ 333              		.align	2
+ 334              		.global	UART0_RECISR
+ 336              	UART0_RECISR:
+ 337              	.LFB7:
+ 129:UART_example.c **** 	}
+ 130:UART_example.c **** }
+ 131:UART_example.c **** 
+ 132:UART_example.c **** //*******************************
+ 133:UART_example.c **** // UART0 receiver interrupt
+ 134:UART_example.c **** //*******************************
+ 135:UART_example.c **** void UART0_RECISR(void)
+ 136:UART_example.c **** {
+ 338              		.loc 1 136 0
+ 339              		@ Interrupt Service Routine.
+ 340              		@ args = 0, pretend = 0, frame = 0
+ 341              		@ frame_needed = 1, uses_anonymous_args = 0
+ 342 0234 04C02DE5 		str	ip, [sp, #-4]!
+ 343 0238 0DC0A0E1 		mov	ip, sp
+ 344              	.LCFI6:
+ 345 023c 3FD82DE9 		stmfd	sp!, {r0, r1, r2, r3, r4, r5, fp, ip, lr, pc}
+ 346              	.LCFI7:
+ 347 0240 04B04CE2 		sub	fp, ip, #4
+ 348              	.LCFI8:
+ 137:UART_example.c **** 	//Read interrupt ID
+ 138:UART_example.c **** 	unsigned int iid=U0IIR;
+ 349              		.loc 1 138 0
+ 350 0244 0339A0E3 		mov	r3, #49152
+ 351 0248 8E3283E2 		add	r3, r3, #-536870904
+ 352 024c 0030D3E5 		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 139:UART_example.c **** 
+ 140:UART_example.c **** 	//if RLS interrupt - error occured
+ 141:UART_example.c **** 	if((iid & 0x0F)==0x6)
+ 353              		.loc 1 141 0
+ 354 0250 0F3003E2 		and	r3, r3, #15
+ 355 0254 060053E3 		cmp	r3, #6
+ 356 0258 A900001A 		bne	.L39
+ 357              	.LBB2:
+ 142:UART_example.c **** 	{
+ 143:UART_example.c **** 		//reading U0LSR clears RLS interrupt
+ 144:UART_example.c **** 		unsigned int err=U0LSR;
+ 358              		.loc 1 144 0
+ 359 025c 623243E2 		sub	r3, r3, #536870918
+ 360 0260 033983E2 		add	r3, r3, #49152
+ 361 0264 1440D3E5 		ldrb	r4, [r3, #20]	@ zero_extendqisi2
+ 362 0268 FF5004E2 		and	r5, r4, #255
+ 363              	.LVL9:
+ 145:UART_example.c **** 
+ 146:UART_example.c **** 		LCDClear();
+ 364              		.loc 1 146 0
+ 365 026c FEFFFFEB 		bl	LCDClear
+ 147:UART_example.c **** 		LCDText("Error: ");
+ 366              		.loc 1 147 0
+ 367 0270 B0009FE5 		ldr	r0, .L55
+ 368 0274 FEFFFFEB 		bl	LCDText
+ 148:UART_example.c **** 
+ 149:UART_example.c **** 		if((err & 0x02)!=0)
+ 369              		.loc 1 149 0
+ 370 0278 020014E3 		tst	r4, #2
+ 150:UART_example.c **** 			LCDText("OE ");
+ 371              		.loc 1 150 0
+ 372 027c A8009F15 		ldrne	r0, .L55+4
+ 373 0280 FEFFFF1B 		blne	LCDText
+ 374              	.L41:
+ 151:UART_example.c **** 
+ 152:UART_example.c **** 		if((err & 0x04)!=0)
+ 375              		.loc 1 152 0
+ 376 0284 040015E3 		tst	r5, #4
+ 153:UART_example.c **** 			LCDText("PE ");
+ 377              		.loc 1 153 0
+ 378 0288 A0009F15 		ldrne	r0, .L55+8
+ 379 028c FEFFFF1B 		blne	LCDText
+ 380              	.L43:
+ 154:UART_example.c **** 
+ 155:UART_example.c **** 		if((err & 0x08)!=0)
+ 381              		.loc 1 155 0
+ 382 0290 080015E3 		tst	r5, #8
+ 156:UART_example.c **** 			LCDText("FE ");
+ 383              		.loc 1 156 0
+ 384 0294 98009F15 		ldrne	r0, .L55+12
+ 385 0298 FEFFFF1B 		blne	LCDText
+ 386              	.L45:
+ 157:UART_example.c **** 
+ 158:UART_example.c **** 		delay(0x800000);
+ 387              		.loc 1 158 0
+ 388 029c 0205A0E3 		mov	r0, #8388608
+ 389 02a0 FEFFFFEB 		bl	delay
+ 159:UART_example.c **** 		LCDClear();
+ 390              		.loc 1 159 0
+ 391 02a4 FEFFFFEB 		bl	LCDClear
+ 392 02a8 BA0000EA 		b	.L47
+ 393              	.LVL10:
+ 394              	.L39:
+ 395              	.LBE2:
+ 160:UART_example.c **** 	}
+ 161:UART_example.c **** 
+ 162:UART_example.c **** 	//if RDA interrupt
+ 163:UART_example.c **** 	if((iid & 0x0F)==0x4)
+ 396              		.loc 1 163 0
+ 397 02ac 040053E3 		cmp	r3, #4
+ 398 02b0 BA00001A 		bne	.L47
+ 399 02b4 C10000EA 		b	.L48
+ 400              	.LVL11:
+ 401              	.L53:
+ 402              	.LBB3:
+ 164:UART_example.c **** 	{
+ 165:UART_example.c **** 		unsigned int data=0;
+ 166:UART_example.c **** 		
+ 167:UART_example.c **** 		//reading U0RBR clears RDA interrupt
+ 168:UART_example.c **** 		//there may be more bytes than 1 in Rx FIFO
+ 169:UART_example.c **** 		while(U0LSR & RDR)
+ 170:UART_example.c **** 			data=U0RBR;
+ 403              		.loc 1 170 0
+ 404 02b8 0E32A0E3 		mov	r3, #-536870912
+ 405 02bc 033983E2 		add	r3, r3, #49152
+ 406 02c0 0020D3E5 		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 407 02c4 FF4002E2 		and	r4, r2, #255
+ 408              		.loc 1 169 0
+ 409 02c8 1430D3E5 		ldrb	r3, [r3, #20]	@ zero_extendqisi2
+ 410 02cc 010013E3 		tst	r3, #1
+ 411 02d0 AC00001A 		bne	.L53
+ 412              	.L50:
+ 171:UART_example.c **** 
+ 172:UART_example.c **** 		LCDGotoXY(0,0);
+ 413              		.loc 1 172 0
+ 414 02d4 0000A0E3 		mov	r0, #0
+ 415 02d8 0010A0E1 		mov	r1, r0
+ 416 02dc FEFFFFEB 		bl	LCDGotoXY
+ 173:UART_example.c **** 		LCD32bitNumberDec(data);
+ 417              		.loc 1 173 0
+ 418 02e0 0400A0E1 		mov	r0, r4
+ 419 02e4 FEFFFFEB 		bl	LCD32bitNumberDec
+ 174:UART_example.c **** 		LCDText("               ");
+ 420              		.loc 1 174 0
+ 421 02e8 48009FE5 		ldr	r0, .L55+16
+ 422 02ec FEFFFFEB 		bl	LCDText
+ 423              	.LVL12:
+ 424              	.L47:
+ 425              	.LBE3:
+ 175:UART_example.c **** 	}
+ 176:UART_example.c **** 
+ 177:UART_example.c **** 	//Acknowledge interrupt
+ 178:UART_example.c ****     VICVectAddr = 0;
+ 426              		.loc 1 178 0
+ 427 02f0 0020A0E3 		mov	r2, #0
+ 428 02f4 3F3DE0E3 		mvn	r3, #4032
+ 429 02f8 0F2003E5 		str	r2, [r3, #-15]
+ 179:UART_example.c **** }
+ 430              		.loc 1 179 0
+ 431 02fc 24D04BE2 		sub	sp, fp, #36
+ 432 0300 3F689DE8 		ldmfd	sp, {r0, r1, r2, r3, r4, r5, fp, sp, lr}
+ 433 0304 0010BDE8 		ldmfd	sp!, {ip}
+ 434 0308 04F05EE2 		subs	pc, lr, #4
+ 435              	.LVL13:
+ 436              	.L48:
+ 437              	.LBB4:
+ 438              		.loc 1 169 0
+ 439 030c 0E32A0E3 		mov	r3, #-536870912
+ 440 0310 033983E2 		add	r3, r3, #49152
+ 441 0314 1430D3E5 		ldrb	r3, [r3, #20]	@ zero_extendqisi2
+ 442 0318 010013E2 		ands	r0, r3, #1
+ 443 031c 0040A001 		moveq	r4, r0
+ 444              	.LVL14:
+ 445 0320 B300000A 		beq	.L50
+ 446 0324 AC0000EA 		b	.L53
+ 447              	.L56:
+ 448              		.align	2
+ 449              	.L55:
+ 450 0328 10000000 		.word	.LC1
+ 451 032c 18000000 		.word	.LC2
+ 452 0330 1C000000 		.word	.LC3
+ 453 0334 20000000 		.word	.LC4
+ 454 0338 24000000 		.word	.LC5
+ 455              	.LBE4:
+ 456              	.LFE7:
+ 589              	.Letext0:

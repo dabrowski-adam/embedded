@@ -1,0 +1,926 @@
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s 			page 1
+
+
+   1              		.file	"PWM_example.c"
+   2              		.section	.debug_abbrev,"",%progbits
+   3              	.Ldebug_abbrev0:
+   4              		.section	.debug_info,"",%progbits
+   5              	.Ldebug_info0:
+   6              		.section	.debug_line,"",%progbits
+   7              	.Ldebug_line0:
+   8 0000 68000000 		.text
+   8      02002100 
+   8      00000201 
+   8      FB0E0A00 
+   8      01010101 
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	PWMInit
+  12              		.type	PWMInit, %function
+  13              	PWMInit:
+  14              	.LFB2:
+  15              		.file 1 "PWM_example.c"
+   1:PWM_example.c **** ////////////////////////////////////////////////////////
+   2:PWM_example.c **** // Function:	PWM example 
+   3:PWM_example.c **** //                - LCD backlight brightness modulation
+   4:PWM_example.c **** // Target:		LPC2138
+   5:PWM_example.c **** // Board:		ZL6ARM
+   6:PWM_example.c **** // Quartz:		12MHz
+   7:PWM_example.c **** // Compiler:	ARM-GCC-4.0.1 (www.gnuarm.com)
+   8:PWM_example.c **** // Author:		Arkadiusz Antoniak @ 2006, Poland
+   9:PWM_example.c **** // Copyright:	(c) Arkadiusz Antoniak, 2006
+  10:PWM_example.c **** ////////////////////////////////////////////////////////
+  11:PWM_example.c **** #include <LPC213x.H>	    
+  12:PWM_example.c **** #include "lcd.h"
+  13:PWM_example.c **** #include "switches_pins.h"
+  14:PWM_example.c **** 
+  15:PWM_example.c **** //Macros
+  16:PWM_example.c **** #define SW_DELAY	delay(0x2000)
+  17:PWM_example.c **** #define PWM_PERIOD	15000
+  18:PWM_example.c **** #define PWM_STEP	(PWM_PERIOD/100)
+  19:PWM_example.c **** 
+  20:PWM_example.c **** //Globals
+  21:PWM_example.c **** 
+  22:PWM_example.c **** 
+  23:PWM_example.c **** //*******************************
+  24:PWM_example.c **** // PWM Init
+  25:PWM_example.c **** //*******************************
+  26:PWM_example.c **** void PWMInit(void)
+  27:PWM_example.c **** {
+  16              		.loc 1 27 0
+  17              		@ Function supports interworking.
+  18              		@ args = 0, pretend = 0, frame = 0
+  19              		@ frame_needed = 0, uses_anonymous_args = 0
+  20              		@ link register save eliminated.
+  21              	.LVL0:
+  22              		@ lr needed for prologue
+  28:PWM_example.c **** 	//P0.8=PWM4
+  29:PWM_example.c **** 	PINSEL0&=~(3<<16);
+  23              		.loc 1 29 0
+  24 0000 0E12A0E3 		mov	r1, #-536870912
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s 			page 2
+
+
+  25 0004 0B2981E2 		add	r2, r1, #180224
+  26 0008 003092E5 		ldr	r3, [r2, #0]
+  27 000c 0338C3E3 		bic	r3, r3, #196608
+  28 0010 003082E5 		str	r3, [r2, #0]
+  30:PWM_example.c **** 	PINSEL0|=(1<<17);
+  29              		.loc 1 30 0
+  30 0014 003092E5 		ldr	r3, [r2, #0]
+  31 0018 023883E3 		orr	r3, r3, #131072
+  32 001c 003082E5 		str	r3, [r2, #0]
+  31:PWM_example.c **** 
+  32:PWM_example.c **** 	//Prescaler = 0, PWMTC increments every 1 VPB cycle
+  33:PWM_example.c **** 	PWMPR=0x00;
+  33              		.loc 1 33 0
+  34 0020 0020A0E3 		mov	r2, #0
+  35 0024 CE32A0E3 		mov	r3, #-536870900
+  36 0028 053983E2 		add	r3, r3, #81920
+  37 002c 002083E5 		str	r2, [r3, #0]
+  34:PWM_example.c **** 
+  35:PWM_example.c **** 	//Enable PWM4 channel and set single edge mode
+  36:PWM_example.c **** 	PWMPCR=(1<<12); 
+  38              		.loc 1 36 0
+  39 0030 051981E2 		add	r1, r1, #81920
+  40 0034 013AA0E3 		mov	r3, #4096
+  41 0038 4C3081E5 		str	r3, [r1, #76]
+  37:PWM_example.c **** 
+  38:PWM_example.c **** 	//Set PWM period = 1ms @ VPBfreq = 15MHz
+  39:PWM_example.c **** 	PWMMR0 = PWM_PERIOD;
+  42              		.loc 1 39 0
+  43 003c AA3D83E2 		add	r3, r3, #10880
+  44 0040 183083E2 		add	r3, r3, #24
+  45 0044 183081E5 		str	r3, [r1, #24]
+  40:PWM_example.c **** 
+  41:PWM_example.c **** 	//Initially R=50%
+  42:PWM_example.c **** 	PWMMR4 = PWM_PERIOD/2;
+  46              		.loc 1 42 0
+  47 0048 753DA0E3 		mov	r3, #7488
+  48 004c 0C3083E2 		add	r3, r3, #12
+  49 0050 403081E5 		str	r3, [r1, #64]
+  43:PWM_example.c **** 
+  44:PWM_example.c **** 	//Reset PWMTC (counter reg.) on match with PWMMR0
+  45:PWM_example.c **** 	PWMMCR=0x02;
+  50              		.loc 1 45 0
+  51 0054 022082E2 		add	r2, r2, #2
+  52 0058 142081E5 		str	r2, [r1, #20]
+  46:PWM_example.c **** 
+  47:PWM_example.c **** 	//Latch PWMMR4
+  48:PWM_example.c **** 	PWMLER=(1<<4);
+  53              		.loc 1 48 0
+  54 005c 1030A0E3 		mov	r3, #16
+  55 0060 503081E5 		str	r3, [r1, #80]
+  49:PWM_example.c **** 
+  50:PWM_example.c **** 	//Reset PWMTC
+  51:PWM_example.c **** 	PWMTCR=0x02;
+  56              		.loc 1 51 0
+  57 0064 C23243E2 		sub	r3, r3, #536870924
+  58 0068 053983E2 		add	r3, r3, #81920
+  59 006c 002083E5 		str	r2, [r3, #0]
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s 			page 3
+
+
+  52:PWM_example.c **** 
+  53:PWM_example.c **** 	//Counter Enable, PWM Mode Enable
+  54:PWM_example.c **** 	PWMTCR=0x09;
+  60              		.loc 1 54 0
+  61 0070 072082E2 		add	r2, r2, #7
+  62 0074 002083E5 		str	r2, [r3, #0]
+  55:PWM_example.c **** }
+  63              		.loc 1 55 0
+  64 0078 1EFF2FE1 		bx	lr
+  65              	.LFE2:
+  66              		.size	PWMInit, .-PWMInit
+  67              		.align	2
+  68              		.global	delay
+  69              		.type	delay, %function
+  70              	delay:
+  71              	.LFB3:
+  56:PWM_example.c **** 
+  57:PWM_example.c **** //*******************************
+  58:PWM_example.c **** // Delay function
+  59:PWM_example.c **** //*******************************
+  60:PWM_example.c **** void delay(unsigned int del_time) 
+  61:PWM_example.c **** { 
+  72              		.loc 1 61 0
+  73              		@ Function supports interworking.
+  74              		@ args = 0, pretend = 0, frame = 0
+  75              		@ frame_needed = 0, uses_anonymous_args = 0
+  76              		@ link register save eliminated.
+  77              	.LVL1:
+  78              		@ lr needed for prologue
+  62:PWM_example.c **** 	unsigned int i;
+  63:PWM_example.c **** 	for(i=0;i<del_time;i++);	   
+  79              		.loc 1 63 0
+  80 007c 000050E3 		cmp	r0, #0
+  81 0080 1EFF2F01 		bxeq	lr
+  82 0084 0030A0E3 		mov	r3, #0
+  83              	.LVL2:
+  84              	.L6:
+  85 0088 013083E2 		add	r3, r3, #1
+  86 008c 030050E1 		cmp	r0, r3
+  87 0090 2000001A 		bne	.L6
+  88 0094 1EFF2FE1 		bx	lr
+  89              	.LFE3:
+  90              		.size	delay, .-delay
+  91              		.section	.rodata.str1.4,"aMS",%progbits,1
+  92              		.align	2
+  93              	.LC0:
+  94 0000 53312B20 		.ascii	"S1+  S2-        \000"
+  94      2053322D 
+  94      20202020 
+  94      20202020 
+  94      00
+  95 0011 000000   		.align	2
+  96              	.LC1:
+  97 0014 52203D20 		.ascii	"R = \000"
+  97      00
+  98 0019 000000   		.align	2
+  99              	.LC2:
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s 			page 4
+
+
+ 100 001c 2E00     		.ascii	".\000"
+ 101 001e 0000     		.align	2
+ 102              	.LC3:
+ 103 0020 25202020 		.ascii	"%               \000"
+ 103      20202020 
+ 103      20202020 
+ 103      20202020 
+ 103      00
+ 104              		.text
+ 105              		.align	2
+ 106              		.global	DisplayRatio
+ 107              		.type	DisplayRatio, %function
+ 108              	DisplayRatio:
+ 109              	.LFB4:
+  64:PWM_example.c **** }
+  65:PWM_example.c **** 
+  66:PWM_example.c **** //*******************************
+  67:PWM_example.c **** // Display PWM ratio
+  68:PWM_example.c **** //*******************************
+  69:PWM_example.c **** void DisplayRatio(void)
+  70:PWM_example.c **** {
+ 110              		.loc 1 70 0
+ 111              		@ Function supports interworking.
+ 112              		@ args = 0, pretend = 0, frame = 0
+ 113              		@ frame_needed = 1, uses_anonymous_args = 0
+ 114 0098 0DC0A0E1 		mov	ip, sp
+ 115              	.LCFI0:
+ 116 009c 30D82DE9 		stmfd	sp!, {r4, r5, fp, ip, lr, pc}
+ 117              	.LCFI1:
+ 118 00a0 04B04CE2 		sub	fp, ip, #4
+ 119              	.LCFI2:
+  71:PWM_example.c **** 	unsigned int tmp;
+  72:PWM_example.c **** 
+  73:PWM_example.c **** 	LCDGotoXY(0,0);
+ 120              		.loc 1 73 0
+ 121 00a4 0000A0E3 		mov	r0, #0
+ 122 00a8 0010A0E1 		mov	r1, r0
+ 123 00ac FEFFFFEB 		bl	LCDGotoXY
+  74:PWM_example.c **** 	LCDText("S1+  S2-        ");
+ 124              		.loc 1 74 0
+ 125 00b0 74009FE5 		ldr	r0, .L11
+ 126 00b4 FEFFFFEB 		bl	LCDText
+  75:PWM_example.c **** 	LCDGotoXY(0,1);
+ 127              		.loc 1 75 0
+ 128 00b8 0000A0E3 		mov	r0, #0
+ 129 00bc 0110A0E3 		mov	r1, #1
+ 130 00c0 FEFFFFEB 		bl	LCDGotoXY
+  76:PWM_example.c **** 	LCDText("R = ");
+ 131              		.loc 1 76 0
+ 132 00c4 64009FE5 		ldr	r0, .L11+4
+ 133 00c8 FEFFFFEB 		bl	LCDText
+  77:PWM_example.c **** 
+  78:PWM_example.c **** 	tmp=(1000*PWMMR4)/PWM_PERIOD;
+ 134              		.loc 1 78 0
+ 135 00cc 0E32A0E3 		mov	r3, #-536870912
+ 136 00d0 053983E2 		add	r3, r3, #81920
+ 137 00d4 403093E5 		ldr	r3, [r3, #64]
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s 			page 5
+
+
+ 138 00d8 832263E0 		rsb	r2, r3, r3, asl #5
+ 139 00dc 023183E0 		add	r3, r3, r2, asl #2
+ 140 00e0 8331A0E1 		mov	r3, r3, asl #3
+ 141 00e4 48209FE5 		ldr	r2, .L11+8
+ 142 00e8 921385E0 		umull	r1, r5, r2, r3
+ 143 00ec 2556A0E1 		mov	r5, r5, lsr #12
+ 144              	.LVL3:
+  79:PWM_example.c **** 
+  80:PWM_example.c **** 	LCD32bitNumberDec(tmp/10);
+ 145              		.loc 1 80 0
+ 146 00f0 40309FE5 		ldr	r3, .L11+12
+ 147 00f4 932584E0 		umull	r2, r4, r3, r5
+ 148 00f8 A441A0E1 		mov	r4, r4, lsr #3
+ 149 00fc 0400A0E1 		mov	r0, r4
+ 150 0100 FEFFFFEB 		bl	LCD32bitNumberDec
+  81:PWM_example.c **** 	LCDText(".");
+ 151              		.loc 1 81 0
+ 152 0104 30009FE5 		ldr	r0, .L11+16
+ 153 0108 FEFFFFEB 		bl	LCDText
+  82:PWM_example.c **** 	LCD32bitNumberDec(tmp%10);
+ 154              		.loc 1 82 0
+ 155 010c 044184E0 		add	r4, r4, r4, asl #2
+ 156 0110 840045E0 		sub	r0, r5, r4, asl #1
+ 157 0114 FEFFFFEB 		bl	LCD32bitNumberDec
+  83:PWM_example.c **** 	LCDText("%               ");
+ 158              		.loc 1 83 0
+ 159 0118 20009FE5 		ldr	r0, .L11+20
+ 160 011c FEFFFFEB 		bl	LCDText
+  84:PWM_example.c **** }
+ 161              		.loc 1 84 0
+ 162 0120 14D04BE2 		sub	sp, fp, #20
+ 163 0124 30689DE8 		ldmfd	sp, {r4, r5, fp, sp, lr}
+ 164 0128 1EFF2FE1 		bx	lr
+ 165              	.L12:
+ 166              		.align	2
+ 167              	.L11:
+ 168 012c 00000000 		.word	.LC0
+ 169 0130 14000000 		.word	.LC1
+ 170 0134 73B2E745 		.word	1172812403
+ 171 0138 CDCCCCCC 		.word	-858993459
+ 172 013c 1C000000 		.word	.LC2
+ 173 0140 20000000 		.word	.LC3
+ 174              	.LFE4:
+ 175              		.size	DisplayRatio, .-DisplayRatio
+ 176              		.section	.rodata.str1.4
+ 177 0031 000000   		.align	2
+ 178              	.LC4:
+ 179 0034 50574D20 		.ascii	"PWM example\000"
+ 179      6578616D 
+ 179      706C6500 
+ 180              		.align	2
+ 181              	.LC5:
+ 182 0040 53312B20 		.ascii	"S1+  S2-\000"
+ 182      2053322D 
+ 182      00
+ 183 0049 000000   		.text
+ 184              		.align	2
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s 			page 6
+
+
+ 185              		.global	main
+ 186              		.type	main, %function
+ 187              	main:
+ 188              	.LFB5:
+  85:PWM_example.c **** 
+  86:PWM_example.c **** //*******************************
+  87:PWM_example.c **** // MAIN
+  88:PWM_example.c **** //*******************************
+  89:PWM_example.c **** int main(void)
+  90:PWM_example.c **** {
+ 189              		.loc 1 90 0
+ 190              		@ Function supports interworking.
+ 191              		@ args = 0, pretend = 0, frame = 0
+ 192              		@ frame_needed = 1, uses_anonymous_args = 0
+ 193 0144 0DC0A0E1 		mov	ip, sp
+ 194              	.LCFI3:
+ 195 0148 30D82DE9 		stmfd	sp!, {r4, r5, fp, ip, lr, pc}
+ 196              	.LCFI4:
+ 197 014c 04B04CE2 		sub	fp, ip, #4
+ 198              	.LCFI5:
+  91:PWM_example.c **** 	//Peripherials' frequency = fclk/4 = 15MHz
+  92:PWM_example.c **** 	VPBDIV&=0xFFFFFFFC;
+ 199              		.loc 1 92 0
+ 200 0150 0E12A0E3 		mov	r1, #-536870912
+ 201 0154 7F2981E2 		add	r2, r1, #2080768
+ 202 0158 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+ 203 015c FC3003E2 		and	r3, r3, #252
+ 204 0160 0031C2E5 		strb	r3, [r2, #256]
+  93:PWM_example.c **** 	VPBDIV|=0x00;
+ 205              		.loc 1 93 0
+ 206 0164 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+ 207 0168 FF3003E2 		and	r3, r3, #255
+ 208 016c 0031C2E5 		strb	r3, [r2, #256]
+  94:PWM_example.c **** 
+  95:PWM_example.c **** 	//Port direction configuration
+  96:PWM_example.c **** 	IODIR0 = 0xFF000000;
+ 209              		.loc 1 96 0
+ 210 0170 FF24A0E3 		mov	r2, #-16777216
+ 211 0174 8E32A0E3 		mov	r3, #-536870904
+ 212 0178 0A3983E2 		add	r3, r3, #163840
+ 213 017c 002083E5 		str	r2, [r3, #0]
+  97:PWM_example.c **** 	IODIR1 = 0x00FF0000;
+ 214              		.loc 1 97 0
+ 215 0180 0A1981E2 		add	r1, r1, #163840
+ 216 0184 FF38A0E3 		mov	r3, #16711680
+ 217 0188 183081E5 		str	r3, [r1, #24]
+  98:PWM_example.c **** 
+  99:PWM_example.c **** 	LCDInit();
+ 218              		.loc 1 99 0
+ 219 018c FEFFFFEB 		bl	LCDInit
+ 100:PWM_example.c **** 
+ 101:PWM_example.c **** 	LCDClear();
+ 220              		.loc 1 101 0
+ 221 0190 FEFFFFEB 		bl	LCDClear
+ 102:PWM_example.c **** 
+ 103:PWM_example.c **** 	LCDText("PWM example");
+ 222              		.loc 1 103 0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s 			page 7
+
+
+ 223 0194 D4009FE5 		ldr	r0, .L24
+ 224 0198 FEFFFFEB 		bl	LCDText
+ 104:PWM_example.c **** 	LCDGotoXY(0,1);
+ 225              		.loc 1 104 0
+ 226 019c 0000A0E3 		mov	r0, #0
+ 227 01a0 0110A0E3 		mov	r1, #1
+ 228 01a4 FEFFFFEB 		bl	LCDGotoXY
+ 105:PWM_example.c **** 	LCDText("S1+  S2-");
+ 229              		.loc 1 105 0
+ 230 01a8 C4009FE5 		ldr	r0, .L24+4
+ 231 01ac FEFFFFEB 		bl	LCDText
+ 106:PWM_example.c **** 	delay(0x1000000);
+ 232              		.loc 1 106 0
+ 233 01b0 0104A0E3 		mov	r0, #16777216
+ 234 01b4 FEFFFFEB 		bl	delay
+ 107:PWM_example.c **** 
+ 108:PWM_example.c **** 	PWMInit();
+ 235              		.loc 1 108 0
+ 236 01b8 FEFFFFEB 		bl	PWMInit
+ 109:PWM_example.c **** 
+ 110:PWM_example.c **** 	DisplayRatio();
+ 237              		.loc 1 110 0
+ 238 01bc FEFFFFEB 		bl	DisplayRatio
+ 239 01c0 0E32A0E3 		mov	r3, #-536870912
+ 240 01c4 0A4983E2 		add	r4, r3, #163840
+ 241 01c8 055983E2 		add	r5, r3, #81920
+ 242              	.L14:
+ 111:PWM_example.c **** 
+ 112:PWM_example.c **** 	//Loop forever
+ 113:PWM_example.c **** 	while(1)
+ 114:PWM_example.c **** 	{
+ 115:PWM_example.c **** 		if(SW1==0)
+ 243              		.loc 1 115 0
+ 244 01cc 003094E5 		ldr	r3, [r4, #0]
+ 245 01d0 100013E3 		tst	r3, #16
+ 246 01d4 8000001A 		bne	.L15
+ 116:PWM_example.c **** 		{
+ 117:PWM_example.c **** 			if(PWMMR4<(PWM_PERIOD-PWM_STEP))
+ 247              		.loc 1 117 0
+ 248 01d8 402095E5 		ldr	r2, [r5, #64]
+ 249 01dc 3A3CA0E3 		mov	r3, #14848
+ 250 01e0 013083E2 		add	r3, r3, #1
+ 251 01e4 030052E1 		cmp	r2, r3
+ 252 01e8 8E00008A 		bhi	.L17
+ 118:PWM_example.c **** 			{
+ 119:PWM_example.c **** 				PWMMR4+=PWM_STEP;
+ 253              		.loc 1 119 0
+ 254 01ec 403095E5 		ldr	r3, [r5, #64]
+ 255 01f0 963083E2 		add	r3, r3, #150
+ 256 01f4 403085E5 		str	r3, [r5, #64]
+ 120:PWM_example.c **** 				PWMLER=(1<<4);
+ 257              		.loc 1 120 0
+ 258 01f8 1030A0E3 		mov	r3, #16
+ 259 01fc 503085E5 		str	r3, [r5, #80]
+ 121:PWM_example.c **** 				DisplayRatio();
+ 260              		.loc 1 121 0
+ 261 0200 FEFFFFEB 		bl	DisplayRatio
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s 			page 8
+
+
+ 262 0204 8E0000EA 		b	.L17
+ 263              	.L15:
+ 122:PWM_example.c **** 			}
+ 123:PWM_example.c **** 		}
+ 124:PWM_example.c **** 		else if(SW2==0)
+ 264              		.loc 1 124 0
+ 265 0208 003094E5 		ldr	r3, [r4, #0]
+ 266 020c 200013E3 		tst	r3, #32
+ 267 0210 8E00001A 		bne	.L17
+ 125:PWM_example.c **** 		{
+ 126:PWM_example.c **** 			if(PWMMR4>PWM_STEP)
+ 268              		.loc 1 126 0
+ 269 0214 0E32A0E3 		mov	r3, #-536870912
+ 270 0218 052983E2 		add	r2, r3, #81920
+ 271 021c 403092E5 		ldr	r3, [r2, #64]
+ 272 0220 960053E3 		cmp	r3, #150
+ 273 0224 8E00009A 		bls	.L17
+ 127:PWM_example.c **** 			{
+ 128:PWM_example.c **** 				PWMMR4-=PWM_STEP;
+ 274              		.loc 1 128 0
+ 275 0228 403092E5 		ldr	r3, [r2, #64]
+ 276 022c 963043E2 		sub	r3, r3, #150
+ 277 0230 403082E5 		str	r3, [r2, #64]
+ 129:PWM_example.c **** 				PWMLER=(1<<4);
+ 278              		.loc 1 129 0
+ 279 0234 1030A0E3 		mov	r3, #16
+ 280 0238 503082E5 		str	r3, [r2, #80]
+ 130:PWM_example.c **** 				DisplayRatio();
+ 281              		.loc 1 130 0
+ 282 023c FEFFFFEB 		bl	DisplayRatio
+ 283              	.L17:
+ 131:PWM_example.c **** 			}
+ 132:PWM_example.c **** 		}
+ 133:PWM_example.c **** 
+ 134:PWM_example.c **** 		if(!SW1|!SW2)
+ 284              		.loc 1 134 0
+ 285 0240 002094E5 		ldr	r2, [r4, #0]
+ 286 0244 003094E5 		ldr	r3, [r4, #0]
+ 287 0248 102022E2 		eor	r2, r2, #16
+ 288 024c A332A0E1 		mov	r3, r3, lsr #5
+ 289 0250 013023E2 		eor	r3, r3, #1
+ 290 0254 223283E1 		orr	r3, r3, r2, lsr #4
+ 291 0258 010013E3 		tst	r3, #1
+ 135:PWM_example.c **** 			delay(0x80000);
+ 292              		.loc 1 135 0
+ 293 025c 0207A013 		movne	r0, #524288
+ 294 0260 FEFFFF1B 		blne	delay
+ 295              	.L21:
+ 136:PWM_example.c **** 
+ 137:PWM_example.c **** 		SW_DELAY;
+ 296              		.loc 1 137 0
+ 297 0264 020AA0E3 		mov	r0, #8192
+ 298 0268 FEFFFFEB 		bl	delay
+ 299 026c 710000EA 		b	.L14
+ 300              	.L25:
+ 301              		.align	2
+ 302              	.L24:
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s 			page 9
+
+
+ 303 0270 34000000 		.word	.LC4
+ 304 0274 40000000 		.word	.LC5
+ 305              	.LFE5:
+ 306              		.size	main, .-main
+ 307              		.section	.debug_frame,"",%progbits
+ 308              	.Lframe0:
+ 309 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ 310              	.LSCIE0:
+ 311 0004 FFFFFFFF 		.4byte	0xffffffff
+ 312 0008 01       		.byte	0x1
+ 313 0009 00       		.ascii	"\000"
+ 314 000a 01       		.uleb128 0x1
+ 315 000b 7C       		.sleb128 -4
+ 316 000c 0E       		.byte	0xe
+ 317 000d 0C       		.byte	0xc
+ 318 000e 0D       		.uleb128 0xd
+ 319 000f 00       		.uleb128 0x0
+ 320              		.align	2
+ 321              	.LECIE0:
+ 322              	.LSFDE0:
+ 323 0010 0C000000 		.4byte	.LEFDE0-.LASFDE0
+ 324              	.LASFDE0:
+ 325 0014 00000000 		.4byte	.Lframe0
+ 326 0018 00000000 		.4byte	.LFB2
+ 327 001c 7C000000 		.4byte	.LFE2-.LFB2
+ 328              		.align	2
+ 329              	.LEFDE0:
+ 330              	.LSFDE2:
+ 331 0020 0C000000 		.4byte	.LEFDE2-.LASFDE2
+ 332              	.LASFDE2:
+ 333 0024 00000000 		.4byte	.Lframe0
+ 334 0028 7C000000 		.4byte	.LFB3
+ 335 002c 1C000000 		.4byte	.LFE3-.LFB3
+ 336              		.align	2
+ 337              	.LEFDE2:
+ 338              	.LSFDE4:
+ 339 0030 20000000 		.4byte	.LEFDE4-.LASFDE4
+ 340              	.LASFDE4:
+ 341 0034 00000000 		.4byte	.Lframe0
+ 342 0038 98000000 		.4byte	.LFB4
+ 343 003c AC000000 		.4byte	.LFE4-.LFB4
+ 344 0040 44       		.byte	0x4
+ 345              		.4byte	.LCFI0-.LFB4
+ 346 0041 0D       		.byte	0xd
+ 347 0042 0C       		.uleb128 0xc
+ 348 0043 44       		.byte	0x4
+ 349              		.4byte	.LCFI1-.LCFI0
+ 350 0044 8E       		.byte	0x8e
+ 351 0045 02       		.uleb128 0x2
+ 352 0046 8D       		.byte	0x8d
+ 353 0047 03       		.uleb128 0x3
+ 354 0048 8B       		.byte	0x8b
+ 355 0049 04       		.uleb128 0x4
+ 356 004a 85       		.byte	0x85
+ 357 004b 05       		.uleb128 0x5
+ 358 004c 84       		.byte	0x84
+ 359 004d 06       		.uleb128 0x6
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s 			page 10
+
+
+ 360 004e 44       		.byte	0x4
+ 361              		.4byte	.LCFI2-.LCFI1
+ 362 004f 0C       		.byte	0xc
+ 363 0050 0B       		.uleb128 0xb
+ 364 0051 04       		.uleb128 0x4
+ 365 0052 0000     		.align	2
+ 366              	.LEFDE4:
+ 367              	.LSFDE6:
+ 368 0054 20000000 		.4byte	.LEFDE6-.LASFDE6
+ 369              	.LASFDE6:
+ 370 0058 00000000 		.4byte	.Lframe0
+ 371 005c 44010000 		.4byte	.LFB5
+ 372 0060 34010000 		.4byte	.LFE5-.LFB5
+ 373 0064 44       		.byte	0x4
+ 374              		.4byte	.LCFI3-.LFB5
+ 375 0065 0D       		.byte	0xd
+ 376 0066 0C       		.uleb128 0xc
+ 377 0067 44       		.byte	0x4
+ 378              		.4byte	.LCFI4-.LCFI3
+ 379 0068 8E       		.byte	0x8e
+ 380 0069 02       		.uleb128 0x2
+ 381 006a 8D       		.byte	0x8d
+ 382 006b 03       		.uleb128 0x3
+ 383 006c 8B       		.byte	0x8b
+ 384 006d 04       		.uleb128 0x4
+ 385 006e 85       		.byte	0x85
+ 386 006f 05       		.uleb128 0x5
+ 387 0070 84       		.byte	0x84
+ 388 0071 06       		.uleb128 0x6
+ 389 0072 44       		.byte	0x4
+ 390              		.4byte	.LCFI5-.LCFI4
+ 391 0073 0C       		.byte	0xc
+ 392 0074 0B       		.uleb128 0xb
+ 393 0075 04       		.uleb128 0x4
+ 394 0076 0000     		.align	2
+ 395              	.LEFDE6:
+ 396              		.text
+ 397              	.Letext0:
+ 398              		.section	.debug_info
+ 399 0000 B1000000 		.4byte	0xb1
+ 400 0004 0200     		.2byte	0x2
+ 401 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 402 000a 04       		.byte	0x4
+ 403 000b 01       		.uleb128 0x1
+ 404 000c 00000000 		.4byte	.Ldebug_line0
+ 405 0010 78020000 		.4byte	.Letext0
+ 406 0014 00000000 		.4byte	.Ltext0
+ 407 0018 31000000 		.4byte	.LASF5
+ 408 001c 01       		.byte	0x1
+ 409 001d 42000000 		.4byte	.LASF6
+ 410 0021 50000000 		.4byte	.LASF7
+ 411 0025 02       		.uleb128 0x2
+ 412 0026 01       		.byte	0x1
+ 413 0027 16000000 		.4byte	.LASF2
+ 414 002b 01       		.byte	0x1
+ 415 002c 1B       		.byte	0x1b
+ 416 002d 01       		.byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s 			page 11
+
+
+ 417 002e 00000000 		.4byte	.LFB2
+ 418 0032 7C000000 		.4byte	.LFE2
+ 419 0036 02       		.byte	0x2
+ 420 0037 7D       		.byte	0x7d
+ 421 0038 00       		.sleb128 0
+ 422 0039 03       		.uleb128 0x3
+ 423 003a 6A000000 		.4byte	0x6a
+ 424 003e 01       		.byte	0x1
+ 425 003f 2B000000 		.4byte	.LASF0
+ 426 0043 01       		.byte	0x1
+ 427 0044 3D       		.byte	0x3d
+ 428 0045 01       		.byte	0x1
+ 429 0046 7C000000 		.4byte	.LFB3
+ 430 004a 98000000 		.4byte	.LFE3
+ 431 004e 02       		.byte	0x2
+ 432 004f 7D       		.byte	0x7d
+ 433 0050 00       		.sleb128 0
+ 434 0051 04       		.uleb128 0x4
+ 435 0052 0D000000 		.4byte	.LASF8
+ 436 0056 01       		.byte	0x1
+ 437 0057 3C       		.byte	0x3c
+ 438 0058 6A000000 		.4byte	0x6a
+ 439 005c 01       		.byte	0x1
+ 440 005d 50       		.byte	0x50
+ 441 005e 05       		.uleb128 0x5
+ 442 005f 6900     		.ascii	"i\000"
+ 443 0061 01       		.byte	0x1
+ 444 0062 3E       		.byte	0x3e
+ 445 0063 6A000000 		.4byte	0x6a
+ 446 0067 01       		.byte	0x1
+ 447 0068 53       		.byte	0x53
+ 448 0069 00       		.byte	0x0
+ 449 006a 06       		.uleb128 0x6
+ 450 006b 00000000 		.4byte	.LASF4
+ 451 006f 04       		.byte	0x4
+ 452 0070 07       		.byte	0x7
+ 453 0071 03       		.uleb128 0x3
+ 454 0072 96000000 		.4byte	0x96
+ 455 0076 01       		.byte	0x1
+ 456 0077 1E000000 		.4byte	.LASF1
+ 457 007b 01       		.byte	0x1
+ 458 007c 46       		.byte	0x46
+ 459 007d 01       		.byte	0x1
+ 460 007e 98000000 		.4byte	.LFB4
+ 461 0082 44010000 		.4byte	.LFE4
+ 462 0086 01       		.byte	0x1
+ 463 0087 5B       		.byte	0x5b
+ 464 0088 05       		.uleb128 0x5
+ 465 0089 746D7000 		.ascii	"tmp\000"
+ 466 008d 01       		.byte	0x1
+ 467 008e 47       		.byte	0x47
+ 468 008f 6A000000 		.4byte	0x6a
+ 469 0093 01       		.byte	0x1
+ 470 0094 55       		.byte	0x55
+ 471 0095 00       		.byte	0x0
+ 472 0096 07       		.uleb128 0x7
+ 473 0097 01       		.byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s 			page 12
+
+
+ 474 0098 3D000000 		.4byte	.LASF3
+ 475 009c 01       		.byte	0x1
+ 476 009d 5A       		.byte	0x5a
+ 477 009e 01       		.byte	0x1
+ 478 009f AD000000 		.4byte	0xad
+ 479 00a3 44010000 		.4byte	.LFB5
+ 480 00a7 78020000 		.4byte	.LFE5
+ 481 00ab 01       		.byte	0x1
+ 482 00ac 5B       		.byte	0x5b
+ 483 00ad 08       		.uleb128 0x8
+ 484 00ae 696E7400 		.ascii	"int\000"
+ 485 00b2 04       		.byte	0x4
+ 486 00b3 05       		.byte	0x5
+ 487 00b4 00       		.byte	0x0
+ 488              		.section	.debug_abbrev
+ 489 0000 01       		.uleb128 0x1
+ 490 0001 11       		.uleb128 0x11
+ 491 0002 01       		.byte	0x1
+ 492 0003 10       		.uleb128 0x10
+ 493 0004 06       		.uleb128 0x6
+ 494 0005 12       		.uleb128 0x12
+ 495 0006 01       		.uleb128 0x1
+ 496 0007 11       		.uleb128 0x11
+ 497 0008 01       		.uleb128 0x1
+ 498 0009 25       		.uleb128 0x25
+ 499 000a 0E       		.uleb128 0xe
+ 500 000b 13       		.uleb128 0x13
+ 501 000c 0B       		.uleb128 0xb
+ 502 000d 03       		.uleb128 0x3
+ 503 000e 0E       		.uleb128 0xe
+ 504 000f 1B       		.uleb128 0x1b
+ 505 0010 0E       		.uleb128 0xe
+ 506 0011 00       		.byte	0x0
+ 507 0012 00       		.byte	0x0
+ 508 0013 02       		.uleb128 0x2
+ 509 0014 2E       		.uleb128 0x2e
+ 510 0015 00       		.byte	0x0
+ 511 0016 3F       		.uleb128 0x3f
+ 512 0017 0C       		.uleb128 0xc
+ 513 0018 03       		.uleb128 0x3
+ 514 0019 0E       		.uleb128 0xe
+ 515 001a 3A       		.uleb128 0x3a
+ 516 001b 0B       		.uleb128 0xb
+ 517 001c 3B       		.uleb128 0x3b
+ 518 001d 0B       		.uleb128 0xb
+ 519 001e 27       		.uleb128 0x27
+ 520 001f 0C       		.uleb128 0xc
+ 521 0020 11       		.uleb128 0x11
+ 522 0021 01       		.uleb128 0x1
+ 523 0022 12       		.uleb128 0x12
+ 524 0023 01       		.uleb128 0x1
+ 525 0024 40       		.uleb128 0x40
+ 526 0025 0A       		.uleb128 0xa
+ 527 0026 00       		.byte	0x0
+ 528 0027 00       		.byte	0x0
+ 529 0028 03       		.uleb128 0x3
+ 530 0029 2E       		.uleb128 0x2e
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s 			page 13
+
+
+ 531 002a 01       		.byte	0x1
+ 532 002b 01       		.uleb128 0x1
+ 533 002c 13       		.uleb128 0x13
+ 534 002d 3F       		.uleb128 0x3f
+ 535 002e 0C       		.uleb128 0xc
+ 536 002f 03       		.uleb128 0x3
+ 537 0030 0E       		.uleb128 0xe
+ 538 0031 3A       		.uleb128 0x3a
+ 539 0032 0B       		.uleb128 0xb
+ 540 0033 3B       		.uleb128 0x3b
+ 541 0034 0B       		.uleb128 0xb
+ 542 0035 27       		.uleb128 0x27
+ 543 0036 0C       		.uleb128 0xc
+ 544 0037 11       		.uleb128 0x11
+ 545 0038 01       		.uleb128 0x1
+ 546 0039 12       		.uleb128 0x12
+ 547 003a 01       		.uleb128 0x1
+ 548 003b 40       		.uleb128 0x40
+ 549 003c 0A       		.uleb128 0xa
+ 550 003d 00       		.byte	0x0
+ 551 003e 00       		.byte	0x0
+ 552 003f 04       		.uleb128 0x4
+ 553 0040 05       		.uleb128 0x5
+ 554 0041 00       		.byte	0x0
+ 555 0042 03       		.uleb128 0x3
+ 556 0043 0E       		.uleb128 0xe
+ 557 0044 3A       		.uleb128 0x3a
+ 558 0045 0B       		.uleb128 0xb
+ 559 0046 3B       		.uleb128 0x3b
+ 560 0047 0B       		.uleb128 0xb
+ 561 0048 49       		.uleb128 0x49
+ 562 0049 13       		.uleb128 0x13
+ 563 004a 02       		.uleb128 0x2
+ 564 004b 0A       		.uleb128 0xa
+ 565 004c 00       		.byte	0x0
+ 566 004d 00       		.byte	0x0
+ 567 004e 05       		.uleb128 0x5
+ 568 004f 34       		.uleb128 0x34
+ 569 0050 00       		.byte	0x0
+ 570 0051 03       		.uleb128 0x3
+ 571 0052 08       		.uleb128 0x8
+ 572 0053 3A       		.uleb128 0x3a
+ 573 0054 0B       		.uleb128 0xb
+ 574 0055 3B       		.uleb128 0x3b
+ 575 0056 0B       		.uleb128 0xb
+ 576 0057 49       		.uleb128 0x49
+ 577 0058 13       		.uleb128 0x13
+ 578 0059 02       		.uleb128 0x2
+ 579 005a 0A       		.uleb128 0xa
+ 580 005b 00       		.byte	0x0
+ 581 005c 00       		.byte	0x0
+ 582 005d 06       		.uleb128 0x6
+ 583 005e 24       		.uleb128 0x24
+ 584 005f 00       		.byte	0x0
+ 585 0060 03       		.uleb128 0x3
+ 586 0061 0E       		.uleb128 0xe
+ 587 0062 0B       		.uleb128 0xb
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s 			page 14
+
+
+ 588 0063 0B       		.uleb128 0xb
+ 589 0064 3E       		.uleb128 0x3e
+ 590 0065 0B       		.uleb128 0xb
+ 591 0066 00       		.byte	0x0
+ 592 0067 00       		.byte	0x0
+ 593 0068 07       		.uleb128 0x7
+ 594 0069 2E       		.uleb128 0x2e
+ 595 006a 00       		.byte	0x0
+ 596 006b 3F       		.uleb128 0x3f
+ 597 006c 0C       		.uleb128 0xc
+ 598 006d 03       		.uleb128 0x3
+ 599 006e 0E       		.uleb128 0xe
+ 600 006f 3A       		.uleb128 0x3a
+ 601 0070 0B       		.uleb128 0xb
+ 602 0071 3B       		.uleb128 0x3b
+ 603 0072 0B       		.uleb128 0xb
+ 604 0073 27       		.uleb128 0x27
+ 605 0074 0C       		.uleb128 0xc
+ 606 0075 49       		.uleb128 0x49
+ 607 0076 13       		.uleb128 0x13
+ 608 0077 11       		.uleb128 0x11
+ 609 0078 01       		.uleb128 0x1
+ 610 0079 12       		.uleb128 0x12
+ 611 007a 01       		.uleb128 0x1
+ 612 007b 40       		.uleb128 0x40
+ 613 007c 0A       		.uleb128 0xa
+ 614 007d 00       		.byte	0x0
+ 615 007e 00       		.byte	0x0
+ 616 007f 08       		.uleb128 0x8
+ 617 0080 24       		.uleb128 0x24
+ 618 0081 00       		.byte	0x0
+ 619 0082 03       		.uleb128 0x3
+ 620 0083 08       		.uleb128 0x8
+ 621 0084 0B       		.uleb128 0xb
+ 622 0085 0B       		.uleb128 0xb
+ 623 0086 3E       		.uleb128 0x3e
+ 624 0087 0B       		.uleb128 0xb
+ 625 0088 00       		.byte	0x0
+ 626 0089 00       		.byte	0x0
+ 627 008a 00       		.byte	0x0
+ 628              		.section	.debug_pubnames,"",%progbits
+ 629 0000 3E000000 		.4byte	0x3e
+ 630 0004 0200     		.2byte	0x2
+ 631 0006 00000000 		.4byte	.Ldebug_info0
+ 632 000a B5000000 		.4byte	0xb5
+ 633 000e 25000000 		.4byte	0x25
+ 634 0012 50574D49 		.ascii	"PWMInit\000"
+ 634      6E697400 
+ 635 001a 39000000 		.4byte	0x39
+ 636 001e 64656C61 		.ascii	"delay\000"
+ 636      7900
+ 637 0024 71000000 		.4byte	0x71
+ 638 0028 44697370 		.ascii	"DisplayRatio\000"
+ 638      6C617952 
+ 638      6174696F 
+ 638      00
+ 639 0035 96000000 		.4byte	0x96
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s 			page 15
+
+
+ 640 0039 6D61696E 		.ascii	"main\000"
+ 640      00
+ 641 003e 00000000 		.4byte	0x0
+ 642              		.section	.debug_aranges,"",%progbits
+ 643 0000 1C000000 		.4byte	0x1c
+ 644 0004 0200     		.2byte	0x2
+ 645 0006 00000000 		.4byte	.Ldebug_info0
+ 646 000a 04       		.byte	0x4
+ 647 000b 00       		.byte	0x0
+ 648 000c 0000     		.2byte	0x0
+ 649 000e 0000     		.2byte	0x0
+ 650 0010 00000000 		.4byte	.Ltext0
+ 651 0014 78020000 		.4byte	.Letext0-.Ltext0
+ 652 0018 00000000 		.4byte	0x0
+ 653 001c 00000000 		.4byte	0x0
+ 654              		.section	.debug_str,"MS",%progbits,1
+ 655              	.LASF4:
+ 656 0000 756E7369 		.ascii	"unsigned int\000"
+ 656      676E6564 
+ 656      20696E74 
+ 656      00
+ 657              	.LASF8:
+ 658 000d 64656C5F 		.ascii	"del_time\000"
+ 658      74696D65 
+ 658      00
+ 659              	.LASF2:
+ 660 0016 50574D49 		.ascii	"PWMInit\000"
+ 660      6E697400 
+ 661              	.LASF1:
+ 662 001e 44697370 		.ascii	"DisplayRatio\000"
+ 662      6C617952 
+ 662      6174696F 
+ 662      00
+ 663              	.LASF0:
+ 664 002b 64656C61 		.ascii	"delay\000"
+ 664      7900
+ 665              	.LASF5:
+ 666 0031 474E5520 		.ascii	"GNU C 4.0.1\000"
+ 666      4320342E 
+ 666      302E3100 
+ 667              	.LASF3:
+ 668 003d 6D61696E 		.ascii	"main\000"
+ 668      00
+ 669              	.LASF6:
+ 670 0042 50574D5F 		.ascii	"PWM_example.c\000"
+ 670      6578616D 
+ 670      706C652E 
+ 670      6300
+ 671              	.LASF7:
+ 672 0050 2F637967 		.ascii	"/cygdrive/d/Ksiazka_ARM/Przykladowe_aplikacje/Wykor"
+ 672      64726976 
+ 672      652F642F 
+ 672      4B736961 
+ 672      7A6B615F 
+ 673 0083 7A797374 		.ascii	"zystanie_PWM/Wykorzystanie_PWM_uP\000"
+ 673      616E6965 
+ 673      5F50574D 
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s 			page 16
+
+
+ 673      2F57796B 
+ 673      6F727A79 
+ 674              		.ident	"GCC: (GNU) 4.0.1"
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s 			page 17
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 PWM_example.c
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s:13     .text:00000000 PWMInit
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s:24     .text:00000000 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s:70     .text:0000007c delay
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s:108    .text:00000098 DisplayRatio
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s:168    .text:0000012c $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s:187    .text:00000144 main
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s:193    .text:00000144 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccxGwtej.s:303    .text:00000270 $d
+
+UNDEFINED SYMBOLS
+LCDGotoXY
+LCDText
+LCD32bitNumberDec
+LCDInit
+LCDClear

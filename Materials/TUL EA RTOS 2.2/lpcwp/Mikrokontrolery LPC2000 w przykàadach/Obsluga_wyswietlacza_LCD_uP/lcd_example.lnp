@@ -1,0 +1,1 @@
+-T .\Flash.ld -mthumb-interwork -Wl,-Ttext=0x00000000,-Tdata=0x40000000 --gc-sections -o lcd_example.elf "startup.o" "lcd.o" "lcd_example.o" -nostartfiles -nodefaultlibs

@@ -1,0 +1,421 @@
+   1              		.file	"NestedInterrupts.c"
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	EINT2Init
+  13              	EINT2Init:
+  14              	.LFB2:
+  15              		.file 1 "NestedInterrupts.c"
+   1:NestedInterrupts.c **** ////////////////////////////////////////////////////////
+   2:NestedInterrupts.c **** // Function:	Nested interrupts example.
+   3:NestedInterrupts.c **** // Target:		LPC2138
+   4:NestedInterrupts.c **** // Board:		ZL6ARM
+   5:NestedInterrupts.c **** // Quartz:		12MHz
+   6:NestedInterrupts.c **** // Compiler:	ARM-GCC
+   7:NestedInterrupts.c **** // Author:		Arkadiusz Antoniak @ 2005, Poland
+   8:NestedInterrupts.c **** // Copyright:	(c) Arkadiusz Antoniak, 2005
+   9:NestedInterrupts.c **** ////////////////////////////////////////////////////////
+  10:NestedInterrupts.c **** #include <LPC213x.H>	    
+  11:NestedInterrupts.c **** #include "lcd.h"
+  12:NestedInterrupts.c **** 
+  13:NestedInterrupts.c **** // Macro for enabling interrupts, moving to System mode and relevant stack operations
+  14:NestedInterrupts.c **** #define IENABLE /* Nested Interrupts Entry */ \
+  15:NestedInterrupts.c **** asm ( "MRS LR, SPSR" ); /* Copy SPSR_irq to LR */ \
+  16:NestedInterrupts.c **** asm ( "STMFD SP!, {LR}" ); /* Save SPSR_irq */ \
+  17:NestedInterrupts.c **** asm ( "MSR CPSR_c, #0x1F" ); /* Enable IRQ (Sys Mode) */ \
+  18:NestedInterrupts.c **** asm ( "STMFD SP!, {LR}" ); /* Save LR */ \
+  19:NestedInterrupts.c **** 
+  20:NestedInterrupts.c **** // Macro for disabling interrupts, switching back to IRQ and relevant stack operations
+  21:NestedInterrupts.c **** #define IDISABLE /* Nested Interrupts Exit */ \
+  22:NestedInterrupts.c **** asm ( "LDMFD SP!, {LR}" ); /* Restore LR */ \
+  23:NestedInterrupts.c **** asm ( "MSR CPSR_c, #0x92" ); /* Disable IRQ (IRQ Mode) */ \
+  24:NestedInterrupts.c **** asm ( "LDMFD SP!, {LR}" ); /* Restore SPSR_irq to LR */ \
+  25:NestedInterrupts.c **** asm ( "MSR SPSR_cxsf, LR" ); /* Copy LR to SPSR_irq */ \
+  26:NestedInterrupts.c **** 
+  27:NestedInterrupts.c **** 
+  28:NestedInterrupts.c **** //Timer0 interrupt handler's header
+  29:NestedInterrupts.c **** void tc0 (void) __attribute__ ((interrupt("IRQ")));
+  30:NestedInterrupts.c **** 
+  31:NestedInterrupts.c **** //EINT2 interrupt handler's header
+  32:NestedInterrupts.c **** void EINT2ISR(void) __attribute__ ((interrupt("IRQ")));
+  33:NestedInterrupts.c **** 
+  34:NestedInterrupts.c **** //*******************************
+  35:NestedInterrupts.c **** // EINT2 Init
+  36:NestedInterrupts.c **** //*******************************
+  37:NestedInterrupts.c **** void EINT2Init(void)
+  38:NestedInterrupts.c **** {
+  16              		.loc 1 38 0
+  17              		@ Function supports interworking.
+  18              		@ args = 0, pretend = 0, frame = 0
+  19              		@ frame_needed = 0, uses_anonymous_args = 0
+  20              		@ link register save eliminated.
+  21              	.LVL0:
+  22              		@ lr needed for prologue
+  39:NestedInterrupts.c **** 	//P0.7=EINT2
+  40:NestedInterrupts.c **** 	PINSEL0|=(3<<14);
+  23              		.loc 1 40 0
+  24 0000 0E22A0E3 		mov	r2, #-536870912
+  25 0004 0B1982E2 		add	r1, r2, #180224
+  26 0008 003091E5 		ldr	r3, [r1, #0]
+  27 000c 033983E3 		orr	r3, r3, #49152
+  28 0010 003081E5 		str	r3, [r1, #0]
+  41:NestedInterrupts.c **** 	
+  42:NestedInterrupts.c **** 	//EXT4 edge trigered
+  43:NestedInterrupts.c **** 	EXTMODE=(1<<2);
+  29              		.loc 1 43 0
+  30 0014 7F2982E2 		add	r2, r2, #2080768
+  31 0018 0430A0E3 		mov	r3, #4
+  32 001c 4831C2E5 		strb	r3, [r2, #328]
+  44:NestedInterrupts.c **** 	
+  45:NestedInterrupts.c **** 	//Falling edge
+  46:NestedInterrupts.c **** 	EXTPOLAR=0;
+  33              		.loc 1 46 0
+  34 0020 043043E2 		sub	r3, r3, #4
+  35 0024 4C31C2E5 		strb	r3, [r2, #332]
+  47:NestedInterrupts.c **** 
+  48:NestedInterrupts.c **** 	//VIC Slot 1 used for handling EINT2 IRQ
+  49:NestedInterrupts.c **** 	VICVectCntl1 = 0x00000030;
+  36              		.loc 1 49 0
+  37 0028 3020A0E3 		mov	r2, #48
+  38 002c DF3EE0E3 		mvn	r3, #3568
+  39 0030 0B2003E5 		str	r2, [r3, #-11]
+  50:NestedInterrupts.c **** 	VICVectAddr1 = (unsigned int)EINT2ISR;
+  40              		.loc 1 50 0
+  41 0034 18209FE5 		ldr	r2, .L3
+  42 0038 013C43E2 		sub	r3, r3, #256
+  43 003c 0B2003E5 		str	r2, [r3, #-11]
+  51:NestedInterrupts.c **** 	VICIntEnable |= 0x00010000;
+  44              		.loc 1 51 0
+  45 0040 FE2EE0E3 		mvn	r2, #4064
+  46 0044 0F3012E5 		ldr	r3, [r2, #-15]
+  47 0048 013883E3 		orr	r3, r3, #65536
+  48 004c 0F3002E5 		str	r3, [r2, #-15]
+  52:NestedInterrupts.c **** }
+  49              		.loc 1 52 0
+  50 0050 1EFF2FE1 		bx	lr
+  51              	.L4:
+  52              		.align	2
+  53              	.L3:
+  54 0054 00000000 		.word	EINT2ISR
+  55              	.LFE2:
+  57              		.align	2
+  58              		.global	InitTimer0
+  60              	InitTimer0:
+  61              	.LFB3:
+  53:NestedInterrupts.c **** 
+  54:NestedInterrupts.c **** //*******************************
+  55:NestedInterrupts.c **** // Setup the Timer Counter 0
+  56:NestedInterrupts.c **** //*******************************
+  57:NestedInterrupts.c **** void InitTimer0(void) 
+  58:NestedInterrupts.c **** {
+  62              		.loc 1 58 0
+  63              		@ Function supports interworking.
+  64              		@ args = 0, pretend = 0, frame = 0
+  65              		@ frame_needed = 0, uses_anonymous_args = 0
+  66              		@ link register save eliminated.
+  67              	.LVL1:
+  68              		@ lr needed for prologue
+  59:NestedInterrupts.c ****     T0MR0 = 2999999;                  		// 200ms counts
+  69              		.loc 1 59 0
+  70 0058 0E22A0E3 		mov	r2, #-536870912
+  71 005c 012982E2 		add	r2, r2, #16384
+  72 0060 B739A0E3 		mov	r3, #2998272
+  73 0064 6B3E83E2 		add	r3, r3, #1712
+  74 0068 0F3083E2 		add	r3, r3, #15
+  75 006c 183082E5 		str	r3, [r2, #24]
+  60:NestedInterrupts.c ****     T0MCR = 3;                             	// Interrupt and Reset on MR0
+  76              		.loc 1 60 0
+  77 0070 0330A0E3 		mov	r3, #3
+  78 0074 143082E5 		str	r3, [r2, #20]
+  61:NestedInterrupts.c ****     T0TCR = 0;                             	// Timer0 Disable
+  79              		.loc 1 61 0
+  80 0078 0020A0E3 		mov	r2, #0
+  81 007c 0139A0E3 		mov	r3, #16384
+  82 0080 4E3283E2 		add	r3, r3, #-536870908
+  83 0084 002083E5 		str	r2, [r3, #0]
+  62:NestedInterrupts.c ****     VICVectAddr0 = (unsigned long)tc0;      // set interrupt vector in 0
+  84              		.loc 1 62 0
+  85 0088 2C209FE5 		ldr	r2, .L7
+  86 008c 2233A0E3 		mov	r3, #-2013265920
+  87 0090 C339A0E1 		mov	r3, r3, asr #19
+  88 0094 002083E5 		str	r2, [r3, #0]
+  63:NestedInterrupts.c ****     VICVectCntl0 = 0x20 | 4;                // use it for Timer 0 Interrupt
+  89              		.loc 1 63 0
+  90 0098 2420A0E3 		mov	r2, #36
+  91 009c 0932A0E3 		mov	r3, #-1879048192
+  92 00a0 C339A0E1 		mov	r3, r3, asr #19
+  93 00a4 002083E5 		str	r2, [r3, #0]
+  64:NestedInterrupts.c ****     VICIntEnable |= 0x00000010;             // Enable Timer0 Interrupt
+  94              		.loc 1 64 0
+  95 00a8 FE2EE0E3 		mvn	r2, #4064
+  96 00ac 0F3012E5 		ldr	r3, [r2, #-15]
+  97 00b0 103083E3 		orr	r3, r3, #16
+  98 00b4 0F3002E5 		str	r3, [r2, #-15]
+  65:NestedInterrupts.c **** }
+  99              		.loc 1 65 0
+ 100 00b8 1EFF2FE1 		bx	lr
+ 101              	.L8:
+ 102              		.align	2
+ 103              	.L7:
+ 104 00bc 00000000 		.word	tc0
+ 105              	.LFE3:
+ 107              		.align	2
+ 108              		.global	delay
+ 110              	delay:
+ 111              	.LFB4:
+  66:NestedInterrupts.c **** 
+  67:NestedInterrupts.c **** //*******************************
+  68:NestedInterrupts.c **** // Delay function
+  69:NestedInterrupts.c **** //*******************************
+  70:NestedInterrupts.c **** void delay(unsigned int del_time) 
+  71:NestedInterrupts.c **** { 
+ 112              		.loc 1 71 0
+ 113              		@ Function supports interworking.
+ 114              		@ args = 0, pretend = 0, frame = 0
+ 115              		@ frame_needed = 0, uses_anonymous_args = 0
+ 116              		@ link register save eliminated.
+ 117              	.LVL2:
+ 118              		@ lr needed for prologue
+  72:NestedInterrupts.c **** 	unsigned int i;
+  73:NestedInterrupts.c **** 	for(i=0;i<del_time;i++);	   
+ 119              		.loc 1 73 0
+ 120 00c0 000050E3 		cmp	r0, #0
+ 121 00c4 1EFF2F01 		bxeq	lr
+ 122 00c8 0030A0E3 		mov	r3, #0
+ 123              	.LVL3:
+ 124              	.L12:
+ 125 00cc 013083E2 		add	r3, r3, #1
+ 126 00d0 030050E1 		cmp	r0, r3
+ 127 00d4 3100001A 		bne	.L12
+ 128 00d8 1EFF2FE1 		bx	lr
+ 129              	.LFE4:
+ 131              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 132              		.align	2
+ 133              	.LC0:
+ 134 0000 4E657374 		.ascii	"Nested Interr.\000"
+ 134      65642049 
+ 134      6E746572 
+ 134      722E00
+ 135 000f 00       		.align	2
+ 136              	.LC1:
+ 137 0010 66616C6C 		.ascii	"falling -> EINT2\000"
+ 137      696E6720 
+ 137      2D3E2045 
+ 137      494E5432 
+ 137      00
+ 138 0021 000000   		.text
+ 139              		.align	2
+ 140              		.global	main
+ 142              	main:
+ 143              	.LFB5:
+  74:NestedInterrupts.c **** }
+  75:NestedInterrupts.c **** 
+  76:NestedInterrupts.c **** //*******************************
+  77:NestedInterrupts.c **** // MAIN
+  78:NestedInterrupts.c **** //*******************************
+  79:NestedInterrupts.c **** int main (void)
+  80:NestedInterrupts.c **** {
+ 144              		.loc 1 80 0
+ 145              		@ Function supports interworking.
+ 146              		@ args = 0, pretend = 0, frame = 0
+ 147              		@ frame_needed = 1, uses_anonymous_args = 0
+ 148 00dc 0DC0A0E1 		mov	ip, sp
+ 149              	.LCFI0:
+ 150 00e0 00D82DE9 		stmfd	sp!, {fp, ip, lr, pc}
+ 151              	.LCFI1:
+ 152 00e4 04B04CE2 		sub	fp, ip, #4
+ 153              	.LCFI2:
+  81:NestedInterrupts.c **** 	//Peripherials' frequency = fclk/4 = 15MHz
+  82:NestedInterrupts.c **** 	VPBDIV&=0xFFFFFFFC;
+ 154              		.loc 1 82 0
+ 155 00e8 0E12A0E3 		mov	r1, #-536870912
+ 156 00ec 7F2981E2 		add	r2, r1, #2080768
+ 157 00f0 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+ 158 00f4 FC3003E2 		and	r3, r3, #252
+ 159 00f8 0031C2E5 		strb	r3, [r2, #256]
+  83:NestedInterrupts.c **** 	VPBDIV|=0x00;
+ 160              		.loc 1 83 0
+ 161 00fc 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+ 162 0100 FF3003E2 		and	r3, r3, #255
+ 163 0104 0031C2E5 		strb	r3, [r2, #256]
+  84:NestedInterrupts.c **** 
+  85:NestedInterrupts.c **** 	//Port direction configuration
+  86:NestedInterrupts.c **** 	IODIR0 = 0xFF000000;
+ 164              		.loc 1 86 0
+ 165 0108 FF24A0E3 		mov	r2, #-16777216
+ 166 010c 8E32A0E3 		mov	r3, #-536870904
+ 167 0110 0A3983E2 		add	r3, r3, #163840
+ 168 0114 002083E5 		str	r2, [r3, #0]
+  87:NestedInterrupts.c **** 	IODIR1 = 0x00FF0000;
+ 169              		.loc 1 87 0
+ 170 0118 0A1981E2 		add	r1, r1, #163840
+ 171 011c FF38A0E3 		mov	r3, #16711680
+ 172 0120 183081E5 		str	r3, [r1, #24]
+  88:NestedInterrupts.c **** 
+  89:NestedInterrupts.c **** 	InitTimer0();
+ 173              		.loc 1 89 0
+ 174 0124 FEFFFFEB 		bl	InitTimer0
+  90:NestedInterrupts.c **** 	EINT2Init();
+ 175              		.loc 1 90 0
+ 176 0128 FEFFFFEB 		bl	EINT2Init
+  91:NestedInterrupts.c **** 	LCDInit();
+ 177              		.loc 1 91 0
+ 178 012c FEFFFFEB 		bl	LCDInit
+  92:NestedInterrupts.c **** 
+  93:NestedInterrupts.c **** 	LCDClear();
+ 179              		.loc 1 93 0
+ 180 0130 FEFFFFEB 		bl	LCDClear
+  94:NestedInterrupts.c **** 
+  95:NestedInterrupts.c **** 	LCDText("Nested Interr.");
+ 181              		.loc 1 95 0
+ 182 0134 20009FE5 		ldr	r0, .L18
+ 183 0138 FEFFFFEB 		bl	LCDText
+  96:NestedInterrupts.c **** 	LCDGotoXY(0,1);
+ 184              		.loc 1 96 0
+ 185 013c 0000A0E3 		mov	r0, #0
+ 186 0140 0110A0E3 		mov	r1, #1
+ 187 0144 FEFFFFEB 		bl	LCDGotoXY
+  97:NestedInterrupts.c **** 	LCDText("falling -> EINT2");
+ 188              		.loc 1 97 0
+ 189 0148 10009FE5 		ldr	r0, .L18+4
+ 190 014c FEFFFFEB 		bl	LCDText
+  98:NestedInterrupts.c **** 	delay(0x200000);
+ 191              		.loc 1 98 0
+ 192 0150 0206A0E3 		mov	r0, #2097152
+ 193 0154 FEFFFFEB 		bl	delay
+ 194              	.L16:
+ 195 0158 540000EA 		b	.L16
+ 196              	.L19:
+ 197              		.align	2
+ 198              	.L18:
+ 199 015c 00000000 		.word	.LC0
+ 200 0160 10000000 		.word	.LC1
+ 201              	.LFE5:
+ 203              		.align	2
+ 204              		.global	EINT2ISR
+ 206              	EINT2ISR:
+ 207              	.LFB6:
+  99:NestedInterrupts.c **** 
+ 100:NestedInterrupts.c **** 	while(1);
+ 101:NestedInterrupts.c **** }
+ 102:NestedInterrupts.c **** 
+ 103:NestedInterrupts.c **** //*******************************
+ 104:NestedInterrupts.c **** // EINT2 interrupt routine
+ 105:NestedInterrupts.c **** //*******************************
+ 106:NestedInterrupts.c **** void EINT2ISR(void)
+ 107:NestedInterrupts.c **** {
+ 208              		.loc 1 107 0
+ 209              		@ Interrupt Service Routine.
+ 210              		@ args = 0, pretend = 0, frame = 0
+ 211              		@ frame_needed = 1, uses_anonymous_args = 0
+ 212 0164 04C02DE5 		str	ip, [sp, #-4]!
+ 213 0168 0DC0A0E1 		mov	ip, sp
+ 214              	.LCFI3:
+ 215 016c FFD82DE9 		stmfd	sp!, {r0, r1, r2, r3, r4, r5, r6, r7, fp, ip, lr, pc}
+ 216              	.LCFI4:
+ 217 0170 04B04CE2 		sub	fp, ip, #4
+ 218              	.LCFI5:
+ 108:NestedInterrupts.c **** 	//Clear EINT2 interrupt flag
+ 109:NestedInterrupts.c **** 	EXTINT=(1<<2);
+ 219              		.loc 1 109 0
+ 220 0174 0E62A0E3 		mov	r6, #-536870912
+ 221 0178 7F6986E2 		add	r6, r6, #2080768
+ 222 017c 0470A0E3 		mov	r7, #4
+ 223 0180 4071C6E5 		strb	r7, [r6, #320]
+ 110:NestedInterrupts.c **** 
+ 111:NestedInterrupts.c **** 	IENABLE;
+ 224              		.loc 1 111 0
+ 225 0184 00E04FE1 		MRS LR, SPSR
+ 226 0188 00402DE9 		STMFD SP!, {LR}
+ 227 018c 1FF021E3 		MSR CPSR_c, #0x1F
+ 228 0190 00402DE9 		STMFD SP!, {LR}
+ 112:NestedInterrupts.c **** 
+ 113:NestedInterrupts.c **** 	//Enable timer
+ 114:NestedInterrupts.c **** 	T0TC=0;
+ 229              		.loc 1 114 0
+ 230 0194 0149A0E3 		mov	r4, #16384
+ 231 0198 8E3284E2 		add	r3, r4, #-536870904
+ 232 019c 0050A0E3 		mov	r5, #0
+ 233 01a0 005083E5 		str	r5, [r3, #0]
+ 115:NestedInterrupts.c **** 	T0TCR=1;
+ 234              		.loc 1 115 0
+ 235 01a4 4E4284E2 		add	r4, r4, #-536870908
+ 236 01a8 0130A0E3 		mov	r3, #1
+ 237 01ac 003084E5 		str	r3, [r4, #0]
+ 116:NestedInterrupts.c **** 
+ 117:NestedInterrupts.c **** 	//Here LED is blinking in T0 Interrupt
+ 118:NestedInterrupts.c **** 	delay(0x800000);
+ 238              		.loc 1 118 0
+ 239 01b0 0205A0E3 		mov	r0, #8388608
+ 240 01b4 FEFFFFEB 		bl	delay
+ 119:NestedInterrupts.c **** 
+ 120:NestedInterrupts.c **** 	//Disable timer
+ 121:NestedInterrupts.c **** 	T0TCR=0;
+ 241              		.loc 1 121 0
+ 242 01b8 005084E5 		str	r5, [r4, #0]
+ 122:NestedInterrupts.c **** 
+ 123:NestedInterrupts.c **** 	IDISABLE;
+ 243              		.loc 1 123 0
+ 244 01bc 0040BDE8 		LDMFD SP!, {LR}
+ 245 01c0 92F021E3 		MSR CPSR_c, #0x92
+ 246 01c4 0040BDE8 		LDMFD SP!, {LR}
+ 247 01c8 0EF06FE1 		MSR SPSR_cxsf, LR
+ 124:NestedInterrupts.c **** 
+ 125:NestedInterrupts.c **** 	//Clear EINT2 interrupt flag & ack interrupt
+ 126:NestedInterrupts.c **** 	EXTINT=(1<<2);
+ 248              		.loc 1 126 0
+ 249 01cc 4071C6E5 		strb	r7, [r6, #320]
+ 127:NestedInterrupts.c **** 	VICVectAddr=0x00000000;
+ 250              		.loc 1 127 0
+ 251 01d0 3F3DE0E3 		mvn	r3, #4032
+ 252 01d4 0F5003E5 		str	r5, [r3, #-15]
+ 128:NestedInterrupts.c **** }
+ 253              		.loc 1 128 0
+ 254 01d8 2CD04BE2 		sub	sp, fp, #44
+ 255 01dc FF689DE8 		ldmfd	sp, {r0, r1, r2, r3, r4, r5, r6, r7, fp, sp, lr}
+ 256 01e0 0010BDE8 		ldmfd	sp!, {ip}
+ 257 01e4 04F05EE2 		subs	pc, lr, #4
+ 258              	.LFE6:
+ 260              		.align	2
+ 261              		.global	tc0
+ 263              	tc0:
+ 264              	.LFB7:
+ 129:NestedInterrupts.c **** 
+ 130:NestedInterrupts.c **** //*******************************
+ 131:NestedInterrupts.c **** // Timer Counter 0 Interrupt
+ 132:NestedInterrupts.c **** //*******************************
+ 133:NestedInterrupts.c **** void tc0(void) 
+ 134:NestedInterrupts.c **** {
+ 265              		.loc 1 134 0
+ 266              		@ Interrupt Service Routine.
+ 267              		@ args = 0, pretend = 0, frame = 0
+ 268              		@ frame_needed = 0, uses_anonymous_args = 0
+ 269              		@ link register save eliminated.
+ 270              	.LVL4:
+ 271 01e8 0E002DE9 		stmfd	sp!, {r1, r2, r3}
+ 272              	.LCFI6:
+ 273              		@ lr needed for prologue
+ 135:NestedInterrupts.c ****     IOPIN1^=0x00FF0000;
+ 274              		.loc 1 135 0
+ 275 01ec 0E22A0E3 		mov	r2, #-536870912
+ 276 01f0 0A1982E2 		add	r1, r2, #163840
+ 277 01f4 103091E5 		ldr	r3, [r1, #16]
+ 278 01f8 FF3823E2 		eor	r3, r3, #16711680
+ 279 01fc 103081E5 		str	r3, [r1, #16]
+ 136:NestedInterrupts.c **** 
+ 137:NestedInterrupts.c ****     //Clear interrupt flag & acknowledge interrupt
+ 138:NestedInterrupts.c ****     T0IR = 1;					
+ 280              		.loc 1 138 0
+ 281 0200 012982E2 		add	r2, r2, #16384
+ 282 0204 0130A0E3 		mov	r3, #1
+ 283 0208 003082E5 		str	r3, [r2, #0]
+ 139:NestedInterrupts.c ****     VICVectAddr = 0;
+ 284              		.loc 1 139 0
+ 285 020c 0020A0E3 		mov	r2, #0
+ 286 0210 3F3DE0E3 		mvn	r3, #4032
+ 287 0214 0F2003E5 		str	r2, [r3, #-15]
+ 140:NestedInterrupts.c **** }
+ 288              		.loc 1 140 0
+ 289 0218 0E00BDE8 		ldmfd	sp!, {r1, r2, r3}
+ 290 021c 04F05EE2 		subs	pc, lr, #4
+ 291              	.LFE7:
+ 417              	.Letext0:

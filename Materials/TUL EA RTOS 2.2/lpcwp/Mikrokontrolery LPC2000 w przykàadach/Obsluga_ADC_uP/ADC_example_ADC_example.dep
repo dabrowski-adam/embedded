@@ -1,0 +1,8 @@
+Dependencies for Project 'ADC_example', Target 'ADC_example': (DO NOT MODIFY !)
+F (.\Startup.s)(0x402006F4)(-m arm7tdmi -gdwarf2 -mthumb-interwork --MD Startup.d -mno-fpu -IC:\Keil\ARM\INC\Philips\ -o Startup.o)
+F (.\lcd.c)(0x42F79965)(-c -mcpu=arm7tdmi -gdwarf-2 -MD -Wall -O -mapcs-frame -mthumb-interwork -IC:\Keil\ARM\INC\Philips\ -o lcd.o)
+I (D:\Ksiazka_ARM\Przykladowe_aplikacje\Obsluga_ADC\Obsluga_ADC_uP\lcd.h)(0x42F7A215)
+I (C:\KEIL\ARM\INC\PHILIPS\LPC213X.H)(0x414472D8)
+F (.\ADC_example.c)(0x4306CB4C)(-c -mcpu=arm7tdmi -gdwarf-2 -MD -Wall -O -mapcs-frame -mthumb-interwork -IC:\Keil\ARM\INC\Philips\ -o adc_example.o)
+I (C:\KEIL\ARM\INC\PHILIPS\LPC213X.H)(0x414472D8)
+I (D:\Ksiazka_ARM\Przykladowe_aplikacje\Obsluga_ADC\Obsluga_ADC_uP\lcd.h)(0x42F7A215)

@@ -1,0 +1,1 @@
+-m arm7tdmi -gdwarf2 -mthumb-interwork --MD Startup.d -mno-fpu -IC:\Keil\ARM\INC\Philips\ -alhms="Startup.lst" -o Startup.o "Startup.s"

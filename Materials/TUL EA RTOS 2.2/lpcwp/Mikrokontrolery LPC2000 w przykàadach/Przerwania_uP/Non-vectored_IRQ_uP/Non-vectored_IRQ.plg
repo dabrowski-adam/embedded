@@ -1,0 +1,67 @@
+<html>
+<body>
+<pre>
+<h1>µVision3 Build Log</h1>
+<h2>Project:</h2>
+D:\Ksiazka_ARM\Przykladowe_aplikacje\Przerwania\Przerwania_uP\Non-vectored_IRQ\Non-vectored_IRQ.uv2
+Project File Date:  06/23/2006
+
+<h2>Output:</h2>
+Build target 'Non-vectored_IRQ'
+compiling Non-vectored_IRQ.c...
+Non-vectored_IRQ.c(11): error: lcd.h: No such file or directory
+Non-vectored_IRQ.c: In function 'main':
+Non-vectored_IRQ.c(58): warning: implicit declaration of function 'LCDInit'
+Non-vectored_IRQ.c(60): warning: implicit declaration of function 'LCDClear'
+Non-vectored_IRQ.c(62): warning: implicit declaration of function 'LCDText'
+Non-vectored_IRQ.c(63): warning: implicit declaration of function 'LCDGotoXY'
+compiling lcd.c...
+lcd.c(1): error: lcd.h: No such file or directory
+lcd.c: In function 'LCDGotoXY':
+lcd.c(70): warning: implicit declaration of function 'LCDSendByte'
+lcd.c: At top level:
+lcd.c(99): warning: conflicting types for 'LCDSendByte'
+lcd.c(70): warning: previous implicit declaration of 'LCDSendByte' was here
+lcd.c: In function 'LCDSendByte':
+lcd.c(100): error: 'IOCLR0' undeclared (first use in this function)
+lcd.c(100): error: (Each undeclared identifier is reported only once
+lcd.c(100): error: for each function it appears in.)
+lcd.c(102): error: 'IOCLR1' undeclared (first use in this function)
+lcd.c(106): error: 'IOSET0' undeclared (first use in this function)
+lcd.c(110): error: 'IOSET1' undeclared (first use in this function)
+assembling Startup.s...
+Target not created
+Build target 'Non-vectored_IRQ'
+compiling Non-vectored_IRQ.c...
+compiling lcd.c...
+assembling Startup.s...
+linking...
+/cygdrive/c/Program Files/GNUARM/Bin/../lib/gcc/arm-elf/4.0.1/../../../../arm-elf/bin/ld: warning: cannot find entry symbol _start; defaulting to 00000000
+startup.o: In function `__main_exit':
+/cygdrive/d/Ksiazka_ARM/Przykladowe_aplikacje/Przerwania/Przerwania_uP/Non-vectored_IRQ/Startup.s(260): error: undefined reference to `_data'
+collect2: ld returned 1 exit status
+Target not created
+Build target 'Non-vectored_IRQ'
+linking...
+creating hex file...
+"Non-vectored_IRQ.elf" - 0 Error(s), 0 Warning(s).
+Build target 'Non-vectored_IRQ'
+compiling Non-vectored_IRQ.c...
+compiling lcd.c...
+assembling Startup.s...
+linking...
+creating hex file...
+"Non-vectored_IRQ.elf" - 0 Error(s), 0 Warning(s).
+Build target 'Non-vectored_IRQ'
+compiling Non-vectored_IRQ.c...
+linking...
+creating hex file...
+"Non-vectored_IRQ.elf" - 0 Error(s), 0 Warning(s).
+Build target 'Non-vectored_IRQ'
+compiling Non-vectored_IRQ.c...
+linking...
+creating hex file...
+"Non-vectored_IRQ.elf" - 0 Error(s), 0 Warning(s).
+</pre>
+</body>
+</html>

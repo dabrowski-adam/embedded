@@ -1,0 +1,8 @@
+Dependencies for Project 'lcd_example', Target 'lcd_example': (DO NOT MODIFY !)
+F (.\Startup.s)(0x40201504)(-m arm7tdmi -gdwarf2 -mthumb-interwork --MD Startup.d -mno-fpu -IC:\Keil\ARM\INC\Philips\ -o Startup.o)
+F (.\lcd.c)(0x44B6B38D)(-c -mcpu=arm7tdmi -gdwarf-2 -MD -Wall -O -mapcs-frame -mthumb-interwork -IC:\Keil\ARM\INC\Philips\ -o lcd.o)
+I (D:\Ksiazka_ARM\Przykladowe_aplikacje\Obsluga_wyswietlacza_LCD\Obsluga_wyswietlacza_LCD_uP\lcd.h)(0x42F7A215)
+I (C:\KEIL\ARM\INC\PHILIPS\LPC213X.H)(0x432F24BA)
+F (.\lcd_example.c)(0x44B6B818)(-c -mcpu=arm7tdmi -gdwarf-2 -MD -Wall -O -mapcs-frame -mthumb-interwork -IC:\Keil\ARM\INC\Philips\ -o lcd_example.o)
+I (C:\KEIL\ARM\INC\PHILIPS\LPC213X.H)(0x432F24BA)
+I (D:\Ksiazka_ARM\Przykladowe_aplikacje\Obsluga_wyswietlacza_LCD\Obsluga_wyswietlacza_LCD_uP\lcd.h)(0x44B6B3E7)

@@ -1,0 +1,1 @@
+-c -mcpu=arm7tdmi -gdwarf-2 -MD -Wall -O -mapcs-frame -mthumb-interwork -IC:\Keil\ARM\INC\Philips\ -o spi_mcp23s08_led.o "SPI_MCP23S08_LED.c"

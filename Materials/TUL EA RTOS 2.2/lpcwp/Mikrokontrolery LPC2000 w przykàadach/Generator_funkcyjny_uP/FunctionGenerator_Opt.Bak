@@ -1,0 +1,43 @@
+### uVision2 Project, (C) Keil Software
+### Do not modify !
+
+ cExt (*.c)
+ aExt (*.s*; *.src; *.a*)
+ oExt (*.obj)
+ lExt (*.lib)
+ tExt (*.txt; *.h; *.inc)
+ pExt (*.plm)
+ CppX (*.cpp)
+ DaveTm { 0,0,0,0,0,0,0,0 }
+
+Target (FunctionGenerator), 0x0003 // Tools: 'ARM-GNU'
+GRPOPT 1,(Startup),0,0,0
+GRPOPT 2,(Source),1,0,0
+
+OPTFFF 1,1,2,0,0,0,0,0,<.\Startup.s><Startup.s> 
+OPTFFF 2,2,1,754974722,0,98,101,0,<.\Timer.c><Timer.c> { 44,0,0,0,2,0,0,0,3,0,0,0,255,255,255,255,255,255,255,255,252,255,255,255,233,255,255,255,66,0,0,0,66,0,0,0,118,2,0,0,67,1,0,0 }
+OPTFFF 2,3,1,0,0,0,0,0,<.\lcd.c><lcd.c> 
+OPTFFF 2,4,1,218103808,0,22,30,0,<.\FunctionGenerator.c><FunctionGenerator.c> { 44,0,0,0,0,0,0,0,1,0,0,0,255,255,255,255,255,255,255,255,252,255,255,255,233,255,255,255,44,0,0,0,44,0,0,0,96,2,0,0,45,1,0,0 }
+OPTFFF 2,5,2,0,0,0,0,0,<.\division.s><division.s> 
+OPTFFF 2,6,1,184549376,0,150,150,0,<.\UserSettings.c><UserSettings.c> { 44,0,0,0,0,0,0,0,1,0,0,0,255,255,255,255,255,255,255,255,252,255,255,255,233,255,255,255,66,0,0,0,66,0,0,0,118,2,0,0,67,1,0,0 }
+OPTFFF 2,7,1,0,0,0,0,0,<.\delay.c><delay.c> 
+
+
+TARGOPT 1, (FunctionGenerator)
+ ARMCLK=12000000
+  OPTTT 1,1,1,0
+  OPTHX 1,65535,0,0,0
+  OPTLX 120,65,8,<.\>
+  OPTOX 16
+  OPTLT 1,1,1,0,1,1,0,1,0,0,0,0
+  OPTXL 1,1,1,1,1,1,1,0,0
+  OPTFL 1,0,1
+  OPTBL 0,(User Manual)<DATASHTS\PHILIPS\UM_LPC2106_2105_2104.PDF>
+  OPTDL (SARM.DLL)(-cLPC2100)(DARMP.DLL)(-pLPC2138)(SARM.DLL)()(TARMP.DLL)(-pLPC2138)
+  OPTDBG 44029,-1,()()()()()()()()()() (BIN\UL2ARM.DLL)()()()
+  OPTKEY 0,(UL2ARM)(-U40296420 -O7 -C0 -FO7 -FD40000000 -FC800 -FN1 -FF0LPC_IAP_128 -FS00 -FL01E000)
+  OPTDF 0x2
+  OPTLE <>
+  OPTLC <>
+EndOpt
+

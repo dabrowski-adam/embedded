@@ -1,0 +1,44 @@
+### uVision2 Project, (C) Keil Software
+### Do not modify !
+
+ cExt (*.c)
+ aExt (*.s*; *.src; *.a*)
+ oExt (*.obj)
+ lExt (*.lib)
+ tExt (*.txt; *.h; *.inc)
+ pExt (*.plm)
+ CppX (*.cpp)
+ DaveTm { 0,0,0,0,0,0,0,0 }
+
+Target (ARMSpectrumAnalyzer), 0x0003 // Tools: 'ARM-GNU'
+GRPOPT 1,(Startup),1,0,0
+GRPOPT 2,(Source),1,0,0
+
+OPTFFF 1,1,2,0,0,0,0,0,<.\Startup.s><Startup.s> 
+OPTFFF 2,2,1,117440512,0,96,107,0,<.\ARMSpectrumAnalyzer.c><ARMSpectrumAnalyzer.c> { 44,0,0,0,0,0,0,0,1,0,0,0,255,255,255,255,255,255,255,255,252,255,255,255,233,255,255,255,66,0,0,0,66,0,0,0,114,2,0,0,63,1,0,0 }
+OPTFFF 2,3,1,0,0,0,0,0,<.\uart.c><uart.c> 
+OPTFFF 2,4,1,0,0,0,0,0,<.\lcd.c><lcd.c> 
+OPTFFF 2,5,1,117440514,0,92,92,0,<.\fft.c><fft.c> { 44,0,0,0,2,0,0,0,3,0,0,0,255,255,255,255,255,255,255,255,252,255,255,255,233,255,255,255,0,0,0,0,0,0,0,0,52,2,0,0,1,1,0,0 }
+OPTFFF 2,6,1,0,0,0,0,0,<.\complex.c><complex.c> 
+OPTFFF 2,7,1,0,0,0,0,0,<.\fix.c><fix.c> 
+OPTFFF 2,8,1,0,0,0,0,0,<.\SamplingModule.c><SamplingModule.c> 
+
+
+TARGOPT 1, (ARMSpectrumAnalyzer)
+ ARMCLK=12000000
+  OPTTT 1,1,1,0
+  OPTHX 1,65535,0,0,0
+  OPTLX 120,65,8,<.\>
+  OPTOX 16
+  OPTLT 1,1,1,0,1,1,0,1,0,0,0,0
+  OPTXL 1,1,1,1,1,1,1,0,0
+  OPTFL 1,0,1
+  OPTBL 0,(User Manual)<DATASHTS\PHILIPS\UM_LPC2106_2105_2104.PDF>
+  OPTDL (SARM.DLL)(-cLPC2100)(DARMP.DLL)(-pLPC2138)(SARM.DLL)()(TARMP.DLL)(-pLPC2138)
+  OPTDBG 44029,-1,()()()()()()()()()() (BIN\UL2ARM.DLL)()()()
+  OPTKEY 0,(UL2ARM)(-U40296420 -O7 -C0 -FO7 -FD40000000 -FC800 -FN1 -FF0LPC_IAP_128 -FS00 -FL01E000)
+  OPTDF 0x2
+  OPTLE <>
+  OPTLC <>
+EndOpt
+

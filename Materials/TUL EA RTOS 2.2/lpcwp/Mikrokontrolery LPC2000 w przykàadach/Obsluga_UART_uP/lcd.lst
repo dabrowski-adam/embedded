@@ -1,0 +1,609 @@
+   1              		.file	"lcd.c"
+   9              	.Ltext0:
+  10              		.global	dat_lcd
+  11              		.section	.rodata
+  14              	dat_lcd:
+  15 0000 01       		.byte	1
+  16              		.global	cmd_lcd
+  19              	cmd_lcd:
+  20 0001 00       		.space	1
+  21              		.global	E
+  22 0002 0000     		.align	2
+  25              	E:
+  26 0004 00000040 		.word	1073741824
+  27              		.global	RS
+  28              		.align	2
+  31              	RS:
+  32 0008 00000080 		.word	-2147483648
+  33              		.global	cmd_bit
+  36              	cmd_bit:
+  37 000c 1F       		.byte	31
+  38 000d 000000   		.text
+  39              		.align	2
+  40              		.global	LCDDelay
+  42              	LCDDelay:
+  43              	.LFB2:
+  44              		.file 1 "lcd.c"
+   1:lcd.c         **** #include "lcd.h"
+   2:lcd.c         **** 
+   3:lcd.c         **** const char dat_lcd = 0x01; 		//send data
+   4:lcd.c         **** const char cmd_lcd = 0x00; 		//send command
+   5:lcd.c         **** 
+   6:lcd.c         **** const unsigned int E  = 0x40000000; // P0.30
+   7:lcd.c         **** const unsigned int RS = 0x80000000; // P0.31
+   8:lcd.c         **** const char cmd_bit = 31;
+   9:lcd.c         **** 
+  10:lcd.c         **** 
+  11:lcd.c         **** void LCDDelay (void) 
+  12:lcd.c         **** { 
+  45              		.loc 1 12 0
+  46              		@ Function supports interworking.
+  47              		@ args = 0, pretend = 0, frame = 0
+  48              		@ frame_needed = 0, uses_anonymous_args = 0
+  49              		@ link register save eliminated.
+  50              	.LVL0:
+  51              		@ lr needed for prologue
+  52              		.loc 1 12 0
+  53 0000 013CA0E3 		mov	r3, #256
+  54              	.L2:
+  13:lcd.c         ****   unsigned int i;
+  14:lcd.c         ****   
+  15:lcd.c         ****   for(i = 0; i < 0x100; i++);	   
+  55              		.loc 1 15 0
+  56 0004 013053E2 		subs	r3, r3, #1
+  57 0008 FFFFFF1A 		bne	.L2
+  16:lcd.c         **** }								    
+  58              		.loc 1 16 0
+  59 000c 1EFF2FE1 		bx	lr
+  60              	.LFE2:
+  62              		.align	2
+  63              		.global	convert32bit_dec
+  65              	convert32bit_dec:
+  66              	.LFB3:
+  17:lcd.c         **** 
+  18:lcd.c         **** char* convert32bit_dec(int val,char *str)
+  19:lcd.c         **** {
+  67              		.loc 1 19 0
+  68              		@ Function supports interworking.
+  69              		@ args = 0, pretend = 0, frame = 0
+  70              		@ frame_needed = 0, uses_anonymous_args = 0
+  71              	.LVL1:
+  72 0010 70402DE9 		stmfd	sp!, {r4, r5, r6, lr}
+  73              	.LCFI0:
+  74 0014 0060A0E1 		mov	r6, r0
+  75 0018 0140A0E1 		mov	r4, r1
+  76              		.loc 1 19 0
+  77 001c C0CF20E0 		eor	ip, r0, r0, asr #31
+  78 0020 C0CF4CE0 		sub	ip, ip, r0, asr #31
+  79              	.LVL2:
+  80 0024 0CE0A0E3 		mov	lr, #12
+  81              	.LVL3:
+  82 0028 A8509FE5 		ldr	r5, .L20
+  83 002c 0000E0E3 		mvn	r0, #0
+  84              	.LVL4:
+  85              	.LVL5:
+  86              	.L8:
+  20:lcd.c         **** 	int v;
+  21:lcd.c         **** 	signed char i,j,p;
+  22:lcd.c         **** 
+  23:lcd.c         **** 	if(val<0)
+  24:lcd.c         **** 		v=-val;
+  25:lcd.c         **** 	else
+  26:lcd.c         **** 		v=val;
+  27:lcd.c         **** 		
+  28:lcd.c         **** 	for(i=12;i>=0;i--)
+  29:lcd.c         **** 	{	
+  30:lcd.c         **** 		str[i]=(v%10)+'0';
+  87              		.loc 1 30 0
+  88 0030 0E1CA0E1 		mov	r1, lr, asl #24
+  89 0034 952CC3E0 		smull	r2, r3, r5, ip
+  90 0038 CC2FA0E1 		mov	r2, ip, asr #31
+  91 003c 432162E0 		rsb	r2, r2, r3, asr #2
+  92 0040 023182E0 		add	r3, r2, r2, asl #2
+  93 0044 83304CE0 		sub	r3, ip, r3, asl #1
+  94 0048 303083E2 		add	r3, r3, #48
+  95 004c 413CC4E7 		strb	r3, [r4, r1, asr #24]
+  31:lcd.c         **** 		v=v/10;
+  32:lcd.c         **** 		if(!v)
+  96              		.loc 1 32 0
+  97 0050 00C052E2 		subs	ip, r2, #0
+  98 0054 1900000A 		beq	.L9
+  99              		.loc 1 28 0
+ 100 0058 01304EE2 		sub	r3, lr, #1
+ 101 005c FFE003E2 		and	lr, r3, #255
+ 102 0060 0E3CA0E1 		mov	r3, lr, asl #24
+ 103 0064 430C50E1 		cmp	r0, r3, asr #24
+ 104 0068 0A00001A 		bne	.L8
+ 105              	.L9:
+ 106 006c A60FA0E1 		mov	r0, r6, lsr #31
+ 107 0070 FFC000E2 		and	ip, r0, #255
+ 108              	.LVL6:
+  33:lcd.c         **** 			break;
+  34:lcd.c         **** 	}
+  35:lcd.c         **** 	if(val<0)
+  36:lcd.c         **** 		p=1;
+  37:lcd.c         **** 	else
+  38:lcd.c         **** 		p=0;
+  39:lcd.c         **** 		
+  40:lcd.c         **** 	j=i;
+  41:lcd.c         **** 	for(i=p;j<13;j++,i++)
+ 109              		.loc 1 41 0
+ 110 0074 0E3CA0E1 		mov	r3, lr, asl #24
+ 111 0078 030353E3 		cmp	r3, #201326592
+ 112 007c FF0000C2 		andgt	r0, r0, #255
+ 113              	.LVL7:
+ 114 0080 2B0000CA 		bgt	.L13
+ 115 0084 FF100EE2 		and	r1, lr, #255
+ 116              	.LVL8:
+ 117 0088 FF000CE2 		and	r0, ip, #255
+ 118              	.L14:
+  42:lcd.c         **** 		str[i]=str[j];  
+ 119              		.loc 1 42 0
+ 120 008c 002CA0E1 		mov	r2, r0, asl #24
+ 121 0090 013CA0E1 		mov	r3, r1, asl #24
+ 122 0094 433CD4E7 		ldrb	r3, [r4, r3, asr #24]	@ zero_extendqisi2
+ 123 0098 423CC4E7 		strb	r3, [r4, r2, asr #24]
+ 124              		.loc 1 41 0
+ 125 009c 013081E2 		add	r3, r1, #1
+ 126 00a0 FF1003E2 		and	r1, r3, #255
+ 127 00a4 013080E2 		add	r3, r0, #1
+ 128 00a8 FF0003E2 		and	r0, r3, #255
+ 129 00ac 0D0051E3 		cmp	r1, #13
+ 130 00b0 2100001A 		bne	.L14
+ 131              	.L13:
+ 132              	.LVL9:
+  43:lcd.c         **** 
+  44:lcd.c         **** 	if(val<0)
+ 133              		.loc 1 44 0
+ 134 00b4 00005CE3 		cmp	ip, #0
+  45:lcd.c         **** 		str[0]='-';
+ 135              		.loc 1 45 0
+ 136 00b8 2D30A013 		movne	r3, #45
+ 137 00bc 0030C415 		strneb	r3, [r4, #0]
+  46:lcd.c         **** 
+  47:lcd.c         **** 	str[i]=0;
+ 138              		.loc 1 47 0
+ 139 00c0 002CA0E1 		mov	r2, r0, asl #24
+ 140 00c4 0030A0E3 		mov	r3, #0
+ 141 00c8 423CC4E7 		strb	r3, [r4, r2, asr #24]
+  48:lcd.c         **** 	return str;
+  49:lcd.c         **** }
+ 142              		.loc 1 49 0
+ 143 00cc 0400A0E1 		mov	r0, r4
+ 144              	.LVL10:
+ 145 00d0 7040BDE8 		ldmfd	sp!, {r4, r5, r6, lr}
+ 146 00d4 1EFF2FE1 		bx	lr
+ 147              	.L21:
+ 148              		.align	2
+ 149              	.L20:
+ 150 00d8 67666666 		.word	1717986919
+ 151              	.LFE3:
+ 153              		.align	2
+ 154              		.global	LCDGotoXY
+ 156              	LCDGotoXY:
+ 157              	.LFB4:
+  50:lcd.c         **** 
+  51:lcd.c         **** // ustawia kursor na wspó³rzêdnych x, y
+  52:lcd.c         **** void LCDGotoXY(char x, char y)
+  53:lcd.c         **** {
+ 158              		.loc 1 53 0
+ 159              		@ Function supports interworking.
+ 160              		@ args = 0, pretend = 0, frame = 0
+ 161              		@ frame_needed = 1, uses_anonymous_args = 0
+ 162              	.LVL11:
+ 163 00dc 0DC0A0E1 		mov	ip, sp
+ 164              	.LCFI1:
+ 165 00e0 00D82DE9 		stmfd	sp!, {fp, ip, lr, pc}
+ 166              	.LCFI2:
+ 167 00e4 04B04CE2 		sub	fp, ip, #4
+ 168              	.LCFI3:
+ 169 00e8 FF0000E2 		and	r0, r0, #255
+ 170 00ec FF1001E2 		and	r1, r1, #255
+  54:lcd.c         **** 	switch (y)			//obliczenie o ile nale¿y zwiêkszyæ
+ 171              		.loc 1 54 0
+ 172 00f0 030051E3 		cmp	r1, #3
+ 173 00f4 01F19F97 		ldrls	pc, [pc, r1, asl #2]
+ 174 00f8 4C0000EA 		b	.L23
+ 175              		.p2align 2
+ 176              	.L28:
+ 177 00fc 0C010000 		.word	.L24
+ 178 0100 18010000 		.word	.L25
+ 179 0104 24010000 		.word	.L26
+ 180 0108 30010000 		.word	.L27
+ 181              	.L24:
+  55:lcd.c         ****  					    //x w zale¿noœci od wartoœci y
+  56:lcd.c         **** 	{
+  57:lcd.c         **** 		case 0:
+  58:lcd.c         **** 			x += 0x80;	//x = x + 0x80
+ 182              		.loc 1 58 0
+ 183 010c 803040E2 		sub	r3, r0, #128
+ 184 0110 FF0003E2 		and	r0, r3, #255
+ 185 0114 4C0000EA 		b	.L23
+ 186              	.L25:
+  59:lcd.c         **** 			break;
+  60:lcd.c         **** 		case 1:
+  61:lcd.c         **** 			x += 0xC0;	//x = x + 0xC0
+ 187              		.loc 1 61 0
+ 188 0118 403040E2 		sub	r3, r0, #64
+ 189 011c FF0003E2 		and	r0, r3, #255
+ 190 0120 4C0000EA 		b	.L23
+ 191              	.L26:
+  62:lcd.c         **** 			break;
+  63:lcd.c         **** 		case 2:
+  64:lcd.c         **** 			x += 0x94;	//x = x + 0x94
+ 192              		.loc 1 64 0
+ 193 0124 6C3040E2 		sub	r3, r0, #108
+ 194 0128 FF0003E2 		and	r0, r3, #255
+ 195 012c 4C0000EA 		b	.L23
+ 196              	.L27:
+  65:lcd.c         **** 			break;
+  66:lcd.c         **** 		case 3:
+  67:lcd.c         **** 			x += 0xD4;	//x = x + 0xD4
+ 197              		.loc 1 67 0
+ 198 0130 2C3040E2 		sub	r3, r0, #44
+ 199 0134 FF0003E2 		and	r0, r3, #255
+ 200              	.L23:
+  68:lcd.c         **** 			break;
+  69:lcd.c         **** 	}
+  70:lcd.c         **** 	LCDSendByte( x , cmd_lcd );
+ 201              		.loc 1 70 0
+ 202 0138 0010A0E3 		mov	r1, #0
+ 203              	.LVL12:
+ 204 013c FEFFFFEB 		bl	LCDSendByte
+ 205              	.LVL13:
+  71:lcd.c         **** }
+ 206              		.loc 1 71 0
+ 207 0140 0CD04BE2 		sub	sp, fp, #12
+ 208 0144 00689DE8 		ldmfd	sp, {fp, sp, lr}
+ 209 0148 1EFF2FE1 		bx	lr
+ 210              	.LFE4:
+ 212              		.align	2
+ 213              		.global	LCDText
+ 215              	LCDText:
+ 216              	.LFB5:
+  72:lcd.c         **** 
+  73:lcd.c         **** 
+  74:lcd.c         **** //wyœwietla tekst rozpoczynaj¹c od aktualnego po³o¿enia kursora
+  75:lcd.c         **** void LCDText(char *T)
+  76:lcd.c         **** {
+ 217              		.loc 1 76 0
+ 218              		@ Function supports interworking.
+ 219              		@ args = 0, pretend = 0, frame = 0
+ 220              		@ frame_needed = 1, uses_anonymous_args = 0
+ 221              	.LVL14:
+ 222 014c 0DC0A0E1 		mov	ip, sp
+ 223              	.LCFI4:
+ 224 0150 10D82DE9 		stmfd	sp!, {r4, fp, ip, lr, pc}
+ 225              	.LCFI5:
+ 226 0154 04B04CE2 		sub	fp, ip, #4
+ 227              	.LCFI6:
+ 228 0158 0030A0E1 		mov	r3, r0
+  77:lcd.c         **** 	while (*T)			//pêtla dzia³a, a¿ napotka 
+ 229              		.loc 1 77 0
+ 230 015c 0000D0E5 		ldrb	r0, [r0, #0]	@ zero_extendqisi2
+ 231              	.LVL15:
+ 232 0160 000050E3 		cmp	r0, #0
+ 233 0164 5E00000A 		beq	.L34
+ 234 0168 0340A0E1 		mov	r4, r3
+ 235              	.L33:
+  78:lcd.c         **** 		LCDSendByte(*T++,dat_lcd);		//wyœwietlenie pojedynczego znaku
+ 236              		.loc 1 78 0
+ 237 016c 0110A0E3 		mov	r1, #1
+ 238 0170 FEFFFFEB 		bl	LCDSendByte
+ 239              	.LVL16:
+ 240              		.loc 1 77 0
+ 241 0174 0100F4E5 		ldrb	r0, [r4, #1]!	@ zero_extendqisi2
+ 242 0178 000050E3 		cmp	r0, #0
+ 243 017c 5900001A 		bne	.L33
+ 244              	.LVL17:
+ 245              	.L34:
+  79:lcd.c         **** }
+ 246              		.loc 1 79 0
+ 247 0180 10D04BE2 		sub	sp, fp, #16
+ 248 0184 10689DE8 		ldmfd	sp, {r4, fp, sp, lr}
+ 249 0188 1EFF2FE1 		bx	lr
+ 250              	.LFE5:
+ 252              		.align	2
+ 253              		.global	LCDTextXY
+ 255              	LCDTextXY:
+ 256              	.LFB6:
+  80:lcd.c         **** 
+  81:lcd.c         **** //wyœwietla tekst rozpoczynaj¹c od wsp. (X,Y)
+  82:lcd.c         **** void LCDTextXY(char x, char y, char *T)
+  83:lcd.c         **** {
+ 257              		.loc 1 83 0
+ 258              		@ Function supports interworking.
+ 259              		@ args = 0, pretend = 0, frame = 0
+ 260              		@ frame_needed = 1, uses_anonymous_args = 0
+ 261              	.LVL18:
+ 262 018c 0DC0A0E1 		mov	ip, sp
+ 263              	.LCFI7:
+ 264 0190 70D82DE9 		stmfd	sp!, {r4, r5, r6, fp, ip, lr, pc}
+ 265              	.LCFI8:
+ 266 0194 04B04CE2 		sub	fp, ip, #4
+ 267              	.LCFI9:
+ 268 0198 0250A0E1 		mov	r5, r2
+ 269 019c FF4000E2 		and	r4, r0, #255
+ 270 01a0 FF6001E2 		and	r6, r1, #255
+ 271 01a4 740000EA 		b	.L47
+ 272              	.LVL19:
+ 273              	.L38:
+  84:lcd.c         **** 	while (*T)
+  85:lcd.c         **** 	{
+  86:lcd.c         **** 		LCDGotoXY(x, y);
+ 274              		.loc 1 86 0
+ 275 01a8 0400A0E1 		mov	r0, r4
+ 276 01ac 0610A0E1 		mov	r1, r6
+ 277 01b0 FEFFFFEB 		bl	LCDGotoXY
+  87:lcd.c         **** 		LCDSendByte(*T,dat_lcd);		//wyœwietlenie pojedynczego znaku
+ 278              		.loc 1 87 0
+ 279 01b4 0100D5E4 		ldrb	r0, [r5], #1	@ zero_extendqisi2
+ 280 01b8 0110A0E3 		mov	r1, #1
+ 281 01bc FEFFFFEB 		bl	LCDSendByte
+  88:lcd.c         **** 		x++; 			//nastêpna pozycja x na ekranie
+ 282              		.loc 1 88 0
+ 283 01c0 013084E2 		add	r3, r4, #1
+ 284 01c4 FF4003E2 		and	r4, r3, #255
+  89:lcd.c         **** 		T++;			//nastêpny znak napisu
+  90:lcd.c         **** 		if (x > 19)		//jeœli x>19 to nastêpna linia
+ 285              		.loc 1 90 0
+ 286 01c8 130054E3 		cmp	r4, #19
+  91:lcd.c         **** 		{
+  92:lcd.c         **** 			x = 0; 
+  93:lcd.c         **** 			y++;
+ 287              		.loc 1 93 0
+ 288 01cc 01308682 		addhi	r3, r6, #1
+ 289 01d0 FF600382 		andhi	r6, r3, #255
+ 290 01d4 0040A083 		movhi	r4, #0
+ 291              	.LVL20:
+ 292              	.L47:
+ 293              		.loc 1 84 0
+ 294 01d8 0030D5E5 		ldrb	r3, [r5, #0]	@ zero_extendqisi2
+ 295 01dc 000053E3 		cmp	r3, #0
+ 296 01e0 6800001A 		bne	.L38
+  94:lcd.c         **** 		}
+  95:lcd.c         **** 	}
+  96:lcd.c         **** }				   
+ 297              		.loc 1 96 0
+ 298 01e4 18D04BE2 		sub	sp, fp, #24
+ 299 01e8 70689DE8 		ldmfd	sp, {r4, r5, r6, fp, sp, lr}
+ 300 01ec 1EFF2FE1 		bx	lr
+ 301              	.LFE6:
+ 303              		.align	2
+ 304              		.global	LCDSendByte
+ 306              	LCDSendByte:
+ 307              	.LFB7:
+  97:lcd.c         **** 
+  98:lcd.c         **** void LCDSendByte(unsigned int data_lcd,unsigned int cmd)
+  99:lcd.c         **** {
+ 308              		.loc 1 99 0
+ 309              		@ Function supports interworking.
+ 310              		@ args = 0, pretend = 0, frame = 0
+ 311              		@ frame_needed = 1, uses_anonymous_args = 0
+ 312              	.LVL21:
+ 313 01f0 0DC0A0E1 		mov	ip, sp
+ 314              	.LCFI10:
+ 315 01f4 F0DD2DE9 		stmfd	sp!, {r4, r5, r6, r7, r8, sl, fp, ip, lr, pc}
+ 316              	.LCFI11:
+ 317 01f8 04B04CE2 		sub	fp, ip, #4
+ 318              	.LCFI12:
+ 319 01fc 0060A0E1 		mov	r6, r0
+ 320 0200 0150A0E1 		mov	r5, r1
+ 100:lcd.c         ****   IOCLR0 = 0xFFFFFFFF & (E | RS);
+ 321              		.loc 1 100 0
+ 322 0204 CE82A0E3 		mov	r8, #-536870900
+ 323 0208 0A8988E2 		add	r8, r8, #163840
+ 324 020c 0331A0E3 		mov	r3, #-1073741824
+ 325 0210 003088E5 		str	r3, [r8, #0]
+ 101:lcd.c         ****   LCDDelay();
+ 326              		.loc 1 101 0
+ 327 0214 FEFFFFEB 		bl	LCDDelay
+ 328              	.LVL22:
+ 102:lcd.c         ****   IOCLR1 = 0x00FF0000;
+ 329              		.loc 1 102 0
+ 330 0218 0E72A0E3 		mov	r7, #-536870912
+ 331 021c 0A7987E2 		add	r7, r7, #163840
+ 332 0220 FFA8A0E3 		mov	sl, #16711680
+ 333 0224 1CA087E5 		str	sl, [r7, #28]
+ 103:lcd.c         ****   LCDDelay();
+ 334              		.loc 1 103 0
+ 335 0228 FEFFFFEB 		bl	LCDDelay
+ 104:lcd.c         **** 
+ 105:lcd.c         ****   // RS=cmd, E=0
+ 106:lcd.c         ****   IOSET0 = 0x00000000 | (cmd << cmd_bit);                  
+ 336              		.loc 1 106 0
+ 337 022c 855FA0E1 		mov	r5, r5, asl #31
+ 338              	.LVL23:
+ 339 0230 4E42A0E3 		mov	r4, #-536870908
+ 340 0234 0A4984E2 		add	r4, r4, #163840
+ 341 0238 005084E5 		str	r5, [r4, #0]
+ 107:lcd.c         ****   LCDDelay();   
+ 342              		.loc 1 107 0
+ 343 023c FEFFFFEB 		bl	LCDDelay
+ 108:lcd.c         ****  
+ 109:lcd.c         ****   // Set data
+ 110:lcd.c         ****   IOSET1 = ((data_lcd & 0xFF) << 16) & 0x00FF0000;    
+ 344              		.loc 1 110 0
+ 345 0240 FF6006E2 		and	r6, r6, #255
+ 346              	.LVL24:
+ 347 0244 0668A0E1 		mov	r6, r6, asl #16
+ 348 0248 146087E5 		str	r6, [r7, #20]
+ 111:lcd.c         ****   LCDDelay();
+ 349              		.loc 1 111 0
+ 350 024c FEFFFFEB 		bl	LCDDelay
+ 112:lcd.c         **** 
+ 113:lcd.c         ****   // RS=cmd, E=1
+ 114:lcd.c         ****   IOSET0 = (0xFF000000 & E) | (cmd << cmd_bit);			  
+ 351              		.loc 1 114 0
+ 352 0250 015185E3 		orr	r5, r5, #1073741824
+ 353 0254 005084E5 		str	r5, [r4, #0]
+ 115:lcd.c         ****   LCDDelay();   	 
+ 354              		.loc 1 115 0
+ 355 0258 FEFFFFEB 		bl	LCDDelay
+ 116:lcd.c         **** 
+ 117:lcd.c         ****   // RS=cmd, E=0
+ 118:lcd.c         ****   IOCLR0 = (0xFF000000 & E);
+ 356              		.loc 1 118 0
+ 357 025c 0131A0E3 		mov	r3, #1073741824
+ 358 0260 003088E5 		str	r3, [r8, #0]
+ 119:lcd.c         **** 
+ 120:lcd.c         ****   IOCLR1 = 0x00FF0000;		                          
+ 359              		.loc 1 120 0
+ 360 0264 1CA087E5 		str	sl, [r7, #28]
+ 121:lcd.c         ****   LCDDelay();
+ 361              		.loc 1 121 0
+ 362 0268 FEFFFFEB 		bl	LCDDelay
+ 122:lcd.c         **** } 
+ 363              		.loc 1 122 0
+ 364 026c 24D04BE2 		sub	sp, fp, #36
+ 365 0270 F06D9DE8 		ldmfd	sp, {r4, r5, r6, r7, r8, sl, fp, sp, lr}
+ 366 0274 1EFF2FE1 		bx	lr
+ 367              	.LFE7:
+ 369              		.align	2
+ 370              		.global	LCDInit
+ 372              	LCDInit:
+ 373              	.LFB8:
+ 123:lcd.c         **** 
+ 124:lcd.c         **** void LCDInit(void)
+ 125:lcd.c         **** {
+ 374              		.loc 1 125 0
+ 375              		@ Function supports interworking.
+ 376              		@ args = 0, pretend = 0, frame = 0
+ 377              		@ frame_needed = 1, uses_anonymous_args = 0
+ 378 0278 0DC0A0E1 		mov	ip, sp
+ 379              	.LCFI13:
+ 380 027c 00D82DE9 		stmfd	sp!, {fp, ip, lr, pc}
+ 381              	.LCFI14:
+ 382 0280 04B04CE2 		sub	fp, ip, #4
+ 383              	.LCFI15:
+ 126:lcd.c         ****    LCDSendByte(0x30,cmd_lcd);	LCDDelay();  LCDDelay();  LCDDelay();
+ 384              		.loc 1 126 0
+ 385 0284 3000A0E3 		mov	r0, #48
+ 386 0288 0010A0E3 		mov	r1, #0
+ 387 028c FEFFFFEB 		bl	LCDSendByte
+ 388 0290 FEFFFFEB 		bl	LCDDelay
+ 389 0294 FEFFFFEB 		bl	LCDDelay
+ 390 0298 FEFFFFEB 		bl	LCDDelay
+ 127:lcd.c         ****    LCDSendByte(0x30,cmd_lcd);	LCDDelay();  LCDDelay();  LCDDelay();
+ 391              		.loc 1 127 0
+ 392 029c 3000A0E3 		mov	r0, #48
+ 393 02a0 0010A0E3 		mov	r1, #0
+ 394 02a4 FEFFFFEB 		bl	LCDSendByte
+ 395 02a8 FEFFFFEB 		bl	LCDDelay
+ 396 02ac FEFFFFEB 		bl	LCDDelay
+ 397 02b0 FEFFFFEB 		bl	LCDDelay
+ 128:lcd.c         ****    LCDSendByte(0x30,cmd_lcd);   LCDDelay();  LCDDelay();  LCDDelay();
+ 398              		.loc 1 128 0
+ 399 02b4 3000A0E3 		mov	r0, #48
+ 400 02b8 0010A0E3 		mov	r1, #0
+ 401 02bc FEFFFFEB 		bl	LCDSendByte
+ 402 02c0 FEFFFFEB 		bl	LCDDelay
+ 403 02c4 FEFFFFEB 		bl	LCDDelay
+ 404 02c8 FEFFFFEB 		bl	LCDDelay
+ 129:lcd.c         **** 
+ 130:lcd.c         ****    LCDSendByte(0x38,cmd_lcd);   LCDDelay();
+ 405              		.loc 1 130 0
+ 406 02cc 3800A0E3 		mov	r0, #56
+ 407 02d0 0010A0E3 		mov	r1, #0
+ 408 02d4 FEFFFFEB 		bl	LCDSendByte
+ 409 02d8 FEFFFFEB 		bl	LCDDelay
+ 131:lcd.c         ****    LCDSendByte(0x0C,cmd_lcd);   LCDDelay();   
+ 410              		.loc 1 131 0
+ 411 02dc 0C00A0E3 		mov	r0, #12
+ 412 02e0 0010A0E3 		mov	r1, #0
+ 413 02e4 FEFFFFEB 		bl	LCDSendByte
+ 414 02e8 FEFFFFEB 		bl	LCDDelay
+ 132:lcd.c         ****    LCDSendByte(0x06,cmd_lcd);   LCDDelay();   
+ 415              		.loc 1 132 0
+ 416 02ec 0600A0E3 		mov	r0, #6
+ 417 02f0 0010A0E3 		mov	r1, #0
+ 418 02f4 FEFFFFEB 		bl	LCDSendByte
+ 419 02f8 FEFFFFEB 		bl	LCDDelay
+ 133:lcd.c         ****    LCDSendByte(0x01,cmd_lcd);   LCDDelay();   
+ 420              		.loc 1 133 0
+ 421 02fc 0100A0E3 		mov	r0, #1
+ 422 0300 0010A0E3 		mov	r1, #0
+ 423 0304 FEFFFFEB 		bl	LCDSendByte
+ 424 0308 FEFFFFEB 		bl	LCDDelay
+ 134:lcd.c         ****    LCDSendByte(0x02,cmd_lcd);   LCDDelay();   
+ 425              		.loc 1 134 0
+ 426 030c 0200A0E3 		mov	r0, #2
+ 427 0310 0010A0E3 		mov	r1, #0
+ 428 0314 FEFFFFEB 		bl	LCDSendByte
+ 429 0318 FEFFFFEB 		bl	LCDDelay
+ 135:lcd.c         **** 
+ 136:lcd.c         **** }
+ 430              		.loc 1 136 0
+ 431 031c 0CD04BE2 		sub	sp, fp, #12
+ 432 0320 00689DE8 		ldmfd	sp, {fp, sp, lr}
+ 433 0324 1EFF2FE1 		bx	lr
+ 434              	.LFE8:
+ 436              		.align	2
+ 437              		.global	LCDClear
+ 439              	LCDClear:
+ 440              	.LFB9:
+ 137:lcd.c         **** 
+ 138:lcd.c         **** void LCDClear(void)
+ 139:lcd.c         **** {
+ 441              		.loc 1 139 0
+ 442              		@ Function supports interworking.
+ 443              		@ args = 0, pretend = 0, frame = 0
+ 444              		@ frame_needed = 1, uses_anonymous_args = 0
+ 445 0328 0DC0A0E1 		mov	ip, sp
+ 446              	.LCFI16:
+ 447 032c 00D82DE9 		stmfd	sp!, {fp, ip, lr, pc}
+ 448              	.LCFI17:
+ 449 0330 04B04CE2 		sub	fp, ip, #4
+ 450              	.LCFI18:
+ 140:lcd.c         ****   int i;
+ 141:lcd.c         ****   LCDSendByte(0x01,0);
+ 451              		.loc 1 141 0
+ 452 0334 0100A0E3 		mov	r0, #1
+ 453 0338 0010A0E3 		mov	r1, #0
+ 454 033c FEFFFFEB 		bl	LCDSendByte
+ 455 0340 0138A0E3 		mov	r3, #65536
+ 456              	.L53:
+ 142:lcd.c         ****   for(i = 0; i < 0x10000; i++);
+ 457              		.loc 1 142 0
+ 458 0344 013053E2 		subs	r3, r3, #1
+ 459 0348 CF00001A 		bne	.L53
+ 143:lcd.c         **** }
+ 460              		.loc 1 143 0
+ 461 034c 0CD04BE2 		sub	sp, fp, #12
+ 462 0350 00689DE8 		ldmfd	sp, {fp, sp, lr}
+ 463 0354 1EFF2FE1 		bx	lr
+ 464              	.LFE9:
+ 466              		.align	2
+ 467              		.global	LCD32bitNumberDec
+ 469              	LCD32bitNumberDec:
+ 470              	.LFB10:
+ 144:lcd.c         **** 
+ 145:lcd.c         **** void LCD32bitNumberDec(int number)
+ 146:lcd.c         **** {
+ 471              		.loc 1 146 0
+ 472              		@ Function supports interworking.
+ 473              		@ args = 0, pretend = 0, frame = 16
+ 474              		@ frame_needed = 1, uses_anonymous_args = 0
+ 475              	.LVL25:
+ 476 0358 0DC0A0E1 		mov	ip, sp
+ 477              	.LCFI19:
+ 478 035c 00D82DE9 		stmfd	sp!, {fp, ip, lr, pc}
+ 479              	.LCFI20:
+ 480 0360 04B04CE2 		sub	fp, ip, #4
+ 481              	.LCFI21:
+ 482 0364 10D04DE2 		sub	sp, sp, #16
+ 483              	.LCFI22:
+ 147:lcd.c         **** 	char buf[15];
+ 148:lcd.c         **** 	LCDText(convert32bit_dec(number,buf));
+ 484              		.loc 1 148 0
+ 485 0368 1B104BE2 		sub	r1, fp, #27
+ 486 036c FEFFFFEB 		bl	convert32bit_dec
+ 487              	.LVL26:
+ 488 0370 FEFFFFEB 		bl	LCDText
+ 149:lcd.c         **** }
+ 489              		.loc 1 149 0
+ 490 0374 0CD04BE2 		sub	sp, fp, #12
+ 491 0378 00689DE8 		ldmfd	sp, {fp, sp, lr}
+ 492 037c 1EFF2FE1 		bx	lr
+ 493              	.LFE10:
+ 734              	.Letext0:

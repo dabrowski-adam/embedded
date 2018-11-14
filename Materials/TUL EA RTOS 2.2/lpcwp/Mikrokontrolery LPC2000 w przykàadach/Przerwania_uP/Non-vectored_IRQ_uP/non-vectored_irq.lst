@@ -1,0 +1,751 @@
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s 			page 1
+
+
+   1              		.file	"Non-vectored_IRQ.c"
+   2              		.section	.debug_abbrev,"",%progbits
+   3              	.Ldebug_abbrev0:
+   4              		.section	.debug_info,"",%progbits
+   5              	.Ldebug_info0:
+   6              		.section	.debug_line,"",%progbits
+   7              	.Ldebug_line0:
+   8 0000 57000000 		.text
+   8      02002600 
+   8      00000201 
+   8      FB0E0A00 
+   8      01010101 
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	EINT2Init
+  12              		.type	EINT2Init, %function
+  13              	EINT2Init:
+  14              	.LFB2:
+  15              		.file 1 "Non-vectored_IRQ.c"
+   1:Non-vectored_IRQ.c **** ////////////////////////////////////////////////////////
+   2:Non-vectored_IRQ.c **** // Function:	Non-vectored_IRQ interrupt example - EINT2 interrupt
+   3:Non-vectored_IRQ.c **** // Target:		LPC2138
+   4:Non-vectored_IRQ.c **** // Board:		ZL6ARM
+   5:Non-vectored_IRQ.c **** // Quartz:		12MHz
+   6:Non-vectored_IRQ.c **** // Compiler:	ARM-GCC
+   7:Non-vectored_IRQ.c **** // Author:		Arkadiusz Antoniak @ 2006, Poland
+   8:Non-vectored_IRQ.c **** // Copyright:	(c) Arkadiusz Antoniak, 2006
+   9:Non-vectored_IRQ.c **** ////////////////////////////////////////////////////////
+  10:Non-vectored_IRQ.c **** #include <LPC213x.H>	    
+  11:Non-vectored_IRQ.c **** #include "lcd.h"
+  12:Non-vectored_IRQ.c **** 
+  13:Non-vectored_IRQ.c **** //EINT2 interrupt handler's header
+  14:Non-vectored_IRQ.c **** void EINT2ISR(void) __attribute__ ((interrupt));
+  15:Non-vectored_IRQ.c **** 
+  16:Non-vectored_IRQ.c **** //*******************************
+  17:Non-vectored_IRQ.c **** // EINT2 Init
+  18:Non-vectored_IRQ.c **** //*******************************
+  19:Non-vectored_IRQ.c **** void EINT2Init(void)
+  20:Non-vectored_IRQ.c **** {
+  16              		.loc 1 20 0
+  17              		@ Function supports interworking.
+  18              		@ args = 0, pretend = 0, frame = 0
+  19              		@ frame_needed = 0, uses_anonymous_args = 0
+  20              		@ link register save eliminated.
+  21              	.LVL0:
+  22              		@ lr needed for prologue
+  21:Non-vectored_IRQ.c **** 	//P0.7=EINT2
+  22:Non-vectored_IRQ.c **** 	PINSEL0|=(3<<14);
+  23              		.loc 1 22 0
+  24 0000 0E22A0E3 		mov	r2, #-536870912
+  25 0004 0B1982E2 		add	r1, r2, #180224
+  26 0008 003091E5 		ldr	r3, [r1, #0]
+  27 000c 033983E3 		orr	r3, r3, #49152
+  28 0010 003081E5 		str	r3, [r1, #0]
+  23:Non-vectored_IRQ.c **** 	
+  24:Non-vectored_IRQ.c **** 	//EXT4 edge trigered
+  25:Non-vectored_IRQ.c **** 	EXTMODE=(1<<2);
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s 			page 2
+
+
+  29              		.loc 1 25 0
+  30 0014 7F2982E2 		add	r2, r2, #2080768
+  31 0018 0430A0E3 		mov	r3, #4
+  32 001c 4831C2E5 		strb	r3, [r2, #328]
+  26:Non-vectored_IRQ.c **** 	
+  27:Non-vectored_IRQ.c **** 	//Falling edge
+  28:Non-vectored_IRQ.c **** 	EXTPOLAR=0;
+  33              		.loc 1 28 0
+  34 0020 043043E2 		sub	r3, r3, #4
+  35 0024 4C31C2E5 		strb	r3, [r2, #332]
+  29:Non-vectored_IRQ.c **** 
+  30:Non-vectored_IRQ.c **** 	//VIC configured for Non-vectored IRQ handling
+  31:Non-vectored_IRQ.c **** 	VICDefVectAddr = (unsigned int)EINT2ISR;
+  36              		.loc 1 31 0
+  37 0028 18209FE5 		ldr	r2, .L3
+  38 002c 3F3DE0E3 		mvn	r3, #4032
+  39 0030 0B2003E5 		str	r2, [r3, #-11]
+  32:Non-vectored_IRQ.c **** 	VICIntEnable |= 0x00010000;
+  40              		.loc 1 32 0
+  41 0034 FE2EE0E3 		mvn	r2, #4064
+  42 0038 0F3012E5 		ldr	r3, [r2, #-15]
+  43 003c 013883E3 		orr	r3, r3, #65536
+  44 0040 0F3002E5 		str	r3, [r2, #-15]
+  33:Non-vectored_IRQ.c **** }
+  45              		.loc 1 33 0
+  46 0044 1EFF2FE1 		bx	lr
+  47              	.L4:
+  48              		.align	2
+  49              	.L3:
+  50 0048 00000000 		.word	EINT2ISR
+  51              	.LFE2:
+  52              		.size	EINT2Init, .-EINT2Init
+  53              		.align	2
+  54              		.global	delay
+  55              		.type	delay, %function
+  56              	delay:
+  57              	.LFB3:
+  34:Non-vectored_IRQ.c **** 
+  35:Non-vectored_IRQ.c **** //*******************************
+  36:Non-vectored_IRQ.c **** // Delay function
+  37:Non-vectored_IRQ.c **** //*******************************
+  38:Non-vectored_IRQ.c **** void delay(unsigned int del_time) 
+  39:Non-vectored_IRQ.c **** { 
+  58              		.loc 1 39 0
+  59              		@ Function supports interworking.
+  60              		@ args = 0, pretend = 0, frame = 0
+  61              		@ frame_needed = 0, uses_anonymous_args = 0
+  62              		@ link register save eliminated.
+  63              	.LVL1:
+  64              		@ lr needed for prologue
+  40:Non-vectored_IRQ.c **** 	unsigned int i;
+  41:Non-vectored_IRQ.c **** 	for(i=0;i<del_time;i++);	   
+  65              		.loc 1 41 0
+  66 004c 000050E3 		cmp	r0, #0
+  67 0050 1EFF2F01 		bxeq	lr
+  68 0054 0030A0E3 		mov	r3, #0
+  69              	.LVL2:
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s 			page 3
+
+
+  70              	.L8:
+  71 0058 013083E2 		add	r3, r3, #1
+  72 005c 030050E1 		cmp	r0, r3
+  73 0060 1400001A 		bne	.L8
+  74 0064 1EFF2FE1 		bx	lr
+  75              	.LFE3:
+  76              		.size	delay, .-delay
+  77              		.section	.rodata.str1.4,"aMS",%progbits,1
+  78              		.align	2
+  79              	.LC0:
+  80 0000 4E6F6E2D 		.ascii	"Non-vectored IRQ\000"
+  80      76656374 
+  80      6F726564 
+  80      20495251 
+  80      00
+  81 0011 000000   		.align	2
+  82              	.LC1:
+  83 0014 50726573 		.ascii	"Press S4\000"
+  83      73205334 
+  83      00
+  84              		.text
+  85              		.align	2
+  86              		.global	main
+  87              		.type	main, %function
+  88              	main:
+  89              	.LFB4:
+  42:Non-vectored_IRQ.c **** }
+  43:Non-vectored_IRQ.c **** 
+  44:Non-vectored_IRQ.c **** //*******************************
+  45:Non-vectored_IRQ.c **** // MAIN
+  46:Non-vectored_IRQ.c **** //*******************************
+  47:Non-vectored_IRQ.c **** int main (void)
+  48:Non-vectored_IRQ.c **** {
+  90              		.loc 1 48 0
+  91              		@ Function supports interworking.
+  92              		@ args = 0, pretend = 0, frame = 0
+  93              		@ frame_needed = 1, uses_anonymous_args = 0
+  94 0068 0DC0A0E1 		mov	ip, sp
+  95              	.LCFI0:
+  96 006c 00D82DE9 		stmfd	sp!, {fp, ip, lr, pc}
+  97              	.LCFI1:
+  98 0070 04B04CE2 		sub	fp, ip, #4
+  99              	.LCFI2:
+  49:Non-vectored_IRQ.c **** 	//Peripherials' frequency = fclk/4 = 15MHz
+  50:Non-vectored_IRQ.c **** 	VPBDIV&=0xFFFFFFFC;
+ 100              		.loc 1 50 0
+ 101 0074 0E12A0E3 		mov	r1, #-536870912
+ 102 0078 7F2981E2 		add	r2, r1, #2080768
+ 103 007c 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+ 104 0080 FC3003E2 		and	r3, r3, #252
+ 105 0084 0031C2E5 		strb	r3, [r2, #256]
+  51:Non-vectored_IRQ.c **** 	VPBDIV|=0x00;
+ 106              		.loc 1 51 0
+ 107 0088 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+ 108 008c FF3003E2 		and	r3, r3, #255
+ 109 0090 0031C2E5 		strb	r3, [r2, #256]
+  52:Non-vectored_IRQ.c **** 
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s 			page 4
+
+
+  53:Non-vectored_IRQ.c **** 	//Port direction configuration
+  54:Non-vectored_IRQ.c **** 	IODIR0 = 0xFF000000;
+ 110              		.loc 1 54 0
+ 111 0094 FF24A0E3 		mov	r2, #-16777216
+ 112 0098 8E32A0E3 		mov	r3, #-536870904
+ 113 009c 0A3983E2 		add	r3, r3, #163840
+ 114 00a0 002083E5 		str	r2, [r3, #0]
+  55:Non-vectored_IRQ.c **** 	IODIR1 = 0x00FF0000;
+ 115              		.loc 1 55 0
+ 116 00a4 0A1981E2 		add	r1, r1, #163840
+ 117 00a8 FF38A0E3 		mov	r3, #16711680
+ 118 00ac 183081E5 		str	r3, [r1, #24]
+  56:Non-vectored_IRQ.c **** 
+  57:Non-vectored_IRQ.c **** 	EINT2Init();
+ 119              		.loc 1 57 0
+ 120 00b0 FEFFFFEB 		bl	EINT2Init
+  58:Non-vectored_IRQ.c **** 	LCDInit();
+ 121              		.loc 1 58 0
+ 122 00b4 FEFFFFEB 		bl	LCDInit
+  59:Non-vectored_IRQ.c **** 
+  60:Non-vectored_IRQ.c **** 	LCDClear();
+ 123              		.loc 1 60 0
+ 124 00b8 FEFFFFEB 		bl	LCDClear
+  61:Non-vectored_IRQ.c **** 
+  62:Non-vectored_IRQ.c **** 	LCDText("Non-vectored IRQ");
+ 125              		.loc 1 62 0
+ 126 00bc 18009FE5 		ldr	r0, .L14
+ 127 00c0 FEFFFFEB 		bl	LCDText
+  63:Non-vectored_IRQ.c **** 	LCDGotoXY(0,1);
+ 128              		.loc 1 63 0
+ 129 00c4 0000A0E3 		mov	r0, #0
+ 130 00c8 0110A0E3 		mov	r1, #1
+ 131 00cc FEFFFFEB 		bl	LCDGotoXY
+  64:Non-vectored_IRQ.c **** 	LCDText("Press S4");
+ 132              		.loc 1 64 0
+ 133 00d0 08009FE5 		ldr	r0, .L14+4
+ 134 00d4 FEFFFFEB 		bl	LCDText
+ 135              	.L12:
+ 136 00d8 340000EA 		b	.L12
+ 137              	.L15:
+ 138              		.align	2
+ 139              	.L14:
+ 140 00dc 00000000 		.word	.LC0
+ 141 00e0 14000000 		.word	.LC1
+ 142              	.LFE4:
+ 143              		.size	main, .-main
+ 144              		.section	.rodata.str1.4
+ 145 001d 000000   		.align	2
+ 146              	.LC2:
+ 147 0020 4E2D7665 		.ascii	"N-vect. IRQ!!!\000"
+ 147      63742E20 
+ 147      49525121 
+ 147      212100
+ 148 002f 00       		.text
+ 149              		.align	2
+ 150              		.global	EINT2ISR
+ 151              		.type	EINT2ISR, %function
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s 			page 5
+
+
+ 152              	EINT2ISR:
+ 153              	.LFB5:
+  65:Non-vectored_IRQ.c **** 
+  66:Non-vectored_IRQ.c **** 	while(1);
+  67:Non-vectored_IRQ.c **** }
+  68:Non-vectored_IRQ.c **** 
+  69:Non-vectored_IRQ.c **** //*******************************
+  70:Non-vectored_IRQ.c **** // EINT2 interrupt routine
+  71:Non-vectored_IRQ.c **** //*******************************
+  72:Non-vectored_IRQ.c **** void EINT2ISR(void)
+  73:Non-vectored_IRQ.c **** {
+ 154              		.loc 1 73 0
+ 155              		@ Interrupt Service Routine.
+ 156              		@ args = 0, pretend = 0, frame = 0
+ 157              		@ frame_needed = 1, uses_anonymous_args = 0
+ 158 00e4 04C02DE5 		str	ip, [sp, #-4]!
+ 159 00e8 0DC0A0E1 		mov	ip, sp
+ 160              	.LCFI3:
+ 161 00ec 0FD82DE9 		stmfd	sp!, {r0, r1, r2, r3, fp, ip, lr, pc}
+ 162              	.LCFI4:
+ 163 00f0 04B04CE2 		sub	fp, ip, #4
+ 164              	.LCFI5:
+  74:Non-vectored_IRQ.c **** 	if(VICIRQStatus & 0x00010000)
+ 165              		.loc 1 74 0
+ 166 00f4 0231A0E3 		mov	r3, #-2147483648
+ 167 00f8 C339A0E1 		mov	r3, r3, asr #19
+ 168 00fc 003093E5 		ldr	r3, [r3, #0]
+ 169 0100 010813E3 		tst	r3, #65536
+ 170 0104 4A00000A 		beq	.L17
+  75:Non-vectored_IRQ.c **** 	{
+  76:Non-vectored_IRQ.c **** 		LCDClear();
+ 171              		.loc 1 76 0
+ 172 0108 FEFFFFEB 		bl	LCDClear
+  77:Non-vectored_IRQ.c **** 		LCDText("N-vect. IRQ!!!");
+ 173              		.loc 1 77 0
+ 174 010c 38009FE5 		ldr	r0, .L20
+ 175 0110 FEFFFFEB 		bl	LCDText
+  78:Non-vectored_IRQ.c **** 		delay(0x800000);
+ 176              		.loc 1 78 0
+ 177 0114 0205A0E3 		mov	r0, #8388608
+ 178 0118 FEFFFFEB 		bl	delay
+  79:Non-vectored_IRQ.c **** 		LCDClear();
+ 179              		.loc 1 79 0
+ 180 011c FEFFFFEB 		bl	LCDClear
+  80:Non-vectored_IRQ.c **** 
+  81:Non-vectored_IRQ.c **** 		//Clear EINT2 interrupt flag
+  82:Non-vectored_IRQ.c **** 		EXTINT=(1<<2);
+ 181              		.loc 1 82 0
+ 182 0120 0420A0E3 		mov	r2, #4
+ 183 0124 0E32A0E3 		mov	r3, #-536870912
+ 184 0128 7F3983E2 		add	r3, r3, #2080768
+ 185 012c 4021C3E5 		strb	r2, [r3, #320]
+ 186              	.L17:
+  83:Non-vectored_IRQ.c **** 	}
+  84:Non-vectored_IRQ.c **** 
+  85:Non-vectored_IRQ.c **** 	//Ack interrupt
+  86:Non-vectored_IRQ.c **** 	VICVectAddr=0x00000000;
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s 			page 6
+
+
+ 187              		.loc 1 86 0
+ 188 0130 0020A0E3 		mov	r2, #0
+ 189 0134 3F3DE0E3 		mvn	r3, #4032
+ 190 0138 0F2003E5 		str	r2, [r3, #-15]
+  87:Non-vectored_IRQ.c **** }
+ 191              		.loc 1 87 0
+ 192 013c 1CD04BE2 		sub	sp, fp, #28
+ 193 0140 0F689DE8 		ldmfd	sp, {r0, r1, r2, r3, fp, sp, lr}
+ 194 0144 0010BDE8 		ldmfd	sp!, {ip}
+ 195 0148 04F05EE2 		subs	pc, lr, #4
+ 196              	.L21:
+ 197              		.align	2
+ 198              	.L20:
+ 199 014c 20000000 		.word	.LC2
+ 200              	.LFE5:
+ 201              		.size	EINT2ISR, .-EINT2ISR
+ 202              		.section	.debug_frame,"",%progbits
+ 203              	.Lframe0:
+ 204 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ 205              	.LSCIE0:
+ 206 0004 FFFFFFFF 		.4byte	0xffffffff
+ 207 0008 01       		.byte	0x1
+ 208 0009 00       		.ascii	"\000"
+ 209 000a 01       		.uleb128 0x1
+ 210 000b 7C       		.sleb128 -4
+ 211 000c 0E       		.byte	0xe
+ 212 000d 0C       		.byte	0xc
+ 213 000e 0D       		.uleb128 0xd
+ 214 000f 00       		.uleb128 0x0
+ 215              		.align	2
+ 216              	.LECIE0:
+ 217              	.LSFDE0:
+ 218 0010 0C000000 		.4byte	.LEFDE0-.LASFDE0
+ 219              	.LASFDE0:
+ 220 0014 00000000 		.4byte	.Lframe0
+ 221 0018 00000000 		.4byte	.LFB2
+ 222 001c 4C000000 		.4byte	.LFE2-.LFB2
+ 223              		.align	2
+ 224              	.LEFDE0:
+ 225              	.LSFDE2:
+ 226 0020 0C000000 		.4byte	.LEFDE2-.LASFDE2
+ 227              	.LASFDE2:
+ 228 0024 00000000 		.4byte	.Lframe0
+ 229 0028 4C000000 		.4byte	.LFB3
+ 230 002c 1C000000 		.4byte	.LFE3-.LFB3
+ 231              		.align	2
+ 232              	.LEFDE2:
+ 233              	.LSFDE4:
+ 234 0030 1C000000 		.4byte	.LEFDE4-.LASFDE4
+ 235              	.LASFDE4:
+ 236 0034 00000000 		.4byte	.Lframe0
+ 237 0038 68000000 		.4byte	.LFB4
+ 238 003c 7C000000 		.4byte	.LFE4-.LFB4
+ 239 0040 44       		.byte	0x4
+ 240              		.4byte	.LCFI0-.LFB4
+ 241 0041 0D       		.byte	0xd
+ 242 0042 0C       		.uleb128 0xc
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s 			page 7
+
+
+ 243 0043 44       		.byte	0x4
+ 244              		.4byte	.LCFI1-.LCFI0
+ 245 0044 8E       		.byte	0x8e
+ 246 0045 02       		.uleb128 0x2
+ 247 0046 8D       		.byte	0x8d
+ 248 0047 03       		.uleb128 0x3
+ 249 0048 8B       		.byte	0x8b
+ 250 0049 04       		.uleb128 0x4
+ 251 004a 44       		.byte	0x4
+ 252              		.4byte	.LCFI2-.LCFI1
+ 253 004b 0C       		.byte	0xc
+ 254 004c 0B       		.uleb128 0xb
+ 255 004d 04       		.uleb128 0x4
+ 256 004e 0000     		.align	2
+ 257              	.LEFDE4:
+ 258              	.LSFDE6:
+ 259 0050 24000000 		.4byte	.LEFDE6-.LASFDE6
+ 260              	.LASFDE6:
+ 261 0054 00000000 		.4byte	.Lframe0
+ 262 0058 E4000000 		.4byte	.LFB5
+ 263 005c 6C000000 		.4byte	.LFE5-.LFB5
+ 264 0060 48       		.byte	0x4
+ 265              		.4byte	.LCFI3-.LFB5
+ 266 0061 0D       		.byte	0xd
+ 267 0062 0C       		.uleb128 0xc
+ 268 0063 44       		.byte	0x4
+ 269              		.4byte	.LCFI4-.LCFI3
+ 270 0064 8E       		.byte	0x8e
+ 271 0065 02       		.uleb128 0x2
+ 272 0066 8D       		.byte	0x8d
+ 273 0067 03       		.uleb128 0x3
+ 274 0068 8B       		.byte	0x8b
+ 275 0069 04       		.uleb128 0x4
+ 276 006a 83       		.byte	0x83
+ 277 006b 05       		.uleb128 0x5
+ 278 006c 82       		.byte	0x82
+ 279 006d 06       		.uleb128 0x6
+ 280 006e 81       		.byte	0x81
+ 281 006f 07       		.uleb128 0x7
+ 282 0070 80       		.byte	0x80
+ 283 0071 08       		.uleb128 0x8
+ 284 0072 44       		.byte	0x4
+ 285              		.4byte	.LCFI5-.LCFI4
+ 286 0073 0C       		.byte	0xc
+ 287 0074 0B       		.uleb128 0xb
+ 288 0075 04       		.uleb128 0x4
+ 289 0076 0000     		.align	2
+ 290              	.LEFDE6:
+ 291              		.text
+ 292              	.Letext0:
+ 293              		.section	.debug_info
+ 294 0000 9F000000 		.4byte	0x9f
+ 295 0004 0200     		.2byte	0x2
+ 296 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 297 000a 04       		.byte	0x4
+ 298 000b 01       		.uleb128 0x1
+ 299 000c 00000000 		.4byte	.Ldebug_line0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s 			page 8
+
+
+ 300 0010 50010000 		.4byte	.Letext0
+ 301 0014 00000000 		.4byte	.Ltext0
+ 302 0018 95000000 		.4byte	.LASF4
+ 303 001c 01       		.byte	0x1
+ 304 001d 77000000 		.4byte	.LASF5
+ 305 0021 16000000 		.4byte	.LASF6
+ 306 0025 02       		.uleb128 0x2
+ 307 0026 01       		.byte	0x1
+ 308 0027 A1000000 		.4byte	.LASF0
+ 309 002b 01       		.byte	0x1
+ 310 002c 14       		.byte	0x14
+ 311 002d 01       		.byte	0x1
+ 312 002e 00000000 		.4byte	.LFB2
+ 313 0032 4C000000 		.4byte	.LFE2
+ 314 0036 02       		.byte	0x2
+ 315 0037 7D       		.byte	0x7d
+ 316 0038 00       		.sleb128 0
+ 317 0039 03       		.uleb128 0x3
+ 318 003a 6A000000 		.4byte	0x6a
+ 319 003e 01       		.byte	0x1
+ 320 003f 8F000000 		.4byte	.LASF7
+ 321 0043 01       		.byte	0x1
+ 322 0044 27       		.byte	0x27
+ 323 0045 01       		.byte	0x1
+ 324 0046 4C000000 		.4byte	.LFB3
+ 325 004a 68000000 		.4byte	.LFE3
+ 326 004e 02       		.byte	0x2
+ 327 004f 7D       		.byte	0x7d
+ 328 0050 00       		.sleb128 0
+ 329 0051 04       		.uleb128 0x4
+ 330 0052 0D000000 		.4byte	.LASF8
+ 331 0056 01       		.byte	0x1
+ 332 0057 26       		.byte	0x26
+ 333 0058 6A000000 		.4byte	0x6a
+ 334 005c 01       		.byte	0x1
+ 335 005d 50       		.byte	0x50
+ 336 005e 05       		.uleb128 0x5
+ 337 005f 6900     		.ascii	"i\000"
+ 338 0061 01       		.byte	0x1
+ 339 0062 28       		.byte	0x28
+ 340 0063 6A000000 		.4byte	0x6a
+ 341 0067 01       		.byte	0x1
+ 342 0068 53       		.byte	0x53
+ 343 0069 00       		.byte	0x0
+ 344 006a 06       		.uleb128 0x6
+ 345 006b 00000000 		.4byte	.LASF2
+ 346 006f 04       		.byte	0x4
+ 347 0070 07       		.byte	0x7
+ 348 0071 07       		.uleb128 0x7
+ 349 0072 01       		.byte	0x1
+ 350 0073 8A000000 		.4byte	.LASF1
+ 351 0077 01       		.byte	0x1
+ 352 0078 30       		.byte	0x30
+ 353 0079 01       		.byte	0x1
+ 354 007a 88000000 		.4byte	0x88
+ 355 007e 68000000 		.4byte	.LFB4
+ 356 0082 E4000000 		.4byte	.LFE4
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s 			page 9
+
+
+ 357 0086 01       		.byte	0x1
+ 358 0087 5B       		.byte	0x5b
+ 359 0088 08       		.uleb128 0x8
+ 360 0089 696E7400 		.ascii	"int\000"
+ 361 008d 04       		.byte	0x4
+ 362 008e 05       		.byte	0x5
+ 363 008f 02       		.uleb128 0x2
+ 364 0090 01       		.byte	0x1
+ 365 0091 6E000000 		.4byte	.LASF3
+ 366 0095 01       		.byte	0x1
+ 367 0096 49       		.byte	0x49
+ 368 0097 01       		.byte	0x1
+ 369 0098 E4000000 		.4byte	.LFB5
+ 370 009c 50010000 		.4byte	.LFE5
+ 371 00a0 01       		.byte	0x1
+ 372 00a1 5B       		.byte	0x5b
+ 373 00a2 00       		.byte	0x0
+ 374              		.section	.debug_abbrev
+ 375 0000 01       		.uleb128 0x1
+ 376 0001 11       		.uleb128 0x11
+ 377 0002 01       		.byte	0x1
+ 378 0003 10       		.uleb128 0x10
+ 379 0004 06       		.uleb128 0x6
+ 380 0005 12       		.uleb128 0x12
+ 381 0006 01       		.uleb128 0x1
+ 382 0007 11       		.uleb128 0x11
+ 383 0008 01       		.uleb128 0x1
+ 384 0009 25       		.uleb128 0x25
+ 385 000a 0E       		.uleb128 0xe
+ 386 000b 13       		.uleb128 0x13
+ 387 000c 0B       		.uleb128 0xb
+ 388 000d 03       		.uleb128 0x3
+ 389 000e 0E       		.uleb128 0xe
+ 390 000f 1B       		.uleb128 0x1b
+ 391 0010 0E       		.uleb128 0xe
+ 392 0011 00       		.byte	0x0
+ 393 0012 00       		.byte	0x0
+ 394 0013 02       		.uleb128 0x2
+ 395 0014 2E       		.uleb128 0x2e
+ 396 0015 00       		.byte	0x0
+ 397 0016 3F       		.uleb128 0x3f
+ 398 0017 0C       		.uleb128 0xc
+ 399 0018 03       		.uleb128 0x3
+ 400 0019 0E       		.uleb128 0xe
+ 401 001a 3A       		.uleb128 0x3a
+ 402 001b 0B       		.uleb128 0xb
+ 403 001c 3B       		.uleb128 0x3b
+ 404 001d 0B       		.uleb128 0xb
+ 405 001e 27       		.uleb128 0x27
+ 406 001f 0C       		.uleb128 0xc
+ 407 0020 11       		.uleb128 0x11
+ 408 0021 01       		.uleb128 0x1
+ 409 0022 12       		.uleb128 0x12
+ 410 0023 01       		.uleb128 0x1
+ 411 0024 40       		.uleb128 0x40
+ 412 0025 0A       		.uleb128 0xa
+ 413 0026 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s 			page 10
+
+
+ 414 0027 00       		.byte	0x0
+ 415 0028 03       		.uleb128 0x3
+ 416 0029 2E       		.uleb128 0x2e
+ 417 002a 01       		.byte	0x1
+ 418 002b 01       		.uleb128 0x1
+ 419 002c 13       		.uleb128 0x13
+ 420 002d 3F       		.uleb128 0x3f
+ 421 002e 0C       		.uleb128 0xc
+ 422 002f 03       		.uleb128 0x3
+ 423 0030 0E       		.uleb128 0xe
+ 424 0031 3A       		.uleb128 0x3a
+ 425 0032 0B       		.uleb128 0xb
+ 426 0033 3B       		.uleb128 0x3b
+ 427 0034 0B       		.uleb128 0xb
+ 428 0035 27       		.uleb128 0x27
+ 429 0036 0C       		.uleb128 0xc
+ 430 0037 11       		.uleb128 0x11
+ 431 0038 01       		.uleb128 0x1
+ 432 0039 12       		.uleb128 0x12
+ 433 003a 01       		.uleb128 0x1
+ 434 003b 40       		.uleb128 0x40
+ 435 003c 0A       		.uleb128 0xa
+ 436 003d 00       		.byte	0x0
+ 437 003e 00       		.byte	0x0
+ 438 003f 04       		.uleb128 0x4
+ 439 0040 05       		.uleb128 0x5
+ 440 0041 00       		.byte	0x0
+ 441 0042 03       		.uleb128 0x3
+ 442 0043 0E       		.uleb128 0xe
+ 443 0044 3A       		.uleb128 0x3a
+ 444 0045 0B       		.uleb128 0xb
+ 445 0046 3B       		.uleb128 0x3b
+ 446 0047 0B       		.uleb128 0xb
+ 447 0048 49       		.uleb128 0x49
+ 448 0049 13       		.uleb128 0x13
+ 449 004a 02       		.uleb128 0x2
+ 450 004b 0A       		.uleb128 0xa
+ 451 004c 00       		.byte	0x0
+ 452 004d 00       		.byte	0x0
+ 453 004e 05       		.uleb128 0x5
+ 454 004f 34       		.uleb128 0x34
+ 455 0050 00       		.byte	0x0
+ 456 0051 03       		.uleb128 0x3
+ 457 0052 08       		.uleb128 0x8
+ 458 0053 3A       		.uleb128 0x3a
+ 459 0054 0B       		.uleb128 0xb
+ 460 0055 3B       		.uleb128 0x3b
+ 461 0056 0B       		.uleb128 0xb
+ 462 0057 49       		.uleb128 0x49
+ 463 0058 13       		.uleb128 0x13
+ 464 0059 02       		.uleb128 0x2
+ 465 005a 0A       		.uleb128 0xa
+ 466 005b 00       		.byte	0x0
+ 467 005c 00       		.byte	0x0
+ 468 005d 06       		.uleb128 0x6
+ 469 005e 24       		.uleb128 0x24
+ 470 005f 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s 			page 11
+
+
+ 471 0060 03       		.uleb128 0x3
+ 472 0061 0E       		.uleb128 0xe
+ 473 0062 0B       		.uleb128 0xb
+ 474 0063 0B       		.uleb128 0xb
+ 475 0064 3E       		.uleb128 0x3e
+ 476 0065 0B       		.uleb128 0xb
+ 477 0066 00       		.byte	0x0
+ 478 0067 00       		.byte	0x0
+ 479 0068 07       		.uleb128 0x7
+ 480 0069 2E       		.uleb128 0x2e
+ 481 006a 00       		.byte	0x0
+ 482 006b 3F       		.uleb128 0x3f
+ 483 006c 0C       		.uleb128 0xc
+ 484 006d 03       		.uleb128 0x3
+ 485 006e 0E       		.uleb128 0xe
+ 486 006f 3A       		.uleb128 0x3a
+ 487 0070 0B       		.uleb128 0xb
+ 488 0071 3B       		.uleb128 0x3b
+ 489 0072 0B       		.uleb128 0xb
+ 490 0073 27       		.uleb128 0x27
+ 491 0074 0C       		.uleb128 0xc
+ 492 0075 49       		.uleb128 0x49
+ 493 0076 13       		.uleb128 0x13
+ 494 0077 11       		.uleb128 0x11
+ 495 0078 01       		.uleb128 0x1
+ 496 0079 12       		.uleb128 0x12
+ 497 007a 01       		.uleb128 0x1
+ 498 007b 40       		.uleb128 0x40
+ 499 007c 0A       		.uleb128 0xa
+ 500 007d 00       		.byte	0x0
+ 501 007e 00       		.byte	0x0
+ 502 007f 08       		.uleb128 0x8
+ 503 0080 24       		.uleb128 0x24
+ 504 0081 00       		.byte	0x0
+ 505 0082 03       		.uleb128 0x3
+ 506 0083 08       		.uleb128 0x8
+ 507 0084 0B       		.uleb128 0xb
+ 508 0085 0B       		.uleb128 0xb
+ 509 0086 3E       		.uleb128 0x3e
+ 510 0087 0B       		.uleb128 0xb
+ 511 0088 00       		.byte	0x0
+ 512 0089 00       		.byte	0x0
+ 513 008a 00       		.byte	0x0
+ 514              		.section	.debug_pubnames,"",%progbits
+ 515 0000 3C000000 		.4byte	0x3c
+ 516 0004 0200     		.2byte	0x2
+ 517 0006 00000000 		.4byte	.Ldebug_info0
+ 518 000a A3000000 		.4byte	0xa3
+ 519 000e 25000000 		.4byte	0x25
+ 520 0012 45494E54 		.ascii	"EINT2Init\000"
+ 520      32496E69 
+ 520      7400
+ 521 001c 39000000 		.4byte	0x39
+ 522 0020 64656C61 		.ascii	"delay\000"
+ 522      7900
+ 523 0026 71000000 		.4byte	0x71
+ 524 002a 6D61696E 		.ascii	"main\000"
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s 			page 12
+
+
+ 524      00
+ 525 002f 8F000000 		.4byte	0x8f
+ 526 0033 45494E54 		.ascii	"EINT2ISR\000"
+ 526      32495352 
+ 526      00
+ 527 003c 00000000 		.4byte	0x0
+ 528              		.section	.debug_aranges,"",%progbits
+ 529 0000 1C000000 		.4byte	0x1c
+ 530 0004 0200     		.2byte	0x2
+ 531 0006 00000000 		.4byte	.Ldebug_info0
+ 532 000a 04       		.byte	0x4
+ 533 000b 00       		.byte	0x0
+ 534 000c 0000     		.2byte	0x0
+ 535 000e 0000     		.2byte	0x0
+ 536 0010 00000000 		.4byte	.Ltext0
+ 537 0014 50010000 		.4byte	.Letext0-.Ltext0
+ 538 0018 00000000 		.4byte	0x0
+ 539 001c 00000000 		.4byte	0x0
+ 540              		.section	.debug_str,"MS",%progbits,1
+ 541              	.LASF2:
+ 542 0000 756E7369 		.ascii	"unsigned int\000"
+ 542      676E6564 
+ 542      20696E74 
+ 542      00
+ 543              	.LASF8:
+ 544 000d 64656C5F 		.ascii	"del_time\000"
+ 544      74696D65 
+ 544      00
+ 545              	.LASF6:
+ 546 0016 2F637967 		.ascii	"/cygdrive/d/Ksiazka_ARM/Przykladowe_aplikacje/Przer"
+ 546      64726976 
+ 546      652F642F 
+ 546      4B736961 
+ 546      7A6B615F 
+ 547 0049 77616E69 		.ascii	"wania/Przerwania_uP/Non-vectored_IRQ\000"
+ 547      612F5072 
+ 547      7A657277 
+ 547      616E6961 
+ 547      5F75502F 
+ 548              	.LASF3:
+ 549 006e 45494E54 		.ascii	"EINT2ISR\000"
+ 549      32495352 
+ 549      00
+ 550              	.LASF5:
+ 551 0077 4E6F6E2D 		.ascii	"Non-vectored_IRQ.c\000"
+ 551      76656374 
+ 551      6F726564 
+ 551      5F495251 
+ 551      2E6300
+ 552              	.LASF1:
+ 553 008a 6D61696E 		.ascii	"main\000"
+ 553      00
+ 554              	.LASF7:
+ 555 008f 64656C61 		.ascii	"delay\000"
+ 555      7900
+ 556              	.LASF4:
+ 557 0095 474E5520 		.ascii	"GNU C 4.0.1\000"
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s 			page 13
+
+
+ 557      4320342E 
+ 557      302E3100 
+ 558              	.LASF0:
+ 559 00a1 45494E54 		.ascii	"EINT2Init\000"
+ 559      32496E69 
+ 559      7400
+ 560              		.ident	"GCC: (GNU) 4.0.1"
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s 			page 14
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 Non-vectored_IRQ.c
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s:13     .text:00000000 EINT2Init
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s:24     .text:00000000 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s:50     .text:00000048 $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s:152    .text:000000e4 EINT2ISR
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s:56     .text:0000004c delay
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s:66     .text:0000004c $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s:88     .text:00000068 main
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s:140    .text:000000dc $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s:158    .text:000000e4 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccAFVufk.s:199    .text:0000014c $d
+
+UNDEFINED SYMBOLS
+LCDInit
+LCDClear
+LCDText
+LCDGotoXY

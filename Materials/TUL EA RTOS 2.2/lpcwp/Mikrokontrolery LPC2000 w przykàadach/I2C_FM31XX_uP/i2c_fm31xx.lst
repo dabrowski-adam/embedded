@@ -1,0 +1,2548 @@
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 1
+
+
+   1              		.file	"I2C_FM31XX.c"
+   2              		.section	.debug_abbrev,"",%progbits
+   3              	.Ldebug_abbrev0:
+   4              		.section	.debug_info,"",%progbits
+   5              	.Ldebug_info0:
+   6              		.section	.debug_line,"",%progbits
+   7              	.Ldebug_line0:
+   8 0000 BF000000 		.text
+   8      02002000 
+   8      00000201 
+   8      FB0E0A00 
+   8      01010101 
+   9              	.Ltext0:
+  10              		.global	fReadWrite
+  11              		.bss
+  12              		.align	2
+  13              		.type	fReadWrite, %object
+  14              		.size	fReadWrite, 4
+  15              	fReadWrite:
+  16 0000 00000000 		.space	4
+  17              		.global	fReadPart
+  18              		.align	2
+  19              		.type	fReadPart, %object
+  20              		.size	fReadPart, 4
+  21              	fReadPart:
+  22 0004 00000000 		.space	4
+  23              		.global	lock
+  24              		.align	2
+  25              		.type	lock, %object
+  26              		.size	lock, 4
+  27              	lock:
+  28 0008 00000000 		.space	4
+  29              		.global	ExampleData
+  30              		.section	.rodata
+  31              		.type	ExampleData, %object
+  32              		.size	ExampleData, 5
+  33              	ExampleData:
+  34 0000 05       		.byte	5
+  35 0001 0A       		.byte	10
+  36 0002 0F       		.byte	15
+  37 0003 14       		.byte	20
+  38 0004 19       		.byte	25
+  39              		.text
+  40              		.align	2
+  41              		.global	I2CInit
+  42              		.type	I2CInit, %function
+  43              	I2CInit:
+  44              	.LFB2:
+  45              		.file 1 "I2C_FM31XX.c"
+   1:I2C_FM31XX.c  **** ////////////////////////////////////////////////////////
+   2:I2C_FM31XX.c  **** // Function:	I2C example - FRAM FM31XX
+   3:I2C_FM31XX.c  **** // Target:		LPC2138
+   4:I2C_FM31XX.c  **** // Board:		ZL6ARM
+   5:I2C_FM31XX.c  **** // Quartz:		12MHz
+   6:I2C_FM31XX.c  **** // Compiler:	ARM-GCC-4.0.1 (www.gnuarm.com)
+   7:I2C_FM31XX.c  **** // Author:		Arkadiusz Antoniak @ 2006, Poland
+   8:I2C_FM31XX.c  **** // Copyright:	(c) Arkadiusz Antoniak, 2006
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 2
+
+
+   9:I2C_FM31XX.c  **** ////////////////////////////////////////////////////////
+  10:I2C_FM31XX.c  **** #include <LPC213x.H>	    
+  11:I2C_FM31XX.c  **** #include "lcd.h"
+  12:I2C_FM31XX.c  **** #include "switches_pins.h"
+  13:I2C_FM31XX.c  **** 
+  14:I2C_FM31XX.c  **** //Constants
+  15:I2C_FM31XX.c  **** #define SLAVE_ADDRESS_MEM_W 0xA0
+  16:I2C_FM31XX.c  **** #define SLAVE_ADDRESS_MEM_R 0xA1
+  17:I2C_FM31XX.c  **** #define BUFFER_SIZE	256
+  18:I2C_FM31XX.c  **** #define SW_DELAY	delay(0x2000)
+  19:I2C_FM31XX.c  **** 
+  20:I2C_FM31XX.c  **** //Globals
+  21:I2C_FM31XX.c  **** 
+  22:I2C_FM31XX.c  **** //I2C
+  23:I2C_FM31XX.c  **** unsigned int I2CAddress,I2CNumberOfBytes;
+  24:I2C_FM31XX.c  **** unsigned char *pI2CData;
+  25:I2C_FM31XX.c  **** unsigned char I2CBuffer[BUFFER_SIZE];
+  26:I2C_FM31XX.c  **** 
+  27:I2C_FM31XX.c  **** //flag: 0 - Write, 1 - Read
+  28:I2C_FM31XX.c  **** unsigned int fReadWrite=0;
+  29:I2C_FM31XX.c  **** 
+  30:I2C_FM31XX.c  **** //fReadPart=0 -> writing W slave address, MSB and LSB of Address
+  31:I2C_FM31XX.c  **** //fReadPart=1 -> sending R slave address, reading byte
+  32:I2C_FM31XX.c  **** unsigned int fReadPart=0;
+  33:I2C_FM31XX.c  **** 
+  34:I2C_FM31XX.c  **** //lock=1 while I2C transmission
+  35:I2C_FM31XX.c  **** volatile unsigned int lock=0;
+  36:I2C_FM31XX.c  **** 
+  37:I2C_FM31XX.c  **** //Example data
+  38:I2C_FM31XX.c  **** const unsigned char ExampleData[]={5,10,15,20,25};
+  39:I2C_FM31XX.c  **** 
+  40:I2C_FM31XX.c  **** //I2C interrupt handler's header
+  41:I2C_FM31XX.c  **** void I2CISR(void) __attribute__ ((interrupt));
+  42:I2C_FM31XX.c  **** 
+  43:I2C_FM31XX.c  **** //*******************************
+  44:I2C_FM31XX.c  **** // I2C Init
+  45:I2C_FM31XX.c  **** //*******************************
+  46:I2C_FM31XX.c  **** void I2CInit(void)
+  47:I2C_FM31XX.c  **** {
+  46              		.loc 1 47 0
+  47              		@ Function supports interworking.
+  48              		@ args = 0, pretend = 0, frame = 0
+  49              		@ frame_needed = 0, uses_anonymous_args = 0
+  50              		@ link register save eliminated.
+  51              	.LVL0:
+  52              		@ lr needed for prologue
+  48:I2C_FM31XX.c  **** 	//P0.2=SCL0, P0.3=SDA0
+  49:I2C_FM31XX.c  **** 	PINSEL0&=~(15<<4);
+  53              		.loc 1 49 0
+  54 0000 0E12A0E3 		mov	r1, #-536870912
+  55 0004 0B2981E2 		add	r2, r1, #180224
+  56 0008 003092E5 		ldr	r3, [r2, #0]
+  57 000c F030C3E3 		bic	r3, r3, #240
+  58 0010 003082E5 		str	r3, [r2, #0]
+  50:I2C_FM31XX.c  **** 	PINSEL0|=(5<<4);
+  59              		.loc 1 50 0
+  60 0014 003092E5 		ldr	r3, [r2, #0]
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 3
+
+
+  61 0018 503083E3 		orr	r3, r3, #80
+  62 001c 003082E5 		str	r3, [r2, #0]
+  51:I2C_FM31XX.c  **** 
+  52:I2C_FM31XX.c  **** 	//VIC Slot 0 used for handling I2C IRQ
+  53:I2C_FM31XX.c  **** 	VICVectCntl0 = 0x00000029;
+  63              		.loc 1 53 0
+  64 0020 2920A0E3 		mov	r2, #41
+  65 0024 0932A0E3 		mov	r3, #-1879048192
+  66 0028 C339A0E1 		mov	r3, r3, asr #19
+  67 002c 002083E5 		str	r2, [r3, #0]
+  54:I2C_FM31XX.c  **** 	VICVectAddr0 = (unsigned)I2CISR;
+  68              		.loc 1 54 0
+  69 0030 28209FE5 		ldr	r2, .L3
+  70 0034 2233A0E3 		mov	r3, #-2013265920
+  71 0038 C339A0E1 		mov	r3, r3, asr #19
+  72 003c 002083E5 		str	r2, [r3, #0]
+  55:I2C_FM31XX.c  **** 	VICIntEnable = 0x00000200;
+  73              		.loc 1 55 0
+  74 0040 022CA0E3 		mov	r2, #512
+  75 0044 FE3EE0E3 		mvn	r3, #4064
+  76 0048 0F2003E5 		str	r2, [r3, #-15]
+  56:I2C_FM31XX.c  **** 
+  57:I2C_FM31XX.c  **** 	//Set bit rate 15MHz/(I2SCLH+I2SCLL)=cca. 57.6k
+  58:I2C_FM31XX.c  **** 	I2C0SCLH 		 = 0x82;
+  77              		.loc 1 58 0
+  78 004c 071981E2 		add	r1, r1, #114688
+  79 0050 8230A0E3 		mov	r3, #130
+  80 0054 B031C1E1 		strh	r3, [r1, #16]	@ movhi
+  59:I2C_FM31XX.c  **** 	I2C0SCLL 		 = 0x82;
+  81              		.loc 1 59 0
+  82 0058 B431C1E1 		strh	r3, [r1, #20]	@ movhi
+  60:I2C_FM31XX.c  **** }
+  83              		.loc 1 60 0
+  84 005c 1EFF2FE1 		bx	lr
+  85              	.L4:
+  86              		.align	2
+  87              	.L3:
+  88 0060 00000000 		.word	I2CISR
+  89              	.LFE2:
+  90              		.size	I2CInit, .-I2CInit
+  91              		.align	2
+  92              		.global	I2CFM31XXSendMultipleBytes
+  93              		.type	I2CFM31XXSendMultipleBytes, %function
+  94              	I2CFM31XXSendMultipleBytes:
+  95              	.LFB3:
+  61:I2C_FM31XX.c  **** 
+  62:I2C_FM31XX.c  **** //***********************************
+  63:I2C_FM31XX.c  **** // I2C Send Multiple Bytes to FM31XX
+  64:I2C_FM31XX.c  **** //***********************************
+  65:I2C_FM31XX.c  **** void I2CFM31XXSendMultipleBytes(const unsigned int SlaveAddress, const unsigned int Address, const 
+  66:I2C_FM31XX.c  **** {
+  96              		.loc 1 66 0
+  97              		@ Function supports interworking.
+  98              		@ args = 0, pretend = 0, frame = 0
+  99              		@ frame_needed = 0, uses_anonymous_args = 0
+ 100              	.LVL1:
+ 101 0064 04E02DE5 		str	lr, [sp, #-4]!
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 4
+
+
+ 102              	.LCFI0:
+ 103 0068 02E0A0E1 		mov	lr, r2
+  67:I2C_FM31XX.c  **** 	unsigned int i;
+  68:I2C_FM31XX.c  **** 	I2CAddress=SlaveAddress;
+ 104              		.loc 1 68 0
+ 105 006c AC209FE5 		ldr	r2, .L19
+ 106              	.LVL2:
+ 107 0070 000082E5 		str	r0, [r2, #0]
+  69:I2C_FM31XX.c  **** 
+  70:I2C_FM31XX.c  **** 	//Copy Address MSB and LSB to I2C buffer
+  71:I2C_FM31XX.c  **** 	I2CBuffer[0]=(Address & 0xFF00)>>8;
+ 108              		.loc 1 71 0
+ 109 0074 A8009FE5 		ldr	r0, .L19+4
+ 110              	.LVL3:
+ 111 0078 2124A0E1 		mov	r2, r1, lsr #8
+ 112 007c 0020C0E5 		strb	r2, [r0, #0]
+  72:I2C_FM31XX.c  **** 	I2CBuffer[1]=Address & 0xFF;
+ 113              		.loc 1 72 0
+ 114 0080 0110C0E5 		strb	r1, [r0, #1]
+  73:I2C_FM31XX.c  **** 
+  74:I2C_FM31XX.c  **** 	for(i=0;i<NumberOfBytes;i++)
+ 115              		.loc 1 74 0
+ 116 0084 00C053E2 		subs	ip, r3, #0
+ 117 0088 2900000A 		beq	.L6
+ 118              	.LVL4:
+ 119 008c 0E20A0E1 		mov	r2, lr
+ 120 0090 0010A0E1 		mov	r1, r0
+ 121              	.LVL5:
+ 122 0094 00008CE0 		add	r0, ip, r0
+ 123              	.L8:
+  75:I2C_FM31XX.c  **** 		I2CBuffer[i+2]=pData[i];
+ 124              		.loc 1 75 0
+ 125 0098 0130D2E4 		ldrb	r3, [r2], #1	@ zero_extendqisi2
+ 126 009c 0230C1E5 		strb	r3, [r1, #2]
+ 127 00a0 011081E2 		add	r1, r1, #1
+ 128              		.loc 1 74 0
+ 129 00a4 000051E1 		cmp	r1, r0
+ 130 00a8 2400001A 		bne	.L8
+ 131              	.LVL6:
+ 132              	.L6:
+  76:I2C_FM31XX.c  **** 
+  77:I2C_FM31XX.c  **** 	pI2CData=I2CBuffer;
+ 133              		.loc 1 77 0
+ 134 00ac 70209FE5 		ldr	r2, .L19+4
+ 135 00b0 70309FE5 		ldr	r3, .L19+8
+ 136 00b4 002083E5 		str	r2, [r3, #0]
+  78:I2C_FM31XX.c  **** 	I2CNumberOfBytes=NumberOfBytes+2;
+ 137              		.loc 1 78 0
+ 138 00b8 02208CE2 		add	r2, ip, #2
+ 139 00bc 68309FE5 		ldr	r3, .L19+12
+ 140 00c0 002083E5 		str	r2, [r3, #0]
+ 141 00c4 64209FE5 		ldr	r2, .L19+16
+ 142              	.L9:
+  79:I2C_FM31XX.c  **** 
+  80:I2C_FM31XX.c  **** 	while(lock==1);
+ 143              		.loc 1 80 0
+ 144 00c8 003092E5 		ldr	r3, [r2, #0]
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 5
+
+
+ 145 00cc 010053E3 		cmp	r3, #1
+ 146 00d0 3000000A 		beq	.L9
+  81:I2C_FM31XX.c  **** 	lock=1;
+ 147              		.loc 1 81 0
+ 148 00d4 0130A0E3 		mov	r3, #1
+ 149 00d8 003082E5 		str	r3, [r2, #0]
+  82:I2C_FM31XX.c  **** 
+  83:I2C_FM31XX.c  **** 	//write
+  84:I2C_FM31XX.c  **** 	fReadWrite=0;
+ 150              		.loc 1 84 0
+ 151 00dc 0020A0E3 		mov	r2, #0
+ 152 00e0 4C309FE5 		ldr	r3, .L19+20
+ 153 00e4 002083E5 		str	r2, [r3, #0]
+  85:I2C_FM31XX.c  **** 
+  86:I2C_FM31XX.c  **** 	I2C0CONCLR 	= 0x000000FF;				//Clear all I2C settings
+ 154              		.loc 1 86 0
+ 155 00e8 0E2282E2 		add	r2, r2, #-536870912
+ 156 00ec 072982E2 		add	r2, r2, #114688
+ 157 00f0 0030E0E3 		mvn	r3, #0
+ 158 00f4 1830C2E5 		strb	r3, [r2, #24]
+  87:I2C_FM31XX.c  **** 	I2C0CONSET 	= 0x00000040; 				//Enable the I2C interface
+ 159              		.loc 1 87 0
+ 160 00f8 413083E2 		add	r3, r3, #65
+ 161 00fc 0030C2E5 		strb	r3, [r2, #0]
+  88:I2C_FM31XX.c  **** 	I2C0CONSET 	= 0x00000020; 				//Start condition
+ 162              		.loc 1 88 0
+ 163 0100 203043E2 		sub	r3, r3, #32
+ 164 0104 0030C2E5 		strb	r3, [r2, #0]
+ 165 0108 20209FE5 		ldr	r2, .L19+16
+ 166              	.L11:
+  89:I2C_FM31XX.c  **** 
+  90:I2C_FM31XX.c  **** 	while(lock==1);
+ 167              		.loc 1 90 0
+ 168 010c 003092E5 		ldr	r3, [r2, #0]
+ 169 0110 010053E3 		cmp	r3, #1
+ 170 0114 4100000A 		beq	.L11
+  91:I2C_FM31XX.c  **** }	  
+ 171              		.loc 1 91 0
+ 172 0118 04E09DE4 		ldr	lr, [sp], #4
+ 173 011c 1EFF2FE1 		bx	lr
+ 174              	.L20:
+ 175              		.align	2
+ 176              	.L19:
+ 177 0120 00000000 		.word	I2CAddress
+ 178 0124 00000000 		.word	I2CBuffer
+ 179 0128 00000000 		.word	pI2CData
+ 180 012c 00000000 		.word	I2CNumberOfBytes
+ 181 0130 00000000 		.word	lock
+ 182 0134 00000000 		.word	fReadWrite
+ 183              	.LFE3:
+ 184              		.size	I2CFM31XXSendMultipleBytes, .-I2CFM31XXSendMultipleBytes
+ 185              		.align	2
+ 186              		.global	I2CFM31XXReadByte
+ 187              		.type	I2CFM31XXReadByte, %function
+ 188              	I2CFM31XXReadByte:
+ 189              	.LFB4:
+  92:I2C_FM31XX.c  **** 
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 6
+
+
+  93:I2C_FM31XX.c  **** //***********************************
+  94:I2C_FM31XX.c  **** // I2C Read Byte from FM31XX
+  95:I2C_FM31XX.c  **** //***********************************
+  96:I2C_FM31XX.c  **** unsigned int I2CFM31XXReadByte(const unsigned int SlaveAddress, const unsigned int Address)
+  97:I2C_FM31XX.c  **** {
+ 190              		.loc 1 97 0
+ 191              		@ Function supports interworking.
+ 192              		@ args = 0, pretend = 0, frame = 0
+ 193              		@ frame_needed = 0, uses_anonymous_args = 0
+ 194              		@ link register save eliminated.
+ 195              	.LVL7:
+ 196              		@ lr needed for prologue
+  98:I2C_FM31XX.c  **** 	I2CAddress=SlaveAddress;
+ 197              		.loc 1 98 0
+ 198 0138 8C309FE5 		ldr	r3, .L31
+ 199 013c 000083E5 		str	r0, [r3, #0]
+  99:I2C_FM31XX.c  **** 
+ 100:I2C_FM31XX.c  **** 	//Copy Address MSB and LSB to I2C buffer
+ 101:I2C_FM31XX.c  **** 	I2CBuffer[0]=(Address & 0xFF00)>>8;
+ 200              		.loc 1 101 0
+ 201 0140 88209FE5 		ldr	r2, .L31+4
+ 202 0144 2134A0E1 		mov	r3, r1, lsr #8
+ 203 0148 0030C2E5 		strb	r3, [r2, #0]
+ 102:I2C_FM31XX.c  **** 	I2CBuffer[1]=Address & 0xFF;
+ 204              		.loc 1 102 0
+ 205 014c 0110C2E5 		strb	r1, [r2, #1]
+ 103:I2C_FM31XX.c  **** 
+ 104:I2C_FM31XX.c  **** 	pI2CData=I2CBuffer;
+ 206              		.loc 1 104 0
+ 207 0150 7C309FE5 		ldr	r3, .L31+8
+ 208 0154 002083E5 		str	r2, [r3, #0]
+ 105:I2C_FM31XX.c  **** 	I2CNumberOfBytes=2;
+ 209              		.loc 1 105 0
+ 210 0158 0220A0E3 		mov	r2, #2
+ 211 015c 74309FE5 		ldr	r3, .L31+12
+ 212 0160 002083E5 		str	r2, [r3, #0]
+ 213 0164 70109FE5 		ldr	r1, .L31+16
+ 214              	.LVL8:
+ 215              	.L22:
+ 106:I2C_FM31XX.c  **** 
+ 107:I2C_FM31XX.c  **** 	while(lock==1);
+ 216              		.loc 1 107 0
+ 217 0168 003091E5 		ldr	r3, [r1, #0]
+ 218 016c 010053E3 		cmp	r3, #1
+ 219 0170 5800000A 		beq	.L22
+ 108:I2C_FM31XX.c  **** 	lock=1;
+ 220              		.loc 1 108 0
+ 221 0174 0120A0E3 		mov	r2, #1
+ 222 0178 002081E5 		str	r2, [r1, #0]
+ 109:I2C_FM31XX.c  **** 
+ 110:I2C_FM31XX.c  **** 	//read
+ 111:I2C_FM31XX.c  **** 	fReadWrite=1;
+ 223              		.loc 1 111 0
+ 224 017c 5C309FE5 		ldr	r3, .L31+20
+ 225 0180 002083E5 		str	r2, [r3, #0]
+ 112:I2C_FM31XX.c  **** 	fReadPart=0;
+ 226              		.loc 1 112 0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 7
+
+
+ 227 0184 012042E2 		sub	r2, r2, #1
+ 228 0188 54309FE5 		ldr	r3, .L31+24
+ 229 018c 002083E5 		str	r2, [r3, #0]
+ 113:I2C_FM31XX.c  **** 
+ 114:I2C_FM31XX.c  **** 	I2C0CONCLR 	= 0x000000FF;				//Clear all I2C settings
+ 230              		.loc 1 114 0
+ 231 0190 0E2282E2 		add	r2, r2, #-536870912
+ 232 0194 072982E2 		add	r2, r2, #114688
+ 233 0198 0030E0E3 		mvn	r3, #0
+ 234 019c 1830C2E5 		strb	r3, [r2, #24]
+ 115:I2C_FM31XX.c  **** 	I2C0CONSET 	= 0x00000040; 				//Enable the I2C interface
+ 235              		.loc 1 115 0
+ 236 01a0 413083E2 		add	r3, r3, #65
+ 237 01a4 0030C2E5 		strb	r3, [r2, #0]
+ 116:I2C_FM31XX.c  **** 	I2C0CONSET 	= 0x00000020; 				//Start condition
+ 238              		.loc 1 116 0
+ 239 01a8 203043E2 		sub	r3, r3, #32
+ 240 01ac 0030C2E5 		strb	r3, [r2, #0]
+ 241 01b0 24209FE5 		ldr	r2, .L31+16
+ 242              	.L24:
+ 117:I2C_FM31XX.c  **** 
+ 118:I2C_FM31XX.c  **** 	while(lock==1);
+ 243              		.loc 1 118 0
+ 244 01b4 003092E5 		ldr	r3, [r2, #0]
+ 245 01b8 010053E3 		cmp	r3, #1
+ 246 01bc 6B00000A 		beq	.L24
+ 119:I2C_FM31XX.c  **** 	return I2CBuffer[2];
+ 120:I2C_FM31XX.c  **** }	  
+ 247              		.loc 1 120 0
+ 248 01c0 08309FE5 		ldr	r3, .L31+4
+ 249 01c4 0200D3E5 		ldrb	r0, [r3, #2]	@ zero_extendqisi2
+ 250              	.LVL9:
+ 251 01c8 1EFF2FE1 		bx	lr
+ 252              	.L32:
+ 253              		.align	2
+ 254              	.L31:
+ 255 01cc 00000000 		.word	I2CAddress
+ 256 01d0 00000000 		.word	I2CBuffer
+ 257 01d4 00000000 		.word	pI2CData
+ 258 01d8 00000000 		.word	I2CNumberOfBytes
+ 259 01dc 00000000 		.word	lock
+ 260 01e0 00000000 		.word	fReadWrite
+ 261 01e4 00000000 		.word	fReadPart
+ 262              	.LFE4:
+ 263              		.size	I2CFM31XXReadByte, .-I2CFM31XXReadByte
+ 264              		.align	2
+ 265              		.global	delay
+ 266              		.type	delay, %function
+ 267              	delay:
+ 268              	.LFB5:
+ 121:I2C_FM31XX.c  **** 
+ 122:I2C_FM31XX.c  **** //*******************************
+ 123:I2C_FM31XX.c  **** // Delay function
+ 124:I2C_FM31XX.c  **** //*******************************
+ 125:I2C_FM31XX.c  **** void delay(unsigned int del_time) 
+ 126:I2C_FM31XX.c  **** { 
+ 269              		.loc 1 126 0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 8
+
+
+ 270              		@ Function supports interworking.
+ 271              		@ args = 0, pretend = 0, frame = 0
+ 272              		@ frame_needed = 0, uses_anonymous_args = 0
+ 273              		@ link register save eliminated.
+ 274              	.LVL10:
+ 275              		@ lr needed for prologue
+ 127:I2C_FM31XX.c  **** 	unsigned int i;
+ 128:I2C_FM31XX.c  **** 	for(i=0;i<del_time;i++);	   
+ 276              		.loc 1 128 0
+ 277 01e8 000050E3 		cmp	r0, #0
+ 278 01ec 1EFF2F01 		bxeq	lr
+ 279 01f0 0030A0E3 		mov	r3, #0
+ 280              	.LVL11:
+ 281              	.L36:
+ 282 01f4 013083E2 		add	r3, r3, #1
+ 283 01f8 030050E1 		cmp	r0, r3
+ 284 01fc 7B00001A 		bne	.L36
+ 285 0200 1EFF2FE1 		bx	lr
+ 286              	.LFE5:
+ 287              		.size	delay, .-delay
+ 288              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 289              		.align	2
+ 290              	.LC0:
+ 291 0000 57726974 		.ascii	"Writing... \000"
+ 291      696E672E 
+ 291      2E2E2000 
+ 292              		.align	2
+ 293              	.LC1:
+ 294 000c 4F4B00   		.ascii	"OK\000"
+ 295              		.text
+ 296              		.align	2
+ 297              		.global	WriteExampleData
+ 298              		.type	WriteExampleData, %function
+ 299              	WriteExampleData:
+ 300              	.LFB6:
+ 129:I2C_FM31XX.c  **** }
+ 130:I2C_FM31XX.c  **** 
+ 131:I2C_FM31XX.c  **** //*******************************
+ 132:I2C_FM31XX.c  **** // Example writing
+ 133:I2C_FM31XX.c  **** //*******************************
+ 134:I2C_FM31XX.c  **** void WriteExampleData(void)
+ 135:I2C_FM31XX.c  **** {
+ 301              		.loc 1 135 0
+ 302              		@ Function supports interworking.
+ 303              		@ args = 0, pretend = 0, frame = 0
+ 304              		@ frame_needed = 1, uses_anonymous_args = 0
+ 305 0204 0DC0A0E1 		mov	ip, sp
+ 306              	.LCFI1:
+ 307 0208 00D82DE9 		stmfd	sp!, {fp, ip, lr, pc}
+ 308              	.LCFI2:
+ 309 020c 04B04CE2 		sub	fp, ip, #4
+ 310              	.LCFI3:
+ 136:I2C_FM31XX.c  **** 	LCDClear();
+ 311              		.loc 1 136 0
+ 312 0210 FEFFFFEB 		bl	LCDClear
+ 137:I2C_FM31XX.c  **** 	LCDText("Writing... ");
+ 313              		.loc 1 137 0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 9
+
+
+ 314 0214 30009FE5 		ldr	r0, .L41
+ 315 0218 FEFFFFEB 		bl	LCDText
+ 138:I2C_FM31XX.c  **** 
+ 139:I2C_FM31XX.c  **** 	I2CFM31XXSendMultipleBytes(SLAVE_ADDRESS_MEM_W,0,ExampleData,sizeof(ExampleData));
+ 316              		.loc 1 139 0
+ 317 021c A000A0E3 		mov	r0, #160
+ 318 0220 0010A0E3 		mov	r1, #0
+ 319 0224 24209FE5 		ldr	r2, .L41+4
+ 320 0228 0530A0E3 		mov	r3, #5
+ 321 022c FEFFFFEB 		bl	I2CFM31XXSendMultipleBytes
+ 140:I2C_FM31XX.c  **** 
+ 141:I2C_FM31XX.c  **** 	LCDText("OK");
+ 322              		.loc 1 141 0
+ 323 0230 1C009FE5 		ldr	r0, .L41+8
+ 324 0234 FEFFFFEB 		bl	LCDText
+ 142:I2C_FM31XX.c  **** 	delay(0x800000);
+ 325              		.loc 1 142 0
+ 326 0238 0205A0E3 		mov	r0, #8388608
+ 327 023c FEFFFFEB 		bl	delay
+ 143:I2C_FM31XX.c  **** }
+ 328              		.loc 1 143 0
+ 329 0240 0CD04BE2 		sub	sp, fp, #12
+ 330 0244 00689DE8 		ldmfd	sp, {fp, sp, lr}
+ 331 0248 1EFF2FE1 		bx	lr
+ 332              	.L42:
+ 333              		.align	2
+ 334              	.L41:
+ 335 024c 00000000 		.word	.LC0
+ 336 0250 00000000 		.word	ExampleData
+ 337 0254 0C000000 		.word	.LC1
+ 338              	.LFE6:
+ 339              		.size	WriteExampleData, .-WriteExampleData
+ 340              		.section	.rodata.str1.4
+ 341 000f 00       		.align	2
+ 342              	.LC2:
+ 343 0010 52656164 		.ascii	"Reading...\000"
+ 343      696E672E 
+ 343      2E2E00
+ 344 001b 00       		.align	2
+ 345              	.LC3:
+ 346 001c 3A2000   		.ascii	": \000"
+ 347              		.text
+ 348              		.align	2
+ 349              		.global	ReadExampleData
+ 350              		.type	ReadExampleData, %function
+ 351              	ReadExampleData:
+ 352              	.LFB7:
+ 144:I2C_FM31XX.c  **** 
+ 145:I2C_FM31XX.c  **** //*******************************
+ 146:I2C_FM31XX.c  **** // Example reading
+ 147:I2C_FM31XX.c  **** //*******************************
+ 148:I2C_FM31XX.c  **** void ReadExampleData(void)
+ 149:I2C_FM31XX.c  **** {
+ 353              		.loc 1 149 0
+ 354              		@ Function supports interworking.
+ 355              		@ args = 0, pretend = 0, frame = 0
+ 356              		@ frame_needed = 1, uses_anonymous_args = 0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 10
+
+
+ 357 0258 0DC0A0E1 		mov	ip, sp
+ 358              	.LCFI4:
+ 359 025c 30D82DE9 		stmfd	sp!, {r4, r5, fp, ip, lr, pc}
+ 360              	.LCFI5:
+ 361 0260 04B04CE2 		sub	fp, ip, #4
+ 362              	.LCFI6:
+ 150:I2C_FM31XX.c  **** 	unsigned int ReadResult,i;
+ 151:I2C_FM31XX.c  **** 
+ 152:I2C_FM31XX.c  **** 	LCDClear();
+ 363              		.loc 1 152 0
+ 364 0264 FEFFFFEB 		bl	LCDClear
+ 153:I2C_FM31XX.c  **** 	LCDText("Reading...");
+ 365              		.loc 1 153 0
+ 366 0268 58009FE5 		ldr	r0, .L49
+ 367 026c FEFFFFEB 		bl	LCDText
+ 154:I2C_FM31XX.c  **** 	delay(0x800000);
+ 368              		.loc 1 154 0
+ 369 0270 0205A0E3 		mov	r0, #8388608
+ 370 0274 FEFFFFEB 		bl	delay
+ 371 0278 0050A0E3 		mov	r5, #0
+ 372              	.LVL12:
+ 373              	.L44:
+ 155:I2C_FM31XX.c  **** 
+ 156:I2C_FM31XX.c  **** 	for(i=0;i<sizeof(ExampleData);i++)
+ 157:I2C_FM31XX.c  **** 	{
+ 158:I2C_FM31XX.c  **** 		ReadResult=I2CFM31XXReadByte(SLAVE_ADDRESS_MEM_R,i);
+ 374              		.loc 1 158 0
+ 375 027c A100A0E3 		mov	r0, #161
+ 376 0280 0510A0E1 		mov	r1, r5
+ 377 0284 FEFFFFEB 		bl	I2CFM31XXReadByte
+ 378 0288 0040A0E1 		mov	r4, r0
+ 379              	.LVL13:
+ 159:I2C_FM31XX.c  **** 		LCDClear();
+ 380              		.loc 1 159 0
+ 381 028c FEFFFFEB 		bl	LCDClear
+ 160:I2C_FM31XX.c  **** 		LCD32bitNumberDec(i);
+ 382              		.loc 1 160 0
+ 383 0290 0500A0E1 		mov	r0, r5
+ 384 0294 FEFFFFEB 		bl	LCD32bitNumberDec
+ 161:I2C_FM31XX.c  **** 		LCDText(": ");
+ 385              		.loc 1 161 0
+ 386 0298 2C009FE5 		ldr	r0, .L49+4
+ 387 029c FEFFFFEB 		bl	LCDText
+ 162:I2C_FM31XX.c  **** 		LCD32bitNumberDec(ReadResult);
+ 388              		.loc 1 162 0
+ 389 02a0 0400A0E1 		mov	r0, r4
+ 390 02a4 FEFFFFEB 		bl	LCD32bitNumberDec
+ 163:I2C_FM31XX.c  **** 		delay(0x800000);
+ 391              		.loc 1 163 0
+ 392 02a8 0205A0E3 		mov	r0, #8388608
+ 393 02ac FEFFFFEB 		bl	delay
+ 394              		.loc 1 156 0
+ 395 02b0 015085E2 		add	r5, r5, #1
+ 396 02b4 050055E3 		cmp	r5, #5
+ 397 02b8 9D00001A 		bne	.L44
+ 164:I2C_FM31XX.c  **** 	}
+ 165:I2C_FM31XX.c  **** }
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 11
+
+
+ 398              		.loc 1 165 0
+ 399 02bc 14D04BE2 		sub	sp, fp, #20
+ 400 02c0 30689DE8 		ldmfd	sp, {r4, r5, fp, sp, lr}
+ 401 02c4 1EFF2FE1 		bx	lr
+ 402              	.L50:
+ 403              		.align	2
+ 404              	.L49:
+ 405 02c8 10000000 		.word	.LC2
+ 406 02cc 1C000000 		.word	.LC3
+ 407              	.LFE7:
+ 408              		.size	ReadExampleData, .-ReadExampleData
+ 409              		.section	.rodata.str1.4
+ 410 001f 00       		.align	2
+ 411              	.LC4:
+ 412 0020 5331202D 		.ascii	"S1 - Write\000"
+ 412      20577269 
+ 412      746500
+ 413 002b 00       		.align	2
+ 414              	.LC5:
+ 415 002c 5332202D 		.ascii	"S2 - Read\000"
+ 415      20526561 
+ 415      6400
+ 416              		.text
+ 417              		.align	2
+ 418              		.global	DisplayMenu
+ 419              		.type	DisplayMenu, %function
+ 420              	DisplayMenu:
+ 421              	.LFB8:
+ 166:I2C_FM31XX.c  **** 
+ 167:I2C_FM31XX.c  **** //*******************************
+ 168:I2C_FM31XX.c  **** // Menu
+ 169:I2C_FM31XX.c  **** //*******************************
+ 170:I2C_FM31XX.c  **** void DisplayMenu(void)
+ 171:I2C_FM31XX.c  **** {
+ 422              		.loc 1 171 0
+ 423              		@ Function supports interworking.
+ 424              		@ args = 0, pretend = 0, frame = 0
+ 425              		@ frame_needed = 1, uses_anonymous_args = 0
+ 426 02d0 0DC0A0E1 		mov	ip, sp
+ 427              	.LCFI7:
+ 428 02d4 00D82DE9 		stmfd	sp!, {fp, ip, lr, pc}
+ 429              	.LCFI8:
+ 430 02d8 04B04CE2 		sub	fp, ip, #4
+ 431              	.LCFI9:
+ 172:I2C_FM31XX.c  **** 	LCDClear();
+ 432              		.loc 1 172 0
+ 433 02dc FEFFFFEB 		bl	LCDClear
+ 173:I2C_FM31XX.c  **** 	LCDText("S1 - Write");
+ 434              		.loc 1 173 0
+ 435 02e0 20009FE5 		ldr	r0, .L53
+ 436 02e4 FEFFFFEB 		bl	LCDText
+ 174:I2C_FM31XX.c  **** 	LCDGotoXY(0,1);
+ 437              		.loc 1 174 0
+ 438 02e8 0000A0E3 		mov	r0, #0
+ 439 02ec 0110A0E3 		mov	r1, #1
+ 440 02f0 FEFFFFEB 		bl	LCDGotoXY
+ 175:I2C_FM31XX.c  **** 	LCDText("S2 - Read");
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 12
+
+
+ 441              		.loc 1 175 0
+ 442 02f4 10009FE5 		ldr	r0, .L53+4
+ 443 02f8 FEFFFFEB 		bl	LCDText
+ 176:I2C_FM31XX.c  **** }
+ 444              		.loc 1 176 0
+ 445 02fc 0CD04BE2 		sub	sp, fp, #12
+ 446 0300 00689DE8 		ldmfd	sp, {fp, sp, lr}
+ 447 0304 1EFF2FE1 		bx	lr
+ 448              	.L54:
+ 449              		.align	2
+ 450              	.L53:
+ 451 0308 20000000 		.word	.LC4
+ 452 030c 2C000000 		.word	.LC5
+ 453              	.LFE8:
+ 454              		.size	DisplayMenu, .-DisplayMenu
+ 455              		.section	.rodata.str1.4
+ 456 0036 0000     		.align	2
+ 457              	.LC6:
+ 458 0038 49324320 		.ascii	"I2C FM31XX\000"
+ 458      464D3331 
+ 458      585800
+ 459 0043 00       		.align	2
+ 460              	.LC7:
+ 461 0044 4652414D 		.ascii	"FRAM test\000"
+ 461      20746573 
+ 461      7400
+ 462 004e 0000     		.text
+ 463              		.align	2
+ 464              		.global	main
+ 465              		.type	main, %function
+ 466              	main:
+ 467              	.LFB9:
+ 177:I2C_FM31XX.c  **** 
+ 178:I2C_FM31XX.c  **** //*******************************
+ 179:I2C_FM31XX.c  **** // MAIN
+ 180:I2C_FM31XX.c  **** //*******************************
+ 181:I2C_FM31XX.c  **** int main (void)
+ 182:I2C_FM31XX.c  **** {
+ 468              		.loc 1 182 0
+ 469              		@ Function supports interworking.
+ 470              		@ args = 0, pretend = 0, frame = 0
+ 471              		@ frame_needed = 1, uses_anonymous_args = 0
+ 472 0310 0DC0A0E1 		mov	ip, sp
+ 473              	.LCFI10:
+ 474 0314 F0D82DE9 		stmfd	sp!, {r4, r5, r6, r7, fp, ip, lr, pc}
+ 475              	.LCFI11:
+ 476 0318 04B04CE2 		sub	fp, ip, #4
+ 477              	.LCFI12:
+ 183:I2C_FM31XX.c  **** 	//Peripherials' frequency = fclk/4 = 15MHz
+ 184:I2C_FM31XX.c  **** 	VPBDIV&=0xFFFFFFFC;
+ 478              		.loc 1 184 0
+ 479 031c 0E12A0E3 		mov	r1, #-536870912
+ 480 0320 7F2981E2 		add	r2, r1, #2080768
+ 481 0324 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+ 482 0328 FC3003E2 		and	r3, r3, #252
+ 483 032c 0031C2E5 		strb	r3, [r2, #256]
+ 185:I2C_FM31XX.c  **** 	VPBDIV|=0x00;
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 13
+
+
+ 484              		.loc 1 185 0
+ 485 0330 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+ 486 0334 FF3003E2 		and	r3, r3, #255
+ 487 0338 0031C2E5 		strb	r3, [r2, #256]
+ 186:I2C_FM31XX.c  **** 
+ 187:I2C_FM31XX.c  **** 	//Port direction configuration
+ 188:I2C_FM31XX.c  **** 	IODIR0 = 0xFF000000;
+ 488              		.loc 1 188 0
+ 489 033c FF24A0E3 		mov	r2, #-16777216
+ 490 0340 8E32A0E3 		mov	r3, #-536870904
+ 491 0344 0A3983E2 		add	r3, r3, #163840
+ 492 0348 002083E5 		str	r2, [r3, #0]
+ 189:I2C_FM31XX.c  **** 	IODIR1 = 0x00FF0000;
+ 493              		.loc 1 189 0
+ 494 034c 0A1981E2 		add	r1, r1, #163840
+ 495 0350 FF38A0E3 		mov	r3, #16711680
+ 496 0354 183081E5 		str	r3, [r1, #24]
+ 190:I2C_FM31XX.c  **** 
+ 191:I2C_FM31XX.c  **** 	I2CInit();
+ 497              		.loc 1 191 0
+ 498 0358 FEFFFFEB 		bl	I2CInit
+ 192:I2C_FM31XX.c  **** 	LCDInit();
+ 499              		.loc 1 192 0
+ 500 035c FEFFFFEB 		bl	LCDInit
+ 193:I2C_FM31XX.c  **** 
+ 194:I2C_FM31XX.c  **** 	LCDClear();
+ 501              		.loc 1 194 0
+ 502 0360 FEFFFFEB 		bl	LCDClear
+ 195:I2C_FM31XX.c  **** 
+ 196:I2C_FM31XX.c  **** 	LCDText("I2C FM31XX");
+ 503              		.loc 1 196 0
+ 504 0364 B4009FE5 		ldr	r0, .L68
+ 505 0368 FEFFFFEB 		bl	LCDText
+ 197:I2C_FM31XX.c  **** 	LCDGotoXY(0,1);
+ 506              		.loc 1 197 0
+ 507 036c 0000A0E3 		mov	r0, #0
+ 508 0370 0110A0E3 		mov	r1, #1
+ 509 0374 FEFFFFEB 		bl	LCDGotoXY
+ 198:I2C_FM31XX.c  **** 	LCDText("FRAM test");
+ 510              		.loc 1 198 0
+ 511 0378 A4009FE5 		ldr	r0, .L68+4
+ 512 037c FEFFFFEB 		bl	LCDText
+ 199:I2C_FM31XX.c  **** 	delay(0x800000);
+ 513              		.loc 1 199 0
+ 514 0380 0205A0E3 		mov	r0, #8388608
+ 515 0384 FEFFFFEB 		bl	delay
+ 200:I2C_FM31XX.c  **** 
+ 201:I2C_FM31XX.c  **** 	DisplayMenu();
+ 516              		.loc 1 201 0
+ 517 0388 FEFFFFEB 		bl	DisplayMenu
+ 518 038c 0E32A0E3 		mov	r3, #-536870912
+ 519 0390 0A5983E2 		add	r5, r3, #163840
+ 520 0394 0A7983E2 		add	r7, r3, #163840
+ 521 0398 0A6983E2 		add	r6, r3, #163840
+ 522              	.L56:
+ 202:I2C_FM31XX.c  **** 
+ 203:I2C_FM31XX.c  **** 	//Main loop
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 14
+
+
+ 204:I2C_FM31XX.c  **** 	while(1)
+ 205:I2C_FM31XX.c  **** 	{
+ 206:I2C_FM31XX.c  **** 		if(SW1==0)
+ 523              		.loc 1 206 0
+ 524 039c 003095E5 		ldr	r3, [r5, #0]
+ 525 03a0 100013E3 		tst	r3, #16
+ 526 03a4 F400001A 		bne	.L57
+ 207:I2C_FM31XX.c  **** 		{
+ 208:I2C_FM31XX.c  **** 			WriteExampleData();
+ 527              		.loc 1 208 0
+ 528 03a8 FEFFFFEB 		bl	WriteExampleData
+ 209:I2C_FM31XX.c  **** 			while(SW1==0)
+ 529              		.loc 1 209 0
+ 530 03ac 003095E5 		ldr	r3, [r5, #0]
+ 531 03b0 100013E3 		tst	r3, #16
+ 532 03b4 F200001A 		bne	.L59
+ 533 03b8 0740A0E1 		mov	r4, r7
+ 534              	.L60:
+ 210:I2C_FM31XX.c  **** 				SW_DELAY;
+ 535              		.loc 1 210 0
+ 536 03bc 020AA0E3 		mov	r0, #8192
+ 537 03c0 FEFFFFEB 		bl	delay
+ 538              		.loc 1 209 0
+ 539 03c4 003094E5 		ldr	r3, [r4, #0]
+ 540 03c8 100013E3 		tst	r3, #16
+ 541 03cc ED00000A 		beq	.L60
+ 542              	.L59:
+ 211:I2C_FM31XX.c  **** 
+ 212:I2C_FM31XX.c  **** 			DisplayMenu();
+ 543              		.loc 1 212 0
+ 544 03d0 FEFFFFEB 		bl	DisplayMenu
+ 545 03d4 030100EA 		b	.L61
+ 546              	.L57:
+ 213:I2C_FM31XX.c  **** 		}
+ 214:I2C_FM31XX.c  **** 		else if(SW2==0)
+ 547              		.loc 1 214 0
+ 548 03d8 003096E5 		ldr	r3, [r6, #0]
+ 549 03dc 200013E3 		tst	r3, #32
+ 550 03e0 0301001A 		bne	.L61
+ 215:I2C_FM31XX.c  **** 		{
+ 216:I2C_FM31XX.c  **** 			ReadExampleData();
+ 551              		.loc 1 216 0
+ 552 03e4 FEFFFFEB 		bl	ReadExampleData
+ 217:I2C_FM31XX.c  **** 			while(SW2==0)
+ 553              		.loc 1 217 0
+ 554 03e8 003096E5 		ldr	r3, [r6, #0]
+ 555 03ec 200013E3 		tst	r3, #32
+ 556 03f0 0201001A 		bne	.L63
+ 557 03f4 0E32A0E3 		mov	r3, #-536870912
+ 558 03f8 0A4983E2 		add	r4, r3, #163840
+ 559              	.L64:
+ 218:I2C_FM31XX.c  **** 				SW_DELAY;
+ 560              		.loc 1 218 0
+ 561 03fc 020AA0E3 		mov	r0, #8192
+ 562 0400 FEFFFFEB 		bl	delay
+ 563              		.loc 1 217 0
+ 564 0404 003094E5 		ldr	r3, [r4, #0]
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 15
+
+
+ 565 0408 200013E3 		tst	r3, #32
+ 566 040c FD00000A 		beq	.L64
+ 567              	.L63:
+ 219:I2C_FM31XX.c  **** 
+ 220:I2C_FM31XX.c  **** 			DisplayMenu();
+ 568              		.loc 1 220 0
+ 569 0410 FEFFFFEB 		bl	DisplayMenu
+ 570              	.L61:
+ 221:I2C_FM31XX.c  **** 		}
+ 222:I2C_FM31XX.c  **** 
+ 223:I2C_FM31XX.c  **** 		SW_DELAY;
+ 571              		.loc 1 223 0
+ 572 0414 020AA0E3 		mov	r0, #8192
+ 573 0418 FEFFFFEB 		bl	delay
+ 574 041c E50000EA 		b	.L56
+ 575              	.L69:
+ 576              		.align	2
+ 577              	.L68:
+ 578 0420 38000000 		.word	.LC6
+ 579 0424 44000000 		.word	.LC7
+ 580              	.LFE9:
+ 581              		.size	main, .-main
+ 582              		.align	2
+ 583              		.global	I2CISR
+ 584              		.type	I2CISR, %function
+ 585              	I2CISR:
+ 586              	.LFB10:
+ 224:I2C_FM31XX.c  **** 	}
+ 225:I2C_FM31XX.c  **** }
+ 226:I2C_FM31XX.c  **** 
+ 227:I2C_FM31XX.c  **** //*******************************
+ 228:I2C_FM31XX.c  **** // I2C interrupt routine
+ 229:I2C_FM31XX.c  **** //*******************************
+ 230:I2C_FM31XX.c  **** void I2CISR(void)
+ 231:I2C_FM31XX.c  **** {
+ 587              		.loc 1 231 0
+ 588              		@ Interrupt Service Routine.
+ 589              		@ args = 0, pretend = 0, frame = 0
+ 590              		@ frame_needed = 0, uses_anonymous_args = 0
+ 591              		@ link register save eliminated.
+ 592              	.LVL14:
+ 593 0428 0F002DE9 		stmfd	sp!, {r0, r1, r2, r3}
+ 594              	.LCFI13:
+ 595              		@ lr needed for prologue
+ 232:I2C_FM31XX.c  **** 	//Simple state machine
+ 233:I2C_FM31XX.c  **** 
+ 234:I2C_FM31XX.c  **** 	if(fReadWrite==0)
+ 596              		.loc 1 234 0
+ 597 042c AC349FE5 		ldr	r3, .L97
+ 598 0430 003093E5 		ldr	r3, [r3, #0]
+ 599 0434 000053E3 		cmp	r3, #0
+ 600 0438 7101001A 		bne	.L71
+ 235:I2C_FM31XX.c  **** 	{
+ 236:I2C_FM31XX.c  **** 		//Write to FRAM
+ 237:I2C_FM31XX.c  **** 		switch (I2C0STAT)
+ 601              		.loc 1 237 0
+ 602 043c 4E3283E2 		add	r3, r3, #-536870908
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 16
+
+
+ 603 0440 073983E2 		add	r3, r3, #114688
+ 604 0444 0030D3E5 		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 605 0448 083043E2 		sub	r3, r3, #8
+ 606 044c 280053E3 		cmp	r3, #40
+ 607 0450 03F19F97 		ldrls	pc, [pc, r3, asl #2]
+ 608 0454 2D0200EA 		b	.L73
+ 609              		.p2align 2
+ 610              	.L79:
+ 611 0458 FC040000 		.word	.L74
+ 612 045c BC080000 		.word	.L73
+ 613 0460 BC080000 		.word	.L73
+ 614 0464 BC080000 		.word	.L73
+ 615 0468 BC080000 		.word	.L73
+ 616 046c BC080000 		.word	.L73
+ 617 0470 BC080000 		.word	.L73
+ 618 0474 BC080000 		.word	.L73
+ 619 0478 BC080000 		.word	.L73
+ 620 047c BC080000 		.word	.L73
+ 621 0480 BC080000 		.word	.L73
+ 622 0484 BC080000 		.word	.L73
+ 623 0488 BC080000 		.word	.L73
+ 624 048c BC080000 		.word	.L73
+ 625 0490 BC080000 		.word	.L73
+ 626 0494 BC080000 		.word	.L73
+ 627 0498 24050000 		.word	.L75
+ 628 049c BC080000 		.word	.L73
+ 629 04a0 BC080000 		.word	.L73
+ 630 04a4 BC080000 		.word	.L73
+ 631 04a8 BC080000 		.word	.L73
+ 632 04ac BC080000 		.word	.L73
+ 633 04b0 BC080000 		.word	.L73
+ 634 04b4 BC080000 		.word	.L73
+ 635 04b8 44050000 		.word	.L76
+ 636 04bc BC080000 		.word	.L73
+ 637 04c0 BC080000 		.word	.L73
+ 638 04c4 BC080000 		.word	.L73
+ 639 04c8 BC080000 		.word	.L73
+ 640 04cc BC080000 		.word	.L73
+ 641 04d0 BC080000 		.word	.L73
+ 642 04d4 BC080000 		.word	.L73
+ 643 04d8 5C050000 		.word	.L77
+ 644 04dc BC080000 		.word	.L73
+ 645 04e0 BC080000 		.word	.L73
+ 646 04e4 BC080000 		.word	.L73
+ 647 04e8 BC080000 		.word	.L73
+ 648 04ec BC080000 		.word	.L73
+ 649 04f0 BC080000 		.word	.L73
+ 650 04f4 BC080000 		.word	.L73
+ 651 04f8 B0050000 		.word	.L78
+ 652              	.L74:
+ 238:I2C_FM31XX.c  **** 		{
+ 239:I2C_FM31XX.c  **** 			//Start and Send byte conditions
+ 240:I2C_FM31XX.c  **** 			case ( 0x08):                      //Start bit
+ 241:I2C_FM31XX.c  **** 				I2C0CONCLR=0x20;               //Clear start bit
+ 653              		.loc 1 241 0
+ 654 04fc 2020A0E3 		mov	r2, #32
+ 655 0500 0E32A0E3 		mov	r3, #-536870912
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 17
+
+
+ 656 0504 073983E2 		add	r3, r3, #114688
+ 657 0508 1820C3E5 		strb	r2, [r3, #24]
+ 242:I2C_FM31XX.c  **** 				I2C0DAT=I2CAddress;            //Send address and write bit
+ 658              		.loc 1 242 0
+ 659 050c D0339FE5 		ldr	r3, .L97+4
+ 660 0510 0020D3E5 		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 661 0514 8E32A0E3 		mov	r3, #-536870904
+ 662 0518 073983E2 		add	r3, r3, #114688
+ 663 051c 0020C3E5 		strb	r2, [r3, #0]
+ 664 0520 2D0200EA 		b	.L73
+ 665              	.L75:
+ 243:I2C_FM31XX.c  **** 				break;
+ 244:I2C_FM31XX.c  **** 	
+ 245:I2C_FM31XX.c  **** 			case (0x18):                       //Slave address+W, ACK
+ 246:I2C_FM31XX.c  **** 				I2C0DAT=*pI2CData++;           //Write data to tx register
+ 666              		.loc 1 246 0
+ 667 0524 BC039FE5 		ldr	r0, .L97+8
+ 668 0528 002090E5 		ldr	r2, [r0, #0]
+ 669 052c 0110D2E4 		ldrb	r1, [r2], #1	@ zero_extendqisi2
+ 670 0530 8E32A0E3 		mov	r3, #-536870904
+ 671 0534 073983E2 		add	r3, r3, #114688
+ 672 0538 0010C3E5 		strb	r1, [r3, #0]
+ 673 053c 002080E5 		str	r2, [r0, #0]
+ 674 0540 2D0200EA 		b	.L73
+ 675              	.L76:
+ 247:I2C_FM31XX.c  **** 				break;
+ 248:I2C_FM31XX.c  **** 	
+ 249:I2C_FM31XX.c  **** 			case (0x20):                       //Salve address +W, Not ACK
+ 250:I2C_FM31XX.c  **** 				I2C0DAT=I2CAddress;            //Resend address and write bit
+ 676              		.loc 1 250 0
+ 677 0544 98339FE5 		ldr	r3, .L97+4
+ 678 0548 0020D3E5 		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 679 054c 8E32A0E3 		mov	r3, #-536870904
+ 680 0550 073983E2 		add	r3, r3, #114688
+ 681 0554 0020C3E5 		strb	r2, [r3, #0]
+ 682 0558 2D0200EA 		b	.L73
+ 683              	.L77:
+ 251:I2C_FM31XX.c  **** 				break;
+ 252:I2C_FM31XX.c  **** 	
+ 253:I2C_FM31XX.c  **** 			case (0x28):                       //Data sent, Ack
+ 254:I2C_FM31XX.c  **** 				if(--I2CNumberOfBytes==0)
+ 684              		.loc 1 254 0
+ 685 055c 88239FE5 		ldr	r2, .L97+12
+ 686 0560 003092E5 		ldr	r3, [r2, #0]
+ 687 0564 011043E2 		sub	r1, r3, #1
+ 688 0568 001082E5 		str	r1, [r2, #0]
+ 689 056c 000051E3 		cmp	r1, #0
+ 690 0570 6201001A 		bne	.L80
+ 255:I2C_FM31XX.c  **** 				{
+ 256:I2C_FM31XX.c  **** 					I2C0CONSET=0x10;           //Stop condition
+ 691              		.loc 1 256 0
+ 692 0574 1030A0E3 		mov	r3, #16
+ 693 0578 0E22A0E3 		mov	r2, #-536870912
+ 694 057c 072982E2 		add	r2, r2, #114688
+ 695 0580 0030C2E5 		strb	r3, [r2, #0]
+ 257:I2C_FM31XX.c  **** 					lock=0;                    //Signal end of I2C activity
+ 696              		.loc 1 257 0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 18
+
+
+ 697 0584 64339FE5 		ldr	r3, .L97+16
+ 698 0588 001083E5 		str	r1, [r3, #0]
+ 699 058c 2D0200EA 		b	.L73
+ 700              	.L80:
+ 258:I2C_FM31XX.c  **** 				}
+ 259:I2C_FM31XX.c  **** 				else
+ 260:I2C_FM31XX.c  **** 				{
+ 261:I2C_FM31XX.c  **** 					I2C0DAT=*pI2CData++;       //Write data to tx register
+ 701              		.loc 1 261 0
+ 702 0590 50039FE5 		ldr	r0, .L97+8
+ 703 0594 002090E5 		ldr	r2, [r0, #0]
+ 704 0598 0110D2E4 		ldrb	r1, [r2], #1	@ zero_extendqisi2
+ 705 059c 8E32A0E3 		mov	r3, #-536870904
+ 706 05a0 073983E2 		add	r3, r3, #114688
+ 707 05a4 0010C3E5 		strb	r1, [r3, #0]
+ 708 05a8 002080E5 		str	r2, [r0, #0]
+ 709 05ac 2D0200EA 		b	.L73
+ 710              	.L78:
+ 262:I2C_FM31XX.c  **** 				}
+ 263:I2C_FM31XX.c  **** 				break;
+ 264:I2C_FM31XX.c  **** 	
+ 265:I2C_FM31XX.c  **** 			case (0x30):                       //Data sent, NOT Ack
+ 266:I2C_FM31XX.c  **** 				I2C0DAT=*(pI2CData-1);         //Write data to tx register
+ 711              		.loc 1 266 0
+ 712 05b0 30339FE5 		ldr	r3, .L97+8
+ 713 05b4 003093E5 		ldr	r3, [r3, #0]
+ 714 05b8 012053E5 		ldrb	r2, [r3, #-1]	@ zero_extendqisi2
+ 715 05bc 8E32A0E3 		mov	r3, #-536870904
+ 716 05c0 073983E2 		add	r3, r3, #114688
+ 717 05c4 0020C3E5 		strb	r2, [r3, #0]
+ 718 05c8 2D0200EA 		b	.L73
+ 719              	.L71:
+ 267:I2C_FM31XX.c  **** 				break;
+ 268:I2C_FM31XX.c  **** 	
+ 269:I2C_FM31XX.c  **** 			default :
+ 270:I2C_FM31XX.c  **** 				break;
+ 271:I2C_FM31XX.c  **** 		}
+ 272:I2C_FM31XX.c  **** 	}
+ 273:I2C_FM31XX.c  **** 	else
+ 274:I2C_FM31XX.c  **** 	{
+ 275:I2C_FM31XX.c  **** 		//Read from FRAM
+ 276:I2C_FM31XX.c  **** 		switch (I2C0STAT)
+ 720              		.loc 1 276 0
+ 721 05cc 4E32A0E3 		mov	r3, #-536870908
+ 722 05d0 073983E2 		add	r3, r3, #114688
+ 723 05d4 0030D3E5 		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 724 05d8 083043E2 		sub	r3, r3, #8
+ 725 05dc 500053E3 		cmp	r3, #80
+ 726 05e0 03F19F97 		ldrls	pc, [pc, r3, asl #2]
+ 727 05e4 2D0200EA 		b	.L73
+ 728              		.p2align 2
+ 729              	.L91:
+ 730 05e8 2C070000 		.word	.L82
+ 731 05ec BC080000 		.word	.L73
+ 732 05f0 BC080000 		.word	.L73
+ 733 05f4 BC080000 		.word	.L73
+ 734 05f8 BC080000 		.word	.L73
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 19
+
+
+ 735 05fc BC080000 		.word	.L73
+ 736 0600 BC080000 		.word	.L73
+ 737 0604 BC080000 		.word	.L73
+ 738 0608 BC080000 		.word	.L73
+ 739 060c BC080000 		.word	.L73
+ 740 0610 BC080000 		.word	.L73
+ 741 0614 BC080000 		.word	.L73
+ 742 0618 BC080000 		.word	.L73
+ 743 061c BC080000 		.word	.L73
+ 744 0620 BC080000 		.word	.L73
+ 745 0624 BC080000 		.word	.L73
+ 746 0628 90070000 		.word	.L83
+ 747 062c BC080000 		.word	.L73
+ 748 0630 BC080000 		.word	.L73
+ 749 0634 BC080000 		.word	.L73
+ 750 0638 BC080000 		.word	.L73
+ 751 063c BC080000 		.word	.L73
+ 752 0640 BC080000 		.word	.L73
+ 753 0644 BC080000 		.word	.L73
+ 754 0648 B0070000 		.word	.L84
+ 755 064c BC080000 		.word	.L73
+ 756 0650 BC080000 		.word	.L73
+ 757 0654 BC080000 		.word	.L73
+ 758 0658 BC080000 		.word	.L73
+ 759 065c BC080000 		.word	.L73
+ 760 0660 BC080000 		.word	.L73
+ 761 0664 BC080000 		.word	.L73
+ 762 0668 CC070000 		.word	.L85
+ 763 066c BC080000 		.word	.L73
+ 764 0670 BC080000 		.word	.L73
+ 765 0674 BC080000 		.word	.L73
+ 766 0678 BC080000 		.word	.L73
+ 767 067c BC080000 		.word	.L73
+ 768 0680 BC080000 		.word	.L73
+ 769 0684 BC080000 		.word	.L73
+ 770 0688 34080000 		.word	.L86
+ 771 068c BC080000 		.word	.L73
+ 772 0690 BC080000 		.word	.L73
+ 773 0694 BC080000 		.word	.L73
+ 774 0698 BC080000 		.word	.L73
+ 775 069c BC080000 		.word	.L73
+ 776 06a0 BC080000 		.word	.L73
+ 777 06a4 BC080000 		.word	.L73
+ 778 06a8 BC080000 		.word	.L73
+ 779 06ac BC080000 		.word	.L73
+ 780 06b0 BC080000 		.word	.L73
+ 781 06b4 BC080000 		.word	.L73
+ 782 06b8 BC080000 		.word	.L73
+ 783 06bc BC080000 		.word	.L73
+ 784 06c0 BC080000 		.word	.L73
+ 785 06c4 BC080000 		.word	.L73
+ 786 06c8 50080000 		.word	.L87
+ 787 06cc BC080000 		.word	.L73
+ 788 06d0 BC080000 		.word	.L73
+ 789 06d4 BC080000 		.word	.L73
+ 790 06d8 BC080000 		.word	.L73
+ 791 06dc BC080000 		.word	.L73
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 20
+
+
+ 792 06e0 BC080000 		.word	.L73
+ 793 06e4 BC080000 		.word	.L73
+ 794 06e8 64080000 		.word	.L88
+ 795 06ec BC080000 		.word	.L73
+ 796 06f0 BC080000 		.word	.L73
+ 797 06f4 BC080000 		.word	.L73
+ 798 06f8 BC080000 		.word	.L73
+ 799 06fc BC080000 		.word	.L73
+ 800 0700 BC080000 		.word	.L73
+ 801 0704 BC080000 		.word	.L73
+ 802 0708 78080000 		.word	.L89
+ 803 070c BC080000 		.word	.L73
+ 804 0710 BC080000 		.word	.L73
+ 805 0714 BC080000 		.word	.L73
+ 806 0718 BC080000 		.word	.L73
+ 807 071c BC080000 		.word	.L73
+ 808 0720 BC080000 		.word	.L73
+ 809 0724 BC080000 		.word	.L73
+ 810 0728 AC080000 		.word	.L90
+ 811              	.L82:
+ 277:I2C_FM31XX.c  **** 		{
+ 278:I2C_FM31XX.c  **** 			case (0x08):                       //Start bit
+ 279:I2C_FM31XX.c  **** 				if(fReadPart==0)
+ 812              		.loc 1 279 0
+ 813 072c C0319FE5 		ldr	r3, .L97+20
+ 814 0730 003093E5 		ldr	r3, [r3, #0]
+ 815 0734 000053E3 		cmp	r3, #0
+ 816 0738 D801001A 		bne	.L92
+ 280:I2C_FM31XX.c  **** 				{
+ 281:I2C_FM31XX.c  **** 					//writing slave W address
+ 282:I2C_FM31XX.c  **** 					I2C0CONCLR=0x20;           //Clear start bit
+ 817              		.loc 1 282 0
+ 818 073c 2020A0E3 		mov	r2, #32
+ 819 0740 0E3283E2 		add	r3, r3, #-536870912
+ 820 0744 073983E2 		add	r3, r3, #114688
+ 821 0748 1820C3E5 		strb	r2, [r3, #24]
+ 283:I2C_FM31XX.c  **** 					I2C0DAT=I2CAddress & 0xFE; //Send W slave address
+ 822              		.loc 1 283 0
+ 823 074c 90319FE5 		ldr	r3, .L97+4
+ 824 0750 002093E5 		ldr	r2, [r3, #0]
+ 825 0754 FE2002E2 		and	r2, r2, #254
+ 826 0758 8E32A0E3 		mov	r3, #-536870904
+ 827 075c 073983E2 		add	r3, r3, #114688
+ 828 0760 0020C3E5 		strb	r2, [r3, #0]
+ 829 0764 2D0200EA 		b	.L73
+ 830              	.L92:
+ 284:I2C_FM31XX.c  **** 				}
+ 285:I2C_FM31XX.c  **** 				else
+ 286:I2C_FM31XX.c  **** 				{
+ 287:I2C_FM31XX.c  **** 					//writing slave R address
+ 288:I2C_FM31XX.c  **** 					I2C0CONCLR=0x20;           //Clear start bit
+ 831              		.loc 1 288 0
+ 832 0768 2020A0E3 		mov	r2, #32
+ 833 076c 0E32A0E3 		mov	r3, #-536870912
+ 834 0770 073983E2 		add	r3, r3, #114688
+ 835 0774 1820C3E5 		strb	r2, [r3, #24]
+ 289:I2C_FM31XX.c  **** 					I2C0DAT=I2CAddress;        //Send address
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 21
+
+
+ 836              		.loc 1 289 0
+ 837 0778 64319FE5 		ldr	r3, .L97+4
+ 838 077c 0020D3E5 		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 839 0780 8E32A0E3 		mov	r3, #-536870904
+ 840 0784 073983E2 		add	r3, r3, #114688
+ 841 0788 0020C3E5 		strb	r2, [r3, #0]
+ 842 078c 2D0200EA 		b	.L73
+ 843              	.L83:
+ 290:I2C_FM31XX.c  **** 				}
+ 291:I2C_FM31XX.c  **** 				break;
+ 292:I2C_FM31XX.c  **** 	
+ 293:I2C_FM31XX.c  **** 			//writing MSB and LSB of Address
+ 294:I2C_FM31XX.c  **** 			case (0x18):                       //Slave address+W, ACK
+ 295:I2C_FM31XX.c  **** 				I2C0DAT=*pI2CData++;           //Write data to tx register
+ 844              		.loc 1 295 0
+ 845 0790 50019FE5 		ldr	r0, .L97+8
+ 846 0794 002090E5 		ldr	r2, [r0, #0]
+ 847 0798 0110D2E4 		ldrb	r1, [r2], #1	@ zero_extendqisi2
+ 848 079c 8E32A0E3 		mov	r3, #-536870904
+ 849 07a0 073983E2 		add	r3, r3, #114688
+ 850 07a4 0010C3E5 		strb	r1, [r3, #0]
+ 851 07a8 002080E5 		str	r2, [r0, #0]
+ 852 07ac 2D0200EA 		b	.L73
+ 853              	.L84:
+ 296:I2C_FM31XX.c  **** 				break;
+ 297:I2C_FM31XX.c  **** 	
+ 298:I2C_FM31XX.c  **** 			case (0x20):                       //Salve address +W, Not ACK
+ 299:I2C_FM31XX.c  **** 				I2C0DAT=I2CAddress & 0xFE;     //Resend w slave address
+ 854              		.loc 1 299 0
+ 855 07b0 2C319FE5 		ldr	r3, .L97+4
+ 856 07b4 002093E5 		ldr	r2, [r3, #0]
+ 857 07b8 FE2002E2 		and	r2, r2, #254
+ 858 07bc 8E32A0E3 		mov	r3, #-536870904
+ 859 07c0 073983E2 		add	r3, r3, #114688
+ 860 07c4 0020C3E5 		strb	r2, [r3, #0]
+ 861 07c8 2D0200EA 		b	.L73
+ 862              	.L85:
+ 300:I2C_FM31XX.c  **** 				break;
+ 301:I2C_FM31XX.c  **** 	
+ 302:I2C_FM31XX.c  **** 			case (0x28):                       //Data sent, Ack
+ 303:I2C_FM31XX.c  **** 				if(--I2CNumberOfBytes==0)
+ 863              		.loc 1 303 0
+ 864 07cc 18219FE5 		ldr	r2, .L97+12
+ 865 07d0 003092E5 		ldr	r3, [r2, #0]
+ 866 07d4 013043E2 		sub	r3, r3, #1
+ 867 07d8 003082E5 		str	r3, [r2, #0]
+ 868 07dc 000053E3 		cmp	r3, #0
+ 869 07e0 0302001A 		bne	.L94
+ 304:I2C_FM31XX.c  **** 				{
+ 305:I2C_FM31XX.c  **** 					//MSB and LSB of Address have been sent
+ 306:I2C_FM31XX.c  **** 					fReadPart=1;
+ 870              		.loc 1 306 0
+ 871 07e4 0120A0E3 		mov	r2, #1
+ 872 07e8 04319FE5 		ldr	r3, .L97+20
+ 873 07ec 002083E5 		str	r2, [r3, #0]
+ 307:I2C_FM31XX.c  **** 					I2C0CONCLR 	= 0x000000FF;  //Clear all I2C settings
+ 874              		.loc 1 307 0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 22
+
+
+ 875 07f0 122242E2 		sub	r2, r2, #536870913
+ 876 07f4 072982E2 		add	r2, r2, #114688
+ 877 07f8 0030E0E3 		mvn	r3, #0
+ 878 07fc 1830C2E5 		strb	r3, [r2, #24]
+ 308:I2C_FM31XX.c  **** 					I2C0CONSET 	= 0x00000040;  //Enable the I2C interface
+ 879              		.loc 1 308 0
+ 880 0800 413083E2 		add	r3, r3, #65
+ 881 0804 0030C2E5 		strb	r3, [r2, #0]
+ 309:I2C_FM31XX.c  **** 					I2C0CONSET 	= 0x00000020;  //Start condition
+ 882              		.loc 1 309 0
+ 883 0808 203043E2 		sub	r3, r3, #32
+ 884 080c 0030C2E5 		strb	r3, [r2, #0]
+ 885 0810 2D0200EA 		b	.L73
+ 886              	.L94:
+ 310:I2C_FM31XX.c  **** 				}
+ 311:I2C_FM31XX.c  **** 				else
+ 312:I2C_FM31XX.c  **** 				{
+ 313:I2C_FM31XX.c  **** 					I2C0DAT=*pI2CData++;       //Write data to tx register
+ 887              		.loc 1 313 0
+ 888 0814 CC009FE5 		ldr	r0, .L97+8
+ 889 0818 002090E5 		ldr	r2, [r0, #0]
+ 890 081c 0110D2E4 		ldrb	r1, [r2], #1	@ zero_extendqisi2
+ 891 0820 8E32A0E3 		mov	r3, #-536870904
+ 892 0824 073983E2 		add	r3, r3, #114688
+ 893 0828 0010C3E5 		strb	r1, [r3, #0]
+ 894 082c 002080E5 		str	r2, [r0, #0]
+ 895 0830 2D0200EA 		b	.L73
+ 896              	.L86:
+ 314:I2C_FM31XX.c  **** 				}
+ 315:I2C_FM31XX.c  **** 				break;
+ 316:I2C_FM31XX.c  **** 	
+ 317:I2C_FM31XX.c  **** 			case (0x30):                       //Data sent, NOT Ack
+ 318:I2C_FM31XX.c  **** 				I2C0DAT=*(pI2CData-1);         //Write data to tx register
+ 897              		.loc 1 318 0
+ 898 0834 AC309FE5 		ldr	r3, .L97+8
+ 899 0838 003093E5 		ldr	r3, [r3, #0]
+ 900 083c 012053E5 		ldrb	r2, [r3, #-1]	@ zero_extendqisi2
+ 901 0840 8E32A0E3 		mov	r3, #-536870904
+ 902 0844 073983E2 		add	r3, r3, #114688
+ 903 0848 0020C3E5 		strb	r2, [r3, #0]
+ 904 084c 2D0200EA 		b	.L73
+ 905              	.L87:
+ 319:I2C_FM31XX.c  **** 				break;
+ 320:I2C_FM31XX.c  **** 
+ 321:I2C_FM31XX.c  **** 
+ 322:I2C_FM31XX.c  **** 			//reading data byte
+ 323:I2C_FM31XX.c  **** 
+ 324:I2C_FM31XX.c  **** 			case (0x40):                       //Slave Address +R, ACK
+ 325:I2C_FM31XX.c  **** 				I2C0CONSET 	= 0x04;            //Enable ACK for data byte
+ 906              		.loc 1 325 0
+ 907 0850 0420A0E3 		mov	r2, #4
+ 908 0854 0E32A0E3 		mov	r3, #-536870912
+ 909 0858 073983E2 		add	r3, r3, #114688
+ 910 085c 0020C3E5 		strb	r2, [r3, #0]
+ 911 0860 2D0200EA 		b	.L73
+ 912              	.L88:
+ 326:I2C_FM31XX.c  **** 				break;
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 23
+
+
+ 327:I2C_FM31XX.c  **** 	
+ 328:I2C_FM31XX.c  **** 			case (0x48):                       //Slave Address +R, Not Ack
+ 329:I2C_FM31XX.c  **** 				I2C0CONSET 	= 0x20;            //Resend Start condition
+ 913              		.loc 1 329 0
+ 914 0864 2020A0E3 		mov	r2, #32
+ 915 0868 0E32A0E3 		mov	r3, #-536870912
+ 916 086c 073983E2 		add	r3, r3, #114688
+ 917 0870 0020C3E5 		strb	r2, [r3, #0]
+ 918 0874 2D0200EA 		b	.L73
+ 919              	.L89:
+ 330:I2C_FM31XX.c  **** 				break;
+ 331:I2C_FM31XX.c  **** 	
+ 332:I2C_FM31XX.c  **** 			case (0x50):                       //Data Received, ACK 
+ 333:I2C_FM31XX.c  **** 				I2CBuffer[2]= I2C0DAT;
+ 920              		.loc 1 333 0
+ 921 0878 8E32A0E3 		mov	r3, #-536870904
+ 922 087c 073983E2 		add	r3, r3, #114688
+ 923 0880 0020D3E5 		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 924 0884 6C309FE5 		ldr	r3, .L97+24
+ 925 0888 0220C3E5 		strb	r2, [r3, #2]
+ 334:I2C_FM31XX.c  **** 				I2C0CONSET 	= 0x10;            //Stop condition
+ 926              		.loc 1 334 0
+ 927 088c 1020A0E3 		mov	r2, #16
+ 928 0890 0E32A0E3 		mov	r3, #-536870912
+ 929 0894 073983E2 		add	r3, r3, #114688
+ 930 0898 0020C3E5 		strb	r2, [r3, #0]
+ 335:I2C_FM31XX.c  **** 				lock 		= 0;               //Signal end of I2C activity							
+ 931              		.loc 1 335 0
+ 932 089c 102042E2 		sub	r2, r2, #16
+ 933 08a0 48309FE5 		ldr	r3, .L97+16
+ 934 08a4 002083E5 		str	r2, [r3, #0]
+ 935 08a8 2D0200EA 		b	.L73
+ 936              	.L90:
+ 336:I2C_FM31XX.c  **** 				break;
+ 337:I2C_FM31XX.c  **** 	
+ 338:I2C_FM31XX.c  **** 			case (0x58):                       //Data Received, Not Ack
+ 339:I2C_FM31XX.c  **** 				I2C0CONSET 	= 0x20;            //Resend Start condition
+ 937              		.loc 1 339 0
+ 938 08ac 2020A0E3 		mov	r2, #32
+ 939 08b0 0E32A0E3 		mov	r3, #-536870912
+ 940 08b4 073983E2 		add	r3, r3, #114688
+ 941 08b8 0020C3E5 		strb	r2, [r3, #0]
+ 942              	.L73:
+ 340:I2C_FM31XX.c  **** 				break;
+ 341:I2C_FM31XX.c  **** 	
+ 342:I2C_FM31XX.c  **** 			default :
+ 343:I2C_FM31XX.c  **** 				break;
+ 344:I2C_FM31XX.c  **** 		}
+ 345:I2C_FM31XX.c  **** 	}
+ 346:I2C_FM31XX.c  **** 
+ 347:I2C_FM31XX.c  **** 	I2C0CONCLR 	= 0x08;                        //Clear I2C interrupt flag
+ 943              		.loc 1 347 0
+ 944 08bc 0820A0E3 		mov	r2, #8
+ 945 08c0 0E32A0E3 		mov	r3, #-536870912
+ 946 08c4 073983E2 		add	r3, r3, #114688
+ 947 08c8 1820C3E5 		strb	r2, [r3, #24]
+ 348:I2C_FM31XX.c  **** 	VICVectAddr = 0x00000000;                  //Acknowlage interrupt
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 24
+
+
+ 948              		.loc 1 348 0
+ 949 08cc 082042E2 		sub	r2, r2, #8
+ 950 08d0 3F3DE0E3 		mvn	r3, #4032
+ 951 08d4 0F2003E5 		str	r2, [r3, #-15]
+ 349:I2C_FM31XX.c  **** }
+ 952              		.loc 1 349 0
+ 953 08d8 0F00BDE8 		ldmfd	sp!, {r0, r1, r2, r3}
+ 954 08dc 04F05EE2 		subs	pc, lr, #4
+ 955              	.L98:
+ 956              		.align	2
+ 957              	.L97:
+ 958 08e0 00000000 		.word	fReadWrite
+ 959 08e4 00000000 		.word	I2CAddress
+ 960 08e8 00000000 		.word	pI2CData
+ 961 08ec 00000000 		.word	I2CNumberOfBytes
+ 962 08f0 00000000 		.word	lock
+ 963 08f4 00000000 		.word	fReadPart
+ 964 08f8 00000000 		.word	I2CBuffer
+ 965              	.LFE10:
+ 966              		.size	I2CISR, .-I2CISR
+ 967              		.comm	I2CAddress,4,4
+ 968              		.comm	I2CNumberOfBytes,4,4
+ 969              		.comm	pI2CData,4,4
+ 970              		.comm	I2CBuffer,256,1
+ 971              		.section	.debug_frame,"",%progbits
+ 972              	.Lframe0:
+ 973 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ 974              	.LSCIE0:
+ 975 0004 FFFFFFFF 		.4byte	0xffffffff
+ 976 0008 01       		.byte	0x1
+ 977 0009 00       		.ascii	"\000"
+ 978 000a 01       		.uleb128 0x1
+ 979 000b 7C       		.sleb128 -4
+ 980 000c 0E       		.byte	0xe
+ 981 000d 0C       		.byte	0xc
+ 982 000e 0D       		.uleb128 0xd
+ 983 000f 00       		.uleb128 0x0
+ 984              		.align	2
+ 985              	.LECIE0:
+ 986              	.LSFDE0:
+ 987 0010 0C000000 		.4byte	.LEFDE0-.LASFDE0
+ 988              	.LASFDE0:
+ 989 0014 00000000 		.4byte	.Lframe0
+ 990 0018 00000000 		.4byte	.LFB2
+ 991 001c 64000000 		.4byte	.LFE2-.LFB2
+ 992              		.align	2
+ 993              	.LEFDE0:
+ 994              	.LSFDE2:
+ 995 0020 14000000 		.4byte	.LEFDE2-.LASFDE2
+ 996              	.LASFDE2:
+ 997 0024 00000000 		.4byte	.Lframe0
+ 998 0028 64000000 		.4byte	.LFB3
+ 999 002c D4000000 		.4byte	.LFE3-.LFB3
+ 1000 0030 44       		.byte	0x4
+ 1001              		.4byte	.LCFI0-.LFB3
+ 1002 0031 0E       		.byte	0xe
+ 1003 0032 04       		.uleb128 0x4
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 25
+
+
+ 1004 0033 8E       		.byte	0x8e
+ 1005 0034 01       		.uleb128 0x1
+ 1006 0035 000000   		.align	2
+ 1007              	.LEFDE2:
+ 1008              	.LSFDE4:
+ 1009 0038 0C000000 		.4byte	.LEFDE4-.LASFDE4
+ 1010              	.LASFDE4:
+ 1011 003c 00000000 		.4byte	.Lframe0
+ 1012 0040 38010000 		.4byte	.LFB4
+ 1013 0044 B0000000 		.4byte	.LFE4-.LFB4
+ 1014              		.align	2
+ 1015              	.LEFDE4:
+ 1016              	.LSFDE6:
+ 1017 0048 0C000000 		.4byte	.LEFDE6-.LASFDE6
+ 1018              	.LASFDE6:
+ 1019 004c 00000000 		.4byte	.Lframe0
+ 1020 0050 E8010000 		.4byte	.LFB5
+ 1021 0054 1C000000 		.4byte	.LFE5-.LFB5
+ 1022              		.align	2
+ 1023              	.LEFDE6:
+ 1024              	.LSFDE8:
+ 1025 0058 1C000000 		.4byte	.LEFDE8-.LASFDE8
+ 1026              	.LASFDE8:
+ 1027 005c 00000000 		.4byte	.Lframe0
+ 1028 0060 04020000 		.4byte	.LFB6
+ 1029 0064 54000000 		.4byte	.LFE6-.LFB6
+ 1030 0068 44       		.byte	0x4
+ 1031              		.4byte	.LCFI1-.LFB6
+ 1032 0069 0D       		.byte	0xd
+ 1033 006a 0C       		.uleb128 0xc
+ 1034 006b 44       		.byte	0x4
+ 1035              		.4byte	.LCFI2-.LCFI1
+ 1036 006c 8E       		.byte	0x8e
+ 1037 006d 02       		.uleb128 0x2
+ 1038 006e 8D       		.byte	0x8d
+ 1039 006f 03       		.uleb128 0x3
+ 1040 0070 8B       		.byte	0x8b
+ 1041 0071 04       		.uleb128 0x4
+ 1042 0072 44       		.byte	0x4
+ 1043              		.4byte	.LCFI3-.LCFI2
+ 1044 0073 0C       		.byte	0xc
+ 1045 0074 0B       		.uleb128 0xb
+ 1046 0075 04       		.uleb128 0x4
+ 1047 0076 0000     		.align	2
+ 1048              	.LEFDE8:
+ 1049              	.LSFDE10:
+ 1050 0078 20000000 		.4byte	.LEFDE10-.LASFDE10
+ 1051              	.LASFDE10:
+ 1052 007c 00000000 		.4byte	.Lframe0
+ 1053 0080 58020000 		.4byte	.LFB7
+ 1054 0084 78000000 		.4byte	.LFE7-.LFB7
+ 1055 0088 44       		.byte	0x4
+ 1056              		.4byte	.LCFI4-.LFB7
+ 1057 0089 0D       		.byte	0xd
+ 1058 008a 0C       		.uleb128 0xc
+ 1059 008b 44       		.byte	0x4
+ 1060              		.4byte	.LCFI5-.LCFI4
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 26
+
+
+ 1061 008c 8E       		.byte	0x8e
+ 1062 008d 02       		.uleb128 0x2
+ 1063 008e 8D       		.byte	0x8d
+ 1064 008f 03       		.uleb128 0x3
+ 1065 0090 8B       		.byte	0x8b
+ 1066 0091 04       		.uleb128 0x4
+ 1067 0092 85       		.byte	0x85
+ 1068 0093 05       		.uleb128 0x5
+ 1069 0094 84       		.byte	0x84
+ 1070 0095 06       		.uleb128 0x6
+ 1071 0096 44       		.byte	0x4
+ 1072              		.4byte	.LCFI6-.LCFI5
+ 1073 0097 0C       		.byte	0xc
+ 1074 0098 0B       		.uleb128 0xb
+ 1075 0099 04       		.uleb128 0x4
+ 1076 009a 0000     		.align	2
+ 1077              	.LEFDE10:
+ 1078              	.LSFDE12:
+ 1079 009c 1C000000 		.4byte	.LEFDE12-.LASFDE12
+ 1080              	.LASFDE12:
+ 1081 00a0 00000000 		.4byte	.Lframe0
+ 1082 00a4 D0020000 		.4byte	.LFB8
+ 1083 00a8 40000000 		.4byte	.LFE8-.LFB8
+ 1084 00ac 44       		.byte	0x4
+ 1085              		.4byte	.LCFI7-.LFB8
+ 1086 00ad 0D       		.byte	0xd
+ 1087 00ae 0C       		.uleb128 0xc
+ 1088 00af 44       		.byte	0x4
+ 1089              		.4byte	.LCFI8-.LCFI7
+ 1090 00b0 8E       		.byte	0x8e
+ 1091 00b1 02       		.uleb128 0x2
+ 1092 00b2 8D       		.byte	0x8d
+ 1093 00b3 03       		.uleb128 0x3
+ 1094 00b4 8B       		.byte	0x8b
+ 1095 00b5 04       		.uleb128 0x4
+ 1096 00b6 44       		.byte	0x4
+ 1097              		.4byte	.LCFI9-.LCFI8
+ 1098 00b7 0C       		.byte	0xc
+ 1099 00b8 0B       		.uleb128 0xb
+ 1100 00b9 04       		.uleb128 0x4
+ 1101 00ba 0000     		.align	2
+ 1102              	.LEFDE12:
+ 1103              	.LSFDE14:
+ 1104 00bc 24000000 		.4byte	.LEFDE14-.LASFDE14
+ 1105              	.LASFDE14:
+ 1106 00c0 00000000 		.4byte	.Lframe0
+ 1107 00c4 10030000 		.4byte	.LFB9
+ 1108 00c8 18010000 		.4byte	.LFE9-.LFB9
+ 1109 00cc 44       		.byte	0x4
+ 1110              		.4byte	.LCFI10-.LFB9
+ 1111 00cd 0D       		.byte	0xd
+ 1112 00ce 0C       		.uleb128 0xc
+ 1113 00cf 44       		.byte	0x4
+ 1114              		.4byte	.LCFI11-.LCFI10
+ 1115 00d0 8E       		.byte	0x8e
+ 1116 00d1 02       		.uleb128 0x2
+ 1117 00d2 8D       		.byte	0x8d
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 27
+
+
+ 1118 00d3 03       		.uleb128 0x3
+ 1119 00d4 8B       		.byte	0x8b
+ 1120 00d5 04       		.uleb128 0x4
+ 1121 00d6 87       		.byte	0x87
+ 1122 00d7 05       		.uleb128 0x5
+ 1123 00d8 86       		.byte	0x86
+ 1124 00d9 06       		.uleb128 0x6
+ 1125 00da 85       		.byte	0x85
+ 1126 00db 07       		.uleb128 0x7
+ 1127 00dc 84       		.byte	0x84
+ 1128 00dd 08       		.uleb128 0x8
+ 1129 00de 44       		.byte	0x4
+ 1130              		.4byte	.LCFI12-.LCFI11
+ 1131 00df 0C       		.byte	0xc
+ 1132 00e0 0B       		.uleb128 0xb
+ 1133 00e1 04       		.uleb128 0x4
+ 1134 00e2 0000     		.align	2
+ 1135              	.LEFDE14:
+ 1136              	.LSFDE16:
+ 1137 00e4 18000000 		.4byte	.LEFDE16-.LASFDE16
+ 1138              	.LASFDE16:
+ 1139 00e8 00000000 		.4byte	.Lframe0
+ 1140 00ec 28040000 		.4byte	.LFB10
+ 1141 00f0 D4040000 		.4byte	.LFE10-.LFB10
+ 1142 00f4 44       		.byte	0x4
+ 1143              		.4byte	.LCFI13-.LFB10
+ 1144 00f5 0E       		.byte	0xe
+ 1145 00f6 10       		.uleb128 0x10
+ 1146 00f7 83       		.byte	0x83
+ 1147 00f8 01       		.uleb128 0x1
+ 1148 00f9 82       		.byte	0x82
+ 1149 00fa 02       		.uleb128 0x2
+ 1150 00fb 81       		.byte	0x81
+ 1151 00fc 03       		.uleb128 0x3
+ 1152 00fd 80       		.byte	0x80
+ 1153 00fe 04       		.uleb128 0x4
+ 1154 00ff 00       		.align	2
+ 1155              	.LEFDE16:
+ 1156              		.text
+ 1157              	.Letext0:
+ 1158              		.section	.debug_loc,"",%progbits
+ 1159              	.Ldebug_loc0:
+ 1160              	.LLST0:
+ 1161 0000 64000000 		.4byte	.LVL1-.Ltext0
+ 1162 0004 78000000 		.4byte	.LVL3-.Ltext0
+ 1163 0008 0100     		.2byte	0x1
+ 1164 000a 50       		.byte	0x50
+ 1165 000b 00000000 		.4byte	0x0
+ 1166 000f 00000000 		.4byte	0x0
+ 1167              	.LLST1:
+ 1168 0013 64000000 		.4byte	.LVL1-.Ltext0
+ 1169 0017 94000000 		.4byte	.LVL5-.Ltext0
+ 1170 001b 0100     		.2byte	0x1
+ 1171 001d 51       		.byte	0x51
+ 1172 001e AC000000 		.4byte	.LVL6-.Ltext0
+ 1173 0022 38010000 		.4byte	.LFE3-.Ltext0
+ 1174 0026 0100     		.2byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 28
+
+
+ 1175 0028 51       		.byte	0x51
+ 1176 0029 00000000 		.4byte	0x0
+ 1177 002d 00000000 		.4byte	0x0
+ 1178              	.LLST2:
+ 1179 0031 64000000 		.4byte	.LVL1-.Ltext0
+ 1180 0035 70000000 		.4byte	.LVL2-.Ltext0
+ 1181 0039 0100     		.2byte	0x1
+ 1182 003b 52       		.byte	0x52
+ 1183 003c 70000000 		.4byte	.LVL2-.Ltext0
+ 1184 0040 38010000 		.4byte	.LFE3-.Ltext0
+ 1185 0044 0100     		.2byte	0x1
+ 1186 0046 5E       		.byte	0x5e
+ 1187 0047 00000000 		.4byte	0x0
+ 1188 004b 00000000 		.4byte	0x0
+ 1189              	.LLST3:
+ 1190 004f 64000000 		.4byte	.LVL1-.Ltext0
+ 1191 0053 8C000000 		.4byte	.LVL4-.Ltext0
+ 1192 0057 0100     		.2byte	0x1
+ 1193 0059 53       		.byte	0x53
+ 1194 005a 8C000000 		.4byte	.LVL4-.Ltext0
+ 1195 005e 38010000 		.4byte	.LFE3-.Ltext0
+ 1196 0062 0100     		.2byte	0x1
+ 1197 0064 5C       		.byte	0x5c
+ 1198 0065 00000000 		.4byte	0x0
+ 1199 0069 00000000 		.4byte	0x0
+ 1200              	.LLST4:
+ 1201 006d 38010000 		.4byte	.LVL7-.Ltext0
+ 1202 0071 C8010000 		.4byte	.LVL9-.Ltext0
+ 1203 0075 0100     		.2byte	0x1
+ 1204 0077 50       		.byte	0x50
+ 1205 0078 00000000 		.4byte	0x0
+ 1206 007c 00000000 		.4byte	0x0
+ 1207              	.LLST5:
+ 1208 0080 38010000 		.4byte	.LVL7-.Ltext0
+ 1209 0084 68010000 		.4byte	.LVL8-.Ltext0
+ 1210 0088 0100     		.2byte	0x1
+ 1211 008a 51       		.byte	0x51
+ 1212 008b 00000000 		.4byte	0x0
+ 1213 008f 00000000 		.4byte	0x0
+ 1214              		.section	.debug_info
+ 1215 0000 6D020000 		.4byte	0x26d
+ 1216 0004 0200     		.2byte	0x2
+ 1217 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 1218 000a 04       		.byte	0x4
+ 1219 000b 01       		.uleb128 0x1
+ 1220 000c 00000000 		.4byte	.Ldebug_line0
+ 1221 0010 FC080000 		.4byte	.Letext0
+ 1222 0014 00000000 		.4byte	.Ltext0
+ 1223 0018 18000000 		.4byte	.LASF26
+ 1224 001c 01       		.byte	0x1
+ 1225 001d 4C010000 		.4byte	.LASF27
+ 1226 0021 D7000000 		.4byte	.LASF28
+ 1227 0025 02       		.uleb128 0x2
+ 1228 0026 01       		.byte	0x1
+ 1229 0027 70010000 		.4byte	.LASF10
+ 1230 002b 01       		.byte	0x1
+ 1231 002c 2F       		.byte	0x2f
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 29
+
+
+ 1232 002d 01       		.byte	0x1
+ 1233 002e 00000000 		.4byte	.LFB2
+ 1234 0032 64000000 		.4byte	.LFE2
+ 1235 0036 02       		.byte	0x2
+ 1236 0037 7D       		.byte	0x7d
+ 1237 0038 00       		.sleb128 0
+ 1238 0039 03       		.uleb128 0x3
+ 1239 003a 97000000 		.4byte	0x97
+ 1240 003e 01       		.byte	0x1
+ 1241 003f 24000000 		.4byte	.LASF6
+ 1242 0043 01       		.byte	0x1
+ 1243 0044 42       		.byte	0x42
+ 1244 0045 01       		.byte	0x1
+ 1245 0046 64000000 		.4byte	.LFB3
+ 1246 004a 38010000 		.4byte	.LFE3
+ 1247 004e 02       		.byte	0x2
+ 1248 004f 7D       		.byte	0x7d
+ 1249 0050 00       		.sleb128 0
+ 1250 0051 04       		.uleb128 0x4
+ 1251 0052 3F000000 		.4byte	.LASF0
+ 1252 0056 01       		.byte	0x1
+ 1253 0057 41       		.byte	0x41
+ 1254 0058 97000000 		.4byte	0x97
+ 1255 005c 00000000 		.4byte	.LLST0
+ 1256 0060 04       		.uleb128 0x4
+ 1257 0061 44010000 		.4byte	.LASF1
+ 1258 0065 01       		.byte	0x1
+ 1259 0066 41       		.byte	0x41
+ 1260 0067 97000000 		.4byte	0x97
+ 1261 006b 13000000 		.4byte	.LLST1
+ 1262 006f 04       		.uleb128 0x4
+ 1263 0070 2C010000 		.4byte	.LASF2
+ 1264 0074 01       		.byte	0x1
+ 1265 0075 41       		.byte	0x41
+ 1266 0076 A3000000 		.4byte	0xa3
+ 1267 007a 31000000 		.4byte	.LLST2
+ 1268 007e 04       		.uleb128 0x4
+ 1269 007f 1E010000 		.4byte	.LASF3
+ 1270 0083 01       		.byte	0x1
+ 1271 0084 41       		.byte	0x41
+ 1272 0085 97000000 		.4byte	0x97
+ 1273 0089 4F000000 		.4byte	.LLST3
+ 1274 008d 05       		.uleb128 0x5
+ 1275 008e 6900     		.ascii	"i\000"
+ 1276 0090 01       		.byte	0x1
+ 1277 0091 43       		.byte	0x43
+ 1278 0092 9C000000 		.4byte	0x9c
+ 1279 0096 00       		.byte	0x0
+ 1280 0097 06       		.uleb128 0x6
+ 1281 0098 9C000000 		.4byte	0x9c
+ 1282 009c 07       		.uleb128 0x7
+ 1283 009d 0B000000 		.4byte	.LASF4
+ 1284 00a1 04       		.byte	0x4
+ 1285 00a2 07       		.byte	0x7
+ 1286 00a3 08       		.uleb128 0x8
+ 1287 00a4 04       		.byte	0x4
+ 1288 00a5 A9000000 		.4byte	0xa9
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 30
+
+
+ 1289 00a9 06       		.uleb128 0x6
+ 1290 00aa AE000000 		.4byte	0xae
+ 1291 00ae 07       		.uleb128 0x7
+ 1292 00af AB000000 		.4byte	.LASF5
+ 1293 00b3 01       		.byte	0x1
+ 1294 00b4 08       		.byte	0x8
+ 1295 00b5 09       		.uleb128 0x9
+ 1296 00b6 F0000000 		.4byte	0xf0
+ 1297 00ba 01       		.byte	0x1
+ 1298 00bb 32010000 		.4byte	.LASF7
+ 1299 00bf 01       		.byte	0x1
+ 1300 00c0 61       		.byte	0x61
+ 1301 00c1 01       		.byte	0x1
+ 1302 00c2 9C000000 		.4byte	0x9c
+ 1303 00c6 38010000 		.4byte	.LFB4
+ 1304 00ca E8010000 		.4byte	.LFE4
+ 1305 00ce 02       		.byte	0x2
+ 1306 00cf 7D       		.byte	0x7d
+ 1307 00d0 00       		.sleb128 0
+ 1308 00d1 04       		.uleb128 0x4
+ 1309 00d2 3F000000 		.4byte	.LASF0
+ 1310 00d6 01       		.byte	0x1
+ 1311 00d7 60       		.byte	0x60
+ 1312 00d8 97000000 		.4byte	0x97
+ 1313 00dc 6D000000 		.4byte	.LLST4
+ 1314 00e0 04       		.uleb128 0x4
+ 1315 00e1 44010000 		.4byte	.LASF1
+ 1316 00e5 01       		.byte	0x1
+ 1317 00e6 60       		.byte	0x60
+ 1318 00e7 97000000 		.4byte	0x97
+ 1319 00eb 80000000 		.4byte	.LLST5
+ 1320 00ef 00       		.byte	0x0
+ 1321 00f0 03       		.uleb128 0x3
+ 1322 00f1 21010000 		.4byte	0x121
+ 1323 00f5 01       		.byte	0x1
+ 1324 00f6 6A010000 		.4byte	.LASF8
+ 1325 00fa 01       		.byte	0x1
+ 1326 00fb 7E       		.byte	0x7e
+ 1327 00fc 01       		.byte	0x1
+ 1328 00fd E8010000 		.4byte	.LFB5
+ 1329 0101 04020000 		.4byte	.LFE5
+ 1330 0105 02       		.byte	0x2
+ 1331 0106 7D       		.byte	0x7d
+ 1332 0107 00       		.sleb128 0
+ 1333 0108 0A       		.uleb128 0xa
+ 1334 0109 4C000000 		.4byte	.LASF9
+ 1335 010d 01       		.byte	0x1
+ 1336 010e 7D       		.byte	0x7d
+ 1337 010f 9C000000 		.4byte	0x9c
+ 1338 0113 01       		.byte	0x1
+ 1339 0114 50       		.byte	0x50
+ 1340 0115 0B       		.uleb128 0xb
+ 1341 0116 6900     		.ascii	"i\000"
+ 1342 0118 01       		.byte	0x1
+ 1343 0119 7F       		.byte	0x7f
+ 1344 011a 9C000000 		.4byte	0x9c
+ 1345 011e 01       		.byte	0x1
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 31
+
+
+ 1346 011f 53       		.byte	0x53
+ 1347 0120 00       		.byte	0x0
+ 1348 0121 02       		.uleb128 0x2
+ 1349 0122 01       		.byte	0x1
+ 1350 0123 8E000000 		.4byte	.LASF11
+ 1351 0127 01       		.byte	0x1
+ 1352 0128 87       		.byte	0x87
+ 1353 0129 01       		.byte	0x1
+ 1354 012a 04020000 		.4byte	.LFB6
+ 1355 012e 58020000 		.4byte	.LFE6
+ 1356 0132 01       		.byte	0x1
+ 1357 0133 5B       		.byte	0x5b
+ 1358 0134 03       		.uleb128 0x3
+ 1359 0135 64010000 		.4byte	0x164
+ 1360 0139 01       		.byte	0x1
+ 1361 013a 78010000 		.4byte	.LASF12
+ 1362 013e 01       		.byte	0x1
+ 1363 013f 95       		.byte	0x95
+ 1364 0140 01       		.byte	0x1
+ 1365 0141 58020000 		.4byte	.LFB7
+ 1366 0145 D0020000 		.4byte	.LFE7
+ 1367 0149 01       		.byte	0x1
+ 1368 014a 5B       		.byte	0x5b
+ 1369 014b 0C       		.uleb128 0xc
+ 1370 014c 00000000 		.4byte	.LASF13
+ 1371 0150 01       		.byte	0x1
+ 1372 0151 96       		.byte	0x96
+ 1373 0152 9C000000 		.4byte	0x9c
+ 1374 0156 01       		.byte	0x1
+ 1375 0157 54       		.byte	0x54
+ 1376 0158 0B       		.uleb128 0xb
+ 1377 0159 6900     		.ascii	"i\000"
+ 1378 015b 01       		.byte	0x1
+ 1379 015c 96       		.byte	0x96
+ 1380 015d 9C000000 		.4byte	0x9c
+ 1381 0161 01       		.byte	0x1
+ 1382 0162 55       		.byte	0x55
+ 1383 0163 00       		.byte	0x0
+ 1384 0164 02       		.uleb128 0x2
+ 1385 0165 01       		.byte	0x1
+ 1386 0166 82000000 		.4byte	.LASF14
+ 1387 016a 01       		.byte	0x1
+ 1388 016b AB       		.byte	0xab
+ 1389 016c 01       		.byte	0x1
+ 1390 016d D0020000 		.4byte	.LFB8
+ 1391 0171 10030000 		.4byte	.LFE8
+ 1392 0175 01       		.byte	0x1
+ 1393 0176 5B       		.byte	0x5b
+ 1394 0177 0D       		.uleb128 0xd
+ 1395 0178 01       		.byte	0x1
+ 1396 0179 B9000000 		.4byte	.LASF15
+ 1397 017d 01       		.byte	0x1
+ 1398 017e B6       		.byte	0xb6
+ 1399 017f 01       		.byte	0x1
+ 1400 0180 8E010000 		.4byte	0x18e
+ 1401 0184 10030000 		.4byte	.LFB9
+ 1402 0188 28040000 		.4byte	.LFE9
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 32
+
+
+ 1403 018c 01       		.byte	0x1
+ 1404 018d 5B       		.byte	0x5b
+ 1405 018e 0E       		.uleb128 0xe
+ 1406 018f 696E7400 		.ascii	"int\000"
+ 1407 0193 04       		.byte	0x4
+ 1408 0194 05       		.byte	0x5
+ 1409 0195 02       		.uleb128 0x2
+ 1410 0196 01       		.byte	0x1
+ 1411 0197 55000000 		.4byte	.LASF16
+ 1412 019b 01       		.byte	0x1
+ 1413 019c E7       		.byte	0xe7
+ 1414 019d 01       		.byte	0x1
+ 1415 019e 28040000 		.4byte	.LFB10
+ 1416 01a2 FC080000 		.4byte	.LFE10
+ 1417 01a6 02       		.byte	0x2
+ 1418 01a7 7D       		.byte	0x7d
+ 1419 01a8 00       		.sleb128 0
+ 1420 01a9 0F       		.uleb128 0xf
+ 1421 01aa 88010000 		.4byte	.LASF17
+ 1422 01ae 01       		.byte	0x1
+ 1423 01af 17       		.byte	0x17
+ 1424 01b0 9C000000 		.4byte	0x9c
+ 1425 01b4 01       		.byte	0x1
+ 1426 01b5 05       		.byte	0x5
+ 1427 01b6 03       		.byte	0x3
+ 1428 01b7 00000000 		.4byte	I2CAddress
+ 1429 01bb 0F       		.uleb128 0xf
+ 1430 01bc 59010000 		.4byte	.LASF18
+ 1431 01c0 01       		.byte	0x1
+ 1432 01c1 17       		.byte	0x17
+ 1433 01c2 9C000000 		.4byte	0x9c
+ 1434 01c6 01       		.byte	0x1
+ 1435 01c7 05       		.byte	0x5
+ 1436 01c8 03       		.byte	0x3
+ 1437 01c9 00000000 		.4byte	I2CNumberOfBytes
+ 1438 01cd 0F       		.uleb128 0xf
+ 1439 01ce 5C000000 		.4byte	.LASF19
+ 1440 01d2 01       		.byte	0x1
+ 1441 01d3 18       		.byte	0x18
+ 1442 01d4 DF010000 		.4byte	0x1df
+ 1443 01d8 01       		.byte	0x1
+ 1444 01d9 05       		.byte	0x5
+ 1445 01da 03       		.byte	0x3
+ 1446 01db 00000000 		.4byte	pI2CData
+ 1447 01df 08       		.uleb128 0x8
+ 1448 01e0 04       		.byte	0x4
+ 1449 01e1 AE000000 		.4byte	0xae
+ 1450 01e5 10       		.uleb128 0x10
+ 1451 01e6 F5010000 		.4byte	0x1f5
+ 1452 01ea AE000000 		.4byte	0xae
+ 1453 01ee 11       		.uleb128 0x11
+ 1454 01ef F5010000 		.4byte	0x1f5
+ 1455 01f3 FF       		.byte	0xff
+ 1456 01f4 00       		.byte	0x0
+ 1457 01f5 07       		.uleb128 0x7
+ 1458 01f6 65000000 		.4byte	.LASF20
+ 1459 01fa 04       		.byte	0x4
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 33
+
+
+ 1460 01fb 07       		.byte	0x7
+ 1461 01fc 0F       		.uleb128 0xf
+ 1462 01fd C8000000 		.4byte	.LASF21
+ 1463 0201 01       		.byte	0x1
+ 1464 0202 19       		.byte	0x19
+ 1465 0203 E5010000 		.4byte	0x1e5
+ 1466 0207 01       		.byte	0x1
+ 1467 0208 05       		.byte	0x5
+ 1468 0209 03       		.byte	0x3
+ 1469 020a 00000000 		.4byte	I2CBuffer
+ 1470 020e 0F       		.uleb128 0xf
+ 1471 020f 77000000 		.4byte	.LASF22
+ 1472 0213 01       		.byte	0x1
+ 1473 0214 1C       		.byte	0x1c
+ 1474 0215 9C000000 		.4byte	0x9c
+ 1475 0219 01       		.byte	0x1
+ 1476 021a 05       		.byte	0x5
+ 1477 021b 03       		.byte	0x3
+ 1478 021c 00000000 		.4byte	fReadWrite
+ 1479 0220 0F       		.uleb128 0xf
+ 1480 0221 BE000000 		.4byte	.LASF23
+ 1481 0225 01       		.byte	0x1
+ 1482 0226 20       		.byte	0x20
+ 1483 0227 9C000000 		.4byte	0x9c
+ 1484 022b 01       		.byte	0x1
+ 1485 022c 05       		.byte	0x5
+ 1486 022d 03       		.byte	0x3
+ 1487 022e 00000000 		.4byte	fReadPart
+ 1488 0232 0F       		.uleb128 0xf
+ 1489 0233 D2000000 		.4byte	.LASF24
+ 1490 0237 01       		.byte	0x1
+ 1491 0238 23       		.byte	0x23
+ 1492 0239 44020000 		.4byte	0x244
+ 1493 023d 01       		.byte	0x1
+ 1494 023e 05       		.byte	0x5
+ 1495 023f 03       		.byte	0x3
+ 1496 0240 00000000 		.4byte	lock
+ 1497 0244 12       		.uleb128 0x12
+ 1498 0245 9C000000 		.4byte	0x9c
+ 1499 0249 10       		.uleb128 0x10
+ 1500 024a 59020000 		.4byte	0x259
+ 1501 024e AE000000 		.4byte	0xae
+ 1502 0252 11       		.uleb128 0x11
+ 1503 0253 F5010000 		.4byte	0x1f5
+ 1504 0257 04       		.byte	0x4
+ 1505 0258 00       		.byte	0x0
+ 1506 0259 0F       		.uleb128 0xf
+ 1507 025a 9F000000 		.4byte	.LASF25
+ 1508 025e 01       		.byte	0x1
+ 1509 025f 26       		.byte	0x26
+ 1510 0260 6B020000 		.4byte	0x26b
+ 1511 0264 01       		.byte	0x1
+ 1512 0265 05       		.byte	0x5
+ 1513 0266 03       		.byte	0x3
+ 1514 0267 00000000 		.4byte	ExampleData
+ 1515 026b 06       		.uleb128 0x6
+ 1516 026c 49020000 		.4byte	0x249
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 34
+
+
+ 1517 0270 00       		.byte	0x0
+ 1518              		.section	.debug_abbrev
+ 1519 0000 01       		.uleb128 0x1
+ 1520 0001 11       		.uleb128 0x11
+ 1521 0002 01       		.byte	0x1
+ 1522 0003 10       		.uleb128 0x10
+ 1523 0004 06       		.uleb128 0x6
+ 1524 0005 12       		.uleb128 0x12
+ 1525 0006 01       		.uleb128 0x1
+ 1526 0007 11       		.uleb128 0x11
+ 1527 0008 01       		.uleb128 0x1
+ 1528 0009 25       		.uleb128 0x25
+ 1529 000a 0E       		.uleb128 0xe
+ 1530 000b 13       		.uleb128 0x13
+ 1531 000c 0B       		.uleb128 0xb
+ 1532 000d 03       		.uleb128 0x3
+ 1533 000e 0E       		.uleb128 0xe
+ 1534 000f 1B       		.uleb128 0x1b
+ 1535 0010 0E       		.uleb128 0xe
+ 1536 0011 00       		.byte	0x0
+ 1537 0012 00       		.byte	0x0
+ 1538 0013 02       		.uleb128 0x2
+ 1539 0014 2E       		.uleb128 0x2e
+ 1540 0015 00       		.byte	0x0
+ 1541 0016 3F       		.uleb128 0x3f
+ 1542 0017 0C       		.uleb128 0xc
+ 1543 0018 03       		.uleb128 0x3
+ 1544 0019 0E       		.uleb128 0xe
+ 1545 001a 3A       		.uleb128 0x3a
+ 1546 001b 0B       		.uleb128 0xb
+ 1547 001c 3B       		.uleb128 0x3b
+ 1548 001d 0B       		.uleb128 0xb
+ 1549 001e 27       		.uleb128 0x27
+ 1550 001f 0C       		.uleb128 0xc
+ 1551 0020 11       		.uleb128 0x11
+ 1552 0021 01       		.uleb128 0x1
+ 1553 0022 12       		.uleb128 0x12
+ 1554 0023 01       		.uleb128 0x1
+ 1555 0024 40       		.uleb128 0x40
+ 1556 0025 0A       		.uleb128 0xa
+ 1557 0026 00       		.byte	0x0
+ 1558 0027 00       		.byte	0x0
+ 1559 0028 03       		.uleb128 0x3
+ 1560 0029 2E       		.uleb128 0x2e
+ 1561 002a 01       		.byte	0x1
+ 1562 002b 01       		.uleb128 0x1
+ 1563 002c 13       		.uleb128 0x13
+ 1564 002d 3F       		.uleb128 0x3f
+ 1565 002e 0C       		.uleb128 0xc
+ 1566 002f 03       		.uleb128 0x3
+ 1567 0030 0E       		.uleb128 0xe
+ 1568 0031 3A       		.uleb128 0x3a
+ 1569 0032 0B       		.uleb128 0xb
+ 1570 0033 3B       		.uleb128 0x3b
+ 1571 0034 0B       		.uleb128 0xb
+ 1572 0035 27       		.uleb128 0x27
+ 1573 0036 0C       		.uleb128 0xc
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 35
+
+
+ 1574 0037 11       		.uleb128 0x11
+ 1575 0038 01       		.uleb128 0x1
+ 1576 0039 12       		.uleb128 0x12
+ 1577 003a 01       		.uleb128 0x1
+ 1578 003b 40       		.uleb128 0x40
+ 1579 003c 0A       		.uleb128 0xa
+ 1580 003d 00       		.byte	0x0
+ 1581 003e 00       		.byte	0x0
+ 1582 003f 04       		.uleb128 0x4
+ 1583 0040 05       		.uleb128 0x5
+ 1584 0041 00       		.byte	0x0
+ 1585 0042 03       		.uleb128 0x3
+ 1586 0043 0E       		.uleb128 0xe
+ 1587 0044 3A       		.uleb128 0x3a
+ 1588 0045 0B       		.uleb128 0xb
+ 1589 0046 3B       		.uleb128 0x3b
+ 1590 0047 0B       		.uleb128 0xb
+ 1591 0048 49       		.uleb128 0x49
+ 1592 0049 13       		.uleb128 0x13
+ 1593 004a 02       		.uleb128 0x2
+ 1594 004b 06       		.uleb128 0x6
+ 1595 004c 00       		.byte	0x0
+ 1596 004d 00       		.byte	0x0
+ 1597 004e 05       		.uleb128 0x5
+ 1598 004f 34       		.uleb128 0x34
+ 1599 0050 00       		.byte	0x0
+ 1600 0051 03       		.uleb128 0x3
+ 1601 0052 08       		.uleb128 0x8
+ 1602 0053 3A       		.uleb128 0x3a
+ 1603 0054 0B       		.uleb128 0xb
+ 1604 0055 3B       		.uleb128 0x3b
+ 1605 0056 0B       		.uleb128 0xb
+ 1606 0057 49       		.uleb128 0x49
+ 1607 0058 13       		.uleb128 0x13
+ 1608 0059 00       		.byte	0x0
+ 1609 005a 00       		.byte	0x0
+ 1610 005b 06       		.uleb128 0x6
+ 1611 005c 26       		.uleb128 0x26
+ 1612 005d 00       		.byte	0x0
+ 1613 005e 49       		.uleb128 0x49
+ 1614 005f 13       		.uleb128 0x13
+ 1615 0060 00       		.byte	0x0
+ 1616 0061 00       		.byte	0x0
+ 1617 0062 07       		.uleb128 0x7
+ 1618 0063 24       		.uleb128 0x24
+ 1619 0064 00       		.byte	0x0
+ 1620 0065 03       		.uleb128 0x3
+ 1621 0066 0E       		.uleb128 0xe
+ 1622 0067 0B       		.uleb128 0xb
+ 1623 0068 0B       		.uleb128 0xb
+ 1624 0069 3E       		.uleb128 0x3e
+ 1625 006a 0B       		.uleb128 0xb
+ 1626 006b 00       		.byte	0x0
+ 1627 006c 00       		.byte	0x0
+ 1628 006d 08       		.uleb128 0x8
+ 1629 006e 0F       		.uleb128 0xf
+ 1630 006f 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 36
+
+
+ 1631 0070 0B       		.uleb128 0xb
+ 1632 0071 0B       		.uleb128 0xb
+ 1633 0072 49       		.uleb128 0x49
+ 1634 0073 13       		.uleb128 0x13
+ 1635 0074 00       		.byte	0x0
+ 1636 0075 00       		.byte	0x0
+ 1637 0076 09       		.uleb128 0x9
+ 1638 0077 2E       		.uleb128 0x2e
+ 1639 0078 01       		.byte	0x1
+ 1640 0079 01       		.uleb128 0x1
+ 1641 007a 13       		.uleb128 0x13
+ 1642 007b 3F       		.uleb128 0x3f
+ 1643 007c 0C       		.uleb128 0xc
+ 1644 007d 03       		.uleb128 0x3
+ 1645 007e 0E       		.uleb128 0xe
+ 1646 007f 3A       		.uleb128 0x3a
+ 1647 0080 0B       		.uleb128 0xb
+ 1648 0081 3B       		.uleb128 0x3b
+ 1649 0082 0B       		.uleb128 0xb
+ 1650 0083 27       		.uleb128 0x27
+ 1651 0084 0C       		.uleb128 0xc
+ 1652 0085 49       		.uleb128 0x49
+ 1653 0086 13       		.uleb128 0x13
+ 1654 0087 11       		.uleb128 0x11
+ 1655 0088 01       		.uleb128 0x1
+ 1656 0089 12       		.uleb128 0x12
+ 1657 008a 01       		.uleb128 0x1
+ 1658 008b 40       		.uleb128 0x40
+ 1659 008c 0A       		.uleb128 0xa
+ 1660 008d 00       		.byte	0x0
+ 1661 008e 00       		.byte	0x0
+ 1662 008f 0A       		.uleb128 0xa
+ 1663 0090 05       		.uleb128 0x5
+ 1664 0091 00       		.byte	0x0
+ 1665 0092 03       		.uleb128 0x3
+ 1666 0093 0E       		.uleb128 0xe
+ 1667 0094 3A       		.uleb128 0x3a
+ 1668 0095 0B       		.uleb128 0xb
+ 1669 0096 3B       		.uleb128 0x3b
+ 1670 0097 0B       		.uleb128 0xb
+ 1671 0098 49       		.uleb128 0x49
+ 1672 0099 13       		.uleb128 0x13
+ 1673 009a 02       		.uleb128 0x2
+ 1674 009b 0A       		.uleb128 0xa
+ 1675 009c 00       		.byte	0x0
+ 1676 009d 00       		.byte	0x0
+ 1677 009e 0B       		.uleb128 0xb
+ 1678 009f 34       		.uleb128 0x34
+ 1679 00a0 00       		.byte	0x0
+ 1680 00a1 03       		.uleb128 0x3
+ 1681 00a2 08       		.uleb128 0x8
+ 1682 00a3 3A       		.uleb128 0x3a
+ 1683 00a4 0B       		.uleb128 0xb
+ 1684 00a5 3B       		.uleb128 0x3b
+ 1685 00a6 0B       		.uleb128 0xb
+ 1686 00a7 49       		.uleb128 0x49
+ 1687 00a8 13       		.uleb128 0x13
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 37
+
+
+ 1688 00a9 02       		.uleb128 0x2
+ 1689 00aa 0A       		.uleb128 0xa
+ 1690 00ab 00       		.byte	0x0
+ 1691 00ac 00       		.byte	0x0
+ 1692 00ad 0C       		.uleb128 0xc
+ 1693 00ae 34       		.uleb128 0x34
+ 1694 00af 00       		.byte	0x0
+ 1695 00b0 03       		.uleb128 0x3
+ 1696 00b1 0E       		.uleb128 0xe
+ 1697 00b2 3A       		.uleb128 0x3a
+ 1698 00b3 0B       		.uleb128 0xb
+ 1699 00b4 3B       		.uleb128 0x3b
+ 1700 00b5 0B       		.uleb128 0xb
+ 1701 00b6 49       		.uleb128 0x49
+ 1702 00b7 13       		.uleb128 0x13
+ 1703 00b8 02       		.uleb128 0x2
+ 1704 00b9 0A       		.uleb128 0xa
+ 1705 00ba 00       		.byte	0x0
+ 1706 00bb 00       		.byte	0x0
+ 1707 00bc 0D       		.uleb128 0xd
+ 1708 00bd 2E       		.uleb128 0x2e
+ 1709 00be 00       		.byte	0x0
+ 1710 00bf 3F       		.uleb128 0x3f
+ 1711 00c0 0C       		.uleb128 0xc
+ 1712 00c1 03       		.uleb128 0x3
+ 1713 00c2 0E       		.uleb128 0xe
+ 1714 00c3 3A       		.uleb128 0x3a
+ 1715 00c4 0B       		.uleb128 0xb
+ 1716 00c5 3B       		.uleb128 0x3b
+ 1717 00c6 0B       		.uleb128 0xb
+ 1718 00c7 27       		.uleb128 0x27
+ 1719 00c8 0C       		.uleb128 0xc
+ 1720 00c9 49       		.uleb128 0x49
+ 1721 00ca 13       		.uleb128 0x13
+ 1722 00cb 11       		.uleb128 0x11
+ 1723 00cc 01       		.uleb128 0x1
+ 1724 00cd 12       		.uleb128 0x12
+ 1725 00ce 01       		.uleb128 0x1
+ 1726 00cf 40       		.uleb128 0x40
+ 1727 00d0 0A       		.uleb128 0xa
+ 1728 00d1 00       		.byte	0x0
+ 1729 00d2 00       		.byte	0x0
+ 1730 00d3 0E       		.uleb128 0xe
+ 1731 00d4 24       		.uleb128 0x24
+ 1732 00d5 00       		.byte	0x0
+ 1733 00d6 03       		.uleb128 0x3
+ 1734 00d7 08       		.uleb128 0x8
+ 1735 00d8 0B       		.uleb128 0xb
+ 1736 00d9 0B       		.uleb128 0xb
+ 1737 00da 3E       		.uleb128 0x3e
+ 1738 00db 0B       		.uleb128 0xb
+ 1739 00dc 00       		.byte	0x0
+ 1740 00dd 00       		.byte	0x0
+ 1741 00de 0F       		.uleb128 0xf
+ 1742 00df 34       		.uleb128 0x34
+ 1743 00e0 00       		.byte	0x0
+ 1744 00e1 03       		.uleb128 0x3
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 38
+
+
+ 1745 00e2 0E       		.uleb128 0xe
+ 1746 00e3 3A       		.uleb128 0x3a
+ 1747 00e4 0B       		.uleb128 0xb
+ 1748 00e5 3B       		.uleb128 0x3b
+ 1749 00e6 0B       		.uleb128 0xb
+ 1750 00e7 49       		.uleb128 0x49
+ 1751 00e8 13       		.uleb128 0x13
+ 1752 00e9 3F       		.uleb128 0x3f
+ 1753 00ea 0C       		.uleb128 0xc
+ 1754 00eb 02       		.uleb128 0x2
+ 1755 00ec 0A       		.uleb128 0xa
+ 1756 00ed 00       		.byte	0x0
+ 1757 00ee 00       		.byte	0x0
+ 1758 00ef 10       		.uleb128 0x10
+ 1759 00f0 01       		.uleb128 0x1
+ 1760 00f1 01       		.byte	0x1
+ 1761 00f2 01       		.uleb128 0x1
+ 1762 00f3 13       		.uleb128 0x13
+ 1763 00f4 49       		.uleb128 0x49
+ 1764 00f5 13       		.uleb128 0x13
+ 1765 00f6 00       		.byte	0x0
+ 1766 00f7 00       		.byte	0x0
+ 1767 00f8 11       		.uleb128 0x11
+ 1768 00f9 21       		.uleb128 0x21
+ 1769 00fa 00       		.byte	0x0
+ 1770 00fb 49       		.uleb128 0x49
+ 1771 00fc 13       		.uleb128 0x13
+ 1772 00fd 2F       		.uleb128 0x2f
+ 1773 00fe 0B       		.uleb128 0xb
+ 1774 00ff 00       		.byte	0x0
+ 1775 0100 00       		.byte	0x0
+ 1776 0101 12       		.uleb128 0x12
+ 1777 0102 35       		.uleb128 0x35
+ 1778 0103 00       		.byte	0x0
+ 1779 0104 49       		.uleb128 0x49
+ 1780 0105 13       		.uleb128 0x13
+ 1781 0106 00       		.byte	0x0
+ 1782 0107 00       		.byte	0x0
+ 1783 0108 00       		.byte	0x0
+ 1784              		.section	.debug_pubnames,"",%progbits
+ 1785 0000 1B010000 		.4byte	0x11b
+ 1786 0004 0200     		.2byte	0x2
+ 1787 0006 00000000 		.4byte	.Ldebug_info0
+ 1788 000a 71020000 		.4byte	0x271
+ 1789 000e 25000000 		.4byte	0x25
+ 1790 0012 49324349 		.ascii	"I2CInit\000"
+ 1790      6E697400 
+ 1791 001a 39000000 		.4byte	0x39
+ 1792 001e 49324346 		.ascii	"I2CFM31XXSendMultipleBytes\000"
+ 1792      4D333158 
+ 1792      5853656E 
+ 1792      644D756C 
+ 1792      7469706C 
+ 1793 0039 B5000000 		.4byte	0xb5
+ 1794 003d 49324346 		.ascii	"I2CFM31XXReadByte\000"
+ 1794      4D333158 
+ 1794      58526561 
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 39
+
+
+ 1794      64427974 
+ 1794      6500
+ 1795 004f F0000000 		.4byte	0xf0
+ 1796 0053 64656C61 		.ascii	"delay\000"
+ 1796      7900
+ 1797 0059 21010000 		.4byte	0x121
+ 1798 005d 57726974 		.ascii	"WriteExampleData\000"
+ 1798      65457861 
+ 1798      6D706C65 
+ 1798      44617461 
+ 1798      00
+ 1799 006e 34010000 		.4byte	0x134
+ 1800 0072 52656164 		.ascii	"ReadExampleData\000"
+ 1800      4578616D 
+ 1800      706C6544 
+ 1800      61746100 
+ 1801 0082 64010000 		.4byte	0x164
+ 1802 0086 44697370 		.ascii	"DisplayMenu\000"
+ 1802      6C61794D 
+ 1802      656E7500 
+ 1803 0092 77010000 		.4byte	0x177
+ 1804 0096 6D61696E 		.ascii	"main\000"
+ 1804      00
+ 1805 009b 95010000 		.4byte	0x195
+ 1806 009f 49324349 		.ascii	"I2CISR\000"
+ 1806      535200
+ 1807 00a6 A9010000 		.4byte	0x1a9
+ 1808 00aa 49324341 		.ascii	"I2CAddress\000"
+ 1808      64647265 
+ 1808      737300
+ 1809 00b5 BB010000 		.4byte	0x1bb
+ 1810 00b9 4932434E 		.ascii	"I2CNumberOfBytes\000"
+ 1810      756D6265 
+ 1810      724F6642 
+ 1810      79746573 
+ 1810      00
+ 1811 00ca CD010000 		.4byte	0x1cd
+ 1812 00ce 70493243 		.ascii	"pI2CData\000"
+ 1812      44617461 
+ 1812      00
+ 1813 00d7 FC010000 		.4byte	0x1fc
+ 1814 00db 49324342 		.ascii	"I2CBuffer\000"
+ 1814      75666665 
+ 1814      7200
+ 1815 00e5 0E020000 		.4byte	0x20e
+ 1816 00e9 66526561 		.ascii	"fReadWrite\000"
+ 1816      64577269 
+ 1816      746500
+ 1817 00f4 20020000 		.4byte	0x220
+ 1818 00f8 66526561 		.ascii	"fReadPart\000"
+ 1818      64506172 
+ 1818      7400
+ 1819 0102 32020000 		.4byte	0x232
+ 1820 0106 6C6F636B 		.ascii	"lock\000"
+ 1820      00
+ 1821 010b 59020000 		.4byte	0x259
+ 1822 010f 4578616D 		.ascii	"ExampleData\000"
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 40
+
+
+ 1822      706C6544 
+ 1822      61746100 
+ 1823 011b 00000000 		.4byte	0x0
+ 1824              		.section	.debug_aranges,"",%progbits
+ 1825 0000 1C000000 		.4byte	0x1c
+ 1826 0004 0200     		.2byte	0x2
+ 1827 0006 00000000 		.4byte	.Ldebug_info0
+ 1828 000a 04       		.byte	0x4
+ 1829 000b 00       		.byte	0x0
+ 1830 000c 0000     		.2byte	0x0
+ 1831 000e 0000     		.2byte	0x0
+ 1832 0010 00000000 		.4byte	.Ltext0
+ 1833 0014 FC080000 		.4byte	.Letext0-.Ltext0
+ 1834 0018 00000000 		.4byte	0x0
+ 1835 001c 00000000 		.4byte	0x0
+ 1836              		.section	.debug_str,"MS",%progbits,1
+ 1837              	.LASF13:
+ 1838 0000 52656164 		.ascii	"ReadResult\000"
+ 1838      52657375 
+ 1838      6C7400
+ 1839              	.LASF4:
+ 1840 000b 756E7369 		.ascii	"unsigned int\000"
+ 1840      676E6564 
+ 1840      20696E74 
+ 1840      00
+ 1841              	.LASF26:
+ 1842 0018 474E5520 		.ascii	"GNU C 4.0.1\000"
+ 1842      4320342E 
+ 1842      302E3100 
+ 1843              	.LASF6:
+ 1844 0024 49324346 		.ascii	"I2CFM31XXSendMultipleBytes\000"
+ 1844      4D333158 
+ 1844      5853656E 
+ 1844      644D756C 
+ 1844      7469706C 
+ 1845              	.LASF0:
+ 1846 003f 536C6176 		.ascii	"SlaveAddress\000"
+ 1846      65416464 
+ 1846      72657373 
+ 1846      00
+ 1847              	.LASF9:
+ 1848 004c 64656C5F 		.ascii	"del_time\000"
+ 1848      74696D65 
+ 1848      00
+ 1849              	.LASF16:
+ 1850 0055 49324349 		.ascii	"I2CISR\000"
+ 1850      535200
+ 1851              	.LASF19:
+ 1852 005c 70493243 		.ascii	"pI2CData\000"
+ 1852      44617461 
+ 1852      00
+ 1853              	.LASF20:
+ 1854 0065 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1854      20756E73 
+ 1854      69676E65 
+ 1854      6420696E 
+ 1854      7400
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 41
+
+
+ 1855              	.LASF22:
+ 1856 0077 66526561 		.ascii	"fReadWrite\000"
+ 1856      64577269 
+ 1856      746500
+ 1857              	.LASF14:
+ 1858 0082 44697370 		.ascii	"DisplayMenu\000"
+ 1858      6C61794D 
+ 1858      656E7500 
+ 1859              	.LASF11:
+ 1860 008e 57726974 		.ascii	"WriteExampleData\000"
+ 1860      65457861 
+ 1860      6D706C65 
+ 1860      44617461 
+ 1860      00
+ 1861              	.LASF25:
+ 1862 009f 4578616D 		.ascii	"ExampleData\000"
+ 1862      706C6544 
+ 1862      61746100 
+ 1863              	.LASF5:
+ 1864 00ab 756E7369 		.ascii	"unsigned char\000"
+ 1864      676E6564 
+ 1864      20636861 
+ 1864      7200
+ 1865              	.LASF15:
+ 1866 00b9 6D61696E 		.ascii	"main\000"
+ 1866      00
+ 1867              	.LASF23:
+ 1868 00be 66526561 		.ascii	"fReadPart\000"
+ 1868      64506172 
+ 1868      7400
+ 1869              	.LASF21:
+ 1870 00c8 49324342 		.ascii	"I2CBuffer\000"
+ 1870      75666665 
+ 1870      7200
+ 1871              	.LASF24:
+ 1872 00d2 6C6F636B 		.ascii	"lock\000"
+ 1872      00
+ 1873              	.LASF28:
+ 1874 00d7 2F637967 		.ascii	"/cygdrive/d/Ksiazka_ARM/Przykladowe_aplikacje/I2C_F"
+ 1874      64726976 
+ 1874      652F642F 
+ 1874      4B736961 
+ 1874      7A6B615F 
+ 1875 010a 4D333158 		.ascii	"M31XX/I2C_FM31XX_uP\000"
+ 1875      582F4932 
+ 1875      435F464D 
+ 1875      33315858 
+ 1875      5F755000 
+ 1876              	.LASF3:
+ 1877 011e 4E756D62 		.ascii	"NumberOfBytes\000"
+ 1877      65724F66 
+ 1877      42797465 
+ 1877      7300
+ 1878              	.LASF2:
+ 1879 012c 70446174 		.ascii	"pData\000"
+ 1879      6100
+ 1880              	.LASF7:
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 42
+
+
+ 1881 0132 49324346 		.ascii	"I2CFM31XXReadByte\000"
+ 1881      4D333158 
+ 1881      58526561 
+ 1881      64427974 
+ 1881      6500
+ 1882              	.LASF1:
+ 1883 0144 41646472 		.ascii	"Address\000"
+ 1883      65737300 
+ 1884              	.LASF27:
+ 1885 014c 4932435F 		.ascii	"I2C_FM31XX.c\000"
+ 1885      464D3331 
+ 1885      58582E63 
+ 1885      00
+ 1886              	.LASF18:
+ 1887 0159 4932434E 		.ascii	"I2CNumberOfBytes\000"
+ 1887      756D6265 
+ 1887      724F6642 
+ 1887      79746573 
+ 1887      00
+ 1888              	.LASF8:
+ 1889 016a 64656C61 		.ascii	"delay\000"
+ 1889      7900
+ 1890              	.LASF10:
+ 1891 0170 49324349 		.ascii	"I2CInit\000"
+ 1891      6E697400 
+ 1892              	.LASF12:
+ 1893 0178 52656164 		.ascii	"ReadExampleData\000"
+ 1893      4578616D 
+ 1893      706C6544 
+ 1893      61746100 
+ 1894              	.LASF17:
+ 1895 0188 49324341 		.ascii	"I2CAddress\000"
+ 1895      64647265 
+ 1895      737300
+ 1896              		.ident	"GCC: (GNU) 4.0.1"
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s 			page 43
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 I2C_FM31XX.c
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:15     .bss:00000000 fReadWrite
+                             .bss:00000000 $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:21     .bss:00000004 fReadPart
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:27     .bss:00000008 lock
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:33     .rodata:00000000 ExampleData
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:43     .text:00000000 I2CInit
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:54     .text:00000000 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:88     .text:00000060 $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:585    .text:00000428 I2CISR
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:94     .text:00000064 I2CFM31XXSendMultipleBytes
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:101    .text:00000064 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:177    .text:00000120 $d
+                            *COM*:00000004 I2CAddress
+                            *COM*:00000100 I2CBuffer
+                            *COM*:00000004 pI2CData
+                            *COM*:00000004 I2CNumberOfBytes
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:188    .text:00000138 I2CFM31XXReadByte
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:198    .text:00000138 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:255    .text:000001cc $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:267    .text:000001e8 delay
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:277    .text:000001e8 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:299    .text:00000204 WriteExampleData
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:335    .text:0000024c $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:351    .text:00000258 ReadExampleData
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:357    .text:00000258 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:405    .text:000002c8 $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:420    .text:000002d0 DisplayMenu
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:426    .text:000002d0 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:451    .text:00000308 $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:466    .text:00000310 main
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:472    .text:00000310 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:578    .text:00000420 $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:593    .text:00000428 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:611    .text:00000458 $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:654    .text:000004fc $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:730    .text:000005e8 $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:813    .text:0000072c $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccJghCWp.s:958    .text:000008e0 $d
+
+UNDEFINED SYMBOLS
+LCDClear
+LCDText
+LCD32bitNumberDec
+LCDGotoXY
+LCDInit

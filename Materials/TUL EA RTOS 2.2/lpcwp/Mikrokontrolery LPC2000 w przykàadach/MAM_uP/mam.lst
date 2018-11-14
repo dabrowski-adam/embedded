@@ -1,0 +1,255 @@
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccHP8xzo.s 			page 1
+
+
+   1              		.file	"MAM.c"
+   2              		.section	.debug_abbrev,"",%progbits
+   3              	.Ldebug_abbrev0:
+   4              		.section	.debug_info,"",%progbits
+   5              	.Ldebug_info0:
+   6              		.section	.debug_line,"",%progbits
+   7              	.Ldebug_line0:
+   8 0000 32000000 		.text
+   8      02001900 
+   8      00000201 
+   8      FB0E0A00 
+   8      01010101 
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	main
+  12              		.type	main, %function
+  13              	main:
+  14              	.LFB2:
+  15              		.file 1 "MAM.c"
+   1:MAM.c         **** ////////////////////////////////////////////////////////
+   2:MAM.c         **** // Function:	MAM testing example
+   3:MAM.c         **** // Target:		LPC2138
+   4:MAM.c         **** // Board:		ZL6ARM
+   5:MAM.c         **** // Quartz:		12MHz
+   6:MAM.c         **** // Compiler:	ARM-GCC-4.0.1 (www.gnuarm.com)
+   7:MAM.c         **** // Author:		Arkadiusz Antoniak @ 2006, Poland
+   8:MAM.c         **** // Copyright:	(c) Arkadiusz Antoniak, 2006
+   9:MAM.c         **** ////////////////////////////////////////////////////////
+  10:MAM.c         **** #include <LPC213x.H>
+  11:MAM.c         **** 
+  12:MAM.c         **** 
+  13:MAM.c         **** //*******************************
+  14:MAM.c         **** // MAIN
+  15:MAM.c         **** //*******************************
+  16:MAM.c         **** int main(void) 
+  17:MAM.c         **** {
+  16              		.loc 1 17 0
+  17              		@ Function supports interworking.
+  18              		@ args = 0, pretend = 0, frame = 0
+  19              		@ frame_needed = 0, uses_anonymous_args = 0
+  20              		@ link register save eliminated.
+  21              	.LVL0:
+  22              		@ lr needed for prologue
+  18:MAM.c         ****     //Peripherials' frequency = fclk = 60MHz
+  19:MAM.c         ****     VPBDIV&=0xFFFFFFFC;
+  23              		.loc 1 19 0
+  24 0000 0E12A0E3 		mov	r1, #-536870912
+  25 0004 7F2981E2 		add	r2, r1, #2080768
+  26 0008 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+  27 000c FC3003E2 		and	r3, r3, #252
+  28 0010 0031C2E5 		strb	r3, [r2, #256]
+  20:MAM.c         ****     VPBDIV|=0x01;
+  29              		.loc 1 20 0
+  30 0014 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+  31 0018 013083E3 		orr	r3, r3, #1
+  32 001c 0031C2E5 		strb	r3, [r2, #256]
+  21:MAM.c         ****     
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccHP8xzo.s 			page 2
+
+
+  22:MAM.c         ****     //P1.16..23 defined as outputs
+  23:MAM.c         ****     IODIR1 = 0x00FF0000;
+  33              		.loc 1 23 0
+  34 0020 0A1981E2 		add	r1, r1, #163840
+  35 0024 FF38A0E3 		mov	r3, #16711680
+  36 0028 183081E5 		str	r3, [r1, #24]
+  37 002c 0E32A0E3 		mov	r3, #-536870912
+  38 0030 0A3983E2 		add	r3, r3, #163840
+  39 0034 FF18A0E3 		mov	r1, #16711680
+  40 0038 0020A0E3 		mov	r2, #0
+  41              	.L2:
+  24:MAM.c         ****     
+  25:MAM.c         ****     while(1)
+  26:MAM.c         ****     {
+  27:MAM.c         ****         IOPIN1=0x00FF0000;
+  42              		.loc 1 27 0
+  43 003c 101083E5 		str	r1, [r3, #16]
+  28:MAM.c         ****         IOPIN1=0x00000000;
+  44              		.loc 1 28 0
+  45 0040 102083E5 		str	r2, [r3, #16]
+  46 0044 0D0000EA 		b	.L2
+  47              	.LFE2:
+  48              		.size	main, .-main
+  49              		.section	.debug_frame,"",%progbits
+  50              	.Lframe0:
+  51 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+  52              	.LSCIE0:
+  53 0004 FFFFFFFF 		.4byte	0xffffffff
+  54 0008 01       		.byte	0x1
+  55 0009 00       		.ascii	"\000"
+  56 000a 01       		.uleb128 0x1
+  57 000b 7C       		.sleb128 -4
+  58 000c 0E       		.byte	0xe
+  59 000d 0C       		.byte	0xc
+  60 000e 0D       		.uleb128 0xd
+  61 000f 00       		.uleb128 0x0
+  62              		.align	2
+  63              	.LECIE0:
+  64              	.LSFDE0:
+  65 0010 0C000000 		.4byte	.LEFDE0-.LASFDE0
+  66              	.LASFDE0:
+  67 0014 00000000 		.4byte	.Lframe0
+  68 0018 00000000 		.4byte	.LFB2
+  69 001c 48000000 		.4byte	.LFE2-.LFB2
+  70              		.align	2
+  71              	.LEFDE0:
+  72              		.text
+  73              	.Letext0:
+  74              		.section	.debug_info
+  75 0000 41000000 		.4byte	0x41
+  76 0004 0200     		.2byte	0x2
+  77 0006 00000000 		.4byte	.Ldebug_abbrev0
+  78 000a 04       		.byte	0x4
+  79 000b 01       		.uleb128 0x1
+  80 000c 00000000 		.4byte	.Ldebug_line0
+  81 0010 48000000 		.4byte	.Letext0
+  82 0014 00000000 		.4byte	.Ltext0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccHP8xzo.s 			page 3
+
+
+  83 0018 00000000 		.4byte	.LASF0
+  84 001c 01       		.byte	0x1
+  85 001d 0C000000 		.4byte	.LASF1
+  86 0021 12000000 		.4byte	.LASF2
+  87 0025 02       		.uleb128 0x2
+  88 0026 01       		.byte	0x1
+  89 0027 4B000000 		.4byte	.LASF3
+  90 002b 01       		.byte	0x1
+  91 002c 11       		.byte	0x11
+  92 002d 01       		.byte	0x1
+  93 002e 3D000000 		.4byte	0x3d
+  94 0032 00000000 		.4byte	.LFB2
+  95 0036 48000000 		.4byte	.LFE2
+  96 003a 02       		.byte	0x2
+  97 003b 7D       		.byte	0x7d
+  98 003c 00       		.sleb128 0
+  99 003d 03       		.uleb128 0x3
+ 100 003e 696E7400 		.ascii	"int\000"
+ 101 0042 04       		.byte	0x4
+ 102 0043 05       		.byte	0x5
+ 103 0044 00       		.byte	0x0
+ 104              		.section	.debug_abbrev
+ 105 0000 01       		.uleb128 0x1
+ 106 0001 11       		.uleb128 0x11
+ 107 0002 01       		.byte	0x1
+ 108 0003 10       		.uleb128 0x10
+ 109 0004 06       		.uleb128 0x6
+ 110 0005 12       		.uleb128 0x12
+ 111 0006 01       		.uleb128 0x1
+ 112 0007 11       		.uleb128 0x11
+ 113 0008 01       		.uleb128 0x1
+ 114 0009 25       		.uleb128 0x25
+ 115 000a 0E       		.uleb128 0xe
+ 116 000b 13       		.uleb128 0x13
+ 117 000c 0B       		.uleb128 0xb
+ 118 000d 03       		.uleb128 0x3
+ 119 000e 0E       		.uleb128 0xe
+ 120 000f 1B       		.uleb128 0x1b
+ 121 0010 0E       		.uleb128 0xe
+ 122 0011 00       		.byte	0x0
+ 123 0012 00       		.byte	0x0
+ 124 0013 02       		.uleb128 0x2
+ 125 0014 2E       		.uleb128 0x2e
+ 126 0015 00       		.byte	0x0
+ 127 0016 3F       		.uleb128 0x3f
+ 128 0017 0C       		.uleb128 0xc
+ 129 0018 03       		.uleb128 0x3
+ 130 0019 0E       		.uleb128 0xe
+ 131 001a 3A       		.uleb128 0x3a
+ 132 001b 0B       		.uleb128 0xb
+ 133 001c 3B       		.uleb128 0x3b
+ 134 001d 0B       		.uleb128 0xb
+ 135 001e 27       		.uleb128 0x27
+ 136 001f 0C       		.uleb128 0xc
+ 137 0020 49       		.uleb128 0x49
+ 138 0021 13       		.uleb128 0x13
+ 139 0022 11       		.uleb128 0x11
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccHP8xzo.s 			page 4
+
+
+ 140 0023 01       		.uleb128 0x1
+ 141 0024 12       		.uleb128 0x12
+ 142 0025 01       		.uleb128 0x1
+ 143 0026 40       		.uleb128 0x40
+ 144 0027 0A       		.uleb128 0xa
+ 145 0028 00       		.byte	0x0
+ 146 0029 00       		.byte	0x0
+ 147 002a 03       		.uleb128 0x3
+ 148 002b 24       		.uleb128 0x24
+ 149 002c 00       		.byte	0x0
+ 150 002d 03       		.uleb128 0x3
+ 151 002e 08       		.uleb128 0x8
+ 152 002f 0B       		.uleb128 0xb
+ 153 0030 0B       		.uleb128 0xb
+ 154 0031 3E       		.uleb128 0x3e
+ 155 0032 0B       		.uleb128 0xb
+ 156 0033 00       		.byte	0x0
+ 157 0034 00       		.byte	0x0
+ 158 0035 00       		.byte	0x0
+ 159              		.section	.debug_pubnames,"",%progbits
+ 160 0000 17000000 		.4byte	0x17
+ 161 0004 0200     		.2byte	0x2
+ 162 0006 00000000 		.4byte	.Ldebug_info0
+ 163 000a 45000000 		.4byte	0x45
+ 164 000e 25000000 		.4byte	0x25
+ 165 0012 6D61696E 		.ascii	"main\000"
+ 165      00
+ 166 0017 00000000 		.4byte	0x0
+ 167              		.section	.debug_aranges,"",%progbits
+ 168 0000 1C000000 		.4byte	0x1c
+ 169 0004 0200     		.2byte	0x2
+ 170 0006 00000000 		.4byte	.Ldebug_info0
+ 171 000a 04       		.byte	0x4
+ 172 000b 00       		.byte	0x0
+ 173 000c 0000     		.2byte	0x0
+ 174 000e 0000     		.2byte	0x0
+ 175 0010 00000000 		.4byte	.Ltext0
+ 176 0014 48000000 		.4byte	.Letext0-.Ltext0
+ 177 0018 00000000 		.4byte	0x0
+ 178 001c 00000000 		.4byte	0x0
+ 179              		.section	.debug_str,"MS",%progbits,1
+ 180              	.LASF0:
+ 181 0000 474E5520 		.ascii	"GNU C 4.0.1\000"
+ 181      4320342E 
+ 181      302E3100 
+ 182              	.LASF1:
+ 183 000c 4D414D2E 		.ascii	"MAM.c\000"
+ 183      6300
+ 184              	.LASF2:
+ 185 0012 2F637967 		.ascii	"/cygdrive/d/Ksiazka_ARM/Przykladowe_aplikacje/MAM/M"
+ 185      64726976 
+ 185      652F642F 
+ 185      4B736961 
+ 185      7A6B615F 
+ 186 0045 414D5F75 		.ascii	"AM_uP\000"
+ 186      5000
+ 187              	.LASF3:
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccHP8xzo.s 			page 5
+
+
+ 188 004b 6D61696E 		.ascii	"main\000"
+ 188      00
+ 189              		.ident	"GCC: (GNU) 4.0.1"
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccHP8xzo.s 			page 6
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 MAM.c
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccHP8xzo.s:13     .text:00000000 main
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccHP8xzo.s:24     .text:00000000 $a
+
+NO UNDEFINED SYMBOLS

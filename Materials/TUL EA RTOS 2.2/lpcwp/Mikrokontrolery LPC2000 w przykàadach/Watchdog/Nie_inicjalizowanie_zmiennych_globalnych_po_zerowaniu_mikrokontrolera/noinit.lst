@@ -1,0 +1,552 @@
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZuvdLb.s 			page 1
+
+
+   1              		.file	"NoInit.c"
+   2              		.section	.debug_abbrev,"",%progbits
+   3              	.Ldebug_abbrev0:
+   4              		.section	.debug_info,"",%progbits
+   5              	.Ldebug_info0:
+   6              		.section	.debug_line,"",%progbits
+   7              	.Ldebug_line0:
+   8 0000 3D000000 		.text
+   8      02001C00 
+   8      00000201 
+   8      FB0E0A00 
+   8      01010101 
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	delay
+  12              		.type	delay, %function
+  13              	delay:
+  14              	.LFB2:
+  15              		.file 1 "NoInit.c"
+   1:NoInit.c      **** ////////////////////////////////////////////////////////
+   2:NoInit.c      **** // Function:    No init
+   3:NoInit.c      **** // Target:      LPC2138
+   4:NoInit.c      **** // Board:       ZL6ARM
+   5:NoInit.c      **** // Quartz:      12MHz
+   6:NoInit.c      **** // Compiler:    ARM-GCC
+   7:NoInit.c      **** // Author:      Arkadiusz Antoniak @ 2006, Poland
+   8:NoInit.c      **** // Copyright:   (c) Arkadiusz Antoniak, 2006
+   9:NoInit.c      **** ////////////////////////////////////////////////////////
+  10:NoInit.c      **** #include <LPC213x.H>	    
+  11:NoInit.c      **** #include "lcd.h"
+  12:NoInit.c      **** #include "switches_pins.h"
+  13:NoInit.c      **** 
+  14:NoInit.c      **** //Globals
+  15:NoInit.c      **** volatile unsigned int global_var __attribute__ ((section(".noinit")));
+  16:NoInit.c      **** 
+  17:NoInit.c      **** //*******************************
+  18:NoInit.c      **** // Delay function
+  19:NoInit.c      **** //*******************************
+  20:NoInit.c      **** void delay(unsigned int del_time) 
+  21:NoInit.c      **** { 
+  16              		.loc 1 21 0
+  17              		@ Function supports interworking.
+  18              		@ args = 0, pretend = 0, frame = 0
+  19              		@ frame_needed = 0, uses_anonymous_args = 0
+  20              		@ link register save eliminated.
+  21              	.LVL0:
+  22              		@ lr needed for prologue
+  22:NoInit.c      ****     unsigned int i;
+  23:NoInit.c      ****     for(i=0;i<del_time;i++);	   
+  23              		.loc 1 23 0
+  24 0000 000050E3 		cmp	r0, #0
+  25 0004 1EFF2F01 		bxeq	lr
+  26 0008 0030A0E3 		mov	r3, #0
+  27              	.LVL1:
+  28              	.L4:
+  29 000c 013083E2 		add	r3, r3, #1
+  30 0010 030050E1 		cmp	r0, r3
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZuvdLb.s 			page 2
+
+
+  31 0014 0100001A 		bne	.L4
+  32 0018 1EFF2FE1 		bx	lr
+  33              	.LFE2:
+  34              		.size	delay, .-delay
+  35              		.section	.rodata.str1.4,"aMS",%progbits,1
+  36              		.align	2
+  37              	.LC0:
+  38 0000 7661723D 		.ascii	"var=\000"
+  38      00
+  39 0005 000000   		.text
+  40              		.align	2
+  41              		.global	main
+  42              		.type	main, %function
+  43              	main:
+  44              	.LFB3:
+  24:NoInit.c      **** }
+  25:NoInit.c      **** 
+  26:NoInit.c      **** //*******************************
+  27:NoInit.c      **** // MAIN
+  28:NoInit.c      **** //*******************************
+  29:NoInit.c      **** int main (void)
+  30:NoInit.c      **** {
+  45              		.loc 1 30 0
+  46              		@ Function supports interworking.
+  47              		@ args = 0, pretend = 0, frame = 0
+  48              		@ frame_needed = 1, uses_anonymous_args = 0
+  49 001c 0DC0A0E1 		mov	ip, sp
+  50              	.LCFI0:
+  51 0020 30D82DE9 		stmfd	sp!, {r4, r5, fp, ip, lr, pc}
+  52              	.LCFI1:
+  53 0024 04B04CE2 		sub	fp, ip, #4
+  54              	.LCFI2:
+  31:NoInit.c      ****     //Peripherials' frequency = fclk/4 = 15MHz
+  32:NoInit.c      ****     VPBDIV&=0xFFFFFFFC;
+  55              		.loc 1 32 0
+  56 0028 0E12A0E3 		mov	r1, #-536870912
+  57 002c 7F2981E2 		add	r2, r1, #2080768
+  58 0030 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+  59 0034 FC3003E2 		and	r3, r3, #252
+  60 0038 0031C2E5 		strb	r3, [r2, #256]
+  33:NoInit.c      ****     VPBDIV|=0x00;
+  61              		.loc 1 33 0
+  62 003c 0031D2E5 		ldrb	r3, [r2, #256]	@ zero_extendqisi2
+  63 0040 FF3003E2 		and	r3, r3, #255
+  64 0044 0031C2E5 		strb	r3, [r2, #256]
+  34:NoInit.c      ****     
+  35:NoInit.c      ****     //Port direction configuration
+  36:NoInit.c      ****     IODIR0 = 0xFF000000;
+  65              		.loc 1 36 0
+  66 0048 FF24A0E3 		mov	r2, #-16777216
+  67 004c 8E32A0E3 		mov	r3, #-536870904
+  68 0050 0A3983E2 		add	r3, r3, #163840
+  69 0054 002083E5 		str	r2, [r3, #0]
+  37:NoInit.c      ****     IODIR1 = 0x00FF0000;
+  70              		.loc 1 37 0
+  71 0058 0A1981E2 		add	r1, r1, #163840
+  72 005c FF38A0E3 		mov	r3, #16711680
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZuvdLb.s 			page 3
+
+
+  73 0060 183081E5 		str	r3, [r1, #24]
+  38:NoInit.c      ****     
+  39:NoInit.c      ****     LCDInit();
+  74              		.loc 1 39 0
+  75 0064 FEFFFFEB 		bl	LCDInit
+  76 0068 38409FE5 		ldr	r4, .L17
+  77 006c 0E32A0E3 		mov	r3, #-536870912
+  78 0070 0A5983E2 		add	r5, r3, #163840
+  79              	.L16:
+  40:NoInit.c      ****     
+  41:NoInit.c      ****     while(1)
+  42:NoInit.c      ****     {
+  43:NoInit.c      ****         //Increment and display global variable
+  44:NoInit.c      ****         LCDClear();
+  80              		.loc 1 44 0
+  81 0074 FEFFFFEB 		bl	LCDClear
+  45:NoInit.c      ****         LCDText("var=");
+  82              		.loc 1 45 0
+  83 0078 2C009FE5 		ldr	r0, .L17+4
+  84 007c FEFFFFEB 		bl	LCDText
+  46:NoInit.c      ****         LCD32bitNumberDec(global_var++);
+  85              		.loc 1 46 0
+  86 0080 000094E5 		ldr	r0, [r4, #0]
+  87 0084 013080E2 		add	r3, r0, #1
+  88 0088 003084E5 		str	r3, [r4, #0]
+  89 008c FEFFFFEB 		bl	LCD32bitNumberDec
+  47:NoInit.c      ****         delay(0x800000);
+  90              		.loc 1 47 0
+  91 0090 0205A0E3 		mov	r0, #8388608
+  92 0094 FEFFFFEB 		bl	delay
+  48:NoInit.c      ****         
+  49:NoInit.c      ****         //Zeroing global variable
+  50:NoInit.c      ****         if(SW1==0)
+  93              		.loc 1 50 0
+  94 0098 003095E5 		ldr	r3, [r5, #0]
+  95 009c 103013E2 		ands	r3, r3, #16
+  51:NoInit.c      ****             global_var=0;
+  96              		.loc 1 51 0
+  97 00a0 00308405 		streq	r3, [r4, #0]
+  98 00a4 1B0000EA 		b	.L16
+  99              	.L18:
+ 100              		.align	2
+ 101              	.L17:
+ 102 00a8 00000000 		.word	global_var
+ 103 00ac 00000000 		.word	.LC0
+ 104              	.LFE3:
+ 105              		.size	main, .-main
+ 106              		.global	global_var
+ 107              		.section	.noinit,"aw",%progbits
+ 108              		.align	2
+ 109              		.type	global_var, %object
+ 110              		.size	global_var, 4
+ 111              	global_var:
+ 112 0000 00000000 		.space	4
+ 113              		.section	.debug_frame,"",%progbits
+ 114              	.Lframe0:
+ 115 0000 0C000000 		.4byte	.LECIE0-.LSCIE0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZuvdLb.s 			page 4
+
+
+ 116              	.LSCIE0:
+ 117 0004 FFFFFFFF 		.4byte	0xffffffff
+ 118 0008 01       		.byte	0x1
+ 119 0009 00       		.ascii	"\000"
+ 120 000a 01       		.uleb128 0x1
+ 121 000b 7C       		.sleb128 -4
+ 122 000c 0E       		.byte	0xe
+ 123 000d 0C       		.byte	0xc
+ 124 000e 0D       		.uleb128 0xd
+ 125 000f 00       		.uleb128 0x0
+ 126              		.align	2
+ 127              	.LECIE0:
+ 128              	.LSFDE0:
+ 129 0010 0C000000 		.4byte	.LEFDE0-.LASFDE0
+ 130              	.LASFDE0:
+ 131 0014 00000000 		.4byte	.Lframe0
+ 132 0018 00000000 		.4byte	.LFB2
+ 133 001c 1C000000 		.4byte	.LFE2-.LFB2
+ 134              		.align	2
+ 135              	.LEFDE0:
+ 136              	.LSFDE2:
+ 137 0020 20000000 		.4byte	.LEFDE2-.LASFDE2
+ 138              	.LASFDE2:
+ 139 0024 00000000 		.4byte	.Lframe0
+ 140 0028 1C000000 		.4byte	.LFB3
+ 141 002c 94000000 		.4byte	.LFE3-.LFB3
+ 142 0030 44       		.byte	0x4
+ 143              		.4byte	.LCFI0-.LFB3
+ 144 0031 0D       		.byte	0xd
+ 145 0032 0C       		.uleb128 0xc
+ 146 0033 44       		.byte	0x4
+ 147              		.4byte	.LCFI1-.LCFI0
+ 148 0034 8E       		.byte	0x8e
+ 149 0035 02       		.uleb128 0x2
+ 150 0036 8D       		.byte	0x8d
+ 151 0037 03       		.uleb128 0x3
+ 152 0038 8B       		.byte	0x8b
+ 153 0039 04       		.uleb128 0x4
+ 154 003a 85       		.byte	0x85
+ 155 003b 05       		.uleb128 0x5
+ 156 003c 84       		.byte	0x84
+ 157 003d 06       		.uleb128 0x6
+ 158 003e 44       		.byte	0x4
+ 159              		.4byte	.LCFI2-.LCFI1
+ 160 003f 0C       		.byte	0xc
+ 161 0040 0B       		.uleb128 0xb
+ 162 0041 04       		.uleb128 0x4
+ 163 0042 0000     		.align	2
+ 164              	.LEFDE2:
+ 165              		.text
+ 166              	.Letext0:
+ 167              		.section	.debug_info
+ 168 0000 8F000000 		.4byte	0x8f
+ 169 0004 0200     		.2byte	0x2
+ 170 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 171 000a 04       		.byte	0x4
+ 172 000b 01       		.uleb128 0x1
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZuvdLb.s 			page 5
+
+
+ 173 000c 00000000 		.4byte	.Ldebug_line0
+ 174 0010 B0000000 		.4byte	.Letext0
+ 175 0014 00000000 		.4byte	.Ltext0
+ 176 0018 00000000 		.4byte	.LASF2
+ 177 001c 01       		.byte	0x1
+ 178 001d B0000000 		.4byte	.LASF3
+ 179 0021 0C000000 		.4byte	.LASF4
+ 180 0025 02       		.uleb128 0x2
+ 181 0026 56000000 		.4byte	0x56
+ 182 002a 01       		.byte	0x1
+ 183 002b C7000000 		.4byte	.LASF5
+ 184 002f 01       		.byte	0x1
+ 185 0030 15       		.byte	0x15
+ 186 0031 01       		.byte	0x1
+ 187 0032 00000000 		.4byte	.LFB2
+ 188 0036 1C000000 		.4byte	.LFE2
+ 189 003a 02       		.byte	0x2
+ 190 003b 7D       		.byte	0x7d
+ 191 003c 00       		.sleb128 0
+ 192 003d 03       		.uleb128 0x3
+ 193 003e B9000000 		.4byte	.LASF6
+ 194 0042 01       		.byte	0x1
+ 195 0043 14       		.byte	0x14
+ 196 0044 56000000 		.4byte	0x56
+ 197 0048 01       		.byte	0x1
+ 198 0049 50       		.byte	0x50
+ 199 004a 04       		.uleb128 0x4
+ 200 004b 6900     		.ascii	"i\000"
+ 201 004d 01       		.byte	0x1
+ 202 004e 16       		.byte	0x16
+ 203 004f 56000000 		.4byte	0x56
+ 204 0053 01       		.byte	0x1
+ 205 0054 53       		.byte	0x53
+ 206 0055 00       		.byte	0x0
+ 207 0056 05       		.uleb128 0x5
+ 208 0057 98000000 		.4byte	.LASF0
+ 209 005b 04       		.byte	0x4
+ 210 005c 07       		.byte	0x7
+ 211 005d 06       		.uleb128 0x6
+ 212 005e 01       		.byte	0x1
+ 213 005f C2000000 		.4byte	.LASF7
+ 214 0063 01       		.byte	0x1
+ 215 0064 1E       		.byte	0x1e
+ 216 0065 01       		.byte	0x1
+ 217 0066 74000000 		.4byte	0x74
+ 218 006a 1C000000 		.4byte	.LFB3
+ 219 006e B0000000 		.4byte	.LFE3
+ 220 0072 01       		.byte	0x1
+ 221 0073 5B       		.byte	0x5b
+ 222 0074 07       		.uleb128 0x7
+ 223 0075 696E7400 		.ascii	"int\000"
+ 224 0079 04       		.byte	0x4
+ 225 007a 05       		.byte	0x5
+ 226 007b 08       		.uleb128 0x8
+ 227 007c A5000000 		.4byte	.LASF1
+ 228 0080 01       		.byte	0x1
+ 229 0081 0F       		.byte	0xf
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZuvdLb.s 			page 6
+
+
+ 230 0082 8D000000 		.4byte	0x8d
+ 231 0086 01       		.byte	0x1
+ 232 0087 05       		.byte	0x5
+ 233 0088 03       		.byte	0x3
+ 234 0089 00000000 		.4byte	global_var
+ 235 008d 09       		.uleb128 0x9
+ 236 008e 56000000 		.4byte	0x56
+ 237 0092 00       		.byte	0x0
+ 238              		.section	.debug_abbrev
+ 239 0000 01       		.uleb128 0x1
+ 240 0001 11       		.uleb128 0x11
+ 241 0002 01       		.byte	0x1
+ 242 0003 10       		.uleb128 0x10
+ 243 0004 06       		.uleb128 0x6
+ 244 0005 12       		.uleb128 0x12
+ 245 0006 01       		.uleb128 0x1
+ 246 0007 11       		.uleb128 0x11
+ 247 0008 01       		.uleb128 0x1
+ 248 0009 25       		.uleb128 0x25
+ 249 000a 0E       		.uleb128 0xe
+ 250 000b 13       		.uleb128 0x13
+ 251 000c 0B       		.uleb128 0xb
+ 252 000d 03       		.uleb128 0x3
+ 253 000e 0E       		.uleb128 0xe
+ 254 000f 1B       		.uleb128 0x1b
+ 255 0010 0E       		.uleb128 0xe
+ 256 0011 00       		.byte	0x0
+ 257 0012 00       		.byte	0x0
+ 258 0013 02       		.uleb128 0x2
+ 259 0014 2E       		.uleb128 0x2e
+ 260 0015 01       		.byte	0x1
+ 261 0016 01       		.uleb128 0x1
+ 262 0017 13       		.uleb128 0x13
+ 263 0018 3F       		.uleb128 0x3f
+ 264 0019 0C       		.uleb128 0xc
+ 265 001a 03       		.uleb128 0x3
+ 266 001b 0E       		.uleb128 0xe
+ 267 001c 3A       		.uleb128 0x3a
+ 268 001d 0B       		.uleb128 0xb
+ 269 001e 3B       		.uleb128 0x3b
+ 270 001f 0B       		.uleb128 0xb
+ 271 0020 27       		.uleb128 0x27
+ 272 0021 0C       		.uleb128 0xc
+ 273 0022 11       		.uleb128 0x11
+ 274 0023 01       		.uleb128 0x1
+ 275 0024 12       		.uleb128 0x12
+ 276 0025 01       		.uleb128 0x1
+ 277 0026 40       		.uleb128 0x40
+ 278 0027 0A       		.uleb128 0xa
+ 279 0028 00       		.byte	0x0
+ 280 0029 00       		.byte	0x0
+ 281 002a 03       		.uleb128 0x3
+ 282 002b 05       		.uleb128 0x5
+ 283 002c 00       		.byte	0x0
+ 284 002d 03       		.uleb128 0x3
+ 285 002e 0E       		.uleb128 0xe
+ 286 002f 3A       		.uleb128 0x3a
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZuvdLb.s 			page 7
+
+
+ 287 0030 0B       		.uleb128 0xb
+ 288 0031 3B       		.uleb128 0x3b
+ 289 0032 0B       		.uleb128 0xb
+ 290 0033 49       		.uleb128 0x49
+ 291 0034 13       		.uleb128 0x13
+ 292 0035 02       		.uleb128 0x2
+ 293 0036 0A       		.uleb128 0xa
+ 294 0037 00       		.byte	0x0
+ 295 0038 00       		.byte	0x0
+ 296 0039 04       		.uleb128 0x4
+ 297 003a 34       		.uleb128 0x34
+ 298 003b 00       		.byte	0x0
+ 299 003c 03       		.uleb128 0x3
+ 300 003d 08       		.uleb128 0x8
+ 301 003e 3A       		.uleb128 0x3a
+ 302 003f 0B       		.uleb128 0xb
+ 303 0040 3B       		.uleb128 0x3b
+ 304 0041 0B       		.uleb128 0xb
+ 305 0042 49       		.uleb128 0x49
+ 306 0043 13       		.uleb128 0x13
+ 307 0044 02       		.uleb128 0x2
+ 308 0045 0A       		.uleb128 0xa
+ 309 0046 00       		.byte	0x0
+ 310 0047 00       		.byte	0x0
+ 311 0048 05       		.uleb128 0x5
+ 312 0049 24       		.uleb128 0x24
+ 313 004a 00       		.byte	0x0
+ 314 004b 03       		.uleb128 0x3
+ 315 004c 0E       		.uleb128 0xe
+ 316 004d 0B       		.uleb128 0xb
+ 317 004e 0B       		.uleb128 0xb
+ 318 004f 3E       		.uleb128 0x3e
+ 319 0050 0B       		.uleb128 0xb
+ 320 0051 00       		.byte	0x0
+ 321 0052 00       		.byte	0x0
+ 322 0053 06       		.uleb128 0x6
+ 323 0054 2E       		.uleb128 0x2e
+ 324 0055 00       		.byte	0x0
+ 325 0056 3F       		.uleb128 0x3f
+ 326 0057 0C       		.uleb128 0xc
+ 327 0058 03       		.uleb128 0x3
+ 328 0059 0E       		.uleb128 0xe
+ 329 005a 3A       		.uleb128 0x3a
+ 330 005b 0B       		.uleb128 0xb
+ 331 005c 3B       		.uleb128 0x3b
+ 332 005d 0B       		.uleb128 0xb
+ 333 005e 27       		.uleb128 0x27
+ 334 005f 0C       		.uleb128 0xc
+ 335 0060 49       		.uleb128 0x49
+ 336 0061 13       		.uleb128 0x13
+ 337 0062 11       		.uleb128 0x11
+ 338 0063 01       		.uleb128 0x1
+ 339 0064 12       		.uleb128 0x12
+ 340 0065 01       		.uleb128 0x1
+ 341 0066 40       		.uleb128 0x40
+ 342 0067 0A       		.uleb128 0xa
+ 343 0068 00       		.byte	0x0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZuvdLb.s 			page 8
+
+
+ 344 0069 00       		.byte	0x0
+ 345 006a 07       		.uleb128 0x7
+ 346 006b 24       		.uleb128 0x24
+ 347 006c 00       		.byte	0x0
+ 348 006d 03       		.uleb128 0x3
+ 349 006e 08       		.uleb128 0x8
+ 350 006f 0B       		.uleb128 0xb
+ 351 0070 0B       		.uleb128 0xb
+ 352 0071 3E       		.uleb128 0x3e
+ 353 0072 0B       		.uleb128 0xb
+ 354 0073 00       		.byte	0x0
+ 355 0074 00       		.byte	0x0
+ 356 0075 08       		.uleb128 0x8
+ 357 0076 34       		.uleb128 0x34
+ 358 0077 00       		.byte	0x0
+ 359 0078 03       		.uleb128 0x3
+ 360 0079 0E       		.uleb128 0xe
+ 361 007a 3A       		.uleb128 0x3a
+ 362 007b 0B       		.uleb128 0xb
+ 363 007c 3B       		.uleb128 0x3b
+ 364 007d 0B       		.uleb128 0xb
+ 365 007e 49       		.uleb128 0x49
+ 366 007f 13       		.uleb128 0x13
+ 367 0080 3F       		.uleb128 0x3f
+ 368 0081 0C       		.uleb128 0xc
+ 369 0082 02       		.uleb128 0x2
+ 370 0083 0A       		.uleb128 0xa
+ 371 0084 00       		.byte	0x0
+ 372 0085 00       		.byte	0x0
+ 373 0086 09       		.uleb128 0x9
+ 374 0087 35       		.uleb128 0x35
+ 375 0088 00       		.byte	0x0
+ 376 0089 49       		.uleb128 0x49
+ 377 008a 13       		.uleb128 0x13
+ 378 008b 00       		.byte	0x0
+ 379 008c 00       		.byte	0x0
+ 380 008d 00       		.byte	0x0
+ 381              		.section	.debug_pubnames,"",%progbits
+ 382 0000 30000000 		.4byte	0x30
+ 383 0004 0200     		.2byte	0x2
+ 384 0006 00000000 		.4byte	.Ldebug_info0
+ 385 000a 93000000 		.4byte	0x93
+ 386 000e 25000000 		.4byte	0x25
+ 387 0012 64656C61 		.ascii	"delay\000"
+ 387      7900
+ 388 0018 5D000000 		.4byte	0x5d
+ 389 001c 6D61696E 		.ascii	"main\000"
+ 389      00
+ 390 0021 7B000000 		.4byte	0x7b
+ 391 0025 676C6F62 		.ascii	"global_var\000"
+ 391      616C5F76 
+ 391      617200
+ 392 0030 00000000 		.4byte	0x0
+ 393              		.section	.debug_aranges,"",%progbits
+ 394 0000 1C000000 		.4byte	0x1c
+ 395 0004 0200     		.2byte	0x2
+ 396 0006 00000000 		.4byte	.Ldebug_info0
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZuvdLb.s 			page 9
+
+
+ 397 000a 04       		.byte	0x4
+ 398 000b 00       		.byte	0x0
+ 399 000c 0000     		.2byte	0x0
+ 400 000e 0000     		.2byte	0x0
+ 401 0010 00000000 		.4byte	.Ltext0
+ 402 0014 B0000000 		.4byte	.Letext0-.Ltext0
+ 403 0018 00000000 		.4byte	0x0
+ 404 001c 00000000 		.4byte	0x0
+ 405              		.section	.debug_str,"MS",%progbits,1
+ 406              	.LASF2:
+ 407 0000 474E5520 		.ascii	"GNU C 4.0.1\000"
+ 407      4320342E 
+ 407      302E3100 
+ 408              	.LASF4:
+ 409 000c 2F637967 		.ascii	"/cygdrive/d/Ksiazka_ARM/Przykladowe_aplikacje/Watch"
+ 409      64726976 
+ 409      652F642F 
+ 409      4B736961 
+ 409      7A6B615F 
+ 410 003f 646F672F 		.ascii	"dog/Nie_inicjalizowanie_zmiennych_globalnych/Nie_in"
+ 410      4E69655F 
+ 410      696E6963 
+ 410      6A616C69 
+ 410      7A6F7761 
+ 411 0072 69636A61 		.ascii	"icjalizowanie_zmiennych_globalnych_uP\000"
+ 411      6C697A6F 
+ 411      77616E69 
+ 411      655F7A6D 
+ 411      69656E6E 
+ 412              	.LASF0:
+ 413 0098 756E7369 		.ascii	"unsigned int\000"
+ 413      676E6564 
+ 413      20696E74 
+ 413      00
+ 414              	.LASF1:
+ 415 00a5 676C6F62 		.ascii	"global_var\000"
+ 415      616C5F76 
+ 415      617200
+ 416              	.LASF3:
+ 417 00b0 4E6F496E 		.ascii	"NoInit.c\000"
+ 417      69742E63 
+ 417      00
+ 418              	.LASF6:
+ 419 00b9 64656C5F 		.ascii	"del_time\000"
+ 419      74696D65 
+ 419      00
+ 420              	.LASF7:
+ 421 00c2 6D61696E 		.ascii	"main\000"
+ 421      00
+ 422              	.LASF5:
+ 423 00c7 64656C61 		.ascii	"delay\000"
+ 423      7900
+ 424              		.ident	"GCC: (GNU) 4.0.1"
+ARM GAS  /cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZuvdLb.s 			page 10
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 NoInit.c
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZuvdLb.s:13     .text:00000000 delay
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZuvdLb.s:24     .text:00000000 $a
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZuvdLb.s:43     .text:0000001c main
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZuvdLb.s:102    .text:000000a8 $d
+/cygdrive/c/DOCUME~1/ADMINI~1/USTAWI~1/Temp/ccZuvdLb.s:111    .noinit:00000000 global_var
+
+UNDEFINED SYMBOLS
+LCDInit
+LCDClear
+LCDText
+LCD32bitNumberDec

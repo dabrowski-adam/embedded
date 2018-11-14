@@ -1,0 +1,1 @@
+-T .\Flash.ld -mthumb-interwork -Wl,-Ttext=0x00000000,-Tdata=0x40000000 --gc-sections -o UART_USB_example.elf "uart_usb_example.o" "lcd.o" "startup.o" -nostartfiles -nodefaultlibs

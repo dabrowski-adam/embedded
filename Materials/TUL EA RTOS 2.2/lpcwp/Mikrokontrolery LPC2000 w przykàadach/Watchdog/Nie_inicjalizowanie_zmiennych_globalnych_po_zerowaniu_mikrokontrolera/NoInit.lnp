@@ -1,0 +1,1 @@
+-T .\Flash.ld -mthumb-interwork -Wl,-Map=".\NoInit.map",-Ttext=0x00000000,-Tdata=0x40000000 -o NoInit.elf "noinit.o" "lcd.o" "startup.o" -nostartfiles -nodefaultlibs

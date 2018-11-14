@@ -1,0 +1,360 @@
+ARM GAS  Startup.s 			page 1
+
+
+   1              	#/***********************************************************************/
+   2              	#/*  This file is part of the uVision/ARM development tools             */
+   3              	#/*  Copyright KEIL ELEKTRONIK GmbH 2002-2004                           */
+   4              	#/***********************************************************************/
+   5              	#/*                                                                     */
+   6              	#/*  STARTUP.S:  Startup file for the Blinky Example                    */
+   7              	#/*                                                                     */
+   8              	#/***********************************************************************/
+   9              	
+  10              	
+  11              	/* 
+  12              	//*** <<< Use Configuration Wizard in Context Menu >>> *** 
+  13              	*/
+  14              	
+  15              	
+  16              	# *** Startup Code (executed after Reset) ***
+  17              	
+  18              	
+  19              	# Standard definitions of Mode bits and Interrupt (I & F) flags in PSRs
+  20              	
+  21              	        .equ    Mode_USR,       0x10
+  22              	        .equ    Mode_FIQ,       0x11
+  23              	        .equ    Mode_IRQ,       0x12
+  24              	        .equ    Mode_SVC,       0x13
+  25              	        .equ    Mode_ABT,       0x17
+  26              	        .equ    Mode_UND,       0x1B
+  27              	        .equ    Mode_SYS,       0x1F
+  28              	
+  29              	        .equ    I_Bit,          0x80    /* when I bit is set, IRQ is disabled */
+  30              	        .equ    F_Bit,          0x40    /* when F bit is set, FIQ is disabled */
+  31              	
+  32              	
+  33              	/*
+  34              	// <h> Stack Configuration
+  35              	//   <o>  Top of Stack Address  <0x0-0xFFFFFFFF>
+  36              	//   <h>  Stack Sizes (in Bytes)
+  37              	//     <o1> Undefined Mode      <0x0-0xFFFFFFFF>
+  38              	//     <o2> Supervisor Mode     <0x0-0xFFFFFFFF>
+  39              	//     <o3> Abort Mode          <0x0-0xFFFFFFFF>
+  40              	//     <o4> Fast Interrupt Mode <0x0-0xFFFFFFFF>
+  41              	//     <o5> Interrupt Mode      <0x0-0xFFFFFFFF>
+  42              	//     <o6> User/System Mode    <0x0-0xFFFFFFFF>
+  43              	//   </h>
+  44              	// </h>
+  45              	*/
+  46              	        .equ    Top_Stack,      0x40004000
+  47              	        .equ    UND_Stack_Size, 0x00000004
+  48              	        .equ    SVC_Stack_Size, 0x00000004
+  49              	        .equ    ABT_Stack_Size, 0x00000004
+  50              	        .equ    FIQ_Stack_Size, 0x00000004
+  51              	        .equ    IRQ_Stack_Size, 0x00000080
+  52              	        .equ    USR_Stack_Size, 0x00000400
+  53              	
+  54              	
+  55              	# Phase Locked Loop (PLL) definitions
+  56              	        .equ    PLL_BASE,       0xE01FC080  /* PLL Base Address */
+  57              	        .equ    PLLCON_OFS,     0x00        /* PLL Control Offset*/
+ARM GAS  Startup.s 			page 2
+
+
+  58              	        .equ    PLLCFG_OFS,     0x04        /* PLL Configuration Offset */
+  59              	        .equ    PLLSTAT_OFS,    0x08        /* PLL Status Offset */
+  60              	        .equ    PLLFEED_OFS,    0x0C        /* PLL Feed Offset */
+  61              	        .equ    PLLCON_PLLE,    (1<<0)      /* PLL Enable */
+  62              	        .equ    PLLCON_PLLC,    (1<<1)      /* PLL Connect */
+  63              	        .equ    PLLCFG_MSEL,    (0x1F<<0)   /* PLL Multiplier */
+  64              	        .equ    PLLCFG_PSEL,    (0x03<<5)   /* PLL Divider */
+  65              	        .equ    PLLSTAT_PLOCK,  (1<<10)     /* PLL Lock Status */
+  66              	
+  67              	/*
+  68              	// <e> PLL Setup
+  69              	//   <o1.0..4>   MSEL: PLL Multiplier Selection
+  70              	//               <1-32><#-1>
+  71              	//               <i> M Value
+  72              	//   <o1.5..6>   PSEL: PLL Divider Selection
+  73              	//               <0=> 1   <1=> 2   <2=> 4   <3=> 8
+  74              	//               <i> P Value
+  75              	// </e>
+  76              	*/
+  77              	        .equ    PLL_SETUP,      1
+  78              	        .equ    PLLCFG_Val,     0x00000023
+  79              	
+  80              	
+  81              	# Memory Accelerator Module (MAM) definitions
+  82              	        .equ    MAM_BASE,       0xE01FC000  /* MAM Base Address */
+  83              	        .equ    MAMCR_OFS,      0x00        /* MAM Control Offset*/
+  84              	        .equ    MAMTIM_OFS,     0x04        /* MAM Timing Offset */
+  85              	
+  86              	/*
+  87              	// <e> MAM Setup
+  88              	//   <o1.0..1>   MAM Control
+  89              	//               <0=> Disabled
+  90              	//               <1=> Partially Enabled
+  91              	//               <2=> Fully Enabled
+  92              	//               <i> Mode
+  93              	//   <o2.0..2>   MAM Timing
+  94              	//               <0=> Reserved  <1=> 1   <2=> 2   <3=> 3
+  95              	//               <4=> 4         <5=> 5   <6=> 6   <7=> 7
+  96              	//               <i> Fetch Cycles
+  97              	// </e>
+  98              	*/
+  99              	        .equ    MAM_SETUP,      1
+ 100              	        .equ    MAMCR_Val,      0x00000002
+ 101              	        .equ    MAMTIM_Val,     0x00000004
+ 102              	
+ 103              	
+ 104              	# Starupt Code must be linked first at Address at which it expects to run.
+ 105              	
+ 106              	        .text
+ 107              	        .arm
+ 108              	
+ 109              	        .global _startup
+ 110              	        .func   _startup
+ 111              	_startup:
+ 112              	
+ 113              	
+ 114              	# Exception Vectors
+ARM GAS  Startup.s 			page 3
+
+
+ 115              	#  Mapped to Address 0.
+ 116              	#  Absolute addressing mode must be used.
+ 117              	#  Dummy Handlers are implemented as infinite loops which can be modified.
+ 118              	
+ 119 0000 18F09FE5 	Vectors:        LDR     PC, Reset_Addr         
+ 120 0004 18F09FE5 	                LDR     PC, Undef_Addr
+ 121 0008 18F09FE5 	                LDR     PC, SWI_Addr
+ 122 000c 18F09FE5 	                LDR     PC, PAbt_Addr
+ 123 0010 18F09FE5 	                LDR     PC, DAbt_Addr
+ 124 0014 0000A0E1 	                NOP                            /* Reserved Vector */
+ 125              	#               LDR     PC, IRQ_Addr
+ 126 0018 F0FF1FE5 	                LDR     PC, [PC, #-0x0FF0]     /* Vector from VicVectAddr */
+ 127 001c 18F09FE5 	                LDR     PC, FIQ_Addr
+ 128              	
+ 129 0020 58000000 	Reset_Addr:     .word   Reset_Handler
+ 130 0024 40000000 	Undef_Addr:     .word   Undef_Handler
+ 131 0028 44000000 	SWI_Addr:       .word   SWI_Handler
+ 132 002c 48000000 	PAbt_Addr:      .word   PAbt_Handler
+ 133 0030 4C000000 	DAbt_Addr:      .word   DAbt_Handler
+ 134 0034 00000000 	                .word   0                      /* Reserved Address */
+ 135 0038 50000000 	IRQ_Addr:       .word   IRQ_Handler
+ 136 003c 54000000 	FIQ_Addr:       .word   FIQ_Handler
+ 137              	
+ 138 0040 0E0000EA 	Undef_Handler:  B       Undef_Handler
+ 139 0044 0F0000EA 	SWI_Handler:    B       SWI_Handler
+ 140 0048 100000EA 	PAbt_Handler:   B       PAbt_Handler
+ 141 004c 110000EA 	DAbt_Handler:   B       DAbt_Handler
+ 142 0050 120000EA 	IRQ_Handler:    B       IRQ_Handler
+ 143 0054 130000EA 	FIQ_Handler:    B       FIQ_Handler
+ 144              	
+ 145              	
+ 146              	# Reset Handler
+ 147              	
+ 148              	Reset_Handler:  
+ 149              	
+ 150              	
+ 151              	.if PLL_SETUP
+ 152 0058 DC009FE5 	                LDR     R0, =PLL_BASE
+ 153 005c AA10A0E3 	                MOV     R1, #0xAA
+ 154 0060 5520A0E3 	                MOV     R2, #0x55
+ 155              	
+ 156              	# Configure and Enable PLL
+ 157 0064 2330A0E3 	                MOV     R3, #PLLCFG_Val
+ 158 0068 043080E5 	                STR     R3, [R0, #PLLCFG_OFS] 
+ 159 006c 0130A0E3 	                MOV     R3, #PLLCON_PLLE
+ 160 0070 003080E5 	                STR     R3, [R0, #PLLCON_OFS]
+ 161 0074 0C1080E5 	                STR     R1, [R0, #PLLFEED_OFS]
+ 162 0078 0C2080E5 	                STR     R2, [R0, #PLLFEED_OFS]
+ 163              	
+ 164              	# Wait until PLL Locked
+ 165 007c 083090E5 	PLL_Loop:       LDR     R3, [R0, #PLLSTAT_OFS]
+ 166 0080 013B13E2 	                ANDS    R3, R3, #PLLSTAT_PLOCK
+ 167 0084 1D00000A 	                BEQ     PLL_Loop
+ 168              	
+ 169              	# Switch to PLL Clock
+ 170 0088 0330A0E3 	                MOV     R3, #(PLLCON_PLLE | PLLCON_PLLC)
+ 171 008c 003080E5 	                STR     R3, [R0, #PLLCON_OFS]
+ARM GAS  Startup.s 			page 4
+
+
+ 172 0090 0C1080E5 	                STR     R1, [R0, #PLLFEED_OFS]
+ 173 0094 0C2080E5 	                STR     R2, [R0, #PLLFEED_OFS]
+ 174              	.endif
+ 175              	
+ 176              	
+ 177              	.if MAM_SETUP
+ 178 0098 A0009FE5 	                LDR     R0, =MAM_BASE
+ 179 009c 0410A0E3 	                MOV     R1, #MAMTIM_Val
+ 180 00a0 041080E5 	                STR     R1, [R0, #MAMTIM_OFS] 
+ 181 00a4 0210A0E3 	                MOV     R1, #MAMCR_Val
+ 182 00a8 001080E5 	                STR     R1, [R0, #MAMCR_OFS] 
+ 183              	.endif
+ 184              	
+ 185              	
+ 186              	# Memory Mapping (when Interrupt Vectors are in RAM)
+ 187              	        .equ    MEMMAP, 0xE01FC040  /* Memory Mapping Control */
+ 188              	.ifdef RAM_INTVEC
+ 189              	                LDR     R0, =MEMMAP
+ 190              	                MOV     R1, #2
+ 191              	                STR     R1, [R0]
+ 192              	.endif
+ 193              	
+ 194              	
+ 195              	# Initialise Interrupt System
+ 196              	#  ...
+ 197              	
+ 198              	
+ 199              	# Setup Stack for each mode
+ 200              	
+ 201 00ac 90009FE5 	                LDR     R0, =Top_Stack
+ 202              	
+ 203              	#  Enter Undefined Instruction Mode and set its Stack Pointer
+ 204 00b0 DBF021E3 	                MSR     CPSR_c, #Mode_UND|I_Bit|F_Bit
+ 205 00b4 00D0A0E1 	                MOV     SP, R0
+ 206 00b8 040040E2 	                SUB     R0, R0, #UND_Stack_Size
+ 207              	
+ 208              	#  Enter Abort Mode and set its Stack Pointer
+ 209 00bc D7F021E3 	                MSR     CPSR_c, #Mode_ABT|I_Bit|F_Bit
+ 210 00c0 00D0A0E1 	                MOV     SP, R0
+ 211 00c4 040040E2 	                SUB     R0, R0, #ABT_Stack_Size
+ 212              	
+ 213              	#  Enter FIQ Mode and set its Stack Pointer
+ 214 00c8 D1F021E3 	                MSR     CPSR_c, #Mode_FIQ|I_Bit|F_Bit
+ 215 00cc 00D0A0E1 	                MOV     SP, R0
+ 216 00d0 040040E2 	                SUB     R0, R0, #FIQ_Stack_Size
+ 217              	
+ 218              	#  Enter IRQ Mode and set its Stack Pointer
+ 219 00d4 D2F021E3 	                MSR     CPSR_c, #Mode_IRQ|I_Bit|F_Bit
+ 220 00d8 00D0A0E1 	                MOV     SP, R0
+ 221 00dc 800040E2 	                SUB     R0, R0, #IRQ_Stack_Size
+ 222              	
+ 223              	#  Enter Supervisor Mode and set its Stack Pointer
+ 224 00e0 D3F021E3 	                MSR     CPSR_c, #Mode_SVC|I_Bit|F_Bit
+ 225 00e4 00D0A0E1 	                MOV     SP, R0
+ 226 00e8 040040E2 	                SUB     R0, R0, #SVC_Stack_Size
+ 227              	
+ 228              	#  Enter User Mode and set its Stack Pointer
+ARM GAS  Startup.s 			page 5
+
+
+ 229 00ec 10F021E3 	                MSR     CPSR_c, #Mode_USR
+ 230 00f0 00D0A0E1 	                MOV     SP, R0
+ 231              	
+ 232              	#  Setup a default Stack Limit (when compiled with "-mapcs-stack-check")
+ 233 00f4 01AB4DE2 	                SUB     SL, SP, #USR_Stack_Size
+ 234              	
+ 235              	
+ 236              	# Relocate .data section (Copy from ROM to RAM)
+ 237 00f8 48109FE5 	                LDR     R1, =_etext
+ 238 00fc 48209FE5 	                LDR     R2, =_data
+ 239 0100 48309FE5 	                LDR     R3, =_edata
+ 240 0104 030052E1 	LoopRel:        CMP     R2, R3
+ 241 0108 04009134 	                LDRLO   R0, [R1], #4
+ 242 010c 04008234 	                STRLO   R0, [R2], #4
+ 243 0110 3F00003A 	                BLO     LoopRel
+ 244              	
+ 245              	
+ 246              	# Clear .bss section (Zero init)
+ 247 0114 0000A0E3 	                MOV     R0, #0
+ 248 0118 34109FE5 	                LDR     R1, =__bss_start__
+ 249 011c 34209FE5 	                LDR     R2, =__bss_end__
+ 250 0120 020051E1 	LoopZI:         CMP     R1, R2
+ 251 0124 04008134 	                STRLO   R0, [R1], #4
+ 252 0128 4600003A 	                BLO     LoopZI
+ 253              	
+ 254              	
+ 255              	# Enter the C code
+ 256 012c 04E08FE2 	                ADR     LR, __main_exit
+ 257 0130 24009FE5 	                LDR     R0, =main
+ 258 0134 10FF2FE1 	                BX      R0
+ 259              	
+ 260 0138 4C0000EA 	__main_exit:    B       __main_exit
+ 261              	
+ 262              	
+ 263              	        .size   _startup, . - _startup
+ 264              	        .endfunc
+ 265              	
+ 266              	
+ 267 013c 80C01FE0 	        .end
+ 267      00C01FE0 
+ 267      00400040 
+ 267      00000000 
+ 267      00000000 
+ARM GAS  Startup.s 			page 6
+
+
+DEFINED SYMBOLS
+           Startup.s:21     *ABS*:00000010 Mode_USR
+           Startup.s:22     *ABS*:00000011 Mode_FIQ
+           Startup.s:23     *ABS*:00000012 Mode_IRQ
+           Startup.s:24     *ABS*:00000013 Mode_SVC
+           Startup.s:25     *ABS*:00000017 Mode_ABT
+           Startup.s:26     *ABS*:0000001b Mode_UND
+           Startup.s:27     *ABS*:0000001f Mode_SYS
+           Startup.s:29     *ABS*:00000080 I_Bit
+           Startup.s:30     *ABS*:00000040 F_Bit
+           Startup.s:46     *ABS*:40004000 Top_Stack
+           Startup.s:47     *ABS*:00000004 UND_Stack_Size
+           Startup.s:48     *ABS*:00000004 SVC_Stack_Size
+           Startup.s:49     *ABS*:00000004 ABT_Stack_Size
+           Startup.s:50     *ABS*:00000004 FIQ_Stack_Size
+           Startup.s:51     *ABS*:00000080 IRQ_Stack_Size
+           Startup.s:52     *ABS*:00000400 USR_Stack_Size
+           Startup.s:56     *ABS*:e01fc080 PLL_BASE
+           Startup.s:57     *ABS*:00000000 PLLCON_OFS
+           Startup.s:58     *ABS*:00000004 PLLCFG_OFS
+           Startup.s:59     *ABS*:00000008 PLLSTAT_OFS
+           Startup.s:60     *ABS*:0000000c PLLFEED_OFS
+           Startup.s:61     *ABS*:00000001 PLLCON_PLLE
+           Startup.s:62     *ABS*:00000002 PLLCON_PLLC
+           Startup.s:63     *ABS*:0000001f PLLCFG_MSEL
+           Startup.s:64     *ABS*:00000060 PLLCFG_PSEL
+           Startup.s:65     *ABS*:00000400 PLLSTAT_PLOCK
+           Startup.s:77     *ABS*:00000001 PLL_SETUP
+           Startup.s:78     *ABS*:00000023 PLLCFG_Val
+           Startup.s:82     *ABS*:e01fc000 MAM_BASE
+           Startup.s:83     *ABS*:00000000 MAMCR_OFS
+           Startup.s:84     *ABS*:00000004 MAMTIM_OFS
+           Startup.s:99     *ABS*:00000001 MAM_SETUP
+           Startup.s:100    *ABS*:00000002 MAMCR_Val
+           Startup.s:101    *ABS*:00000004 MAMTIM_Val
+           Startup.s:107    .text:00000000 $a
+           Startup.s:111    .text:00000000 _startup
+           Startup.s:119    .text:00000000 Vectors
+           Startup.s:129    .text:00000020 Reset_Addr
+           Startup.s:130    .text:00000024 Undef_Addr
+           Startup.s:131    .text:00000028 SWI_Addr
+           Startup.s:132    .text:0000002c PAbt_Addr
+           Startup.s:133    .text:00000030 DAbt_Addr
+           Startup.s:136    .text:0000003c FIQ_Addr
+           Startup.s:129    .text:00000020 $d
+           Startup.s:148    .text:00000058 Reset_Handler
+           Startup.s:138    .text:00000040 Undef_Handler
+           Startup.s:139    .text:00000044 SWI_Handler
+           Startup.s:140    .text:00000048 PAbt_Handler
+           Startup.s:141    .text:0000004c DAbt_Handler
+           Startup.s:135    .text:00000038 IRQ_Addr
+           Startup.s:142    .text:00000050 IRQ_Handler
+           Startup.s:143    .text:00000054 FIQ_Handler
+           Startup.s:138    .text:00000040 $a
+           Startup.s:165    .text:0000007c PLL_Loop
+           Startup.s:187    *ABS*:e01fc040 MEMMAP
+           Startup.s:240    .text:00000104 LoopRel
+ARM GAS  Startup.s 			page 7
+
+
+           Startup.s:250    .text:00000120 LoopZI
+           Startup.s:260    .text:00000138 __main_exit
+           Startup.s:267    .text:0000013c $d
+
+UNDEFINED SYMBOLS
+_etext
+_data
+_edata
+__bss_start__
+__bss_end__
+main

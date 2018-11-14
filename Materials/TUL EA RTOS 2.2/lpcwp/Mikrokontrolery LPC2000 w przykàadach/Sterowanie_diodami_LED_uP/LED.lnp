@@ -1,0 +1,1 @@
+-T .\Flash.ld -mthumb-interwork -Wl,-Map=".\LED.map",-Ttext=0x00000000,-Tdata=0x40000000 -o LED.elf "startup.o" "led.o" -nostartfiles -nodefaultlibs

@@ -1,0 +1,30 @@
+//---------------------------------------------------------------------------
+// ClassExplorer Pro generated header file
+// Created by Administrator on 2005-02-20, 13:24:57
+//---------------------------------------------------------------------------
+#ifndef CommInterfaceH
+#define CommInterfaceH
+
+#include <string>
+using namespace std;
+//---------------------------------------------------------------------------
+class CCommInterface {
+private:
+        /*LPCTSTR*/const char *lpFileName;
+        /*HANDLE*/void *hCommDev;
+        unsigned long cbInQueue;
+        unsigned long cbOutQueue;
+protected:
+public:
+        /*DWORD*/unsigned long BaudRate;
+        CCommInterface();
+        bool Open(string CommID, unsigned long Baud);
+        void Close(void);
+        unsigned long Write(const void* Buffer, unsigned long NumberOfBytesToWrite);
+        bool Read(void * Buffer, unsigned long * lpNumberOfBytesRead, unsigned long NumberOfBytesToRead);
+        void CheckCommInput(unsigned long * lpErrors, unsigned long * lpInQue);
+        void ClearComm(void);
+};
+
+//---------------------------------------------------------------------------
+#endif

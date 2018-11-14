@@ -1,0 +1,6 @@
+SIGNAL void PinToggle (void) {
+  while (1) {
+    //IOPIN0^=0xFF000000;
+    twatch (10);
+  }
+}

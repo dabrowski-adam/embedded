@@ -1,0 +1,11 @@
+#ifndef WindowTypeH
+#define WindowTypeH
+
+enum CWindowType
+{
+        wtNone,
+        wtHanning,
+        wtHamming
+};
+#endif
+
