@@ -5,7 +5,7 @@
 
 static tU8 lm75Address = LM75_ADDRESS;
 static tU8 lm75LastRegister = LM75_REGISTER_TEMPERATURE;
-static tU8 lm75Mode = 0;
+static tU8 lm75Mode = 1;
 
 
 static int lm75Read8 (tU8 reg, int *value)
@@ -42,7 +42,8 @@ static int lm75Read16 (tU8 reg, int *value)
 
   if (!lm75Mode)
   {
-    if (i2cWriteReadBuffer (lm75Address, buffer, sizeof (tU8), sizeof (buffer)))
+    // NOT IMPLEMENTED!!!
+    // if (i2cWriteReadBuffer (lm75Address, buffer, sizeof (tU8), sizeof (buffer)))
       return -1;
   }
   else

@@ -102,6 +102,9 @@ tS32 main(void)
 {
   tS32 temperature;
 
+  // Setup lm75 (not sure if necessary)
+  lm75Init();
+
   //uruchomienie 'simple printf'
   eaInit();
 
