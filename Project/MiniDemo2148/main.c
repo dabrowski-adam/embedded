@@ -101,9 +101,8 @@ static void init_irq (tU32 period, tU8 duty_cycle)
 tS32 main(void)
 {
   tS32 temperature;
-
-  // Setup lm75 (not sure if necessary)
-  lm75Init();
+  tS32 targetTemperature = 28;
+  tBool isTargetReached = FALSE;
 
   //uruchomienie 'simple printf'
   eaInit();
@@ -117,6 +116,13 @@ tS32 main(void)
   printf("\n* Moj pierwszy program");
   printf("\n*");
   printf("\n*********************************************************");
+
+  // Setup lm75 (not sure if necessary)
+  lm75Init();
+
+  // Setup buzzer (P.07)
+  PINSEL0 &= ~((1 << 14) | (1 << 15));
+  IODIR0 |= (1 << 7); // Try 3?
 
   // uruchomienie GPIO na nodze P.08: out
   PINSEL0 &= ~((1 << 16) | (1 << 17));
@@ -134,7 +140,29 @@ tS32 main(void)
   {
     // Read temperature
     lm75TemperatureRead(&temperature);
+    if (temperature >= targetTemperature)
+    {
+      isTargetReached = TRUE;
+      printf("\rTemperature exceeded %d", targetTemperature);
+    }
+    else
+    {
+      isTargetReached = FALSE;
+      printf("\rTemperature below %d", targetTemperature);
+    }
     printf("\rLM75 temp = %d.%d", temperature / 2, (temperature&1) * 5);
+
+    // Buzzer ON/OFF
+    if (isTargetReached) 
+    {
+      IOSET0 = (1 << 7);
+      printf("Buzzer ON\n");
+    }
+    else 
+    {
+      IOCLR0 = (1 << 7);
+      printf("Buzzer OFF\n");
+    }
 
     // Diode ON/OFF
     if (i) 
