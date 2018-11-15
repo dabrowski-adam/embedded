@@ -100,7 +100,7 @@ static void init_irq (tU32 period, tU8 duty_cycle)
 
 tS32 main(void)
 {
-  int temperature;
+  tS32 temperature;
 
   //uruchomienie 'simple printf'
   eaInit();
