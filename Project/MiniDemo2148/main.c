@@ -40,6 +40,7 @@
 #include <consol.h>
 #include <config.h>
 #include "irq/irq_handler.h"
+#include "lm75/lm75.h"
 #include "timer.h"
 #include "VIC.h"
 
@@ -99,6 +100,8 @@ static void init_irq (tU32 period, tU8 duty_cycle)
 
 tS32 main(void)
 {
+  int temperature;
+
   //uruchomienie 'simple printf'
   eaInit();
 
@@ -118,24 +121,33 @@ tS32 main(void)
   // uruchomienie GPIO na nodze P.09: out
   PINSEL0 &= ~((1 << 18) | (1 << 19));
   IODIR0 |= (1 << 9);
+
   // Uruchomienie przerwań co 1/2 s.
   init_irq(500, 20);
+
   // Aktywne "mruganie" diodą
   tU8 i = 0;
   while (1) 
   {
+    // Read temperature
+    lm75TemperatureRead(&temperature);
+    printf("\rLM75 temp = %d.%d", temperature / 2, (temperature&1) * 5);
+
+    // Diode ON/OFF
     if (i) 
     {
       IOCLR0 = (1 << 8);
-      printf("Swieci\n");
+      printf("Diode ON\n");
     }
     else 
     {
       IOSET0 = (1 << 8);
-      printf("Nie swieci\n");
+      printf("Diode OFF\n");
     }
     i = (i + 1) % 2;
-    sdelay(1);  // czekaj 1 s
+
+    // Wait 1s
+    sdelay(1);
   };
   return 0;
 } 
