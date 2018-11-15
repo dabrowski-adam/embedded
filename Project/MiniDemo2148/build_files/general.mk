@@ -19,7 +19,9 @@ endif
 # TOOL DEFINITIONS
 #----------------------------------------------------------------------
 #TOOLTARGET      = arm-elf
-TOOLTARGET      = c:/Embedded/Tools/bin/arm-none-eabi
+#TOOLTARGET      = c:/Embedded/Tools/bin/arm-none-eabi
+#TOOLTARGET      = /usr/local/bin/arm-none-eabi
+TOOLTARGET      = arm-none-eabi
 AR              = $(TOOLTARGET)-ar
 AS              = $(TOOLTARGET)-gcc
 AWK             = gawk
